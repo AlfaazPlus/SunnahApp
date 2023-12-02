@@ -8,3 +8,6 @@
 - Initial data preparation required for the app is almost complete.
 - Significant development has also be done. I am hoping to publish the code with initial features soon, In Sha Allah.
 - No ETA can be provided.
+
+## Update (Dec 02, 2023)
+An Alpha/Beta version will be released this year, InshaAllah.
