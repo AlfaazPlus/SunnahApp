@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+            app:font="@font/kfgqpc_uthman_taha_naskh"
+            app:fontWeight="400"
+            app:fontStyle="normal" />
+    <font
+            app:font="@font/kfgqpc_uthman_taha_naskh_bold"
+            app:fontWeight="700"
+            app:fontStyle="normal" />
+</font-family>

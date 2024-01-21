@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_violet_primary">#714AAA</color>
+    <color name="theme_violet_primary80">#CC714AAA</color>
+    <color name="theme_violet_primary50">#80714AAA</color>
+    <color name="theme_violet_primary40">#66714AAA</color>
+    <color name="theme_violet_primary30">#4D714AAA</color>
+    <color name="theme_violet_primary20">#33714AAA</color>
+    <color name="theme_violet_primary10">#1A714AAA</color>
+    <color name="theme_violet_onPrimary">#FFFFFF</color>
+    <color name="theme_violet_primaryContainer">#EDDCFF</color>
+    <color name="theme_violet_onPrimaryContainer">#290055</color>
+    <color name="theme_violet_secondary">#714AAA</color>
+    <color name="theme_violet_onSecondary">#FFFFFF</color>
+    <color name="theme_violet_secondaryContainer">#EDDCFF</color>
+    <color name="theme_violet_onSecondaryContainer">#290055</color>
+    <color name="theme_violet_tertiary">#714AAA</color>
+    <color name="theme_violet_onTertiary">#FFFFFF</color>
+    <color name="theme_violet_tertiaryContainer">#EDDCFF</color>
+    <color name="theme_violet_onTertiaryContainer">#290055</color>
+    <color name="theme_violet_error">#BA1A1A</color>
+    <color name="theme_violet_errorContainer">#FFDAD6</color>
+    <color name="theme_violet_onError">#FFFFFF</color>
+    <color name="theme_violet_onErrorContainer">#410002</color>
+    <color name="theme_violet_background">#FFFBFF</color>
+    <color name="theme_violet_onBackground">#2B0052</color>
+    <color name="theme_violet_surface">#FFFBFF</color>
+    <color name="theme_violet_onSurface">#2B0052</color>
+    <color name="theme_violet_surfaceVariant">#E8E0EB</color>
+    <color name="theme_violet_onSurfaceVariant">#4A454E</color>
+    <color name="theme_violet_outline">#7B757F</color>
+    <color name="theme_violet_inverseOnSurface">#F9ECFF</color>
+    <color name="theme_violet_inverseSurface">#421A6C</color>
+    <color name="theme_violet_inversePrimary">#D7BAFF</color>
+</resources>

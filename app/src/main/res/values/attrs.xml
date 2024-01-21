@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DrawableTextView">
+        <attr name="drawableStartDimen" format="dimension" />
+        <attr name="drawableTopDimen" format="dimension" />
+        <attr name="drawableEndDimen" format="dimension" />
+        <attr name="drawableBottomDimen" format="dimension" />
+        <attr name="android:drawablePadding" />
+        <attr name="android:gravity" />
+    </declare-styleable>
+
+    <declare-styleable name="CollectionIconView">
+        <attr name="collectionId" format="integer|reference" />
+    </declare-styleable>
+</resources>

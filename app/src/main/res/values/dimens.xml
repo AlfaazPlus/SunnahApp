@@ -1,0 +1,15 @@
+<resources>
+    <dimen name="padBig">50dp</dimen>
+    <dimen name="padHuge">100dp</dimen>
+    <dimen name="padMassive">150dp</dimen>
+
+    <dimen name="actionButton">38dp</dimen>
+    <dimen name="actionButtonSmall">30dp</dimen>
+    <dimen name="actionButtonTiny">25dp</dimen>
+
+    <dimen name="padActionButton">7dp</dimen>
+
+    <dimen name="card_corner_radius">12dp</dimen>
+
+    <dimen name="textSizeArabic">22sp</dimen>
+</resources>

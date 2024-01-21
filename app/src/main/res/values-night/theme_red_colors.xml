@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_red_primary">#FFB4A9</color>
+    <color name="theme_red_primary80">#CC9F4034</color>
+    <color name="theme_red_primary50">#809F4034</color>
+    <color name="theme_red_primary40">#669F4034</color>
+    <color name="theme_red_primary30">#4D9F4034</color>
+    <color name="theme_red_primary20">#339F4034</color>
+    <color name="theme_red_primary10">#1A9F4034</color>
+    <color name="theme_red_onPrimary">#61120C</color>
+    <color name="theme_red_primaryContainer">#7F291F</color>
+    <color name="theme_red_onPrimaryContainer">#FFDAD5</color>
+    <color name="theme_red_secondary">#E7BDB6</color>
+    <color name="theme_red_onSecondary">#442925</color>
+    <color name="theme_red_secondaryContainer">#5D3F3B</color>
+    <color name="theme_red_onSecondaryContainer">#FFDAD5</color>
+    <color name="theme_red_tertiary">#DEC38C</color>
+    <color name="theme_red_onTertiary">#3E2E04</color>
+    <color name="theme_red_tertiaryContainer">#574419</color>
+    <color name="theme_red_onTertiaryContainer">#FCDFA6</color>
+    <color name="theme_red_error">#FFB4AB</color>
+    <color name="theme_red_errorContainer">#93000A</color>
+    <color name="theme_red_onError">#690005</color>
+    <color name="theme_red_onErrorContainer">#FFDAD6</color>
+    <color name="theme_red_background">#161111</color>
+    <color name="theme_red_onBackground">#EDE0DE</color>
+    <color name="theme_red_surface">#201A19</color>
+    <color name="theme_red_onSurface">#EDE0DE</color>
+    <color name="theme_red_surfaceVariant">#534341</color>
+    <color name="theme_red_onSurfaceVariant">#D8C2BE</color>
+    <color name="theme_red_outline">#A08C89</color>
+    <color name="theme_red_inverseOnSurface">#201A19</color>
+    <color name="theme_red_inverseSurface">#EDE0DE</color>
+    <color name="theme_red_inversePrimary">#9F4034</color>
+</resources>

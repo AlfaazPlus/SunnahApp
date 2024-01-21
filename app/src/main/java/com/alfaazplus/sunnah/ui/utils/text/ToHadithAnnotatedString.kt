@@ -1,0 +1,39 @@
+package com.alfaazplus.sunnah.ui.utils.text
+
+import android.text.Spanned
+import android.text.style.URLSpan
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.core.text.getSpans
+
+fun CharSequence.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
+    return if (this is Spanned) {
+        this.toHadithAnnotatedString(primaryColor)
+    } else {
+        buildAnnotatedString {
+            append(this@toHadithAnnotatedString.toString())
+        }
+    }
+}
+
+fun Spanned.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
+    return buildAnnotatedString {
+        append(this@toHadithAnnotatedString.toString())
+        val urlSpans = getSpans<URLSpan>()
+
+        urlSpans.forEach { urlSpan ->
+            val start = getSpanStart(urlSpan)
+            val end = getSpanEnd(urlSpan)
+            addStyle(
+                SpanStyle(
+                    color = primaryColor,
+                    fontWeight = FontWeight.Medium
+                ), start, end
+            )
+            addStringAnnotation("ref", urlSpan.url, start, end)
+        }
+    }
+}

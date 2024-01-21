@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_purple_primary">#FFACE7</color>
+    <color name="theme_purple_primary80">#CC9B3489</color>
+    <color name="theme_purple_primary50">#809B3489</color>
+    <color name="theme_purple_primary40">#669B3489</color>
+    <color name="theme_purple_primary30">#4D9B3489</color>
+    <color name="theme_purple_primary20">#339B3489</color>
+    <color name="theme_purple_primary10">#1A9B3489</color>
+    <color name="theme_purple_onPrimary">#5E0052</color>
+    <color name="theme_purple_primaryContainer">#7E186F</color>
+    <color name="theme_purple_onPrimaryContainer">#FFD7F0</color>
+    <color name="theme_purple_secondary">#DCBED0</color>
+    <color name="theme_purple_onSecondary">#3E2A38</color>
+    <color name="theme_purple_secondaryContainer">#56404F</color>
+    <color name="theme_purple_onSecondaryContainer">#F9DAEC</color>
+    <color name="theme_purple_tertiary">#F5B9A2</color>
+    <color name="theme_purple_onTertiary">#4B2617</color>
+    <color name="theme_purple_tertiaryContainer">#663C2B</color>
+    <color name="theme_purple_onTertiaryContainer">#FFDBCE</color>
+    <color name="theme_purple_error">#FFB4AB</color>
+    <color name="theme_purple_errorContainer">#93000A</color>
+    <color name="theme_purple_onError">#690005</color>
+    <color name="theme_purple_onErrorContainer">#FFDAD6</color>
+    <color name="theme_purple_background">#141012</color>
+    <color name="theme_purple_onBackground">#EAE0E3</color>
+    <color name="theme_purple_surface">#1F1A1D</color>
+    <color name="theme_purple_onSurface">#EAE0E3</color>
+    <color name="theme_purple_surfaceVariant">#4F444A</color>
+    <color name="theme_purple_onSurfaceVariant">#D2C2CA</color>
+    <color name="theme_purple_outline">#9B8D94</color>
+    <color name="theme_purple_inverseOnSurface">#1F1A1D</color>
+    <color name="theme_purple_inverseSurface">#EAE0E3</color>
+    <color name="theme_purple_inversePrimary">#9B3489</color>
+</resources>

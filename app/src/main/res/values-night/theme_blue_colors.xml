@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_blue_primary">#B0C6FF</color>
+    <color name="theme_blue_primary80">#CC0058CB</color>
+    <color name="theme_blue_primary50">#800058CB</color>
+    <color name="theme_blue_primary40">#660058CB</color>
+    <color name="theme_blue_primary30">#4D0058CB</color>
+    <color name="theme_blue_primary20">#330058CB</color>
+    <color name="theme_blue_primary10">#1A0058CB</color>
+    <color name="theme_blue_onPrimary">#002D6F</color>
+    <color name="theme_blue_primaryContainer">#00429B</color>
+    <color name="theme_blue_onPrimaryContainer">#D9E2FF</color>
+    <color name="theme_blue_secondary">#C0C6DC</color>
+    <color name="theme_blue_onSecondary">#293042</color>
+    <color name="theme_blue_secondaryContainer">#404659</color>
+    <color name="theme_blue_onSecondaryContainer">#DCE2F9</color>
+    <color name="theme_blue_tertiary">#E0BBDD</color>
+    <color name="theme_blue_onTertiary">#412742</color>
+    <color name="theme_blue_tertiaryContainer">#593D5A</color>
+    <color name="theme_blue_onTertiaryContainer">#FDD7FA</color>
+    <color name="theme_blue_error">#FFB4AB</color>
+    <color name="theme_blue_errorContainer">#93000A</color>
+    <color name="theme_blue_onError">#690005</color>
+    <color name="theme_blue_onErrorContainer">#FFDAD6</color>
+    <color name="theme_blue_background">#121216</color>
+    <color name="theme_blue_onBackground">#E3E2E6</color>
+    <color name="theme_blue_surface">#1B1B1F</color>
+    <color name="theme_blue_onSurface">#E3E2E6</color>
+    <color name="theme_blue_surfaceVariant">#44464F</color>
+    <color name="theme_blue_onSurfaceVariant">#C5C6D0</color>
+    <color name="theme_blue_outline">#8F9099</color>
+    <color name="theme_blue_inverseOnSurface">#1B1B1F</color>
+    <color name="theme_blue_inverseSurface">#E3E2E6</color>
+    <color name="theme_blue_inversePrimary">#0058CB</color>
+</resources>

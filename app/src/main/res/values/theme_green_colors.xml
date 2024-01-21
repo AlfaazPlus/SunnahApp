@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_green_primary">#3E6A00</color>
+    <color name="theme_green_primary80">#CC3E6A00</color>
+    <color name="theme_green_primary50">#803E6A00</color>
+    <color name="theme_green_primary40">#663E6A00</color>
+    <color name="theme_green_primary30">#4D3E6A00</color>
+    <color name="theme_green_primary20">#333E6A00</color>
+    <color name="theme_green_primary10">#1A3E6A00</color>
+    <color name="theme_green_onPrimary">#FFFFFF</color>
+    <color name="theme_green_primaryContainer">#B9F474</color>
+    <color name="theme_green_onPrimaryContainer">#0F2000</color>
+    <color name="theme_green_secondary">#576249</color>
+    <color name="theme_green_onSecondary">#FFFFFF</color>
+    <color name="theme_green_secondaryContainer">#DBE7C8</color>
+    <color name="theme_green_onSecondaryContainer">#151E0B</color>
+    <color name="theme_green_tertiary">#386663</color>
+    <color name="theme_green_onTertiary">#FFFFFF</color>
+    <color name="theme_green_tertiaryContainer">#BBECE8</color>
+    <color name="theme_green_onTertiaryContainer">#00201E</color>
+    <color name="theme_green_error">#BA1A1A</color>
+    <color name="theme_green_errorContainer">#FFDAD6</color>
+    <color name="theme_green_onError">#FFFFFF</color>
+    <color name="theme_green_onErrorContainer">#410002</color>
+    <color name="theme_green_background">#F0F0F0</color>
+    <color name="theme_green_onBackground">#1B1C18</color>
+    <color name="theme_green_surface">#FDFCF5</color>
+    <color name="theme_green_onSurface">#1B1C18</color>
+    <color name="theme_green_surfaceVariant">#E1E4D5</color>
+    <color name="theme_green_onSurfaceVariant">#44483D</color>
+    <color name="theme_green_outline">#75796C</color>
+    <color name="theme_green_inverseOnSurface">#F2F1E9</color>
+    <color name="theme_green_inverseSurface">#30312C</color>
+    <color name="theme_green_inversePrimary">#9ED75B</color>
+</resources>

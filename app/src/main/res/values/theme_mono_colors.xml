@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_monochrome_primary">#616161</color>
+    <color name="theme_monochrome_primary80">#CC616161</color>
+    <color name="theme_monochrome_primary50">#80616161</color>
+    <color name="theme_monochrome_primary40">#66616161</color>
+    <color name="theme_monochrome_primary30">#4D616161</color>
+    <color name="theme_monochrome_primary20">#33616161</color>
+    <color name="theme_monochrome_primary10">#1A616161</color>
+    <color name="theme_monochrome_onPrimary">#FFFFFF</color>
+    <color name="theme_monochrome_primaryContainer">#DCDCDC</color>
+    <color name="theme_monochrome_onPrimaryContainer">#272727</color>
+    <color name="theme_monochrome_secondary">#797979</color>
+    <color name="theme_monochrome_onSecondary">#B39494</color>
+    <color name="theme_monochrome_secondaryContainer">#DCDCDC</color>
+    <color name="theme_monochrome_onSecondaryContainer">#272727</color>
+    <color name="theme_monochrome_tertiary">#DCDCDC</color>
+    <color name="theme_monochrome_onTertiary">#272727</color>
+    <color name="theme_monochrome_tertiaryContainer">#DCDCDC</color>
+    <color name="theme_monochrome_onTertiaryContainer">#272727</color>
+    <color name="theme_monochrome_error">#DCDCDC</color>
+    <color name="theme_monochrome_errorContainer">#DCDCDC</color>
+    <color name="theme_monochrome_onError">#272727</color>
+    <color name="theme_monochrome_onErrorContainer">#272727</color>
+    <color name="theme_monochrome_background">#FFFFFF</color>
+    <color name="theme_monochrome_onBackground">#272727</color>
+    <color name="theme_monochrome_surface">#FFFFFF</color>
+    <color name="theme_monochrome_onSurface">#272727</color>
+    <color name="theme_monochrome_surfaceVariant">#DCDCDC</color>
+    <color name="theme_monochrome_onSurfaceVariant">#353535</color>
+    <color name="theme_monochrome_outline">#797979</color>
+    <color name="theme_monochrome_inverseOnSurface">#DCDCDC</color>
+    <color name="theme_monochrome_inverseSurface">#606060</color>
+    <color name="theme_monochrome_inversePrimary">#C1C1C1</color>
+</resources>

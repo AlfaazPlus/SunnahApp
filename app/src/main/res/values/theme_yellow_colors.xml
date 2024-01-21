@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_yellow_primary">#745B00</color>
+    <color name="theme_yellow_primary80">#CC745B00</color>
+    <color name="theme_yellow_primary50">#80745B00</color>
+    <color name="theme_yellow_primary40">#66745B00</color>
+    <color name="theme_yellow_primary30">#4D745B00</color>
+    <color name="theme_yellow_primary20">#33745B00</color>
+    <color name="theme_yellow_primary10">#1A745B00</color>
+    <color name="theme_yellow_onPrimary">#FFFFFF</color>
+    <color name="theme_yellow_primaryContainer">#FFE08D</color>
+    <color name="theme_yellow_onPrimaryContainer">#241A00</color>
+    <color name="theme_yellow_secondary">#695D3F</color>
+    <color name="theme_yellow_onSecondary">#FFFFFF</color>
+    <color name="theme_yellow_secondaryContainer">#F2E1BB</color>
+    <color name="theme_yellow_onSecondaryContainer">#231B04</color>
+    <color name="theme_yellow_tertiary">#47664A</color>
+    <color name="theme_yellow_onTertiary">#FFFFFF</color>
+    <color name="theme_yellow_tertiaryContainer">#C9ECC8</color>
+    <color name="theme_yellow_onTertiaryContainer">#04210B</color>
+    <color name="theme_yellow_error">#BA1A1A</color>
+    <color name="theme_yellow_errorContainer">#FFDAD6</color>
+    <color name="theme_yellow_onError">#FFFFFF</color>
+    <color name="theme_yellow_onErrorContainer">#410002</color>
+    <color name="theme_yellow_background">#FFFBFF</color>
+    <color name="theme_yellow_onBackground">#1E1B16</color>
+    <color name="theme_yellow_surface">#FFFBFF</color>
+    <color name="theme_yellow_onSurface">#1E1B16</color>
+    <color name="theme_yellow_surfaceVariant">#EBE1CF</color>
+    <color name="theme_yellow_onSurfaceVariant">#4C4639</color>
+    <color name="theme_yellow_outline">#7E7667</color>
+    <color name="theme_yellow_inverseOnSurface">#F7F0E7</color>
+    <color name="theme_yellow_inverseSurface">#33302A</color>
+    <color name="theme_yellow_inversePrimary">#EBC248</color>
+</resources>

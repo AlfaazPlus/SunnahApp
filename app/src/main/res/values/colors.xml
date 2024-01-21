@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryHover">#004A30</color>
+    <color name="primaryAlpha50">#80008B5B</color>
+    <color name="primaryAlpha30">#4D008B5B</color>
+    <color name="primaryAlpha20">#33008B5B</color>
+    <color name="primaryAlpha10">#1A008B5B</color>
+
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="black">#FF000000</color>
+
+    <color name="bGLightGrey">#F0F0F0</color>
+
+    <color name="bGPage1_5">#F0F0F0</color>
+    <color name="bGPage2">#E0E0E0</color>
+    <color name="bGHomePage">#FFE0E0E0</color>
+    <color name="bGHomePageItem">@color/white</color>
+    <color name="bGHomePageItemHover">#FFE6E6E6</color>
+    <color name="bGLastVersesChapterNo">#FFE6E6E6</color>
+
+    <color name="bGPageVariable">@color/bGPage1_5</color>
+
+    <color name="text">#FF000000</color>
+    <color name="text2">#FF333333</color>
+    <color name="text3">#FF777777</color>
+    <color name="text4">#FFAAAAAA</color>
+
+    <color name="textNoArabic">#606060</color>
+    <color name="textArabic">#454545</color>
+
+    <color name="icon">#5A5A5A</color>
+    <color name="icon2">#7A7A7A</color>
+    <color name="divider">#FFE0E0E0</color>
+    <color name="dividerContrast">#BDBDBD</color>
+    <color name="dividerVariable">@color/divider</color>
+    <color name="dividerCardOnlyLight">@color/divider</color>
+    <color name="dividerVerse">@color/dividerVariable</color>
+
+    <color name="hintFormField">#80848484</color>
+    <color name="borderFormField">#E6E6E6</color>
+
+    <color name="danger">#FFDC3545</color>
+    <color name="dangerDark">#AC2330</color>
+    <color name="success">#28A745</color>
+    <color name="successDark">#007E33</color>
+    <color name="warning">#D67200</color>
+    <color name="warningDark">#B86200</color>
+    <color name="info">#33E5B5</color>
+    <color name="infoDark">#1FAD87</color>
+</resources>
