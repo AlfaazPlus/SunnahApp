@@ -35,11 +35,18 @@ import androidx.annotation.NonNull;
 
 public class SimpleTextView extends View implements Drawable.Callback {
 
+    private static final int PIXELS_PER_SECOND = 50;
+    private static final int PIXELS_PER_SECOND_SLOW = 30;
+    private static final int DIST_BETWEEN_SCROLLING_TEXT = 16;
+    private static final int SCROLL_DELAY_MS = 500;
+    private static final int SCROLL_SLOWDOWN_PX = 100;
+    public int rightDrawableX;
+    public int rightDrawableY;
     private Layout layout;
     private Layout firstLineLayout;
     private Layout fullLayout;
     private Layout partLayout;
-    private TextPaint textPaint;
+    private final TextPaint textPaint;
     private int gravity = Gravity.LEFT | Gravity.TOP;
     private int maxLines = 1;
     private CharSequence text;
@@ -57,9 +64,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
     private boolean buildFullLayout;
     private float fullAlpha;
     private boolean widthWrapContent;
-
     private Drawable wrapBackgroundDrawable;
-
     private boolean scrollNonFitText;
     private boolean textDoesNotFit;
     private float scrollingOffset;
@@ -70,29 +75,18 @@ public class SimpleTextView extends View implements Drawable.Callback {
     private Paint fadeEllpsizePaint;
     private int fadeEllpsizePaintWidth;
     private int lastWidth;
-
     private int offsetX;
     private int offsetY;
     private int textWidth;
     private int totalWidth;
     private int textHeight;
-    public int rightDrawableX;
-    public int rightDrawableY;
     private boolean wasLayout;
-
     private boolean rightDrawableOutside;
     private boolean ellipsizeByGradient, ellipsizeByGradientLeft;
     private Boolean forceEllipsizeByGradientLeft;
     private int ellipsizeByGradientWidthDp = 16;
     private int paddingRight;
-
     private int minWidth;
-
-    private static final int PIXELS_PER_SECOND = 50;
-    private static final int PIXELS_PER_SECOND_SLOW = 30;
-    private static final int DIST_BETWEEN_SCROLLING_TEXT = 16;
-    private static final int SCROLL_DELAY_MS = 500;
-    private static final int SCROLL_SLOWDOWN_PX = 100;
     private int fullLayoutAdditionalWidth;
     private int fullLayoutLeftOffset;
     private float fullLayoutLeftCharactersOffset;
@@ -100,7 +94,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
     private int minusWidth;
     private int fullTextMaxLines = 3;
 
-    private Path path = new Path();
+    private final Path path = new Path();
     private boolean usaAlphaForEmoji;
     private boolean canHideRightDrawable;
     private boolean rightDrawableHidden;
@@ -116,11 +110,6 @@ public class SimpleTextView extends View implements Drawable.Callback {
         super(context);
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
-    }
-
-    public void setTextColor(int color) {
-        textPaint.setColor(color);
-        invalidate();
     }
 
     public void setLinkTextColor(int color) {
@@ -156,13 +145,13 @@ public class SimpleTextView extends View implements Drawable.Callback {
         buildFullLayout = value;
     }
 
+    public float getFullAlpha() {
+        return fullAlpha;
+    }
+
     public void setFullAlpha(float value) {
         fullAlpha = value;
         invalidate();
-    }
-
-    public float getFullAlpha() {
-        return fullAlpha;
     }
 
     public void setScrollNonFitText(boolean value) {
@@ -397,13 +386,13 @@ public class SimpleTextView extends View implements Drawable.Callback {
         return true;
     }
 
+    private Layout.Alignment getAlignment() {
+        return mAlignment;
+    }
+
     public void setAlignment(Layout.Alignment alignment) {
         mAlignment = alignment;
         requestLayout();
-    }
-
-    private Layout.Alignment getAlignment() {
-        return mAlignment;
     }
 
     @Override
@@ -458,16 +447,28 @@ public class SimpleTextView extends View implements Drawable.Callback {
         rightDrawableTopPadding = value;
     }
 
-    public void setLeftDrawable(int resId) {
-        setLeftDrawable(resId == 0 ? null : getContext().getResources().getDrawable(resId));
-    }
-
     public Drawable getLeftDrawable() {
         return leftDrawable;
     }
 
-    public void setRightDrawable(int resId) {
-        setRightDrawable(resId == 0 ? null : getContext().getResources().getDrawable(resId));
+    public void setLeftDrawable(int resId) {
+        setLeftDrawable(resId == 0 ? null : getContext().getResources().getDrawable(resId));
+    }
+
+    public void setLeftDrawable(Drawable drawable) {
+        if (leftDrawable == drawable) {
+            return;
+        }
+        if (leftDrawable != null) {
+            leftDrawable.setCallback(null);
+        }
+        leftDrawable = drawable;
+        if (drawable != null) {
+            drawable.setCallback(this);
+        }
+        if (!recreateLayoutMaybe()) {
+            invalidate();
+        }
     }
 
     public void setMinWidth(int width) {
@@ -489,22 +490,6 @@ public class SimpleTextView extends View implements Drawable.Callback {
             return wrapBackgroundDrawable;
         }
         return super.getBackground();
-    }
-
-    public void setLeftDrawable(Drawable drawable) {
-        if (leftDrawable == drawable) {
-            return;
-        }
-        if (leftDrawable != null) {
-            leftDrawable.setCallback(null);
-        }
-        leftDrawable = drawable;
-        if (drawable != null) {
-            drawable.setCallback(this);
-        }
-        if (!recreateLayoutMaybe()) {
-            invalidate();
-        }
     }
 
     @Override
@@ -541,6 +526,10 @@ public class SimpleTextView extends View implements Drawable.Callback {
 
     public Drawable getRightDrawable() {
         return rightDrawable;
+    }
+
+    public void setRightDrawable(int resId) {
+        setRightDrawable(resId == 0 ? null : getContext().getResources().getDrawable(resId));
     }
 
     public void setRightDrawable(Drawable drawable) {
@@ -1000,16 +989,21 @@ public class SimpleTextView extends View implements Drawable.Callback {
         return textPaint.getColor();
     }
 
+    public void setTextColor(int color) {
+        textPaint.setColor(color);
+        invalidate();
+    }
+
     public void setCanHideRightDrawable(boolean b) {
         canHideRightDrawable = b;
     }
 
-    public void setRightDrawableOutside(boolean outside) {
-        rightDrawableOutside = outside;
-    }
-
     public boolean getRightDrawableOutside() {
         return rightDrawableOutside;
+    }
+
+    public void setRightDrawableOutside(boolean outside) {
+        rightDrawableOutside = outside;
     }
 
     public void setRightDrawableOnClick(OnClickListener onClickListener) {

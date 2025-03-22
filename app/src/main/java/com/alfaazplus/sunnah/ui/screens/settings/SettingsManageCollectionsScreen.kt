@@ -1,74 +1,67 @@
 package com.alfaazplus.sunnah.ui.screens.settings
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.work.WorkInfo
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
-import com.alfaazplus.sunnah.ui.components.common.BorderedCard
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
-import com.alfaazplus.sunnah.ui.components.settings.SettingsItemContent
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
-import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
+import com.alfaazplus.sunnah.ui.viewModels.DownloadCollectionViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ManageHadithCollectionItem(
-    cwi: CollectionWithInfo,
-    onClick: () -> Unit
+    cwi: CollectionWithInfo, onClick: () -> Unit
 ) {
     val isDownloaded = cwi.isDownloaded == true
+    val isDownloading = cwi.isDownloading == true
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(horizontal = 22.dp, vertical = 10.dp)
-    ) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        .clickable(enabled = !isDownloading) {
+            onClick()
+        }
+        .alpha(if (isDownloading) 0.5f else 1f)
+        .padding(horizontal = 22.dp, vertical = 10.dp)) {
         Column(
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                text = cwi.collection.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontFamily = fontUthmani,
-                fontWeight = FontWeight.ExtraBold
+                text = cwi.collection.name, style = MaterialTheme.typography.titleMedium, fontFamily = fontUthmani, fontWeight = FontWeight.ExtraBold
             )
             Text(
-                text = cwi.info?.name ?: "",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(top = 3.dp)
+                text = cwi.info?.name ?: "", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Normal, modifier = Modifier.padding(top = 3.dp)
             )
         }
 
@@ -86,23 +79,77 @@ fun ManageHadithCollectionItem(
 
 @Composable
 fun SettingsManageCollectionsScreen(
-    vm: CollectionListViewModel = hiltViewModel()
+    vm: CollectionListViewModel = hiltViewModel(), downloadVm: DownloadCollectionViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) { vm.loadCollections() }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val downloadStates by downloadVm.downloadStates.collectAsStateWithLifecycle()
+    val collections by vm.collections.collectAsState()
 
-    val collections = vm.collections
 
-    Scaffold(
-        topBar = { AppBar(title = "Manage Collections") }
-    ) { paddingValues ->
+    var showDialogForItem by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(Unit) {
+        vm.loadCollections()
+    }
+
+    LaunchedEffect(downloadStates) {
+        vm.loadCollections()
+    }
+
+
+    val downloadCollection = { collectionId: Int ->
+        downloadVm.startDownload(collectionId) { cid, isSuccess ->
+            coroutineScope.launch {
+                vm.loadCollections()
+            }
+
+            val cwi = collections.find { it.collection.id == cid }
+
+            if (isSuccess) {
+                MessageUtils.showToast(context, "Downloaded: ${cwi?.collection?.name} (${cwi?.info?.name})", Toast.LENGTH_SHORT)
+            } else {
+                MessageUtils.showToast(context, "Failed to download: ${cwi?.collection?.name} (${cwi?.info?.name})", Toast.LENGTH_SHORT)
+            }
+        }
+    }
+
+    val deleteCollection = { collectionId: Int ->
+        vm.deleteCollection(collectionId) {
+            val cwi = collections.find { it.collection.id == collectionId }
+            MessageUtils.showToast(context, "Deleted: ${cwi?.collection?.name} (${cwi?.info?.name})", Toast.LENGTH_SHORT)
+        }
+    }
+
+    Scaffold(topBar = { AppBar(title = stringResource(R.string.manage_collections)) }) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.padding(paddingValues),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
+            modifier = Modifier.padding(paddingValues), contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
         ) {
             items(collections.size) {
                 val cwi = collections[it]
+                cwi.isDownloading = downloadStates[cwi.collection.id] == WorkInfo.State.RUNNING
                 ManageHadithCollectionItem(cwi) {
+                    if (cwi.isDownloaded == true) {
+                        showDialogForItem = cwi.collection.id
+                    } else if (cwi.isDownloading != true) {
+                        downloadCollection(cwi.collection.id)
+                    }
                 }
+
+                AlertDialog(isOpen = showDialogForItem == cwi.collection.id,
+                    onClose = { showDialogForItem = null },
+                    title = stringResource(R.string.delete_collection),
+                    cancelText = stringResource(R.string.cancel),
+                    confirmText = stringResource(R.string.delete),
+                    confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
+                    onConfirm = {
+                        deleteCollection(cwi.collection.id)
+                    },
+                    content = {
+                        Text(
+                            text = stringResource(R.string.msg_delete_collection) + "\n ${cwi.collection.name} (${cwi.info?.name})", style = MaterialTheme.typography.bodyMedium
+                        )
+                    })
             }
         }
     }

@@ -12,4 +12,5 @@ sealed class MainScreenBase(
 ) {
     object Home : MainScreenBase(Routes.HOME, R.string.home, R.drawable.ic_home)
     object History : MainScreenBase(Routes.HISTORY, R.string.history, R.drawable.ic_history)
+    object Search : MainScreenBase(Routes.SEARCH, R.string.search, R.drawable.ic_search)
 }

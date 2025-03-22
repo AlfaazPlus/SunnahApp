@@ -92,9 +92,9 @@ class NetworkStateMonitor : ConnectivityManager.NetworkCallback() {
                 val nw = mgr.activeNetwork ?: return false
                 val actNw = mgr.getNetworkCapabilities(nw) ?: return false
                 return actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)
             } else {
                 return mgr.activeNetworkInfo?.state == NetworkInfo.State.CONNECTED
             }

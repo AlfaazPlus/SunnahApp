@@ -11,14 +11,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(ThemeUtils.getThemeId())
         super.onCreate(savedInstanceState)
 
         setContent {
-            val isDarkTheme = appPreferenceModel.isDarkTheme()
+            val isDarkTheme = ThemeUtils.isDarkTheme()
+            val colorScheme = ThemeUtils.getColorScheme(this, isDarkTheme)
+
             SunnahAppTheme(
                 darkTheme = isDarkTheme,
-                colorScheme = appPreferenceModel.getColorScheme(this, isDarkTheme),
+                colorScheme = colorScheme,
             ) { MainApp() }
         }
     }

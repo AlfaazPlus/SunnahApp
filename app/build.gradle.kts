@@ -2,24 +2,24 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
-    kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 }
 
 android {
     namespace = "com.alfaazplus.sunnah"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.alfaazplus.sunnah"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
 
         setProperty("archivesBaseName", versionName)
 
-        resValue("string", "app_name", "SunnahApp")
+        resValue("string", "app_name", "SunnahApp (Beta)")
         resValue("string", "cleartextTrafficPermitted", "false")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -116,6 +116,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -123,4 +124,12 @@ dependencies {
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
+    implementation(libs.commons.compress)
+    implementation(libs.workManager)
+    implementation(libs.dataStore)
+    implementation(libs.hiltWork)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinxSerialization)
+    implementation(libs.kotlinxRetrofit)
+    implementation(libs.guava)
 }

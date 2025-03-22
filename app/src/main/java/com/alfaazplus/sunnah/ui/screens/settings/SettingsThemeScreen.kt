@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
@@ -32,10 +34,8 @@ import com.alfaazplus.sunnah.ui.theme.colors.ThemePurpleColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeRedColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeVioletColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeYellowColors
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
-import com.alfaazplus.sunnah.ui.utils.shared_preference.Preferences
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
-import com.alfaazplus.sunnah.ui.viewModels.appPreferenceModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,14 +50,18 @@ fun SettingsThemeScreen() {
         ThemeItem(ThemeUtils.THEME_COLOR_MONO, R.string.theme_mono, ThemeMonoColors()),
     )
 
-    val appPreferenceModel = appPreferenceModel()
+    val coroutineScope = rememberCoroutineScope()
+    val isDarkTheme = ThemeUtils.isDarkTheme()
+    val themeMode = ThemeUtils.getThemeMode()
+    val themeColor = ThemeUtils.getThemeColor()
+    val isDynamicColor = ThemeUtils.isDynamicColor()
     var showThemeBottomSheet by remember { mutableStateOf(false) }
     val themeSheetState = rememberModalBottomSheetState()
 
     val span = 2
 
     Scaffold(
-        topBar = { AppBar(title = "App Theme") },
+        topBar = { AppBar(title = stringResource(R.string.app_theme)) },
     ) { paddingValues ->
 
         LazyVerticalGrid(
@@ -71,7 +75,7 @@ fun SettingsThemeScreen() {
             fullWidthColumn(span) {
                 SettingsItem(
                     title = R.string.theme_mode,
-                    subtitle = ThemeUtils.resolveThemeModeLabel(appPreferenceModel.themeMode),
+                    subtitle = ThemeUtils.resolveThemeModeLabel(themeMode),
                 ) { showThemeBottomSheet = true }
             }
             if (ThemeUtils.isDynamicColorSupported()) {
@@ -79,23 +83,25 @@ fun SettingsThemeScreen() {
                     SwitchItem(
                         title = R.string.dynamic_color,
                         subtitle = R.string.dynamic_color_description,
-                        checked = appPreferenceModel.isDynamicColor,
+                        checked = isDynamicColor,
                     ) {
-                        appPreferenceModel.isDynamicColor = it
-                        Preferences.edit { putBoolean(Keys.THEME_DYNAMIC_COLOR, it) }
+                        coroutineScope.launch {
+                            ThemeUtils.setDynamicColor(it)
+                        }
                     }
                 }
             }
-            if (!ThemeUtils.isDynamicColorSupported() || !appPreferenceModel.isDynamicColor) {
-                fullWidthColumn(span) { ListItemCategoryLabel(title = "Theme colors") }
+            if (!ThemeUtils.isDynamicColorSupported() || !isDynamicColor) {
+                fullWidthColumn(span) { ListItemCategoryLabel(title = stringResource(R.string.theme_colors)) }
                 items(themeItems.size) { index ->
                     SettingsThemeItem(
                         themeItem = themeItems[index],
-                        isDarkTheme = appPreferenceModel.isDarkTheme(),
-                        currentThemeColor = appPreferenceModel.themeColor
+                        isDarkTheme = isDarkTheme,
+                        currentThemeColor = themeColor,
                     ) {
-                        appPreferenceModel.themeColor = it
-                        Preferences.edit { putString(Keys.THEME_COLOR, it) }
+                        coroutineScope.launch {
+                            ThemeUtils.setThemeColor(it)
+                        }
                     }
                 }
             }
@@ -106,9 +112,7 @@ fun SettingsThemeScreen() {
                 onDismissRequest = { showThemeBottomSheet = false },
                 sheetState = themeSheetState,
             ) {
-                ThemeSelectorSheet(
-                    themeModel = appPreferenceModel,
-                ) { showThemeBottomSheet = false }
+                ThemeSelectorSheet { showThemeBottomSheet = false }
             }
         }
     }

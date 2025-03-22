@@ -23,8 +23,10 @@ data class MultiArgRoute(private val route: String, private val argNames: List<S
 }
 
 object Routes {
+    const val MAIN = "main"
     const val HOME = "home"
     const val HISTORY = "history"
+    const val SEARCH = "search"
     const val SETTINGS = "settings"
     const val SETTINGS_THEME = "settings_theme"
     const val SETTINGS_LANGUAGE = "settings_language"

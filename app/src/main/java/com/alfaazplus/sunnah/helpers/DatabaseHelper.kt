@@ -15,20 +15,20 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
 import com.alfaazplus.sunnah.ui.utils.shared_preference.SPHadithConfigs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 
 
 object DatabaseHelper {
     suspend fun populateHadithDataFromAssets(database: AppDatabase, context: Context) {
-        context.assets.open("prebuilt-hadiths/bukhari/base.zip").use {
+        context.assets.open("prebuilt-hadiths/bukhari/base.tar.bz2").use {
             importHadithBaseData(database, it)
         }
-        context.assets.open("prebuilt-hadiths/bukhari/en.zip").use {
+        context.assets.open("prebuilt-hadiths/bukhari/en.tar.bz2").use {
             importHadithLocaleData(database, it)
         }
         SPHadithConfigs.setAssetHadithsImported(context, true)
@@ -40,21 +40,19 @@ object DatabaseHelper {
      * [HChapter] -> 3_chapters.jsontxt
      * [Hadith] -> 4_hadiths.jsontxt
      */
-    private suspend fun importHadithBaseData(database: AppDatabase, inputStream: InputStream) {
-        val zipInputStream = ZipInputStream(inputStream)
-
-        var zipEntry: ZipEntry?
-
-        while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
-            when (zipEntry?.name) {
-                "1_collection.jsontxt" -> importCollectionBase(database.hadithDao, zipInputStream)
-                "2_books.jsontxt" -> importBookBase(database.hadithDao, zipInputStream)
-                "3_chapters.jsontxt" -> importChapterBase(database.hadithDao, zipInputStream)
-                "4_hadiths.jsontxt" -> importHadithBase(database.hadithDao, zipInputStream)
+    suspend fun importHadithBaseData(database: AppDatabase, inputStream: InputStream) {
+        TarArchiveInputStream(BZip2CompressorInputStream(inputStream)).use { tarInput ->
+            var entry = tarInput.nextEntry
+            while (entry != null) {
+                when (entry.name) {
+                    "1_collection.jsontxt" -> importCollectionBase(database.hadithDao, tarInput)
+                    "2_books.jsontxt" -> importBookBase(database.hadithDao, tarInput)
+                    "3_chapters.jsontxt" -> importChapterBase(database.hadithDao, tarInput)
+                    "4_hadiths.jsontxt" -> importHadithBase(database.hadithDao, tarInput)
+                }
+                entry = tarInput.nextEntry
             }
         }
-
-        zipInputStream.close()
     }
 
     /**
@@ -63,17 +61,17 @@ object DatabaseHelper {
      * [HChapterInfo] -> 3_chapters.jsontxt
      * [HadithTranslation] -> 4_hadiths.jsontxt
      */
-    private suspend fun importHadithLocaleData(database: AppDatabase, inputStream: InputStream) {
-        val zipInputStream = ZipInputStream(inputStream)
-
-        var zipEntry: ZipEntry?
-
-        while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
-            when (zipEntry?.name) {
-                "1_collection.jsontxt" -> importCollectionInfo(database.hadithDao, zipInputStream)
-                "2_books.jsontxt" -> importBookInfo(database.hadithDao, zipInputStream)
-                "3_chapters.jsontxt" -> importChapterInfo(database.hadithDao, zipInputStream)
-                "4_hadiths.jsontxt" -> importHadithTranslations(database.hadithDao, zipInputStream)
+    suspend fun importHadithLocaleData(database: AppDatabase, inputStream: InputStream) {
+        TarArchiveInputStream(BZip2CompressorInputStream(inputStream)).use { tarInput ->
+            var entry = tarInput.nextEntry
+            while (entry != null) {
+                when (entry.name) {
+                    "1_collection.jsontxt" -> importCollectionInfo(database.hadithDao, tarInput)
+                    "2_books.jsontxt" -> importBookInfo(database.hadithDao, tarInput)
+                    "3_chapters.jsontxt" -> importChapterInfo(database.hadithDao, tarInput)
+                    "4_hadiths.jsontxt" -> importHadithTranslations(database.hadithDao, tarInput)
+                }
+                entry = tarInput.nextEntry
             }
         }
     }
@@ -121,24 +119,31 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            var lineNum = 0
             var line: String?
             while (reader.readLine().also { line = it } != null) {
+                lineNum++
                 val columns = JSONArray(line)
 
-                dao.insertBook(
-                    HBook(
-                        columns[0] as Int, // id
-                        columns[1] as Int, // collection_id
-                        columns[2] as String, // serial_number
-                        columns[3] as Int, // order_in_collection
-                        columns[4] as Int, // hadith_start
-                        columns[5] as Int, // hadith_end
-                        columns[6] as Int, // hadith_count
-                        columns[7] as String, // title
-                        stringColumn(columns, 8), // intro
-                        stringColumn(columns, 9), // description
+                try {
+                    dao.insertBook(
+                        HBook(
+                            columns[0] as Int, // id
+                            columns[1] as Int, // collection_id
+                            columns[2] as String, // serial_number
+                            columns[3] as Int, // order_in_collection
+                            columns[4] as Int, // hadith_start
+                            columns[5] as Int, // hadith_end
+                            columns[6] as Int, // hadith_count
+                            stringColumn(columns, 7), // title
+                            stringColumn(columns, 8), // intro
+                            stringColumn(columns, 9), // description
+                        )
                     )
-                )
+                } catch (e: Exception) {
+                    Logger.d("ERROR: importBookBase (line $lineNum): ", columns)
+                    throw e
+                }
             }
         }
     }
@@ -147,21 +152,28 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            var lineNum = 0
             var line: String?
             while (reader.readLine().also { line = it } != null) {
+                lineNum++
                 val columns = JSONArray(line)
 
-                dao.insertBookInfo(
-                    HBookInfo(
-                        columns[0] as Int,  // id
-                        columns[1] as Int,  // book_id
-                        columns[2] as Int,  // collection_id
-                        columns[3] as String,  // title
-                        stringColumn(columns, 4),  // intro
-                        stringColumn(columns, 5),  // description
-                        columns[6] as String,  // language_code
+                try {
+                    dao.insertBookInfo(
+                        HBookInfo(
+                            columns[0] as Int,  // id
+                            columns[1] as Int,  // book_id
+                            columns[2] as Int,  // collection_id
+                            columns[3] as String,  // title
+                            stringColumn(columns, 4),  // intro
+                            stringColumn(columns, 5),  // description
+                            columns[6] as String,  // language_code
+                        )
                     )
-                )
+                } catch (e: Exception) {
+                    Logger.d("ERROR: importBookInfo (line $lineNum): ", columns)
+                    throw e
+                }
             }
         }
     }
@@ -256,28 +268,35 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            var lineNum = 0
             var line: String?
             while (reader.readLine().also { line = it } != null) {
+                lineNum++
                 val columns = JSONArray(line)
 
-                dao.insertHadithTranslation(
-                    HadithTranslation(
-                        columns[0] as Int,  // id
-                        columns[1] as Int,  // collection_id
-                        stringColumn(columns, 2),  // urn
-                        stringColumn(columns, 3),  // ar_urn
-                        stringColumn(columns, 4),  // narrator_prefix
-                        columns[5] as String,  // hadith_text
-                        stringColumn(columns, 6),  // narrator_suffix
-                        stringColumn(columns, 7),  // comments
-                        stringColumn(columns, 8),  // grades
-                        stringColumn(columns, 9),  // reference
-                        stringColumn(columns, 10),  // reference_in_book
-                        stringColumn(columns, 11),  // reference_usc_msa
-                        stringColumn(columns, 12),  // reference_eng
-                        columns[13] as String,  // language_code
+                try {
+                    dao.insertHadithTranslation(
+                        HadithTranslation(
+                            columns[0] as Int,  // id
+                            columns[1] as Int,  // collection_id
+                            stringColumn(columns, 2),  // urn
+                            stringColumn(columns, 3),  // ar_urn
+                            stringColumn(columns, 4),  // narrator_prefix
+                            stringColumn(columns, 5),  // hadith_text
+                            stringColumn(columns, 6),  // narrator_suffix
+                            stringColumn(columns, 7),  // comments
+                            stringColumn(columns, 8),  // grades
+                            stringColumn(columns, 9),  // reference
+                            stringColumn(columns, 10),  // reference_in_book
+                            stringColumn(columns, 11),  // reference_usc_msa
+                            stringColumn(columns, 12),  // reference_eng
+                            columns[13] as String,  // language_code
+                        )
                     )
-                )
+                } catch (e: Exception) {
+                    Logger.d("ERROR: importHadithTranslations (line $lineNum): ", columns)
+                    throw e
+                }
             }
         }
     }

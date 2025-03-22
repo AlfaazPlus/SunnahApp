@@ -1,32 +1,42 @@
 [versions]
-agp = "8.2.1"
+agp = "8.7.3"
 kotlin = "1.8.10"
-core-ktx = "1.12.0"
+core-ktx = "1.15.0"
 junit = "4.13.2"
-androidx-test-ext-junit = "1.1.5"
-espresso-core = "3.5.1"
-appcompat = "1.6.1"
-material = "1.10.0"
-google-fonts = "1.5.4"
+androidx-test-ext-junit = "1.2.1"
+espresso-core = "3.6.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+google-fonts = "1.7.8"
 
 # compose
-compose-bom = "2023.10.01"
-compose-viewmodel = "2.6.2"
-activity-compose = "1.8.0"
-compose-navigation = "2.7.4"
-hilt-navigation-compose = "1.0.0"
+compose-bom = "2025.03.00"
+compose-viewmodel = "2.8.7"
+activity-compose = "1.10.1"
+compose-navigation = "2.8.9"
 
-lifecycle-runtime-ktx = "2.6.2"
+hilt-navigation-compose = "1.2.0"
+daggerHilt = "2.51.1"
+hiltAndroidCompiler = "2.51.1"
+hiltAndroidXCompiler = "1.2.0"
+hiltWork = "1.2.0"
 
-constraintlayout = "2.1.4"
-navigation-fragment-ktx = "2.7.4"
-navigation-ui-ktx = "2.7.4"
+lifecycle-runtime-ktx = "2.8.7"
+
+constraintlayout = "2.2.1"
+navigation-fragment-ktx = "2.8.9"
+navigation-ui-ktx = "2.8.9"
 asynclayoutinflater = "1.0.0"
-lifecycle-livedata-ktx = "2.6.2"
-lifecycle-viewmodel-ktx = "2.6.2"
-daggerHilt = "2.44"
-hiltAndroidCompiler = "2.46.1"
-room = "2.6.0"
+lifecycle-livedata-ktx = "2.8.7"
+lifecycle-viewmodel-ktx = "2.8.7"
+room = "2.6.1"
+commons-compress = "1.26.0"
+workManager = "2.8.1"
+dataStore = "1.1.3"
+retrofit = "2.9.0"
+kotlinxRetrofit = "0.8.0"
+kotlinxSerialization = "1.4.1"
+guava = "33.0.0-jre"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -51,7 +61,6 @@ activity-compose = { module = "androidx.activity:activity-compose", version.ref 
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 material3 = { module = "androidx.compose.material3:material3" }
-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 
 
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation-fragment-ktx" }
@@ -60,8 +69,11 @@ navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version.ref = "asynclayoutinflater" }
 
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidCompiler" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltAndroidXCompiler" }
+hiltWork = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }
@@ -69,6 +81,14 @@ lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
+workManager = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
+dataStore = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+kotlinxRetrofit = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "kotlinxRetrofit" }
+kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

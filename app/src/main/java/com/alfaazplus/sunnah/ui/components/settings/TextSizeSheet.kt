@@ -14,8 +14,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,21 +22,42 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.utils.composable.getArabicTextSize
+import com.alfaazplus.sunnah.ui.utils.composable.getTranslationTextSize
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
-import com.alfaazplus.sunnah.ui.utils.shared_preference.rememberPreference
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import kotlinx.coroutines.launch
+
+@Composable
+fun TextPreview(
+    key: String, previewText: String
+) {
+    val (fontSize, fontLineHeight) = if (key == Keys.TEXT_SIZE_ARABIC) {
+        getArabicTextSize()
+    } else {
+        getTranslationTextSize()
+    }
+
+    Text(
+        previewText,
+        fontSize = fontSize,
+        lineHeight = fontLineHeight,
+        fontFamily = if (key == Keys.TEXT_SIZE_ARABIC) fontUthmani else MaterialTheme.typography.bodyLarge.fontFamily,
+    )
+}
 
 @Composable
 fun TextSizeSlider(key: String, title: Int, previewText: String) {
+    val coroutineScope = rememberCoroutineScope()
+    val textSize = DataStoreManager.observe(intPreferencesKey(key), 100)
+
     val min = 50f
     val max = 200f
-    val default = if (key == Keys.TEXT_SIZE_ARABIC) 110f else 100f
     val steps = max.toInt() - min.toInt()
 
-    var textSize by rememberPreference(key, default)
-    val multiplier = textSize / 100
 
     ListItemCategoryLabel(stringResource(title))
     Row(
@@ -46,13 +66,17 @@ fun TextSizeSlider(key: String, title: Int, previewText: String) {
         Slider(
             modifier = Modifier
                 .weight(1f),
-            value = textSize,
-            onValueChange = { textSize = it },
+            value = textSize.toFloat(),
+            onValueChange = {
+                coroutineScope.launch {
+                    DataStoreManager.write(intPreferencesKey(key), it.toInt())
+                }
+            },
             valueRange = min..max,
             steps = steps
         )
         Text(
-            text = "${textSize.toInt()}%",
+            text = "${textSize}%",
             modifier = Modifier
                 .padding(start = 10.dp),
             style = MaterialTheme.typography.labelSmall
@@ -66,12 +90,7 @@ fun TextSizeSlider(key: String, title: Int, previewText: String) {
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides if (key == Keys.TEXT_SIZE_ARABIC) LayoutDirection.Rtl else LayoutDirection.Ltr) {
-            Text(
-                previewText,
-                fontSize = MaterialTheme.typography.bodyLarge.fontSize * multiplier,
-                fontFamily = if (key == Keys.TEXT_SIZE_ARABIC) fontUthmani else MaterialTheme.typography.bodyLarge.fontFamily,
-                lineHeight = if (key == Keys.TEXT_SIZE_ARABIC) 32.sp else MaterialTheme.typography.bodyLarge.lineHeight,
-            )
+            TextPreview(key, previewText)
         }
     }
 }

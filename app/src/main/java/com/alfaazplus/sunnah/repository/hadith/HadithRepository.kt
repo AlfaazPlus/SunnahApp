@@ -11,4 +11,5 @@ interface HadithRepository {
     suspend fun getHadithCount(collectionId: Int, bookId: Int): Int
     suspend fun getHadithList(collectionId: Int, bookId: Int): List<HadithWithTranslation>
     suspend fun getHadithByOrder(collectionId: Int, bookId: Int, orderInBook: Int): HadithWithTranslation
+    suspend fun deleteCollection(collectionId: Int)
 }

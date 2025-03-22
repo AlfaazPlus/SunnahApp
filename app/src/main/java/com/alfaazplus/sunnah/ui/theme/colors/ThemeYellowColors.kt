@@ -53,7 +53,7 @@ class ThemeYellowColors : BaseColors() {
             onTertiaryContainer = Color(0xFFC9ECC8),
             error = Color(0xFFFFB4AB),
             errorContainer = Color(0xFF93000A),
-            onError = Color(0xFF690005),
+            onError = Color(0xFFFFFFFF),
             onErrorContainer = Color(0xFFFFDAD6),
             background = Color(0xFF191712),
             onBackground = Color(0xFFE8E1D9),

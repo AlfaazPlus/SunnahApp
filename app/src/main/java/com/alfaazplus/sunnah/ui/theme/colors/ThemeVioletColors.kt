@@ -53,7 +53,7 @@ class ThemeVioletColors : BaseColors() {
             onTertiaryContainer = Color(0xFFEDDCFF),
             error = Color(0xFFFFB4AB),
             errorContainer = Color(0xFF93000A),
-            onError = Color(0xFF690005),
+            onError = Color(0xFFFFFFFF),
             onErrorContainer = Color(0xFFFFDAD6),
             background = Color(0xFF17111D),
             onBackground = Color(0xFFEFDBFF),

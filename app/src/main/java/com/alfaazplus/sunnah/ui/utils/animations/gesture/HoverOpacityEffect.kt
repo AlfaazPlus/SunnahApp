@@ -17,6 +17,7 @@ class HoverOpacityEffect(
                 val y = e.y
                 if (x >= 0 && y >= 0 && x <= v.width && y <= v.height) v.performClick()
             }
+
             MotionEvent.ACTION_CANCEL -> up(v)
         }
         return true

@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,7 +42,6 @@ import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.theme.type
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun BookMetaInfoCard(
@@ -223,8 +220,8 @@ fun BooksIndexScreen(collectionId: Int) {
                     .align(Alignment.TopStart)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
-                    contentDescription = "Back",
+                    painter = painterResource(R.drawable.ic_back),
+                    contentDescription = stringResource(R.string.goBack),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -238,8 +235,8 @@ fun BooksIndexScreen(collectionId: Int) {
                     .align(Alignment.TopEnd)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = "Search",
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = stringResource(R.string.search),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

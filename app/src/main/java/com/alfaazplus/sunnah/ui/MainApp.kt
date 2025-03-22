@@ -21,9 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
-import com.alfaazplus.sunnah.ui.screens.main.HistoryScreen
-import com.alfaazplus.sunnah.ui.screens.main.HomeScreen
-import com.alfaazplus.sunnah.ui.screens.settings.SettingsLanguageScreen
+import com.alfaazplus.sunnah.ui.screens.main.MainScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsThemeScreen
@@ -73,10 +71,9 @@ fun MainApp() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             NavHost(
                 navController = navController,
-                startDestination = Routes.READER(),
+                startDestination = Routes.MAIN,
             ) {
-                route(Routes.HOME) { HomeScreen() }
-                route(Routes.HISTORY) { HistoryScreen() }
+                route(Routes.MAIN) { MainScreen() }
                 route(Routes.SETTINGS) { SettingsScreen() }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
                 route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }

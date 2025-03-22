@@ -72,4 +72,7 @@ interface HadithDao {
 
     @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND chapter_id = :chapterId")
     suspend fun getHadithListByChapter(collectionId: Int, bookId: Int, chapterId: Int): List<Hadith>
+
+    @Query("DELETE FROM collection WHERE collection_id = :collectionId")
+    suspend fun deleteCollection(collectionId: Int)
 }

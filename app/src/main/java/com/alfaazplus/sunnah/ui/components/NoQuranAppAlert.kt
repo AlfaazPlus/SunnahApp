@@ -1,7 +1,5 @@
 package com.alfaazplus.sunnah.ui.components
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

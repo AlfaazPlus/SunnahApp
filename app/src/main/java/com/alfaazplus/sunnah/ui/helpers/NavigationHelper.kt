@@ -3,6 +3,7 @@ package com.alfaazplus.sunnah.ui.helpers
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.alfaazplus.sunnah.api.ApiConfig
 import com.alfaazplus.sunnah.ui.models.QuranReference
 
 object NavigationHelper {
@@ -24,7 +25,7 @@ object NavigationHelper {
     }
 
     fun openGithubRepo(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AlfaazPlus/SunnahApp")))
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(ApiConfig.GITHUB_REPOSITORY_URL)))
     }
 
     fun openPlayStoreListing(context: Context) {

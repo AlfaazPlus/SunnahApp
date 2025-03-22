@@ -53,7 +53,7 @@ class ThemePurpleColors : BaseColors() {
             onTertiaryContainer = Color(0xFFFFDBCE),
             error = Color(0xFFFFB4AB),
             errorContainer = Color(0xFF93000A),
-            onError = Color(0xFF690005),
+            onError = Color(0xFFFFFFFF),
             onErrorContainer = Color(0xFFFFDAD6),
             background = Color(0xFF110D0F),
             onBackground = Color(0xFFEAE0E3),

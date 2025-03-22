@@ -15,6 +15,9 @@ import android.text.Layout;
 
 public class LinkPath extends Path {
 
+    private static CornerPathEffect roundedEffect;
+    private static int roundedEffectRadius;
+    public float centerX, centerY;
     private Layout currentLayout;
     private int currentLine;
     private float lastTop = -1;
@@ -23,23 +26,6 @@ public class LinkPath extends Path {
     private boolean allowReset = true;
     private int baselineShift;
     private int lineHeight;
-
-    public float centerX, centerY;
-
-    public static int getRadius() {
-        return 10;
-    }
-
-    private static CornerPathEffect roundedEffect;
-    private static int roundedEffectRadius;
-
-    public static CornerPathEffect getRoundedEffect() {
-        if (roundedEffect == null || roundedEffectRadius != getRadius()) {
-            roundedEffect = new CornerPathEffect(roundedEffectRadius = getRadius());
-        }
-        return roundedEffect;
-    }
-
     public LinkPath() {
         super();
     }
@@ -47,6 +33,17 @@ public class LinkPath extends Path {
     public LinkPath(boolean roundRect) {
         super();
         useRoundRect = roundRect;
+    }
+
+    public static int getRadius() {
+        return 10;
+    }
+
+    public static CornerPathEffect getRoundedEffect() {
+        if (roundedEffect == null || roundedEffectRadius != getRadius()) {
+            roundedEffect = new CornerPathEffect(roundedEffectRadius = getRadius());
+        }
+        return roundedEffect;
     }
 
     public void setCurrentLayout(Layout layout, int start, float yOffset) {

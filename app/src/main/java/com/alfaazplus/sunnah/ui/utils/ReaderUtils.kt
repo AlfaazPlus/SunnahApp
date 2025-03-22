@@ -1,8 +1,6 @@
 package com.alfaazplus.sunnah.ui.utils
 
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
 
 object ReaderUtils {
     const val HADITH_TEXT_OPTION_BOTH = "hadith_text_option_both"

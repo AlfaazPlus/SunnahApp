@@ -45,4 +45,8 @@ class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
 
         return HadithWithTranslation(hadith, translation)
     }
+
+    override suspend fun deleteCollection(collectionId: Int) {
+        dao.deleteCollection(collectionId)
+    }
 }

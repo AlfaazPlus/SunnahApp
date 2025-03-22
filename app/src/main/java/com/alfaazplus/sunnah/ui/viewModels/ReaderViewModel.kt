@@ -8,10 +8,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.text.toHadithAnnotatedString
@@ -33,7 +33,7 @@ class ReaderViewModel @Inject constructor(
     var hadithList by mutableStateOf(listOf<HadithWithTranslation>())
     var parsedHadithList by mutableStateOf(listOf<ParsedHadith>())
 
-//    var collectionWithInfo by mutableStateOf<CollectionWithInfo?>(null)
+    //    var collectionWithInfo by mutableStateOf<CollectionWithInfo?>(null)
     var books by mutableStateOf(listOf<BookWithInfo>())
 
     init {
@@ -75,6 +75,7 @@ class ReaderViewModel @Inject constructor(
 
     private suspend fun loadHadiths() {
         hadithList = repo.getHadithList(collectionId, bookId.value!!)
+        Logger.d("Hadith list size: ${hadithList.size}")
         parseHadiths()
         initialized = true
     }

@@ -1,30 +1,33 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.helpers.HadithHelper.getIncludedCollections
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class CollectionListViewModel @Inject constructor(
     private val repo: HadithRepository,
 ) : ViewModel() {
-    var collections: List<CollectionWithInfo> by mutableStateOf(listOf())
+
+    private val _collections = MutableStateFlow<List<CollectionWithInfo>>(emptyList())
+    var collections: StateFlow<List<CollectionWithInfo>> = _collections
 
     suspend fun loadCollections() {
-        if (collections.isNotEmpty()) return
-
         val collections = getIncludedCollections()
         collections.forEach {
             it.isDownloaded = isCollectionDownloaded(it.collection.id)
         }
 
-        this.collections = collections
+        _collections.value = collections
     }
 
     private suspend fun isCollectionDownloaded(collectionId: Int): Boolean {
@@ -33,6 +36,17 @@ class CollectionListViewModel @Inject constructor(
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    fun deleteCollection(collectionId: Int, onDeleted: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.deleteCollection(collectionId)
+            loadCollections()
+
+            withContext(Dispatchers.Main) {
+                onDeleted()
+            }
         }
     }
 }

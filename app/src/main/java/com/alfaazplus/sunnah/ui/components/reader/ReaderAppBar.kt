@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,14 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowLeft
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +31,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,33 +40,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
-import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 @Composable
 fun ItemDivider() {
-    Divider(
-        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+    HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
-            .height(1.dp)
+            .height(1.dp),
+        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
     )
 }
 
@@ -257,11 +249,11 @@ fun ReaderHadithNavigator(
             onJumpToBook = onJumpToBook,
             modifier = Modifier.weight(1f)
         )
-        Divider(
-            color = Color.Transparent,
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(6.dp)
+                .width(6.dp),
+            color = Color.Transparent
         )
         HadithList(
             hadiths = hadiths,
@@ -354,21 +346,23 @@ fun ReaderAppBar(
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.KeyboardArrowLeft,
-                        contentDescription = "Go Back"
-                    )
+                SimpleTooltip(text = stringResource(R.string.goBack)) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_back),
+                            contentDescription = stringResource(R.string.goBack),
+                        )
+                    }
                 }
             },
             actions = {
-                IconButton(
-                    onClick = { navController.navigate(route = Routes.SETTINGS) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Settings,
-                        contentDescription = "Settings"
-                    )
+                SimpleTooltip(text = stringResource(R.string.settings)) {
+                    IconButton(onClick = { navController.navigate(route = Routes.SETTINGS) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = stringResource(R.string.settings),
+                        )
+                    }
                 }
             },
             scrollBehavior = scrollBehavior

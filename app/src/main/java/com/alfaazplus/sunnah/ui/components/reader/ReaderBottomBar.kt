@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.R
 
 @Composable
 fun NavigationButtonIcon(
@@ -62,8 +64,8 @@ fun NavigationButton(
     ) {
         if (hadithNumber != null) {
             Text(
-                text = if (isPrevious && hadithNumber == "book") "Previous Book"
-                else if (!isPrevious && hadithNumber == "book") "Next Book"
+                text = if (isPrevious && hadithNumber == "book") stringResource(R.string.previousBook)
+                else if (!isPrevious && hadithNumber == "book") stringResource(R.string.nextBook)
                 else hadithNumber,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
@@ -76,15 +78,15 @@ fun NavigationButton(
         ) {
             if (isPrevious) {
                 NavigationButtonIcon(
-                    icon = Icons.Rounded.ArrowBack,
-                    label = "Previous Hadith",
+                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                    label = stringResource(R.string.previousHadith),
                     modifier = Modifier
                         .padding(end = 4.dp)
                 )
             }
             if (hadithNumber != "book") {
                 Text(
-                    text = if (isPrevious) "Previous Hadith" else "Next Hadith",
+                    text = if (isPrevious) stringResource(R.string.previousHadith) else stringResource(R.string.nextHadith),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Normal,
@@ -92,8 +94,8 @@ fun NavigationButton(
             }
             if (!isPrevious) {
                 NavigationButtonIcon(
-                    icon = Icons.Rounded.ArrowForward,
-                    label = "Next Hadith",
+                    icon = Icons.AutoMirrored.Rounded.ArrowForward,
+                    label = stringResource(R.string.nextHadith),
                     modifier = Modifier
                         .padding(start = 4.dp)
                 )

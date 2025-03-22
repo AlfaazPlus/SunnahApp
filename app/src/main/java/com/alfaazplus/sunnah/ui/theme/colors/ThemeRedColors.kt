@@ -53,7 +53,7 @@ class ThemeRedColors : BaseColors() {
             onTertiaryContainer = Color(0xFFFCDFA6),
             error = Color(0xFFFFB4AB),
             errorContainer = Color(0xFF93000A),
-            onError = Color(0xFF690005),
+            onError = Color(0xFFFFFFFF),
             onErrorContainer = Color(0xFFFFDAD6),
             background = Color(0xFF161110),
             onBackground = Color(0xFFEDE0DE),

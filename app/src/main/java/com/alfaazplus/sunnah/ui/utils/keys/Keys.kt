@@ -16,4 +16,5 @@ object Keys {
     const val SHOW_SANAD = "show_sanad"
     const val TEXT_SIZE_ARABIC = "text_size_arabic"
     const val TEXT_SIZE_TRANSLATION = "text_size_translation"
+    const val RESOURCE_DOWNLOAD_SRC = "resource_download_src"
 }

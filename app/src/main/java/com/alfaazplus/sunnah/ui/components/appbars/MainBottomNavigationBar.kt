@@ -1,9 +1,10 @@
-package com.alfaazplus.sunnah.ui.components
+package com.alfaazplus.sunnah.ui.components.appbars
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ fun MainBottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         MainScreenBase.Home,
         MainScreenBase.History,
+        MainScreenBase.Search,
     )
 
     NavigationBar(
@@ -32,7 +34,10 @@ fun MainBottomNavigationBar(navController: NavHostController) {
     ) {
         items.forEach { screen ->
             NavigationBarItem(
-                icon = { Icon(painterResource(id = screen.icon), null)},
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+                ),
+                icon = { Icon(painterResource(id = screen.icon), null) },
                 label = { Text(stringResource(screen.resourceId)) },
                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {

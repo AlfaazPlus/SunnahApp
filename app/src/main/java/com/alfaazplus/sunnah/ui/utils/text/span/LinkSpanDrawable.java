@@ -28,34 +28,30 @@ import java.util.ArrayList;
 public class LinkSpanDrawable<S extends CharacterStyle> {
 
     private static final int CORNER_RADIUS_DP = 4;
-
-    private int cornerRadius;
-    private int color;
-    private Paint mSelectionPaint, mRipplePaint;
-    private int mSelectionAlpha, mRippleAlpha;
-
     private static final ArrayList<LinkPath> pathCache = new ArrayList<>();
+    private static final long mReleaseDelay = 75;
+    private static final long mReleaseDuration = 100;
+    private static final Handler handler = new Handler(Looper.getMainLooper());
     private final ArrayList<LinkPath> mPathes = new ArrayList<>();
-    private int mPathesCount = 0;
-
     private final S mSpan;
     private final ResourcesProvider mResourcesProvider;
     private final float mTouchX;
     private final float mTouchY;
     private final Path circlePath = new Path();
-
+    private final long mDuration;
+    private final long mLongPressDuration;
+    private final boolean mSupportsLongPress;
+    private final float selectionAlpha = 0.2f;
+    private final float rippleAlpha = 0.8f;
+    private int cornerRadius;
+    private int color;
+    private Paint mSelectionPaint, mRipplePaint;
+    private int mSelectionAlpha, mRippleAlpha;
+    private int mPathesCount = 0;
     private Rect mBounds;
     private float mMaxRadius;
     private long mStart = -1;
     private long mReleaseStart = -1;
-    private final long mDuration;
-    private final long mLongPressDuration;
-    private final boolean mSupportsLongPress;
-    private static final long mReleaseDelay = 75;
-    private static final long mReleaseDuration = 100;
-
-    private final float selectionAlpha = 0.2f;
-    private final float rippleAlpha = 0.8f;
 
     public LinkSpanDrawable(S span, ResourcesProvider resourcesProvider, float touchX, float touchY) {
         mSpan = span;
@@ -72,8 +68,6 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
     private static int dp(float value) {
         return (int) (value * 2);
     }
-
-    private static Handler handler = new Handler(Looper.getMainLooper());
 
     private static void runOnUIThread(Runnable runnable, long delay) {
         if (delay == 0) {
@@ -228,16 +222,14 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
     public static class LinkCollector {
 
         private View mParent;
+        private final ArrayList<Pair<LinkSpanDrawable, Object>> mLinks = new ArrayList<>();
+        private int mLinksCount = 0;
 
         public LinkCollector() {
         }
-
         public LinkCollector(View parentView) {
             mParent = parentView;
         }
-
-        private ArrayList<Pair<LinkSpanDrawable, Object>> mLinks = new ArrayList<>();
-        private int mLinksCount = 0;
 
         public void addLink(LinkSpanDrawable link) {
             addLink(link, null);
@@ -383,23 +375,15 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
     }
 
     public static class LinksTextView extends androidx.appcompat.widget.AppCompatTextView {
-        public interface OnLinkPress {
-            public void run(ClickableSpan span);
-        }
-
-        private boolean isCustomLinkCollector;
-        private LinkCollector links;
-        private ResourcesProvider resourcesProvider;
-
+        private final boolean isCustomLinkCollector;
+        private final LinkCollector links;
+        private final ResourcesProvider resourcesProvider;
         private LinkSpanDrawable<ClickableSpan> pressedLink;
-
         private OnLinkPress onPressListener;
         private OnLinkPress onLongPressListener;
-
         private boolean disablePaddingsOffset;
         private boolean disablePaddingsOffsetX;
         private boolean disablePaddingsOffsetY;
-
         public LinksTextView(Context context) {
             this(context, null);
         }
@@ -519,15 +503,21 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
             }
             super.onDraw(canvas);
         }
+
+        public interface OnLinkPress {
+            void run(ClickableSpan span);
+        }
     }
 
     public static class ClickableSmallTextView extends SimpleTextView {
         private final ResourcesProvider resourcesProvider;
+        private final LinkCollector links = new LinkCollector(this);
+        private final Paint linkBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private LinkSpanDrawable<ClickableSpan> pressedLink;
 
         public ClickableSmallTextView(Context context) {
             this(context, null);
         }
-
         public ClickableSmallTextView(Context context, ResourcesProvider resourcesProvider) {
             super(context);
             this.resourcesProvider = resourcesProvider;
@@ -536,9 +526,6 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
         private int getLinkColor() {
             return ColorUtils.setAlphaComponent(getTextColor(), (int) (Color.alpha(getTextColor()) * .1175f));
         }
-
-        private final LinkCollector links = new LinkCollector(this);
-        private final Paint linkBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         @Override
         protected void onDraw(Canvas canvas) {
@@ -554,8 +541,6 @@ public class LinkSpanDrawable<S extends CharacterStyle> {
                 invalidate();
             }
         }
-
-        private LinkSpanDrawable<ClickableSpan> pressedLink;
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
