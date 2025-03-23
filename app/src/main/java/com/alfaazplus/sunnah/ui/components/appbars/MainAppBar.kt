@@ -57,7 +57,7 @@ fun MainAppBar() {
             }
             SimpleTooltip(text = stringResource(R.string.settings)) {
                 IconButton(
-                    onClick = { navController.navigate(route = Routes.SETTINGS) },
+                    onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) },
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_settings),

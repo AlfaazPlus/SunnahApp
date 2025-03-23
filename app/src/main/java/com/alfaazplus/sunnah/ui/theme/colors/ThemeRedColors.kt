@@ -30,10 +30,12 @@ class ThemeRedColors : BaseColors() {
             onSurface = Color(0xFF201A19),
             surfaceVariant = Color(0xFFF5DDDA),
             onSurfaceVariant = Color(0xFF534341),
-            outline = Color(0xFF857370),
+            outline = Color(0xFFE0E0E0),
             inverseOnSurface = Color(0xFFFBEEEC),
             inverseSurface = Color(0xFF362F2E),
             inversePrimary = Color(0xFFFFB4A9),
+            surfaceContainer = Color(0xFFFFFBFF),
+            surfaceContainerLow = Color(0xFFFFFBFF),
         )
     }
 
@@ -61,10 +63,12 @@ class ThemeRedColors : BaseColors() {
             onSurface = Color(0xFFEDE0DE),
             surfaceVariant = Color(0xFF534341),
             onSurfaceVariant = Color(0xFFD8C2BE),
-            outline = Color(0xFFA08C89),
+            outline = Color(0xFF202020),
             inverseOnSurface = Color(0xFF201A19),
             inverseSurface = Color(0xFFEDE0DE),
             inversePrimary = Color(0xFF9F4034),
+            surfaceContainer = Color(0xFF2B211F),
+            surfaceContainerLow = Color(0xFF2B211F),
         )
     }
 }

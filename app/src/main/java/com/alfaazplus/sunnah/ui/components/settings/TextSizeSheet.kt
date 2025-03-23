@@ -12,6 +12,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,7 +33,7 @@ import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun TextPreview(
+private fun TextPreview(
     key: String, previewText: String
 ) {
     val (fontSize, fontLineHeight) = if (key == Keys.TEXT_SIZE_ARABIC) {
@@ -50,7 +51,7 @@ fun TextPreview(
 }
 
 @Composable
-fun TextSizeSlider(key: String, title: Int, previewText: String) {
+private fun TextSizeSlider(key: String, title: Int, previewText: String) {
     val coroutineScope = rememberCoroutineScope()
     val textSize = DataStoreManager.observe(intPreferencesKey(key), 100)
 
@@ -97,7 +98,11 @@ fun TextSizeSlider(key: String, title: Int, previewText: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextSizeSheet(sheetState: SheetState, onDismiss: () -> Unit) {
+fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState(true)
+
+    if (!isOpen) return
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
@@ -92,7 +93,7 @@ fun HadithList(
     currentHadithNumber: String,
     onJumpToHadith: (HadithWithTranslation) -> Unit
 ) {
-    val hadithListState = rememberLazyListState(hadiths.indexOfFirst { it.hadith.hadithNumber == currentHadithNumber })
+    val hadithListState = rememberLazyListState(hadiths.indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }.takeIf { it != -1 } ?: 0)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -274,14 +275,15 @@ fun ReaderAppBar(
 ) {
     val collectionId = readerVm.collectionId
     val bookId = readerVm.bookId
-    val books = readerVm.books
+    val books = readerVm.books.value!!
+    val bwi = readerVm.bwi
     val hadiths = readerVm.hadithList
 
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     val navController = LocalNavHostController.current
 
-    val currentBookNumber = books.find { it.book.id == bookId.value }?.book?.serialNumber ?: ""
+    val currentBookNumber = bwi?.book?.serialNumber ?: ""
 
     Surface(
         shadowElevation = 4.dp,
@@ -349,7 +351,7 @@ fun ReaderAppBar(
                 SimpleTooltip(text = stringResource(R.string.goBack)) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_back),
+                            painter = painterResource(R.drawable.ic_chevron_left),
                             contentDescription = stringResource(R.string.goBack),
                         )
                     }
@@ -357,7 +359,7 @@ fun ReaderAppBar(
             },
             actions = {
                 SimpleTooltip(text = stringResource(R.string.settings)) {
-                    IconButton(onClick = { navController.navigate(route = Routes.SETTINGS) }) {
+                    IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_settings),
                             contentDescription = stringResource(R.string.settings),

@@ -22,8 +22,8 @@ fun getTranslationTextSize()
 : Pair<TextUnit, TextUnit> {
     val translationTextSizePercentage = DataStoreManager.observe(intPreferencesKey(Keys.TEXT_SIZE_TRANSLATION), 100)
 
-    val textSize = (translationTextSizePercentage / 100f * 20f).toInt().sp
-    val lineHeight = (translationTextSizePercentage / 100f * 28f).toInt().sp
+    val textSize = (translationTextSizePercentage / 100f * 17f).toInt().sp
+    val lineHeight = (translationTextSizePercentage / 100f * 24f).toInt().sp
 
     return textSize to lineHeight
 }

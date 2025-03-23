@@ -140,8 +140,6 @@ private fun ScreenContent(
         vm.setCollectionId(collectionId)
     }
 
-    val coroutineScope = rememberCoroutineScope()
-
     val books = vm.books
     val cwi = vm.collectionWithInfo
 
@@ -220,7 +218,7 @@ fun BooksIndexScreen(collectionId: Int) {
                     .align(Alignment.TopStart)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_back),
+                    painter = painterResource(R.drawable.ic_arrow_left),
                     contentDescription = stringResource(R.string.goBack),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )

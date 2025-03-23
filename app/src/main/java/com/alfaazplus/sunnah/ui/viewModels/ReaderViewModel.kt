@@ -12,6 +12,7 @@ import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
+import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.text.toHadithAnnotatedString
@@ -26,6 +27,7 @@ class ReaderViewModel @Inject constructor(
     private val repo: HadithRepository
 ) : ViewModel() {
     var primaryColor by mutableStateOf(Color(0xFF000000))
+    var onPrimaryColor by mutableStateOf(Color(0xFF000000))
     var initialized by mutableStateOf(false)
 
     var collectionId by mutableIntStateOf(0)
@@ -33,8 +35,11 @@ class ReaderViewModel @Inject constructor(
     var hadithList by mutableStateOf(listOf<HadithWithTranslation>())
     var parsedHadithList by mutableStateOf(listOf<ParsedHadith>())
 
-    //    var collectionWithInfo by mutableStateOf<CollectionWithInfo?>(null)
-    var books by mutableStateOf(listOf<BookWithInfo>())
+    var books: MutableLiveData<List<BookWithInfo>> = MutableLiveData(listOf())
+    var cwi by mutableStateOf<CollectionWithInfo?>(null)
+    var bwi by mutableStateOf<BookWithInfo?>(null)
+
+    var currentHadithNumber by mutableStateOf("")
 
     init {
         bookId.observeForever {
@@ -44,11 +49,17 @@ class ReaderViewModel @Inject constructor(
                 }
             }
         }
+
+        books.observeForever { books ->
+            if (books.isNotEmpty()) {
+                bwi = books.firstOrNull { it.book.id == bookId.value }
+            }
+        }
     }
 
     suspend fun loadEssentials() {
-//        collectionWithInfo = repo.getCollection(collectionId)
-        books = repo.getBookList(collectionId)
+        cwi = repo.getCollection(collectionId)
+        books.value = repo.getBookList(collectionId)
     }
 
     private fun parseHadiths() {
@@ -59,14 +70,14 @@ class ReaderViewModel @Inject constructor(
                 parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(it.hadith.narratorPrefix)
             }
 
-            parsedHadith.hadithText = HadithTextHelper.prepareText(it.hadith.hadithText).toHadithAnnotatedString(primaryColor)
+            parsedHadith.hadithText = HadithTextHelper.prepareText(it.hadith.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
             if (!it.hadith.narratorSuffix.isNullOrEmpty()) {
                 parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(it.hadith.narratorSuffix)
             }
 
             if (it.translation != null) {
-                parsedHadith.translationText = HadithTextHelper.prepareText(it.translation.hadithText).toHadithAnnotatedString(primaryColor)
+                parsedHadith.translationText = HadithTextHelper.prepareText(it.translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
             }
 
             return@map parsedHadith

@@ -30,7 +30,7 @@ fun AppBar(
                     onClick = { navController.popBackStack() },
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_back),
+                        painter = painterResource(R.drawable.ic_arrow_left),
                         contentDescription = stringResource(R.string.goBack)
                     )
                 }

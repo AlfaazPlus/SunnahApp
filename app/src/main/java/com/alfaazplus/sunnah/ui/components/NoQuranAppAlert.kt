@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,43 +26,52 @@ import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoQuranAppAlert() {
+fun NoQuranAppAlert(isOpen: Boolean, onClose: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(20.dp)
-            .padding(bottom = 20.dp)
-            .fillMaxWidth()
+    if (!isOpen) return
+
+    ModalBottomSheet(
+        onDismissRequest = onClose,
+        sheetState = sheetState,
     ) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(20.dp)
+                .padding(bottom = 20.dp)
+                .fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(R.drawable.logo_quranapp),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(60.dp)
-                    .width(60.dp)
-                    .padding(4.dp)
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.logo_quranapp),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(60.dp)
+                        .width(60.dp)
+                        .padding(4.dp)
+                )
+            }
+            Text(
+                text = stringResource(R.string.install_quranapp),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(top = 15.dp)
             )
-        }
-        Text(
-            text = stringResource(R.string.install_quranapp),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(top = 15.dp)
-        )
-        Text(
-            text = stringResource(R.string.install_quranapp_description),
-            modifier = Modifier.padding(bottom = 15.dp)
-        )
-        Button(onClick = {
-            NavigationHelper.openQuranAppPlayStoreListing(context)
-        }) {
-            Text(text = "Install from Google Play")
+            Text(
+                text = stringResource(R.string.install_quranapp_description),
+                modifier = Modifier.padding(bottom = 15.dp)
+            )
+            Button(onClick = {
+                NavigationHelper.openQuranAppPlayStoreListing(context)
+            }) {
+                Text(text = "Install from Google Play")
+            }
         }
     }
 }

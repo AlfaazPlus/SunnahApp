@@ -12,9 +12,12 @@ object Keys {
     const val BOOK_ID = "book_id"
     const val HADITH_NUMBER = "hadith_number"
 
+    const val HADITH_LAYOUT = "hadith_layout"
     const val HADITH_TEXT_OPTION = "hadith_text_option"
     const val SHOW_SANAD = "show_sanad"
     const val TEXT_SIZE_ARABIC = "text_size_arabic"
     const val TEXT_SIZE_TRANSLATION = "text_size_translation"
     const val RESOURCE_DOWNLOAD_SRC = "resource_download_src"
+
+    const val SHOW_READER_SETTINGS_ONLY = "show_reader_settings_only"
 }

@@ -83,6 +83,9 @@
     <string name="share_app">Share App</string>
     <string name="install_quranapp">Install QuranApp</string>
     <string name="install_quranapp_description">Free, secure &amp; open source</string>
+    <string name="hadith_layout">Hadith Layout</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="vertical">Vertical</string>
     <string name="text_sizes">Text Sizes</string>
     <string name="arabic_text_size">Arabic Text Size</string>
     <string name="translation_text_size">Translation Text Size</string>

@@ -74,7 +74,12 @@ fun MainApp() {
                 startDestination = Routes.MAIN,
             ) {
                 route(Routes.MAIN) { MainScreen() }
-                route(Routes.SETTINGS) { SettingsScreen() }
+                route(
+                    Routes.SETTINGS(),
+                    arguments = listOf(
+                        navArgument(Keys.SHOW_READER_SETTINGS_ONLY) { type = NavType.BoolType },
+                    )
+                ) { rsEntry -> SettingsScreen(rsEntry.arguments?.getBoolean(Keys.SHOW_READER_SETTINGS_ONLY) ?: false) }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
                 route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
 

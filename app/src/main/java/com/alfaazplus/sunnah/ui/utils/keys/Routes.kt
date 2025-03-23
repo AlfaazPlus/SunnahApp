@@ -27,7 +27,7 @@ object Routes {
     const val HOME = "home"
     const val HISTORY = "history"
     const val SEARCH = "search"
-    const val SETTINGS = "settings"
+    val SETTINGS = SingleArgRoute("settings", Keys.SHOW_READER_SETTINGS_ONLY)
     const val SETTINGS_THEME = "settings_theme"
     const val SETTINGS_LANGUAGE = "settings_language"
     const val SETTINGS_MANAGE_COLLECTIONS = "settings_manage_collections"

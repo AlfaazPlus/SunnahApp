@@ -20,7 +20,7 @@ fun SimpleTooltip(
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(12.dp),
         tooltip = {
-            PlainTooltip(caretSize = TooltipDefaults.caretSize) {
+            PlainTooltip {
                 Text(
                     text,
                     style = MaterialTheme.typography.bodyLarge

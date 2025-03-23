@@ -2,12 +2,13 @@ package com.alfaazplus.sunnah.ui.utils.shared_preference
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 
 private const val DATASTORE_NAME = "app_preferences"
@@ -27,14 +28,19 @@ object DataStoreManager {
         }
     }
 
-    suspend fun <T> read(key: Preferences.Key<T>, defaultValue: T): T {
-        val preferences = appContext.dataStore.data.first()
-        return preferences[key] ?: defaultValue
+    fun <T> read(key: Preferences.Key<T>, defaultValue: T): T {
+        return runBlocking {
+            val preferences = appContext.dataStore.data.first()
+            preferences[key] ?: defaultValue
+        }
     }
 
     @Composable
-    fun <T> observe(key: Preferences.Key<T>, defaultValue: T) =
-        appContext.dataStore.data.map { preferences ->
-            preferences[key] ?: defaultValue
-        }.collectAsState(defaultValue).value
+    fun <T> observe(key: Preferences.Key<T>, defaultValue: T): T {
+        val dValue = read(key, defaultValue)
+
+        return appContext.dataStore.data.map { preferences ->
+            preferences[key] ?: dValue
+        }.collectAsStateWithLifecycle(dValue).value
+    }
 }

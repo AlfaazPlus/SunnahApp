@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,9 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,29 +19,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 
 @Composable
-fun NavigationButtonIcon(
-    icon: ImageVector,
+private fun NavigationButtonIcon(
+    @DrawableRes
+    icon: Int,
     label: String,
     modifier: Modifier,
 ) {
     Icon(
-        imageVector = icon,
+        painter = painterResource(icon),
         contentDescription = label,
         modifier = modifier
             .width(14.dp)
-            .height(14.dp)
+            .height(14.dp),
+        tint = MaterialTheme.colorScheme.onSurface,
     )
 }
 
 @Composable
-fun NavigationButton(
+private fun NavigationButton(
     hadithNumber: String?,
     modifier: Modifier = Modifier,
     isPrevious: Boolean,
@@ -69,6 +69,7 @@ fun NavigationButton(
                 else hadithNumber,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
 
@@ -78,7 +79,7 @@ fun NavigationButton(
         ) {
             if (isPrevious) {
                 NavigationButtonIcon(
-                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                    icon = R.drawable.ic_arrow_left,
                     label = stringResource(R.string.previousHadith),
                     modifier = Modifier
                         .padding(end = 4.dp)
@@ -94,7 +95,7 @@ fun NavigationButton(
             }
             if (!isPrevious) {
                 NavigationButtonIcon(
-                    icon = Icons.AutoMirrored.Rounded.ArrowForward,
+                    icon = R.drawable.ic_arrow_right,
                     label = stringResource(R.string.nextHadith),
                     modifier = Modifier
                         .padding(start = 4.dp)
@@ -105,7 +106,7 @@ fun NavigationButton(
 }
 
 @Composable
-fun ReaderBottomBar(
+fun HorizontalReaderBottomBar(
     prevHadithNumber: String?,
     nextHadithNumber: String?,
     onPreviousClick: () -> Unit,

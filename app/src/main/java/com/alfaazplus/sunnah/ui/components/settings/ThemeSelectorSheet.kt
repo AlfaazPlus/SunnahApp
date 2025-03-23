@@ -2,6 +2,9 @@ package com.alfaazplus.sunnah.ui.components.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -13,8 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThemeSelectorSheet(onDismiss: () -> Unit) {
+fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState(true)
     val coroutineScope = rememberCoroutineScope()
     val themeMode = ThemeUtils.getThemeMode()
 
@@ -24,24 +29,31 @@ fun ThemeSelectorSheet(onDismiss: () -> Unit) {
         Triple(ThemeUtils.THEME_LIGHT, R.string.light, null),
     )
 
-    Column(
-        modifier = Modifier.padding(12.dp)
-    ) {
-        items.forEach { (theme, title, description) ->
-            RadioItem(
-                title = title,
-                subtitle = description,
-                selected = themeMode == theme,
-                onClick = {
-                    coroutineScope.launch {
-                        ThemeUtils.setThemeMode(theme)
+    if (!isOpen) return
 
-                        withContext(Dispatchers.Main) {
-                            onDismiss()
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            items.forEach { (theme, title, description) ->
+                RadioItem(
+                    title = title,
+                    subtitle = description,
+                    selected = themeMode == theme,
+                    onClick = {
+                        coroutineScope.launch {
+                            ThemeUtils.setThemeMode(theme)
+
+                            withContext(Dispatchers.Main) {
+                                onDismiss()
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

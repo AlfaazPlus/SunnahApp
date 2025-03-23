@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.components.hadith
 
 import android.content.Context
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -62,45 +63,47 @@ fun HadithText(
         text.getStringAnnotations("ref", 0, text.lastIndex)
     }
 
-    Text(
-        text = text,
-        modifier = modifier.then(if (clickable) Modifier
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = { pos ->
-                    layoutResult.value?.let { layoutResult ->
-                        val position = layoutResult.getOffsetForPosition(pos)
-                        text
-                            .getStringAnnotations(position, position)
-                            .firstOrNull()
-                            ?.let { sa ->
-                                if (sa.tag == "ref") {
-                                    handleOpenQuranReference(context, sa.item, quranAppNotInstallCallback)
+    SelectionContainer {
+        Text(
+            text = text,
+            modifier = modifier.then(if (clickable) Modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { pos ->
+                        layoutResult.value?.let { layoutResult ->
+                            val position = layoutResult.getOffsetForPosition(pos)
+                            text
+                                .getStringAnnotations(position, position)
+                                .firstOrNull()
+                                ?.let { sa ->
+                                    if (sa.tag == "ref") {
+                                        handleOpenQuranReference(context, sa.item, quranAppNotInstallCallback)
+                                    }
                                 }
-                            }
-                    }
-                })
-            }
-            .semantics {
-                if (quranRefs.size == 1) {
-                    role = Role.Button
-                    onClick("Link (${text.substring(quranRefs[0].start, quranRefs[0].end)}") {
-                        handleOpenQuranReference(context, quranRefs[0].item, quranAppNotInstallCallback)
-                        true
-                    }
-                } else {
-                    customActions = quranRefs.map {
-                        CustomAccessibilityAction("Link (${text.substring(it.start, it.end)})") {
-                            handleOpenQuranReference(context, it.item, quranAppNotInstallCallback)
+                        }
+                    })
+                }
+                .semantics {
+                    if (quranRefs.size == 1) {
+                        role = Role.Button
+                        onClick("Link (${text.substring(quranRefs[0].start, quranRefs[0].end)}") {
+                            handleOpenQuranReference(context, quranRefs[0].item, quranAppNotInstallCallback)
                             true
                         }
+                    } else {
+                        customActions = quranRefs.map {
+                            CustomAccessibilityAction("Link (${text.substring(it.start, it.end)})") {
+                                handleOpenQuranReference(context, it.item, quranAppNotInstallCallback)
+                                true
+                            }
+                        }
                     }
-                }
-            } else Modifier),
-        fontFamily = fontFamily,
-        fontSize = fontSize,
-        lineHeight = lineHeight,
-        onTextLayout = {
-            layoutResult.value = it
-        },
-    )
+                } else Modifier),
+            fontFamily = fontFamily,
+            fontSize = fontSize,
+            lineHeight = lineHeight,
+            onTextLayout = {
+                layoutResult.value = it
+            },
+        )
+    }
 }

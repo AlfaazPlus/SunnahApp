@@ -7,11 +7,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.getSpans
+import com.alfaazplus.sunnah.ui.theme.alpha
 
-fun CharSequence.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
+fun CharSequence.toHadithAnnotatedString(primaryColor: Color, onPrimary: Color): AnnotatedString {
     return if (this is Spanned) {
-        this.toHadithAnnotatedString(primaryColor)
+        this.toHadithAnnotatedString(primaryColor, onPrimary)
     } else {
         buildAnnotatedString {
             append(this@toHadithAnnotatedString.toString())
@@ -19,7 +21,7 @@ fun CharSequence.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
     }
 }
 
-fun Spanned.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
+fun Spanned.toHadithAnnotatedString(primaryColor: Color, onPrimary: Color): AnnotatedString {
     return buildAnnotatedString {
         append(this@toHadithAnnotatedString.toString())
         val urlSpans = getSpans<URLSpan>()
@@ -30,7 +32,8 @@ fun Spanned.toHadithAnnotatedString(primaryColor: Color): AnnotatedString {
             addStyle(
                 SpanStyle(
                     color = primaryColor,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold,
+                    textDecoration = TextDecoration.Underline,
                 ), start, end
             )
             addStringAnnotation("ref", urlSpan.url, start, end)
