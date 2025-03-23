@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -23,7 +24,7 @@ class DownloadCollectionViewModel @Inject constructor(
     private val _downloadStates = MutableStateFlow<Map<Int, WorkInfo.State>>(emptyMap())
     val downloadStates: StateFlow<Map<Int, WorkInfo.State>> = _downloadStates
 
-    fun startDownload(collectionId: Int, onResult: (Int, Boolean) -> Unit) {
+    fun startDownload(collectionId: Int, onResult: (Int, Boolean, Data) -> Unit) {
         val data = workDataOf("collectionId" to collectionId)
 
         val workRequest = OneTimeWorkRequestBuilder<DownloadCollectionWorker>()
@@ -39,7 +40,7 @@ class DownloadCollectionViewModel @Inject constructor(
         observeWorkState(collectionId, workRequest.id, onResult)
     }
 
-    private fun observeWorkState(collectionId: Int, workId: UUID, onResult: (Int, Boolean) -> Unit) {
+    private fun observeWorkState(collectionId: Int, workId: UUID, onResult: (Int, Boolean, Data) -> Unit) {
         workManager.getWorkInfoByIdLiveData(workId).observeForever { workInfo ->
             if (workInfo != null) {
                 val newState = workInfo.state
@@ -48,7 +49,7 @@ class DownloadCollectionViewModel @Inject constructor(
                 _downloadStates.value = currentStates
 
                 if (workInfo.state.isFinished) {
-                    onResult(collectionId, workInfo.state == WorkInfo.State.SUCCEEDED)
+                    onResult(collectionId, workInfo.state == WorkInfo.State.SUCCEEDED, workInfo.outputData)
                 }
             }
         }

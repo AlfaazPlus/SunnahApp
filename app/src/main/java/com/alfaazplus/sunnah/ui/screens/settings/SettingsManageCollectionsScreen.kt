@@ -5,8 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -85,6 +88,7 @@ fun SettingsManageCollectionsScreen(
     val coroutineScope = rememberCoroutineScope()
     val downloadStates by downloadVm.downloadStates.collectAsStateWithLifecycle()
     val collections by vm.collections.collectAsState()
+    var lastDownloadError by remember { mutableStateOf<String?>(null) }
 
 
     var showDialogForItem by remember { mutableStateOf<Int?>(null) }
@@ -99,7 +103,7 @@ fun SettingsManageCollectionsScreen(
 
 
     val downloadCollection = { collectionId: Int ->
-        downloadVm.startDownload(collectionId) { cid, isSuccess ->
+        downloadVm.startDownload(collectionId) { cid, isSuccess, outputData ->
             coroutineScope.launch {
                 vm.loadCollections()
             }
@@ -110,6 +114,7 @@ fun SettingsManageCollectionsScreen(
                 MessageUtils.showToast(context, "Downloaded: ${cwi?.collection?.name} (${cwi?.info?.name})", Toast.LENGTH_SHORT)
             } else {
                 MessageUtils.showToast(context, "Failed to download: ${cwi?.collection?.name} (${cwi?.info?.name})", Toast.LENGTH_SHORT)
+                lastDownloadError = outputData.getString("error")
             }
         }
     }
@@ -152,5 +157,25 @@ fun SettingsManageCollectionsScreen(
                     })
             }
         }
+
+        AlertDialog(isOpen = lastDownloadError != null,
+            onClose = { lastDownloadError = null },
+            title = "Download Error",
+            cancelText = stringResource(R.string.cancel),
+            confirmText = "Done",
+            onConfirm = {
+            },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .height(300.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = lastDownloadError ?: "", style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            })
     }
 }

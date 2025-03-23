@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.alfaazplus.sunnah.api.RetrofitInstance
 import com.alfaazplus.sunnah.db.AppDatabase
 import com.alfaazplus.sunnah.helpers.DatabaseHelper
 import com.alfaazplus.sunnah.ui.utils.extension.getContentLengthAndStream
+import com.alfaazplus.sunnah.ui.utils.extension.getStackTraceString
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +41,8 @@ class DownloadCollectionWorker @AssistedInject constructor(
             database.hadithDao.deleteCollection(collectionId)
 
             e.printStackTrace()
-            return@withContext Result.failure()
+
+            return@withContext Result.failure(workDataOf("error" to e.getStackTraceString()))
         }
     }
 

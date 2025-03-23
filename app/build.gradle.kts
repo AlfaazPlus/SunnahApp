@@ -15,11 +15,11 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "0.1.0-alpha.1"
 
         setProperty("archivesBaseName", versionName)
 
-        resValue("string", "app_name", "SunnahApp (Beta)")
+        resValue("string", "app_name", "SunnahApp (Alpha)")
         resValue("string", "cleartextTrafficPermitted", "false")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

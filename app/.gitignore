@@ -1,1 +1,4 @@
+*.aab
 /build
+/debug
+/release
