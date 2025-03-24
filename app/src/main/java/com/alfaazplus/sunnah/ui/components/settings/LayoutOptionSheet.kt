@@ -1,7 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.settings
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -31,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
@@ -43,12 +41,10 @@ private fun RowScope.LayoutButton(
     icon: Int,
     label: Int,
     isSelected: Boolean,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .weight(1f)
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -60,13 +56,10 @@ private fun RowScope.LayoutButton(
             onClick = onClick
         ) {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(60.dp)
+                    painter = painterResource(icon), contentDescription = null, modifier = Modifier.size(60.dp)
                 )
             }
         }
@@ -81,12 +74,10 @@ private fun RowScope.LayoutButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val selectedLayoutOption = ReaderUtils.getHadithLayoutOption()
-    val sheetState = rememberModalBottomSheetState(true)
     val onSelected = { option: String ->
         coroutineScope.launch {
             DataStoreManager.write(stringPreferencesKey(Keys.HADITH_LAYOUT), option)
@@ -97,27 +88,24 @@ fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
         }
     }
 
-    if (!isOpen) return
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onDismiss,
+        icon = R.drawable.ic_square_menu,
+        title = stringResource(R.string.hadith_layout),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             LayoutButton(
-                R.drawable.ic_carousel_horizontal,
-                R.string.horizontal, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+                R.drawable.ic_carousel_horizontal, R.string.horizontal, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
             ) {
                 onSelected(ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
             }
             LayoutButton(
-                R.drawable.ic_carousel_vertical,
-                R.string.vertical, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_VERTICAL
+                R.drawable.ic_carousel_vertical, R.string.vertical, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_VERTICAL
             ) {
                 onSelected(ReaderUtils.HADITH_LAYOUT_VERTICAL)
             }

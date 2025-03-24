@@ -14,8 +14,8 @@ android {
         applicationId = "com.alfaazplus.sunnah"
         minSdk = 21
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.1.0-alpha.2"
+        versionCode = 3
+        versionName = "0.1.0-alpha.3"
 
         setProperty("archivesBaseName", versionName)
 
@@ -30,8 +30,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += mapOf(
-                    "room.schemaLocation" to "$projectDir/schemas",
-                    "room.incremental" to "true"
+                    "room.schemaLocation" to "$projectDir/schemas", "room.incremental" to "true"
                 )
             }
         }
@@ -78,8 +77,7 @@ android {
         viewBinding = true
         compose = true
     }
-}
-// Allow references to generated code
+} // Allow references to generated code
 kapt {
     correctErrorTypes = true
 }

@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.components.hadith
 
 import android.content.Context
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,7 +67,7 @@ fun HadithText(
     SelectionContainer {
         Text(
             text = text,
-            modifier = modifier.then(if (clickable) Modifier
+            modifier = modifier.fillMaxWidth().then(if (clickable) Modifier
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { pos ->
                         layoutResult.value?.let { layoutResult ->

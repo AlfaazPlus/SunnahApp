@@ -80,7 +80,7 @@ fun SettingsScreen(
                 subtitle = ReaderUtils.resolveHadithLayoutLabel(),
             ) { showLayoutOptionSheet = true }
             SettingsItem(
-                title = R.string.text_sizes,
+                title = R.string.text_size_and_style,
                 icon = R.drawable.ic_text_size,
             ) { showTextSizesSheet = true }
             SettingsItem(

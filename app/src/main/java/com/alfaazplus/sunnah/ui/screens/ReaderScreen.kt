@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.reader.HorizontalReader
 import com.alfaazplus.sunnah.ui.components.reader.VerticalReader

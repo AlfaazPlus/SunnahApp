@@ -16,6 +16,11 @@ object ReaderUtils {
     const val HADITH_TEXT_OPTION_ONLY_TRANSLATION = "hadith_text_option_translation"
 
     @Composable
+    fun getIsSerifFontStyle(): Boolean {
+        return DataStoreManager.observe(booleanPreferencesKey(Keys.SERIF_FONT_STYLE), false)
+    }
+
+    @Composable
     fun resolveHadithTextOptionLabel(): Int {
         val option = getHadithTextOption()
 

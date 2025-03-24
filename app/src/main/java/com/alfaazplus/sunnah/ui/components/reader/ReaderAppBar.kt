@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.components.reader
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
@@ -63,43 +62,49 @@ fun ItemDivider() {
     HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
-            .height(1.dp),
-        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            .height(1.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
     )
 }
 
 @Composable
 fun HadithItem(
-    hadithNumber: String,
+    hwt: HadithWithTranslation,
     isActive: Boolean,
     onClick: () -> Unit,
 ) {
-    Text(
-        text = "Hadith: $hadithNumber",
-        style = MaterialTheme.typography.bodyMedium,
-        fontWeight = FontWeight.Bold,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (isActive) MaterialTheme.colorScheme.primary else Color.Transparent)
             .clickable { onClick() }
             .padding(horizontal = 15.dp, vertical = 10.dp),
-        color = if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
-    )
+    ) {
+        Text(
+            text = "Hadith: ${hwt.hadith.hadithNumber}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+        )
+        Text(
+            text = hwt.translation?.referenceInBook ?: "",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.alpha(0.8f),
+        )
+    }
 }
 
 @Composable
 fun HadithList(
     hadiths: List<HadithWithTranslation>,
     currentHadithNumber: String,
-    onJumpToHadith: (HadithWithTranslation) -> Unit
+    onJumpToHadith: (HadithWithTranslation) -> Unit,
 ) {
     val hadithListState = rememberLazyListState(hadiths.indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }.takeIf { it != -1 } ?: 0)
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxHeight()
-            .width(120.dp)
+            .width(140.dp)
     ) {
         Text(
             "Hadiths",
@@ -118,7 +123,7 @@ fun HadithList(
                     hadiths.size,
                 ) {
                     HadithItem(
-                        hadithNumber = hadiths[it].hadith.hadithNumber,
+                        hwt = hadiths[it],
                         isActive = hadiths[it].hadith.hadithNumber == currentHadithNumber,
                     ) { onJumpToHadith(hadiths[it]) }
 
@@ -140,22 +145,19 @@ fun BookItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (isActive) MaterialTheme.colorScheme.primary else Color.Transparent)
             .clickable { onClick() }
-            .padding(horizontal = 8.dp, vertical = 12.dp),
+            .padding(horizontal = 10.dp, vertical = 12.dp),
     ) {
         Box(
             modifier = Modifier.size(28.dp),
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painterResource(R.drawable.vector_bg2),
-                null,
-                colorFilter = ColorFilter.tint(if (!isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
+                painterResource(R.drawable.vector_bg2), null, colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
             Text(
                 text = bwi.book.serialNumber,
-                color = if (!isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -163,15 +165,14 @@ fun BookItem(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(start = 8.dp)
         ) {
             if (bwi.info?.title != null) {
                 Text(
                     text = bwi.info.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    textAlign = TextAlign.Center,
-                    color = if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                 )
             }
             Text(
@@ -179,9 +180,8 @@ fun BookItem(
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
                 fontFamily = fontUthmani,
-                color = if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
+                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             )
         }
         Box(modifier = Modifier.size(28.dp))
@@ -193,12 +193,11 @@ fun BookList(
     books: List<BookWithInfo>,
     currentBookId: Int,
     onJumpToBook: (BookWithInfo) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val bookListState = rememberLazyListState(books.indexOfFirst { it.book.id == currentBookId })
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier
     ) {
         Text(
             "Books",
@@ -213,10 +212,7 @@ fun BookList(
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.alpha(0.2f))
         ) {
             LazyColumn(state = bookListState) {
-                items(
-                    books.size,
-                    key = { index -> books[index].book.id }
-                ) {
+                items(books.size, key = { index -> books[index].book.id }) {
                     BookItem(
                         bwi = books[it],
                         isActive = books[it].book.id == currentBookId,
@@ -245,16 +241,12 @@ fun ReaderHadithNavigator(
 
     Row(modifier = Modifier.padding(5.dp)) {
         BookList(
-            books = books,
-            currentBookId = currentBookId,
-            onJumpToBook = onJumpToBook,
-            modifier = Modifier.weight(1f)
+            books = books, currentBookId = currentBookId, onJumpToBook = onJumpToBook, modifier = Modifier.weight(1f)
         )
         HorizontalDivider(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(6.dp),
-            color = Color.Transparent
+                .width(6.dp), color = Color.Transparent
         )
         HadithList(
             hadiths = hadiths,
@@ -283,91 +275,90 @@ fun ReaderAppBar(
     var showBottomSheet by remember { mutableStateOf(false) }
     val navController = LocalNavHostController.current
 
-    val currentBookNumber = bwi?.book?.serialNumber ?: ""
-
     Surface(
         shadowElevation = 4.dp,
     ) {
-        CenterAlignedTopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surface,
-            ),
-            title = {
-                Surface(
+        CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            scrolledContainerColor = MaterialTheme.colorScheme.surface,
+        ), title = {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .fillMaxHeight()
+                        .padding(horizontal = 10.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .clickable {
+                            showBottomSheet = true
+                        },
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(horizontal = 10.dp)
-                            .clip(MaterialTheme.shapes.large)
-                            .clickable {
-                                showBottomSheet = true
-                            },
-                    ) {
-                        CollectionIcon(
-                            collectionId = collectionId,
-                            height = 40.dp,
-                        )
+                    CollectionIcon(
+                        collectionId = collectionId,
+                        height = 40.dp,
+                    )
 
+                    Row {
                         Text(
-                            text = "Book $currentBookNumber • Hadith $currentHadithNumber",
+                            text = bwi?.info?.title ?: "",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Normal,
                             lineHeight = 0.sp,
                         )
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_drop_down),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
+                        )
                     }
+                }
 
-                    if (showBottomSheet) {
-                        ModalBottomSheet(
-                            onDismissRequest = { showBottomSheet = false },
-                            sheetState = sheetState,
-                        ) {
-                            ReaderHadithNavigator(
-                                books = books,
-                                hadiths = hadiths,
-                                currentBookId = bookId.value ?: 0,
-                                currentHadithNumber = currentHadithNumber,
-                                onJumpToBook = { bwi ->
-                                    onJumpToBook(bwi)
-                                    showBottomSheet = false
-                                },
-                                onJumpToHadith = { hwt ->
-                                    onJumpToHadith(hwt)
-                                    showBottomSheet = false
-                                }
-                            )
-                        }
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { showBottomSheet = false },
+                        sheetState = sheetState,
+                    ) {
+                        ReaderHadithNavigator(books = books,
+                                              hadiths = hadiths,
+                                              currentBookId = bookId.value ?: 0,
+                                              currentHadithNumber = currentHadithNumber,
+                                              onJumpToBook = { bwi ->
+                                                  onJumpToBook(bwi)
+                                                  showBottomSheet = false
+                                              },
+                                              onJumpToHadith = { hwt ->
+                                                  onJumpToHadith(hwt)
+                                                  showBottomSheet = false
+                                              })
                     }
                 }
-            },
-            navigationIcon = {
-                SimpleTooltip(text = stringResource(R.string.goBack)) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_chevron_left),
-                            contentDescription = stringResource(R.string.goBack),
-                        )
-                    }
+            }
+        }, navigationIcon = {
+            SimpleTooltip(text = stringResource(R.string.goBack)) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_chevron_left),
+                        contentDescription = stringResource(R.string.goBack),
+                    )
                 }
-            },
-            actions = {
-                SimpleTooltip(text = stringResource(R.string.settings)) {
-                    IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_settings),
-                            contentDescription = stringResource(R.string.settings),
-                        )
-                    }
+            }
+        }, actions = {
+            SimpleTooltip(text = stringResource(R.string.settings)) {
+                IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_settings),
+                        contentDescription = stringResource(R.string.settings),
+                    )
                 }
-            },
-            scrollBehavior = scrollBehavior
+            }
+        }, scrollBehavior = scrollBehavior
         )
     }
 }

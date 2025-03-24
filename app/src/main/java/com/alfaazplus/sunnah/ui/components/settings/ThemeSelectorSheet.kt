@@ -8,18 +8,18 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState(true)
     val coroutineScope = rememberCoroutineScope()
     val themeMode = ThemeUtils.getThemeMode()
 
@@ -29,11 +29,11 @@ fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
         Triple(ThemeUtils.THEME_LIGHT, R.string.light, null),
     )
 
-    if (!isOpen) return
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onDismiss,
+        icon = R.drawable.ic_theme,
+        title = stringResource(R.string.app_theme),
     ) {
         Column(
             modifier = Modifier.padding(12.dp)

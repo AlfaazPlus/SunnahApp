@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,11 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.common.SwitchItem
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.composable.getArabicTextSize
 import com.alfaazplus.sunnah.ui.utils.composable.getTranslationTextSize
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 private fun TextPreview(
-    key: String, previewText: String
+    key: String, previewText: String, isSerif: Boolean,
 ) {
     val (fontSize, fontLineHeight) = if (key == Keys.TEXT_SIZE_ARABIC) {
         getArabicTextSize()
@@ -46,12 +47,12 @@ private fun TextPreview(
         previewText,
         fontSize = fontSize,
         lineHeight = fontLineHeight,
-        fontFamily = if (key == Keys.TEXT_SIZE_ARABIC) fontUthmani else MaterialTheme.typography.bodyLarge.fontFamily,
+        fontFamily = if (key == Keys.TEXT_SIZE_ARABIC) fontUthmani else if (isSerif) FontFamily.Serif else FontFamily.SansSerif,
     )
 }
 
 @Composable
-private fun TextSizeSlider(key: String, title: Int, previewText: String) {
+private fun TextSizeSlider(key: String, title: Int, previewText: String, isSerif: Boolean = false) {
     val coroutineScope = rememberCoroutineScope()
     val textSize = DataStoreManager.observe(intPreferencesKey(key), 100)
 
@@ -65,22 +66,14 @@ private fun TextSizeSlider(key: String, title: Int, previewText: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Slider(
-            modifier = Modifier
-                .weight(1f),
-            value = textSize.toFloat(),
-            onValueChange = {
+            modifier = Modifier.weight(1f), value = textSize.toFloat(), onValueChange = {
                 coroutineScope.launch {
                     DataStoreManager.write(intPreferencesKey(key), it.toInt())
                 }
-            },
-            valueRange = min..max,
-            steps = steps
+            }, valueRange = min..max, steps = steps
         )
         Text(
-            text = "${textSize}%",
-            modifier = Modifier
-                .padding(start = 10.dp),
-            style = MaterialTheme.typography.labelSmall
+            text = "${textSize}%", modifier = Modifier.padding(start = 10.dp), style = MaterialTheme.typography.labelSmall
         )
     }
     Box(
@@ -91,21 +84,21 @@ private fun TextSizeSlider(key: String, title: Int, previewText: String) {
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides if (key == Keys.TEXT_SIZE_ARABIC) LayoutDirection.Rtl else LayoutDirection.Ltr) {
-            TextPreview(key, previewText)
+            TextPreview(key, previewText, isSerif)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState(true)
+    val coroutineScope = rememberCoroutineScope()
+    val isSerifFontStyle = ReaderUtils.getIsSerifFontStyle()
 
-    if (!isOpen) return
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onDismiss,
+        icon = R.drawable.ic_text_size,
+        title = stringResource(R.string.text_size_and_style),
     ) {
         Column(
             modifier = Modifier
@@ -120,8 +113,18 @@ fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
             TextSizeSlider(
                 Keys.TEXT_SIZE_TRANSLATION,
                 R.string.translation_text_size,
-                previewText = "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins."
+                previewText = "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins.",
+                isSerifFontStyle
             )
+            SwitchItem(
+                modifier = Modifier.padding(top = 16.dp),
+                title = R.string.serif_font_style,
+                checked = isSerifFontStyle,
+            ) {
+                coroutineScope.launch {
+                    DataStoreManager.write(booleanPreferencesKey(Keys.SERIF_FONT_STYLE), it)
+                }
+            }
         }
     }
 }

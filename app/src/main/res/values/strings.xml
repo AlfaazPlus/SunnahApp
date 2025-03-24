@@ -86,7 +86,8 @@
     <string name="hadith_layout">Hadith Layout</string>
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
-    <string name="text_sizes">Text Sizes</string>
+    <string name="text_size_and_style">Text Size &amp; Style</string>
+    <string name="serif_font_style">Serif Font Style</string>
     <string name="arabic_text_size">Arabic Text Size</string>
     <string name="translation_text_size">Translation Text Size</string>
     <string name="hadith_text_option">Hadith Text Option</string>

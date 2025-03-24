@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val repo: HadithRepository
+    private val repo: HadithRepository,
 ) : ViewModel() {
     var primaryColor by mutableStateOf(Color(0xFF000000))
     var onPrimaryColor by mutableStateOf(Color(0xFF000000))
@@ -77,7 +77,16 @@ class ReaderViewModel @Inject constructor(
             }
 
             if (it.translation != null) {
-                parsedHadith.translationText = HadithTextHelper.prepareText(it.translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                parsedHadith.translationText =
+                    HadithTextHelper.prepareText(it.translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+
+                if (parsedHadith.translation?.grades?.contains("Sahih") == true) {
+                    parsedHadith.gradeType = "sahih"
+                } else if (parsedHadith.translation?.grades?.contains("Da'if") == true) {
+                    parsedHadith.gradeType = "daif"
+                } else if (parsedHadith.translation?.grades?.contains("Hasan") == true) {
+                    parsedHadith.gradeType = "hasan"
+                }
             }
 
             return@map parsedHadith

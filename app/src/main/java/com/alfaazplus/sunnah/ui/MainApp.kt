@@ -29,37 +29,32 @@ import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 
 val enterTransition = slideInHorizontally(
-    initialOffsetX = { fullWidth -> fullWidth },
-    animationSpec = tween(durationMillis = 100)
+    initialOffsetX = { fullWidth -> fullWidth }, animationSpec = tween(durationMillis = 100)
 )
 val exitTransition = slideOutHorizontally(
-    targetOffsetX = { fullWidth -> -fullWidth },
-    animationSpec = tween(durationMillis = 100)
+    targetOffsetX = { fullWidth -> -fullWidth }, animationSpec = tween(durationMillis = 100)
 )
 val popEnterTransition = slideInHorizontally(
-    initialOffsetX = { fullWidth -> -fullWidth },
-    animationSpec = tween(durationMillis = 100)
+    initialOffsetX = { fullWidth -> -fullWidth }, animationSpec = tween(durationMillis = 100)
 )
 val popExitTransition = slideOutHorizontally(
-    targetOffsetX = { fullWidth -> fullWidth },
-    animationSpec = tween(durationMillis = 100)
+    targetOffsetX = { fullWidth -> fullWidth }, animationSpec = tween(durationMillis = 100)
 )
 
 private fun NavGraphBuilder.route(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    composable(
-        route = route,
-        arguments = arguments,
-        deepLinks = deepLinks,
-        enterTransition = { enterTransition },
-        exitTransition = { exitTransition },
-        popEnterTransition = { popEnterTransition },
-        popExitTransition = { popExitTransition },
-        content = content
+    composable(route = route,
+               arguments = arguments,
+               deepLinks = deepLinks,
+               enterTransition = { enterTransition },
+               exitTransition = { exitTransition },
+               popEnterTransition = { popEnterTransition },
+               popExitTransition = { popExitTransition },
+               content = content
     )
 }
 
@@ -75,26 +70,20 @@ fun MainApp() {
             ) {
                 route(Routes.MAIN) { MainScreen() }
                 route(
-                    Routes.SETTINGS(),
-                    arguments = listOf(
+                    Routes.SETTINGS(), arguments = listOf(
                         navArgument(Keys.SHOW_READER_SETTINGS_ONLY) { type = NavType.BoolType },
                     )
                 ) { rsEntry -> SettingsScreen(rsEntry.arguments?.getBoolean(Keys.SHOW_READER_SETTINGS_ONLY) ?: false) }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
                 route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
 
-                route(
-                    Routes.READER(),
-                    arguments = listOf(
-                        navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
-                        navArgument(Keys.BOOK_ID) { type = NavType.IntType },
-                        navArgument(Keys.HADITH_NUMBER) {
-                            type = NavType.StringType
-                            defaultValue = null
-                            nullable = true
-                        }
-                    )
-                ) { rsEntry ->
+                route(Routes.READER(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
+                                                          navArgument(Keys.BOOK_ID) { type = NavType.IntType },
+                                                          navArgument(Keys.HADITH_NUMBER) {
+                                                              type = NavType.StringType
+                                                              defaultValue = null
+                                                              nullable = true
+                                                          })) { rsEntry ->
                     ReaderScreen(
                         collectionId = rsEntry.arguments?.getInt(Keys.COLLECTION_ID, 1) ?: 1,
                         bookId = rsEntry.arguments?.getInt(Keys.BOOK_ID, 1) ?: 1,
@@ -102,8 +91,7 @@ fun MainApp() {
                     )
                 }
                 route(
-                    Routes.BOOKS_INDEX(),
-                    arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })
+                    Routes.BOOKS_INDEX(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })
                 ) { bsEntry ->
                     BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
                 }

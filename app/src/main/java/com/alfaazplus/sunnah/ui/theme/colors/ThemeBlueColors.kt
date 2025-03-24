@@ -33,7 +33,6 @@ class ThemeBlueColors : BaseColors() {
             inverseOnSurface = Color(0xFFF2F0F4),
             inverseSurface = Color(0xFF303034),
             inversePrimary = Color(0xFFB0C6FF),
-            outline = Color(0xFFE0E0E0),
             surfaceContainer = Color(0xFFFEFBFF),
             surfaceContainerLow = Color(0xFFFEFBFF),
         )
@@ -66,7 +65,6 @@ class ThemeBlueColors : BaseColors() {
             inverseOnSurface = Color(0xFF1B1B1F),
             inverseSurface = Color(0xFFE3E2E6),
             inversePrimary = Color(0xFF0058CB),
-            outline = Color(0xFF202020),
             surfaceContainer = Color(0xFF22222A),
             surfaceContainerLow = Color(0xFF22222A),
         )
