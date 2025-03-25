@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,11 @@ import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
+import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+import com.alfaazplus.sunnah.ui.utils.datatype.ReadOnce
+import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.utils.text.toHadithAnnotatedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +36,8 @@ class ReaderViewModel @Inject constructor(
     var onPrimaryColor by mutableStateOf(Color(0xFF000000))
     var initialized by mutableStateOf(false)
 
+    var hadithLayout by mutableStateOf(ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
+
     var collectionId by mutableIntStateOf(0)
     val bookId = MutableLiveData(0)
     var hadithList by mutableStateOf(listOf<HadithWithTranslation>())
@@ -39,25 +47,38 @@ class ReaderViewModel @Inject constructor(
     var cwi by mutableStateOf<CollectionWithInfo?>(null)
     var bwi by mutableStateOf<BookWithInfo?>(null)
 
+    /**
+     * Hadith number, consumed
+     */
+    var initialHadithNumber by mutableStateOf(Pair<String?, Boolean>(null, false))
     var currentHadithNumber by mutableStateOf("")
+
+    /**
+     * Hadith number, consumed
+     */
+    val transientScroll = ReadOnce<String?>()
 
     init {
         bookId.observeForever {
             if (it != null) {
                 viewModelScope.launch(Dispatchers.Main) {
                     loadHadiths()
+                    setCurrentBookInfo(books.value)
                 }
             }
         }
 
         books.observeForever { books ->
-            if (books.isNotEmpty()) {
-                bwi = books.firstOrNull { it.book.id == bookId.value }
-            }
+            setCurrentBookInfo(books)
         }
     }
 
+    private fun setCurrentBookInfo(books: List<BookWithInfo>?) {
+        bwi = books?.firstOrNull { it.book.id == bookId.value }
+    }
+
     suspend fun loadEssentials() {
+        hadithLayout = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_LAYOUT), HADITH_LAYOUT_HORIZONTAL)
         cwi = repo.getCollection(collectionId)
         books.value = repo.getBookList(collectionId)
     }

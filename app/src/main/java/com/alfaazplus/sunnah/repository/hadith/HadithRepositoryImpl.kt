@@ -8,8 +8,7 @@ import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
     override suspend fun getCollection(collectionId: Int): CollectionWithInfo {
         return CollectionWithInfo(
-            dao.getCollectionById(collectionId),
-            dao.getCollectionInfoById("en", collectionId)
+            dao.getCollectionById(collectionId), dao.getCollectionInfoById("en", collectionId)
         )
     }
 
@@ -21,7 +20,7 @@ class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
 
     override suspend fun getBookList(collectionId: Int): List<BookWithInfo> {
         return dao.getBookList(collectionId).map {
-            BookWithInfo(it, dao.getBookInfoById("en", it.id))
+            BookWithInfo(it, dao.getBookInfoById("en", collectionId, it.id))
         }
     }
 
@@ -38,7 +37,7 @@ class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
     override suspend fun getHadithByOrder(
         collectionId: Int,
         bookId: Int,
-        orderInBook: Int
+        orderInBook: Int,
     ): HadithWithTranslation {
         val hadith = dao.getHadithByOrder(collectionId, bookId, orderInBook)
         val translation = dao.getHadithTranslationByArURN(hadith.urn, "en")

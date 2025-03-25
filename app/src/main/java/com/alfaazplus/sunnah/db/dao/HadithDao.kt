@@ -52,8 +52,8 @@ interface HadithDao {
     @Query("SELECT * FROM book WHERE collection_id = :collectionId")
     suspend fun getBookList(collectionId: Int): List<HBook>
 
-    @Query("SELECT * FROM book_info WHERE book_id = :bookId AND language_code = :langCode")
-    suspend fun getBookInfoById(langCode: String, bookId: Int): HBookInfo
+    @Query("SELECT * FROM book_info WHERE collection_id=:collectionId AND book_id = :bookId AND language_code = :langCode")
+    suspend fun getBookInfoById(langCode: String, collectionId: Int, bookId: Int): HBookInfo
 
     @Query("SELECT * FROM chapter INNER JOIN chapter_info ON chapter.chapter_id = chapter_info.chapter_id WHERE chapter.book_id = :bookId AND chapter.collection_id = :collectionId AND chapter_info.book_id = :bookId AND chapter_info.collection_id = :collectionId AND chapter_info.language_code = :langCode")
     suspend fun getChapterList(langCode: String, collectionId: Int, bookId: Int): List<HadithChapter>

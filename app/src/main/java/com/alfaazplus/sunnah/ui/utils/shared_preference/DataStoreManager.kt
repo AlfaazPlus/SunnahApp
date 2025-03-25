@@ -43,4 +43,11 @@ object DataStoreManager {
             preferences[key] ?: dValue
         }.collectAsStateWithLifecycle(dValue).value
     }
+
+    suspend fun <T> observeWithCallback(key: Preferences.Key<T>, onChange: (T) -> Unit) {
+        appContext.dataStore.data.collect { preferences ->
+            val value = preferences[key]
+            value?.let { onChange(it) }
+        }
+    }
 }

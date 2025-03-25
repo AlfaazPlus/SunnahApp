@@ -27,6 +27,7 @@ fun ReaderScreen(
 
     LaunchedEffect(collectionId, bookId) {
         if (!vm.initialized) {
+            vm.initialHadithNumber = Pair(hadithNumber, false)
             vm.collectionId = collectionId
             vm.bookId.value = bookId
             vm.loadEssentials()
@@ -51,17 +52,11 @@ fun ReaderScreen(
         }
     }
 
-    val initialHadithNumber = if (vm.currentHadithNumber != "") {
-        vm.currentHadithNumber
-    } else {
-        hadithNumber
-    }
-
-    val layoutOption = ReaderUtils.getHadithLayoutOption()
+    val layoutOption = vm.hadithLayout
 
     if (layoutOption == ReaderUtils.HADITH_LAYOUT_VERTICAL) {
-        VerticalReader(vm, initialHadithNumber)
+        VerticalReader(vm)
     } else {
-        HorizontalReader(vm, initialHadithNumber)
+        HorizontalReader(vm)
     }
 }

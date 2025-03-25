@@ -19,7 +19,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
+import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -28,7 +32,7 @@ import kotlinx.coroutines.launch
 private fun PageContent(
     vm: ReaderViewModel,
     hadithList: List<ParsedHadith>,
-    listState: LazyListState
+    listState: LazyListState,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val books = vm.books.value!!
@@ -59,7 +63,6 @@ private fun PageContent(
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 20.dp, bottom = 120.dp),
         state = listState,
     ) {
@@ -72,22 +75,14 @@ private fun PageContent(
         }
 
         item {
-            VerticalReaderFooter(
-                vm,
-                onPreviousClick = { navigateToBook(-1) },
-                onNextClick = { navigateToBook(1) },
-                onTopClick = { scrollToTop() }
-            )
+            VerticalReaderFooter(vm, onPreviousClick = { navigateToBook(-1) }, onNextClick = { navigateToBook(1) }, onTopClick = { scrollToTop() })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VerticalReader(
-    vm: ReaderViewModel,
-    initialHadithNumber: String?
-) {
+fun VerticalReader(vm: ReaderViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
@@ -121,13 +116,26 @@ fun VerticalReader(
         }
     }*/
 
-    LaunchedEffect(initialHadithNumber) {
-        if (initialHadithNumber != null) {
-            navigateToHadith(initialHadithNumber)
+    LaunchedEffect(Unit) {
+        val initialHNo = vm.initialHadithNumber
+        val transientScroll = vm.transientScroll
+
+        if (initialHNo.first != null && !initialHNo.second) {
+            navigateToHadith(initialHNo.first!!)
+            vm.initialHadithNumber = Pair(initialHNo.first, true)
         } else {
-            coroutineScope.launch {
-                vm.currentHadithNumber = hadithList[0].hadith.hadithNumber
-                listState.scrollToItem(0)
+            transientScroll.get()?.let {
+                navigateToHadith(it)
+            }
+        }
+
+        DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
+            if (vm.hadithLayout != layout) {
+                val index = listState.firstVisibleItemIndex
+                val hadithNumber = hadithList.getOrNull(index)?.hadith?.hadithNumber
+
+                vm.transientScroll.set(hadithNumber)
+                vm.hadithLayout = layout
             }
         }
     }
@@ -138,12 +146,20 @@ fun VerticalReader(
         topBar = {
             ReaderAppBar(
                 readerVm = vm,
-                currentHadithNumber = vm.currentHadithNumber,
+                currentHadithNumber = {
+                    val fullVisibleItem = listState.layoutInfo.visibleItemsInfo.first {
+                        it.offset >= -250
+                    }
+                    val index = fullVisibleItem.index
+                    val hadithNumber = hadithList.getOrNull(index)?.hadith?.hadithNumber
+
+                    hadithNumber ?: vm.currentHadithNumber
+                },
                 scrollBehavior = scrollBehavior,
                 onJumpToBook = { navigateToBook(it.book.id) },
                 onJumpToHadith = {
                     navigateToHadith(it.hadith.hadithNumber)
-                }
+                },
             )
         },
     ) {

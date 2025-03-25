@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
@@ -170,9 +172,11 @@ fun BookItem(
             if (bwi.info?.title != null) {
                 Text(
                     text = bwi.info.title,
+                    modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center
                 )
             }
             Text(
@@ -182,6 +186,7 @@ fun BookItem(
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = fontUthmani,
                 color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
             )
         }
         Box(modifier = Modifier.size(28.dp))
@@ -260,7 +265,7 @@ fun ReaderHadithNavigator(
 @Composable
 fun ReaderAppBar(
     readerVm: ReaderViewModel,
-    currentHadithNumber: String,
+    currentHadithNumber: () -> String,
     scrollBehavior: TopAppBarScrollBehavior,
     onJumpToBook: (BookWithInfo) -> Unit,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
@@ -305,11 +310,14 @@ fun ReaderAppBar(
 
                     Row {
                         Text(
+                            modifier = Modifier.widthIn(max = 150.dp),
                             text = bwi?.info?.title ?: "",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Normal,
                             lineHeight = 0.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_drop_down),
@@ -325,18 +333,20 @@ fun ReaderAppBar(
                         onDismissRequest = { showBottomSheet = false },
                         sheetState = sheetState,
                     ) {
-                        ReaderHadithNavigator(books = books,
-                                              hadiths = hadiths,
-                                              currentBookId = bookId.value ?: 0,
-                                              currentHadithNumber = currentHadithNumber,
-                                              onJumpToBook = { bwi ->
-                                                  onJumpToBook(bwi)
-                                                  showBottomSheet = false
-                                              },
-                                              onJumpToHadith = { hwt ->
-                                                  onJumpToHadith(hwt)
-                                                  showBottomSheet = false
-                                              })
+                        ReaderHadithNavigator(
+                            books = books,
+                            hadiths = hadiths,
+                            currentBookId = bookId.value ?: 0,
+                            currentHadithNumber = currentHadithNumber(),
+                            onJumpToBook = { bwi ->
+                                onJumpToBook(bwi)
+                                showBottomSheet = false
+                            },
+                            onJumpToHadith = { hwt ->
+                                onJumpToHadith(hwt)
+                                showBottomSheet = false
+                            },
+                        )
                     }
                 }
             }

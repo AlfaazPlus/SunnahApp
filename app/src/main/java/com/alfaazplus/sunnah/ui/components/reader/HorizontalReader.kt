@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import android.provider.CalendarContract.Colors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
 import com.alfaazplus.sunnah.ui.components.hadith.HadithText
@@ -58,6 +59,8 @@ import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.composable.getArabicTextSize
 import com.alfaazplus.sunnah.ui.utils.composable.getTranslationTextSize
+import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -95,12 +98,9 @@ private fun resolvePage(hadithList: List<ParsedHadith>, hadithNumber: String?): 
 private fun HadithGrade(hwt: ParsedHadith) {
     if (hwt.gradeType == null) return
 
-    val color = when (hwt.gradeType) {
-        // green
-        "sahih" -> Color(0xFF4CAF50)
-        // yellow
-        "hasan" -> Color(0xFF9D912B)
-        // red
+    val color = when (hwt.gradeType) { // green
+        "sahih" -> Color(0xFF4CAF50) // yellow
+        "hasan" -> Color(0xFF9D912B) // red
         "daif" -> Color(0xFFF44336)
         else -> MaterialTheme.colorScheme.onSurface
     }
@@ -264,22 +264,37 @@ private fun PageContent(
 @Composable
 fun HorizontalReader(
     vm: ReaderViewModel,
-    initialHadithNumber: String?,
 ) {
     val hadithList = vm.parsedHadithList
     val pagerState = rememberPagerState(
-        initialPage = resolvePage(hadithList, initialHadithNumber) ?: 0,
+        initialPage = resolvePage(hadithList, vm.initialHadithNumber.first) ?: 0,
         pageCount = { hadithList.size },
     )
 
-    LaunchedEffect(initialHadithNumber) {
-        if (initialHadithNumber != null) {
-            val index = resolvePage(hadithList, initialHadithNumber)
-            if (index != null) {
-                pagerState.scrollToPage(index)
+    LaunchedEffect(Unit) {
+        val initialHNo = vm.initialHadithNumber
+        val transientScroll = vm.transientScroll
+
+        if (initialHNo.first != null && !initialHNo.second) {
+            val index = resolvePage(hadithList, initialHNo.first)
+            if (index != null) pagerState.scrollToPage(index)
+
+            vm.initialHadithNumber = Pair(initialHNo.first, true)
+        } else {
+            transientScroll.get()?.let {
+                val index = resolvePage(hadithList, it)
+                if (index != null) pagerState.scrollToPage(index)
+            }
+        }
+
+        DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
+            if (vm.hadithLayout != layout) {
+                vm.transientScroll.set(vm.currentHadithNumber)
+                vm.hadithLayout = layout
             }
         }
     }
+
 
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -307,16 +322,15 @@ fun HorizontalReader(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            ReaderAppBar(readerVm = vm,
-                         currentHadithNumber = currentHadithNumber,
-                         scrollBehavior = scrollBehavior,
-                         onJumpToBook = { navigateToBook(it.book.id) },
-                         onJumpToHadith = {
-                             val index = resolvePage(hadithList, it.hadith.hadithNumber)
-                             if (index != null) {
-                                 navigateToIndex(index)
-                             }
-                         })
+            ReaderAppBar(readerVm = vm, currentHadithNumber = {
+                Logger.d("REQUEST CURRRENT HADITH NUM")
+                currentHadithNumber
+            }, scrollBehavior = scrollBehavior, onJumpToBook = { navigateToBook(it.book.id) }, onJumpToHadith = {
+                val index = resolvePage(hadithList, it.hadith.hadithNumber)
+                if (index != null) {
+                    navigateToIndex(index)
+                }
+            })
         },
         bottomBar = {
             HorizontalReaderBottomBar(
