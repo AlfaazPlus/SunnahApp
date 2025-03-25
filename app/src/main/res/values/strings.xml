@@ -100,4 +100,8 @@
     <string name="manage_collections">Manage Collections</string>
     <string name="delete_collection">Delete Collection?</string>
     <string name="msg_delete_collection">Are you sure you want to delete this collection?</string>
+    <string name="desc_hadith_options">Hadith options</string>
+    <string name="narrators_chain">Narrators Chain</string>
+    <string name="desc_narrators_chain">View narrators chain</string>
+    <string name="scholar_info">Scholar Information</string>
 </resources>

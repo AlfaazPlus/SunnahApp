@@ -6,6 +6,7 @@ data class ParsedHadith(private val hwt: HadithWithTranslation) {
     var hadithText: AnnotatedString? = null
     var narratorPrefixText: CharSequence? = null
     var narratorSuffixText: CharSequence? = null
+    var translationNarrator: AnnotatedString? = null
     var translationText: AnnotatedString? = null
     var gradeType: String? = null
 

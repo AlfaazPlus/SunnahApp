@@ -11,6 +11,8 @@ object Keys {
     const val COLLECTION_ID = "collection_id"
     const val BOOK_ID = "book_id"
     const val HADITH_NUMBER = "hadith_number"
+    const val HADITH_URN = "hadith_urn"
+    const val SCHOLAR_ID = "scholar_id"
 
     const val HADITH_LAYOUT = "hadith_layout"
     const val HADITH_TEXT_OPTION = "hadith_text_option"

@@ -60,7 +60,7 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 @Composable
-fun ItemDivider() {
+private fun ItemDivider() {
     HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,7 +69,7 @@ fun ItemDivider() {
 }
 
 @Composable
-fun HadithItem(
+private fun HadithItem(
     hwt: HadithWithTranslation,
     isActive: Boolean,
     onClick: () -> Unit,
@@ -96,7 +96,7 @@ fun HadithItem(
 }
 
 @Composable
-fun HadithList(
+private fun HadithList(
     hadiths: List<HadithWithTranslation>,
     currentHadithNumber: String,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
@@ -139,7 +139,7 @@ fun HadithList(
 }
 
 @Composable
-fun BookItem(
+private fun BookItem(
     bwi: BookWithInfo,
     isActive: Boolean,
     onClick: () -> Unit,
@@ -194,7 +194,7 @@ fun BookItem(
 }
 
 @Composable
-fun BookList(
+private fun BookList(
     books: List<BookWithInfo>,
     currentBookId: Int,
     onJumpToBook: (BookWithInfo) -> Unit,

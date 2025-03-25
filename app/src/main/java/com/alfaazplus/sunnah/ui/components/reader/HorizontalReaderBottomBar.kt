@@ -1,24 +1,25 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +28,7 @@ import com.alfaazplus.sunnah.R
 
 @Composable
 private fun NavigationButtonIcon(
-    @DrawableRes
-    icon: Int,
+    @DrawableRes icon: Int,
     label: String,
     modifier: Modifier,
 ) {
@@ -49,57 +49,58 @@ private fun NavigationButton(
     isPrevious: Boolean,
     onClick: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Card(
         modifier = modifier
             .height(50.dp)
             .padding(horizontal = 10.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.background)
-            .clickable(
-                enabled = hadithNumber != null,
-            ) { onClick() }
-            .alpha(if (hadithNumber != null) 1f else 0.5f)
-    ) {
-        if (hadithNumber != null) {
-            Text(
-                text = if (isPrevious && hadithNumber == "book") stringResource(R.string.previousBook)
-                else if (!isPrevious && hadithNumber == "book") stringResource(R.string.nextBook)
-                else hadithNumber,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+            .alpha(if (hadithNumber != null) 1f else 0.5f),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+        ),
+        shape = MaterialTheme.shapes.small,
+        enabled = hadithNumber != null,
+        onClick = onClick,
 
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (isPrevious) {
-                NavigationButtonIcon(
-                    icon = R.drawable.ic_arrow_left,
-                    label = stringResource(R.string.previousHadith),
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                )
-            }
-            if (hadithNumber != "book") {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            if (hadithNumber != null) {
                 Text(
-                    text = if (isPrevious) stringResource(R.string.previousHadith) else stringResource(R.string.nextHadith),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Normal,
+                    text = if (isPrevious && hadithNumber == "book") stringResource(R.string.previousBook)
+                    else if (!isPrevious && hadithNumber == "book") stringResource(R.string.nextBook)
+                    else hadithNumber,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
-            if (!isPrevious) {
-                NavigationButtonIcon(
-                    icon = R.drawable.ic_arrow_right,
-                    label = stringResource(R.string.nextHadith),
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                )
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (isPrevious) {
+                    NavigationButtonIcon(
+                        icon = R.drawable.ic_arrow_left, label = stringResource(R.string.previousHadith), modifier = Modifier.padding(end = 4.dp)
+                    )
+                }
+                if (hadithNumber != "book") {
+                    Text(
+                        text = if (isPrevious) stringResource(R.string.previousHadith) else stringResource(R.string.nextHadith),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Normal,
+                    )
+                }
+                if (!isPrevious) {
+                    NavigationButtonIcon(
+                        icon = R.drawable.ic_arrow_right, label = stringResource(R.string.nextHadith), modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
             }
         }
     }
@@ -112,21 +113,25 @@ fun HorizontalReaderBottomBar(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        contentPadding = PaddingValues(0.dp),
-        modifier = Modifier.height(64.dp)
+    Surface(
+        shadowElevation = 12.dp,
     ) {
-        NavigationButton(
-            hadithNumber = prevHadithNumber,
-            modifier = Modifier.weight(1f),
-            isPrevious = true,
-        ) { onPreviousClick() }
-        NavigationButton(
-            hadithNumber = nextHadithNumber,
-            modifier = Modifier.weight(1f),
-            isPrevious = false,
-        ) { onNextClick() }
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.height(64.dp)
+        ) {
+            NavigationButton(
+                hadithNumber = prevHadithNumber,
+                modifier = Modifier.weight(1f),
+                isPrevious = true,
+            ) { onPreviousClick() }
+            NavigationButton(
+                hadithNumber = nextHadithNumber,
+                modifier = Modifier.weight(1f),
+                isPrevious = false,
+            ) { onNextClick() }
+        }
     }
 }

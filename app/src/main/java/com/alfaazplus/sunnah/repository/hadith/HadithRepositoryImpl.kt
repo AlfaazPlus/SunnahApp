@@ -1,11 +1,16 @@
 package com.alfaazplus.sunnah.repository.hadith
 
 import com.alfaazplus.sunnah.db.dao.HadithDao
+import com.alfaazplus.sunnah.db.dao.ScholarsDao
+import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 
-class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
+class HadithRepositoryImpl(
+    private val dao: HadithDao,
+    private val scholarsDao: ScholarsDao,
+) : HadithRepository {
     override suspend fun getCollection(collectionId: Int): CollectionWithInfo {
         return CollectionWithInfo(
             dao.getCollectionById(collectionId), dao.getCollectionInfoById("en", collectionId)
@@ -47,5 +52,13 @@ class HadithRepositoryImpl(private val dao: HadithDao) : HadithRepository {
 
     override suspend fun deleteCollection(collectionId: Int) {
         dao.deleteCollection(collectionId)
+    }
+
+
+    override suspend fun getNarratorsOfHadith(urn: Int): List<Scholar> {
+        val narratorIdsStr = dao.getNarratorIds(urn)
+        val narratorIds = narratorIdsStr.split(",").map { it.toInt() }
+
+        return scholarsDao.getScholars(narratorIds)
     }
 }

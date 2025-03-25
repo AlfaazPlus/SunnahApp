@@ -33,4 +33,6 @@ object Routes {
     const val SETTINGS_MANAGE_COLLECTIONS = "settings_manage_collections"
     val BOOKS_INDEX = SingleArgRoute("books_index", Keys.COLLECTION_ID)
     val READER = MultiArgRoute("reader", listOf(Keys.COLLECTION_ID, Keys.BOOK_ID, Keys.HADITH_NUMBER))
+    val NARRATOR_CHAIN = SingleArgRoute("narrators_chain", Keys.HADITH_URN)
+    val SCHOLAR_INFO = SingleArgRoute("scholar_info", Keys.SCHOLAR_ID)
 }

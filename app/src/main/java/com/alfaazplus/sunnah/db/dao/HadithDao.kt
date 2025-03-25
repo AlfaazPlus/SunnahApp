@@ -13,6 +13,7 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.models.scholars.Scholar
 
 @Dao
 interface HadithDao {
@@ -75,4 +76,7 @@ interface HadithDao {
 
     @Query("DELETE FROM collection WHERE collection_id = :collectionId")
     suspend fun deleteCollection(collectionId: Int)
+
+    @Query("SELECT narrators2 from hadith WHERE urn = :urn")
+    suspend fun getNarratorIds(urn: Int): String
 }

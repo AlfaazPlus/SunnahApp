@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
@@ -140,6 +140,9 @@ fun VerticalReader(vm: ReaderViewModel) {
         }
     }
 
+    val isDarkTheme = ThemeUtils.isDarkTheme()
+    val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
+    val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -162,6 +165,8 @@ fun VerticalReader(vm: ReaderViewModel) {
                 },
             )
         },
+        containerColor = bgColor,
+        contentColor = txtColor,
     ) {
         Box(
             modifier = Modifier.padding(it)

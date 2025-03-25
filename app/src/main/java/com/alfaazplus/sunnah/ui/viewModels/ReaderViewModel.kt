@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.core.text.parseAsHtml
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -85,21 +87,27 @@ class ReaderViewModel @Inject constructor(
 
     private fun parseHadiths() {
         parsedHadithList = hadithList.map {
+            val hadith = it.hadith
+            val translation = it.translation
             val parsedHadith = ParsedHadith(it)
 
-            if (!it.hadith.narratorPrefix.isNullOrEmpty()) {
-                parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(it.hadith.narratorPrefix)
+            if (!hadith.narratorPrefix.isNullOrEmpty()) {
+                parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(hadith.narratorPrefix)
             }
 
-            parsedHadith.hadithText = HadithTextHelper.prepareText(it.hadith.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+            parsedHadith.hadithText =
+                HadithTextHelper.prepareText(hadith.hadithText.replace("\n", "<br/>")).toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
-            if (!it.hadith.narratorSuffix.isNullOrEmpty()) {
-                parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(it.hadith.narratorSuffix)
+            if (!hadith.narratorSuffix.isNullOrEmpty()) {
+                parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(hadith.narratorSuffix)
             }
 
-            if (it.translation != null) {
+            if (translation != null) {
+                parsedHadith.translationNarrator = buildAnnotatedString {
+                    append(translation.narratorPrefix?.parseAsHtml())
+                }
                 parsedHadith.translationText =
-                    HadithTextHelper.prepareText(it.translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                    HadithTextHelper.prepareText(translation.hadithText.replace("\n", "<br/>")).toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
                 if (parsedHadith.translation?.grades?.contains("Sahih") == true) {
                     parsedHadith.gradeType = "sahih"

@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -49,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
+import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.HadithText
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
@@ -57,9 +61,11 @@ import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.composable.getArabicTextSize
 import com.alfaazplus.sunnah.ui.utils.composable.getTranslationTextSize
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
@@ -105,11 +111,19 @@ private fun HadithGrade(hwt: ParsedHadith) {
         else -> MaterialTheme.colorScheme.onSurface
     }
 
-    Text(
-        "Grade: ${hwt.translation?.grades}", color = color,
-        style = MaterialTheme.typography.labelMedium,
+    Card(
         modifier = Modifier.padding(top = 16.dp),
-    )
+        shape = MaterialTheme.shapes.extraSmall,
+        colors = CardDefaults.cardColors(
+            containerColor = color.alpha(0.2f)
+        ),
+    ) {
+        Text(
+            "Grade: ${hwt.translation?.grades}", color = color,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+        )
+    }
 }
 
 @Composable
@@ -120,20 +134,60 @@ private fun HadithActionBar(
 ) {
     var showReferenceSheet by remember { mutableStateOf(false) }
 
+    val isDarkTheme = ThemeUtils.isDarkTheme()
+    val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
+    val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onBackground
+
+    val navController = LocalNavHostController.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically
-
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        IconButton(modifier = Modifier
-            .padding(0.dp)
-            .size(32.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface
-        ), onClick = { }) {
-            Icon(
-                modifier = Modifier.padding(6.dp), painter = painterResource(R.drawable.ic_ellipsis_vertical), contentDescription = "Menu"
-            )
+        SimpleTooltip(
+            text = stringResource(R.string.desc_hadith_options)
+        ) {
+            IconButton(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .size(32.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = bgColor,
+                    contentColor = txtColor,
+                ),
+                onClick = { },
+            ) {
+                Icon(
+                    modifier = Modifier.padding(6.dp),
+                    painter = painterResource(R.drawable.ic_ellipsis_vertical),
+                    contentDescription = stringResource(R.string.desc_hadith_options),
+                )
+            }
+        }
+        SimpleTooltip(
+            text = stringResource(R.string.desc_narrators_chain)
+        ) {
+            IconButton(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .size(32.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = bgColor,
+                    contentColor = txtColor,
+                ),
+                onClick = {
+                    navController.navigate(route = Routes.NARRATOR_CHAIN.arg(hadith.hadith.urn))
+                },
+            ) {
+                Icon(
+                    modifier = Modifier.padding(6.dp),
+                    painter = painterResource(R.drawable.ic_users),
+                    contentDescription = stringResource(R.string.desc_narrators_chain),
+                )
+            }
         }
 
         Box(
@@ -141,7 +195,8 @@ private fun HadithActionBar(
         ) { }
 
         Card(shape = MaterialTheme.shapes.small, colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface
+            containerColor = bgColor,
+            contentColor = txtColor,
         ), onClick = { showReferenceSheet = true }) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -172,9 +227,7 @@ fun HadithItem(cwi: CollectionWithInfo, bwi: BookWithInfo, parsedHadith: ParsedH
     val translationTextSize = getTranslationTextSize()
     val isSerifFontStyle = ReaderUtils.getIsSerifFontStyle()
 
-    val translation = parsedHadith.translation
-
-    val hadithText = if (parsedHadith.hadithText == null || hadithTextOption == ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION) null
+    val arabicHadithText = if (parsedHadith.hadithText == null || hadithTextOption == ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION) null
     else buildAnnotatedString {
         if (!parsedHadith.narratorPrefixText.isNullOrEmpty() && showSanad) {
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground.alpha(0.7f))) { append(parsedHadith.narratorPrefixText) }
@@ -184,6 +237,9 @@ fun HadithItem(cwi: CollectionWithInfo, bwi: BookWithInfo, parsedHadith: ParsedH
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground.alpha(0.7f))) { append(parsedHadith.narratorSuffixText) }
         }
     }
+
+    val translationNarrator = parsedHadith.translationNarrator
+    val translationHadithText = parsedHadith.translationText
 
     var modifier = Modifier
         .fillMaxWidth()
@@ -204,35 +260,39 @@ fun HadithItem(cwi: CollectionWithInfo, bwi: BookWithInfo, parsedHadith: ParsedH
         )
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            HadithText(text = hadithText,
-                       fontFamily = fontUthmani,
-                       fontSize = arabicTextSize.first,
-                       lineHeight = arabicTextSize.second,
-                       modifier = Modifier.padding(bottom = 20.dp),
-                       quranAppNotInstallCallback = {
-                           showNoQuranAppBottomSheet = true
-                       })
+            HadithText(
+                text = arabicHadithText,
+                fontFamily = fontUthmani,
+                fontSize = arabicTextSize.first,
+                lineHeight = arabicTextSize.second,
+                modifier = Modifier.padding(bottom = 20.dp),
+                quranAppNotInstallCallback = {
+                    showNoQuranAppBottomSheet = true
+                },
+            )
         }
-        if (parsedHadith.translationText != null && hadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC) {
-            if (translation != null && !translation.narratorPrefix.isNullOrEmpty()) {
+        if (translationHadithText != null && hadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC) {
+            if (!translationNarrator.isNullOrEmpty()) {
                 Text(
-                    translation.narratorPrefix,
+                    translationNarrator,
                     modifier = Modifier
                         .alpha(0.7f)
                         .padding(bottom = 10.dp),
                     style = MaterialTheme.typography.labelMedium,
                     fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.Normal,
                 )
             }
 
-            HadithText(text = parsedHadith.translationText,
-                       fontSize = translationTextSize.first,
-                       fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
-                       lineHeight = translationTextSize.second,
-                       quranAppNotInstallCallback = {
-                           showNoQuranAppBottomSheet = true
-                       })
+            HadithText(
+                text = translationHadithText,
+                fontSize = translationTextSize.first,
+                fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
+                lineHeight = translationTextSize.second,
+                quranAppNotInstallCallback = {
+                    showNoQuranAppBottomSheet = true
+                },
+            )
         }
 
         HadithGrade(parsedHadith)
@@ -318,37 +378,42 @@ fun HorizontalReader(
     LaunchedEffect(currentHadithNumber) {
         vm.currentHadithNumber = currentHadithNumber
     }
-
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            ReaderAppBar(readerVm = vm, currentHadithNumber = {
+    val isDarkTheme = ThemeUtils.isDarkTheme()
+    val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
+    val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+    Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+        ReaderAppBar(
+            readerVm = vm,
+            currentHadithNumber = {
                 Logger.d("REQUEST CURRRENT HADITH NUM")
                 currentHadithNumber
-            }, scrollBehavior = scrollBehavior, onJumpToBook = { navigateToBook(it.book.id) }, onJumpToHadith = {
+            },
+            scrollBehavior = scrollBehavior,
+            onJumpToBook = { navigateToBook(it.book.id) },
+            onJumpToHadith = {
                 val index = resolvePage(hadithList, it.hadith.hadithNumber)
                 if (index != null) {
                     navigateToIndex(index)
                 }
-            })
-        },
-        bottomBar = {
-            HorizontalReaderBottomBar(
-                prevHadithNumber = previousHadithNumber,
-                nextHadithNumber = nextHadithNumber,
-                onPreviousClick = {/*if (previousHadithNumber == "book") {
+            },
+        )
+    }, bottomBar = {
+        HorizontalReaderBottomBar(
+            prevHadithNumber = previousHadithNumber,
+            nextHadithNumber = nextHadithNumber,
+            onPreviousClick = {/*if (previousHadithNumber == "book") {
                         getPreviousBookId(vm.books, vm.bookId.value)?.let { navigateToBook(it) }
                     } else {
                     }*/
-                    navigateToIndex(pagerState.currentPage - 1)
-                },
-                onNextClick = {/*if (nextHadithNumber == "book") {
+                navigateToIndex(pagerState.currentPage - 1)
+            },
+            onNextClick = {/*if (nextHadithNumber == "book") {
                         getNextBookId(vm.books, vm.bookId.value)?.let { navigateToBook(it) }
                     } else {
                     }*/
-                    navigateToIndex(pagerState.currentPage + 1)
-                },
-            )
-        },
+                navigateToIndex(pagerState.currentPage + 1)
+            },
+        )
+    }, containerColor = bgColor, contentColor = txtColor
     ) { PageContent(vm.cwi!!, vm.bwi!!, it, hadithList, pagerState) }
 }

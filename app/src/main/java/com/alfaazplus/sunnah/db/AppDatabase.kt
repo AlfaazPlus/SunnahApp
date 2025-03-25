@@ -11,6 +11,7 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.models.scholars.Scholar
 
 @Database(
     entities = [
@@ -21,7 +22,7 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
         HChapter::class,
         HChapterInfo::class,
         Hadith::class,
-        HadithTranslation::class
+        HadithTranslation::class,
     ],
     version = 1,
 )

@@ -20,7 +20,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
+import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
+import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
@@ -77,23 +79,36 @@ fun MainApp() {
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
                 route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
 
-                route(Routes.READER(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
-                                                          navArgument(Keys.BOOK_ID) { type = NavType.IntType },
-                                                          navArgument(Keys.HADITH_NUMBER) {
-                                                              type = NavType.StringType
-                                                              defaultValue = null
-                                                              nullable = true
-                                                          })) { rsEntry ->
+                route(
+                    Routes.BOOKS_INDEX(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })
+                ) { bsEntry ->
+                    BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
+                }
+                route(
+                    Routes.READER(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
+                                                        navArgument(Keys.BOOK_ID) { type = NavType.IntType },
+                                                        navArgument(Keys.HADITH_NUMBER) {
+                                                            type = NavType.StringType
+                                                            defaultValue = null
+                                                            nullable = true
+                                                        })
+                ) { rsEntry ->
                     ReaderScreen(
                         collectionId = rsEntry.arguments?.getInt(Keys.COLLECTION_ID, 1) ?: 1,
                         bookId = rsEntry.arguments?.getInt(Keys.BOOK_ID, 1) ?: 1,
                         hadithNumber = rsEntry.arguments?.getString(Keys.HADITH_NUMBER)
                     )
                 }
+
                 route(
-                    Routes.BOOKS_INDEX(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })
+                    Routes.NARRATOR_CHAIN(), arguments = listOf(navArgument(Keys.HADITH_URN) { type = NavType.IntType })
                 ) { bsEntry ->
-                    BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
+                    NarratorsChainScreen(hadithUrn = bsEntry.arguments?.getInt(Keys.HADITH_URN) ?: 0)
+                }
+                route(
+                    Routes.SCHOLAR_INFO(), arguments = listOf(navArgument(Keys.SCHOLAR_ID) { type = NavType.IntType })
+                ) { bsEntry ->
+                    ScholarInfoScreen(scholarId = bsEntry.arguments?.getInt(Keys.SCHOLAR_ID) ?: 0)
                 }
             }
         }
