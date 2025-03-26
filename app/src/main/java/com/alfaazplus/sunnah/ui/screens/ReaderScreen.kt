@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,6 +14,7 @@ import com.alfaazplus.sunnah.ui.components.reader.HorizontalReader
 import com.alfaazplus.sunnah.ui.components.reader.VerticalReader
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -22,6 +24,7 @@ fun ReaderScreen(
     hadithNumber: String? = null,
     vm: ReaderViewModel = hiltViewModel(),
 ) {
+    val coroutineScope = rememberCoroutineScope()
     vm.primaryColor = MaterialTheme.colorScheme.primary
     vm.onPrimaryColor = MaterialTheme.colorScheme.onPrimary
 
@@ -30,7 +33,10 @@ fun ReaderScreen(
             vm.initialHadithNumber = Pair(hadithNumber, false)
             vm.collectionId = collectionId
             vm.bookId.value = bookId
-            vm.loadEssentials()
+
+            coroutineScope.launch {
+                vm.loadEssentials()
+            }
         }
     }
 

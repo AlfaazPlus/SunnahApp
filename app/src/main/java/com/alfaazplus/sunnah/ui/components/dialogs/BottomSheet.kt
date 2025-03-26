@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 fun BottomSheet(
     isOpen: Boolean,
     onDismiss: () -> Unit,
-    icon: Int?,
+    icon: Int? = null,
     title: String?,
     content: @Composable () -> Unit,
 ) {

@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -47,10 +46,9 @@ private fun NarratorCard(
         colors = CardDefaults.outlinedCardColors(
             containerColor = rankColor.alpha(0.15f),
 
-        ),
+            ),
         border = BorderStroke(
-            color = rankColor.alpha(0.5f),
-            width = 1.dp
+            color = rankColor.alpha(0.5f), width = 1.dp
         ),
         onClick = {
             navController.navigate(route = Routes.SCHOLAR_INFO.arg(narrator.id))
@@ -62,9 +60,7 @@ private fun NarratorCard(
             verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
-                text = "${narrator.shortName}\n${narrator.arabic}",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                text = "${narrator.shortName}\n${narrator.arabic}", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center
             )
             Text(
                 modifier = Modifier.alpha(0.8f),
@@ -88,7 +84,8 @@ private fun NarratorsList(narrators: List<Scholar>) {
         ),
     ) {
         items(
-            count = narrators.size
+            count = narrators.size,
+            key = { narrators[it].id },
         ) { i ->
             NarratorCard(narrators[i])
 

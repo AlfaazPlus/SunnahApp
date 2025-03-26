@@ -11,10 +11,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -66,8 +68,10 @@ private fun PageContent(
         contentPadding = PaddingValues(top = 20.dp, bottom = 120.dp),
         state = listState,
     ) {
-        items(totalHadiths) { index ->
-            HadithItem(vm.cwi!!, vm.bwi!!, hadithList[index], true)
+        items(totalHadiths, key = { hadithList[it].hadith.urn }) { index ->
+            val hadithItem = hadithList[index]
+
+            HadithItem(vm.cwi!!, vm.bwi!!, hadithItem, true)
 
             HorizontalDivider(
                 modifier = Modifier.padding(top = 20.dp)
@@ -87,25 +91,28 @@ fun VerticalReader(vm: ReaderViewModel) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
 
-    val hadithList = vm.parsedHadithList
 
-    fun navigateToHadith(hadithNumber: String) {
-        val index = hadithList.indexOfFirst { parsedHadith ->
-            parsedHadith.hadith.hadithNumber == hadithNumber
-        }
-        if (index >= 0) {
-            vm.currentHadithNumber = hadithNumber
-            coroutineScope.launch {
-                listState.scrollToItem(index)
+    val navigateToHadith = remember {
+        { hadithNumber: String ->
+            val index = vm.parsedHadithList.indexOfFirst { parsedHadith ->
+                parsedHadith.hadith.hadithNumber == hadithNumber
+            }
+            if (index >= 0) {
+                vm.currentHadithNumber = hadithNumber
+                coroutineScope.launch {
+                    listState.scrollToItem(index)
+                }
             }
         }
     }
 
-    fun navigateToBook(bookId: Int) {
-        vm.bookId.value = bookId
+    val navigateToBook = remember {
+        { bookId: Int ->
+            vm.bookId.value = bookId
 
-        coroutineScope.launch {
-            listState.scrollToItem(0)
+            coroutineScope.launch {
+                listState.scrollToItem(0)
+            }
         }
     }
 
@@ -129,17 +136,20 @@ fun VerticalReader(vm: ReaderViewModel) {
             }
         }
 
-        DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
-            if (vm.hadithLayout != layout) {
-                val index = listState.firstVisibleItemIndex
-                val hadithNumber = hadithList.getOrNull(index)?.hadith?.hadithNumber
+        coroutineScope.launch {
+            DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
+                if (vm.hadithLayout != layout) {
+                    val index = listState.firstVisibleItemIndex
+                    val hadithNumber = vm.parsedHadithList.getOrNull(index)?.hadith?.hadithNumber
 
-                vm.transientScroll.set(hadithNumber)
-                vm.hadithLayout = layout
+                    vm.transientScroll.set(hadithNumber)
+                    vm.hadithLayout = layout
+                }
             }
         }
     }
 
+    val hadithList = vm.parsedHadithList
     val isDarkTheme = ThemeUtils.isDarkTheme()
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface

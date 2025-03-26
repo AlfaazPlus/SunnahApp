@@ -99,18 +99,15 @@ object DatabaseHelper {
     }
 
     private fun stringColumn(columns: JSONArray, index: Int): String {
-        if (columns.isNull(index))
-            return ""
+        if (columns.isNull(index)) return ""
 
-        if (columns[index] is String)
-            return columns[index] as String
+        if (columns[index] is String) return columns[index] as String
 
         return columns[index].toString()
     }
 
     private fun doubleColumn(columns: JSONArray, index: Int): Double {
-        if (columns[index] is Double)
-            return columns[index] as Double
+        if (columns[index] is Double) return columns[index] as Double
 
         return columns[index].toString().toDouble()
     }
@@ -128,16 +125,16 @@ object DatabaseHelper {
                 try {
                     dao.insertBook(
                         HBook(
-                            columns[0] as Int, // id
-                            columns[1] as Int, // collection_id
-                            columns[2] as String, // serial_number
-                            columns[3] as Int, // order_in_collection
-                            columns[4] as Int, // hadith_start
-                            columns[5] as Int, // hadith_end
-                            columns[6] as Int, // hadith_count
-                            stringColumn(columns, 7), // title
-                            stringColumn(columns, 8), // intro
-                            stringColumn(columns, 9), // description
+                            id = columns[0] as Int,
+                            collectionId = columns[1] as Int,
+                            serialNumber = columns[2] as String,
+                            orderInCollection = columns[3] as Int,
+                            hadithStart = columns[4] as Int,
+                            hadithEnd = columns[5] as Int,
+                            hadithCount = columns[6] as Int,
+                            title = stringColumn(columns, 7),
+                            intro = stringColumn(columns, 8),
+                            description = stringColumn(columns, 9),
                         )
                     )
                 } catch (e: Exception) {
@@ -161,13 +158,13 @@ object DatabaseHelper {
                 try {
                     dao.insertBookInfo(
                         HBookInfo(
-                            columns[0] as Int,  // id
-                            columns[1] as Int,  // book_id
-                            columns[2] as Int,  // collection_id
-                            columns[3] as String,  // title
-                            stringColumn(columns, 4),  // intro
-                            stringColumn(columns, 5),  // description
-                            columns[6] as String,  // language_code
+                            id = columns[0] as Int,
+                            bookId = columns[1] as Int,
+                            collectionId = columns[2] as Int,
+                            title = columns[3] as String,
+                            intro = stringColumn(columns, 4),
+                            description = stringColumn(columns, 5),
+                            languageCode = columns[6] as String,
                         )
                     )
                 } catch (e: Exception) {
@@ -188,14 +185,14 @@ object DatabaseHelper {
 
                 dao.insertChapter(
                     HChapter(
-                        doubleColumn(columns, 0),  // id
-                        columns[1] as Int,  // collection_id
-                        columns[2] as Int,  // book_id
-                        stringColumn(columns, 3),  // serial_number
-                        stringColumn(columns, 4),  // title
-                        stringColumn(columns, 5),  // intro
-                        stringColumn(columns, 6),  // description
-                        stringColumn(columns, 7),  // ending
+                        id = doubleColumn(columns, 0),
+                        collectionId = columns[1] as Int,
+                        bookId = columns[2] as Int,
+                        serialNumber = stringColumn(columns, 3),
+                        title = stringColumn(columns, 4),
+                        intro = stringColumn(columns, 5),
+                        description = stringColumn(columns, 6),
+                        ending = stringColumn(columns, 7),
                     )
                 )
             }
@@ -212,16 +209,16 @@ object DatabaseHelper {
 
                 dao.insertChapterInfo(
                     HChapterInfo(
-                        columns[0] as Int,  // id
-                        columns[1] as Int,  // collection_id
-                        columns[2] as Int,  // book_id
-                        doubleColumn(columns, 3),  // chapter_id
-                        stringColumn(columns, 4),  // serial_number
-                        stringColumn(columns, 5),  // title
-                        stringColumn(columns, 6),  // intro
-                        stringColumn(columns, 7),  // description
-                        stringColumn(columns, 8),  // ending
-                        columns[9] as String,  // language_code
+                        id = columns[0] as Int,
+                        collectionId = columns[1] as Int,
+                        bookId = columns[2] as Int,
+                        chapterId = doubleColumn(columns, 3),
+                        serialNumber = stringColumn(columns, 4),
+                        title = stringColumn(columns, 5),
+                        intro = stringColumn(columns, 6),
+                        description = stringColumn(columns, 7),
+                        ending = stringColumn(columns, 8),
+                        languageCode = columns[9] as String,
                     )
                 )
             }
@@ -239,21 +236,22 @@ object DatabaseHelper {
                 try {
                     dao.insertHadith(
                         Hadith(
-                            columns[0] as Int,  // id
-                            stringColumn(columns, 1),  // urn
-                            columns[2] as Int,  // collection_id
-                            columns[3] as Int,  // book_id
-                            if (columns.isNull(4)) null else doubleColumn(columns, 4),  // chapter_id
-                            stringColumn(columns, 5),  // hadith_number
-                            columns[6] as Int,  // order_in_book
-                            stringColumn(columns, 7),  // narrator_prefix
-                            stringColumn(columns, 8),  // hadith_text
-                            stringColumn(columns, 9),  // narrator_suffix
-                            stringColumn(columns, 10),  // comments
-                            stringColumn(columns, 11),  // grades
-                            stringColumn(columns, 12),  // narrators
-                            stringColumn(columns, 13),  // narrators2
-                            stringColumn(columns, 14),  // related
+                            id = columns[0] as Int,
+                            urn = stringColumn(columns, 1),
+                            collectionId = columns[2] as Int,
+                            bookId = columns[3] as Int,
+                            chapterId = if (columns.isNull(4)) null else doubleColumn(columns, 4),
+                            hadithNumber = stringColumn(columns, 5),
+                            orderInBook = columns[6] as Int,
+                            hadithPrefix = stringColumn(columns, 7),
+                            hadithText = stringColumn(columns, 8),
+                            hadithSuffix = stringColumn(columns, 9),
+                            comments = stringColumn(columns, 10),
+                            grades = stringColumn(columns, 11),
+                            gradedBy = stringColumn(columns, 12),
+                            narrators = stringColumn(columns, 13),
+                            narrators2 = stringColumn(columns, 14),
+                            related = stringColumn(columns, 15),
                         )
                     )
                 } catch (e: Exception) {
@@ -277,20 +275,21 @@ object DatabaseHelper {
                 try {
                     dao.insertHadithTranslation(
                         HadithTranslation(
-                            columns[0] as Int,  // id
-                            columns[1] as Int,  // collection_id
-                            stringColumn(columns, 2),  // urn
-                            stringColumn(columns, 3),  // ar_urn
-                            stringColumn(columns, 4),  // narrator_prefix
-                            stringColumn(columns, 5),  // hadith_text
-                            stringColumn(columns, 6),  // narrator_suffix
-                            stringColumn(columns, 7),  // comments
-                            stringColumn(columns, 8),  // grades
-                            stringColumn(columns, 9),  // reference
-                            stringColumn(columns, 10),  // reference_in_book
-                            stringColumn(columns, 11),  // reference_usc_msa
-                            stringColumn(columns, 12),  // reference_eng
-                            columns[13] as String,  // language_code
+                            id = columns[0] as Int,
+                            collectionId = columns[1] as Int,
+                            urn = stringColumn(columns, 2),
+                            arUrn = stringColumn(columns, 3),
+                            narratorPrefix = stringColumn(columns, 4),
+                            hadithText = stringColumn(columns, 5),
+                            narratorSuffix = stringColumn(columns, 6),
+                            comments = stringColumn(columns, 7),
+                            grades = stringColumn(columns, 8),
+                            gradedBy = stringColumn(columns, 9),
+                            reference = stringColumn(columns, 10),
+                            refInBook = stringColumn(columns, 11),
+                            refUscMsa = stringColumn(columns, 12),
+                            refEn = stringColumn(columns, 13),
+                            langCode = columns[14] as String,
                         )
                     )
                 } catch (e: Exception) {
@@ -305,15 +304,15 @@ object DatabaseHelper {
         val columns = JSONArray(jsonText)
 
         return HCollection(
-            columns[0] as Int, // id
-            columns[1] as String, // type
-            columns[2] == 1, // has_volumes
-            columns[3] == 1, // has_books
-            columns[4] == 1, // has_chapters
-            columns[5] as String, // name
-            stringColumn(columns, 6), // intro
-            stringColumn(columns, 7), // description
-            stringColumn(columns, 8), // numbering_source
+            id = columns[0] as Int,
+            type = columns[1] as String,
+            hasVolumes = columns[2] == 1,
+            hasBooks = columns[3] == 1,
+            hasChapters = columns[4] == 1,
+            name = columns[5] as String,
+            intro = stringColumn(columns, 6),
+            description = stringColumn(columns, 7),
+            numberingSource = stringColumn(columns, 8),
         )
     }
 
@@ -321,13 +320,13 @@ object DatabaseHelper {
         val columns = JSONArray(jsonText)
 
         return HCollectionInfo(
-            columns[0] as Int, // id
-            columns[1] as Int, // collection_id
-            columns[2] as String, // name
-            stringColumn(columns, 3), // intro
-            stringColumn(columns, 4), // description
-            stringColumn(columns, 5), // numbering_source
-            columns[6] as String // language_code
+            id = columns[0] as Int,
+            collectionId = columns[1] as Int,
+            name = columns[2] as String,
+            intro = stringColumn(columns, 3),
+            description = stringColumn(columns, 4),
+            numberingSource = stringColumn(columns, 5),
+            languageCode = columns[6] as String
         )
     }
 }

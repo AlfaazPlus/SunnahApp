@@ -22,7 +22,9 @@ import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 
 @Composable
-fun MainAppBar() {
+fun MainAppBar(
+    title: Int?,
+) {
     val navController = LocalNavHostController.current
 
     Surface(
@@ -36,7 +38,7 @@ fun MainAppBar() {
                 .padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.app_name),
+                text = stringResource(title ?: R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Black,
@@ -44,7 +46,7 @@ fun MainAppBar() {
                     .weight(1f)
                     .padding(end = 5.dp),
             )
-            SimpleTooltip(text = stringResource(R.string.search)) {
+            SimpleTooltip(text = stringResource(R.string.manage_collections)) {
                 IconButton(
                     onClick = { navController.navigate(route = Routes.SETTINGS_MANAGE_COLLECTIONS) },
                 ) {

@@ -8,7 +8,8 @@ data class ParsedHadith(private val hwt: HadithWithTranslation) {
     var narratorSuffixText: CharSequence? = null
     var translationNarrator: AnnotatedString? = null
     var translationText: AnnotatedString? = null
-    var gradeType: String? = null
+    var gradeType: Pair<Int, String>? = null
+    var chapter: ParsedChapter? = null
 
     val hadith get() = hwt.hadith
     val translation get() = hwt.translation

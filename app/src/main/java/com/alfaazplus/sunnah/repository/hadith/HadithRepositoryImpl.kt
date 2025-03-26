@@ -35,7 +35,12 @@ class HadithRepositoryImpl(
 
     override suspend fun getHadithList(collectionId: Int, bookId: Int): List<HadithWithTranslation> {
         return dao.getHadithList(collectionId, bookId).map {
-            HadithWithTranslation(it, dao.getHadithTranslationByArURN(it.urn, "en"))
+//            val chapter = it.chapterId?.let { chapterId -> dao.getChapterWithInfoById(chapterId) }
+            HadithWithTranslation(
+                it,
+                dao.getHadithTranslationByArURN(it.urn, "en"),
+//                chapter,
+            )
         }
     }
 

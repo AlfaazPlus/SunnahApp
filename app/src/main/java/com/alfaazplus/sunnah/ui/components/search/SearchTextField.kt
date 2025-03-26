@@ -1,0 +1,63 @@
+package com.alfaazplus.sunnah.ui.components.search
+
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
+
+@Composable
+fun SearchTextField() {
+    var showSearchFilterSheet by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    Row {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = TextFieldDefaults.colors(
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+            ),
+            trailingIcon = {
+                SimpleTooltip(stringResource(R.string.search_fitler)) {
+                    IconButton(onClick = {
+                        showSearchFilterSheet = true
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_fitler)
+                        )
+                    }
+                }
+            },
+            placeholder = { Text(stringResource(R.string.global_search)) },
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            textStyle = MaterialTheme.typography.titleSmall,
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true,
+        )
+    }
+
+    SearchFilterSheet(
+        isOpen = showSearchFilterSheet,
+        onClose = { showSearchFilterSheet = false },
+    )
+}

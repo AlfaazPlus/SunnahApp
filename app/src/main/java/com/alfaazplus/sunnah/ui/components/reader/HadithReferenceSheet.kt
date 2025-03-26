@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
@@ -66,8 +65,8 @@ fun HadithReferenceSheet(
     isOpen: Boolean, onClose: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val englishReference = hadith.translation?.referenceEn?.takeIf { it.trim().isNotBlank() }
-    val uscMsaReference = hadith.translation?.referenceUscMsa?.takeIf { it.trim().isNotBlank() }
+    val englishReference = hadith.translation?.refEn?.takeIf { it.trim().isNotBlank() }
+    val uscMsaReference = hadith.translation?.refUscMsa?.takeIf { it.trim().isNotBlank() }
 
     if (!isOpen) return
 
@@ -82,7 +81,7 @@ fun HadithReferenceSheet(
                 .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             ItemRow(title = "Reference", value = "${cwi.info?.name} ${hadith.hadith.hadithNumber}")
-            ItemRow(title = "In-book reference", value = hadith.translation?.referenceInBook ?: "")
+            ItemRow(title = "In-book reference", value = hadith.translation?.refInBook ?: "")
             if (englishReference != null) {
                 ItemRow(
                     title = "English reference", value = englishReference

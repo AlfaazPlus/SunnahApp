@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class CollectionListViewModel @Inject constructor(
+open class CollectionListViewModel @Inject constructor(
     private val repo: HadithRepository,
 ) : ViewModel() {
 

@@ -87,7 +87,7 @@ private fun HadithItem(
             color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
         )
         Text(
-            text = hwt.translation?.referenceInBook ?: "",
+            text = hwt.translation?.refInBook ?: "",
             style = MaterialTheme.typography.bodySmall,
             color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.alpha(0.8f),

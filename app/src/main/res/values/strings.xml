@@ -20,6 +20,10 @@
     <string name="nextBook">Next Book</string>
 
     <string name="search">Search</string>
+    <string name="global_search">Global search…</string>
+    <string name="search_fitler">Search filter</string>
+    <string name="search_in">Search in…</string>
+    <string name="search_for">Search for…</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum
@@ -104,4 +108,5 @@
     <string name="narrators_chain">Narrators Chain</string>
     <string name="desc_narrators_chain">View narrators chain</string>
     <string name="scholar_info">Scholar Information</string>
+    <string name="scholars">Scholars</string>
 </resources>

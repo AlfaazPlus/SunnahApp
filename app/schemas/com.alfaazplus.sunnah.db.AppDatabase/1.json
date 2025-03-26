@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cd048cacdd98c643cf7bdd56cbfd0441",
+    "identityHash": "f3704c1f81394e6bad4c525ad971b789",
     "entities": [
       {
         "tableName": "collection",
@@ -640,7 +640,7 @@
       },
       {
         "tableName": "hadith",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `collection_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `chapter_id` REAL, `hadith_number` TEXT NOT NULL, `order_in_book` INTEGER NOT NULL, `narrator_prefix` TEXT, `hadith_text` TEXT NOT NULL, `narrator_suffix` TEXT, `comments` TEXT, `grades` TEXT, `narrators` TEXT, `narrators2` TEXT, `related` TEXT, PRIMARY KEY(`hadith_id`), FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`, `book_id`, `chapter_id`) REFERENCES `chapter`(`collection_id`, `book_id`, `chapter_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `collection_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `chapter_id` REAL, `hadith_number` TEXT NOT NULL, `order_in_book` INTEGER NOT NULL, `hadith_prefix` TEXT, `hadith_text` TEXT NOT NULL, `hadith_suffix` TEXT, `comments` TEXT, `grades` TEXT, `graded_by` TEXT, `narrators` TEXT, `narrators2` TEXT, `related` TEXT, PRIMARY KEY(`hadith_id`), FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`, `book_id`, `chapter_id`) REFERENCES `chapter`(`collection_id`, `book_id`, `chapter_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -685,8 +685,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "narratorPrefix",
-            "columnName": "narrator_prefix",
+            "fieldPath": "hadithPrefix",
+            "columnName": "hadith_prefix",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -697,8 +697,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "narratorSuffix",
-            "columnName": "narrator_suffix",
+            "fieldPath": "hadithSuffix",
+            "columnName": "hadith_suffix",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -711,6 +711,12 @@
           {
             "fieldPath": "grades",
             "columnName": "grades",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "gradedBy",
+            "columnName": "graded_by",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -824,7 +830,7 @@
       },
       {
         "tableName": "hadith_translation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_translation_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `ar_urn` TEXT NOT NULL, `narrator_prefix` TEXT, `hadith_text` TEXT NOT NULL, `narrator_suffix` TEXT, `comments` TEXT, `grades` TEXT, `reference` TEXT, `reference_in_book` TEXT, `reference_usc_msa` TEXT, `reference_eng` TEXT, `language_code` TEXT NOT NULL, PRIMARY KEY(`hadith_translation_id`), FOREIGN KEY(`ar_urn`) REFERENCES `hadith`(`urn`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_translation_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `ar_urn` TEXT NOT NULL, `hadith_prefix` TEXT, `hadith_text` TEXT NOT NULL, `hadith_suffix` TEXT, `comments` TEXT, `grades` TEXT, `graded_by` TEXT, `reference` TEXT, `ref_in_book` TEXT, `ref_usc_msa` TEXT, `ref_eng` TEXT, `lang_code` TEXT NOT NULL, PRIMARY KEY(`hadith_translation_id`), FOREIGN KEY(`ar_urn`) REFERENCES `hadith`(`urn`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -852,7 +858,7 @@
           },
           {
             "fieldPath": "narratorPrefix",
-            "columnName": "narrator_prefix",
+            "columnName": "hadith_prefix",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -864,7 +870,7 @@
           },
           {
             "fieldPath": "narratorSuffix",
-            "columnName": "narrator_suffix",
+            "columnName": "hadith_suffix",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -881,32 +887,38 @@
             "notNull": false
           },
           {
+            "fieldPath": "gradedBy",
+            "columnName": "graded_by",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "reference",
             "columnName": "reference",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "referenceInBook",
-            "columnName": "reference_in_book",
+            "fieldPath": "refInBook",
+            "columnName": "ref_in_book",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "referenceUscMsa",
-            "columnName": "reference_usc_msa",
+            "fieldPath": "refUscMsa",
+            "columnName": "ref_usc_msa",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "referenceEn",
-            "columnName": "reference_eng",
+            "fieldPath": "refEn",
+            "columnName": "ref_eng",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "languageCode",
-            "columnName": "language_code",
+            "fieldPath": "langCode",
+            "columnName": "lang_code",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -955,7 +967,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cd048cacdd98c643cf7bdd56cbfd0441')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3704c1f81394e6bad4c525ad971b789')"
     ]
   }
 }

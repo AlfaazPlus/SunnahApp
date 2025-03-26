@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ManageHadithCollectionItem(
-    cwi: CollectionWithInfo, onClick: () -> Unit
+    cwi: CollectionWithInfo, onClick: () -> Unit,
 ) {
     val isDownloaded = cwi.isDownloaded == true
     val isDownloading = cwi.isDownloading == true
@@ -64,7 +64,10 @@ fun ManageHadithCollectionItem(
                 text = cwi.collection.name, style = MaterialTheme.typography.titleMedium, fontFamily = fontUthmani, fontWeight = FontWeight.ExtraBold
             )
             Text(
-                text = cwi.info?.name ?: "", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Normal, modifier = Modifier.padding(top = 3.dp)
+                text = cwi.info?.name ?: "",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 3.dp)
             )
         }
 
@@ -82,7 +85,7 @@ fun ManageHadithCollectionItem(
 
 @Composable
 fun SettingsManageCollectionsScreen(
-    vm: CollectionListViewModel = hiltViewModel(), downloadVm: DownloadCollectionViewModel = hiltViewModel()
+    vm: CollectionListViewModel = hiltViewModel(), downloadVm: DownloadCollectionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -130,7 +133,7 @@ fun SettingsManageCollectionsScreen(
         LazyColumn(
             modifier = Modifier.padding(paddingValues), contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
         ) {
-            items(collections.size) {
+            items(collections.size, key = { collections[it].collection.id }) {
                 val cwi = collections[it]
                 cwi.isDownloading = downloadStates[cwi.collection.id] == WorkInfo.State.RUNNING
                 ManageHadithCollectionItem(cwi) {
@@ -141,7 +144,8 @@ fun SettingsManageCollectionsScreen(
                     }
                 }
 
-                AlertDialog(isOpen = showDialogForItem == cwi.collection.id,
+                AlertDialog(
+                    isOpen = showDialogForItem == cwi.collection.id,
                     onClose = { showDialogForItem = null },
                     title = stringResource(R.string.delete_collection),
                     cancelText = stringResource(R.string.cancel),
@@ -152,30 +156,30 @@ fun SettingsManageCollectionsScreen(
                     },
                     content = {
                         Text(
-                            text = stringResource(R.string.msg_delete_collection) + "\n ${cwi.collection.name} (${cwi.info?.name})", style = MaterialTheme.typography.bodyMedium
+                            text = stringResource(R.string.msg_delete_collection) + "\n ${cwi.collection.name} (${cwi.info?.name})",
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                    })
+                    },
+                )
             }
         }
 
         AlertDialog(isOpen = lastDownloadError != null,
-            onClose = { lastDownloadError = null },
-            title = "Download Error",
-            cancelText = stringResource(R.string.cancel),
-            confirmText = "Done",
-            onConfirm = {
-            },
-            content = {
-                Column(
-                    modifier = Modifier
-                        .height(300.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text(
-                        text = lastDownloadError ?: "", style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            })
+                    onClose = { lastDownloadError = null },
+                    title = "Download Error",
+                    cancelText = stringResource(R.string.cancel),
+                    confirmText = "Done",
+                    onConfirm = {},
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .height(300.dp)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                text = lastDownloadError ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    })
     }
 }

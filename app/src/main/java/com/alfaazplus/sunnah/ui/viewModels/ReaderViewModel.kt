@@ -12,14 +12,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.Logger
+import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
+import com.alfaazplus.sunnah.ui.models.ParsedChapter
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils.HADITH_LAYOUT_HORIZONTAL
 import com.alfaazplus.sunnah.ui.utils.datatype.ReadOnce
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
@@ -80,7 +81,7 @@ class ReaderViewModel @Inject constructor(
     }
 
     suspend fun loadEssentials() {
-        hadithLayout = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_LAYOUT), HADITH_LAYOUT_HORIZONTAL)
+        hadithLayout = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_LAYOUT), ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
         cwi = repo.getCollection(collectionId)
         books.value = repo.getBookList(collectionId)
     }
@@ -91,15 +92,14 @@ class ReaderViewModel @Inject constructor(
             val translation = it.translation
             val parsedHadith = ParsedHadith(it)
 
-            if (!hadith.narratorPrefix.isNullOrEmpty()) {
-                parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(hadith.narratorPrefix)
+            if (!hadith.hadithPrefix.isNullOrEmpty()) {
+                parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(hadith.hadithPrefix)
             }
 
-            parsedHadith.hadithText =
-                HadithTextHelper.prepareText(hadith.hadithText.replace("\n", "<br/>")).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+            parsedHadith.hadithText = HadithTextHelper.prepareText(hadith.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
-            if (!hadith.narratorSuffix.isNullOrEmpty()) {
-                parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(hadith.narratorSuffix)
+            if (!hadith.hadithSuffix.isNullOrEmpty()) {
+                parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(hadith.hadithSuffix)
             }
 
             if (translation != null) {
@@ -107,15 +107,25 @@ class ReaderViewModel @Inject constructor(
                     append(translation.narratorPrefix?.parseAsHtml())
                 }
                 parsedHadith.translationText =
-                    HadithTextHelper.prepareText(translation.hadithText.replace("\n", "<br/>")).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                    HadithTextHelper.prepareText(translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
-                if (parsedHadith.translation?.grades?.contains("Sahih") == true) {
-                    parsedHadith.gradeType = "sahih"
-                } else if (parsedHadith.translation?.grades?.contains("Da'if") == true) {
-                    parsedHadith.gradeType = "daif"
-                } else if (parsedHadith.translation?.grades?.contains("Hasan") == true) {
-                    parsedHadith.gradeType = "hasan"
+                parsedHadith.gradeType = HadithHelper.getHadithGradeText(translation.grades, translation.gradedBy)
+            }
+
+            if (it.chapter != null) {
+                val parsedChapter = ParsedChapter(it.chapter)
+
+                if (!it.chapter.chapter.intro.isNullOrEmpty()) {
+                    parsedChapter.chapterIntro =
+                        HadithTextHelper.prepareText(it.chapter.chapter.intro).toHadithAnnotatedString(primaryColor, onPrimaryColor)
                 }
+
+                if (!it.chapter.info.intro.isNullOrEmpty()) {
+                    parsedChapter.chapterIntroEn =
+                        HadithTextHelper.prepareText(it.chapter.info.intro).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                }
+
+                parsedHadith.chapter = parsedChapter
             }
 
             return@map parsedHadith

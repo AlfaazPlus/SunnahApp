@@ -13,7 +13,6 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
 
 @Dao
 interface HadithDao {
@@ -56,8 +55,8 @@ interface HadithDao {
     @Query("SELECT * FROM book_info WHERE collection_id=:collectionId AND book_id = :bookId AND language_code = :langCode")
     suspend fun getBookInfoById(langCode: String, collectionId: Int, bookId: Int): HBookInfo
 
-    @Query("SELECT * FROM chapter INNER JOIN chapter_info ON chapter.chapter_id = chapter_info.chapter_id WHERE chapter.book_id = :bookId AND chapter.collection_id = :collectionId AND chapter_info.book_id = :bookId AND chapter_info.collection_id = :collectionId AND chapter_info.language_code = :langCode")
-    suspend fun getChapterList(langCode: String, collectionId: Int, bookId: Int): List<HadithChapter>
+    @Query("SELECT * FROM chapter INNER JOIN chapter_info ON chapter.chapter_id = chapter_info.chapter_id WHERE chapter.chapter_id = :chapterId")
+    suspend fun getChapterWithInfoById(chapterId: Double): HadithChapter
 
     @Query("SELECT COUNT(*) FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId")
     suspend fun getHadithCount(collectionId: Int, bookId: Int): Int
@@ -68,7 +67,7 @@ interface HadithDao {
     @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND order_in_book = :orderInBook")
     suspend fun getHadithByOrder(collectionId: Int, bookId: Int, orderInBook: Int): Hadith
 
-    @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND language_code = :langCode")
+    @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND lang_code = :langCode")
     suspend fun getHadithTranslationByArURN(arURN: String, langCode: String): HadithTranslation
 
     @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND chapter_id = :chapterId")
