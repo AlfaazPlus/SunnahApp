@@ -27,10 +27,12 @@ import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
 fun SearchFilterSheet(
     isOpen: Boolean,
     onClose: () -> Unit,
+    onApply: (
+        collectionIds: Set<Int>,
+    ) -> Unit,
     vm: CollectionListViewModel = hiltViewModel(),
 ) {
     val selectedCollections = remember { mutableStateMapOf<Int, Boolean>() }
-    val selectedSearchFor = remember { mutableStateMapOf<String, Boolean>() }
     val collections = vm.collections.collectAsState().value
 
     LaunchedEffect(Unit) {
@@ -39,12 +41,6 @@ fun SearchFilterSheet(
             selectedCollections[c.collection.id] = true
         }
     }
-
-    val searchForType = mapOf(
-        "hadiths" to stringResource(R.string.hadiths),
-        "books" to stringResource(R.string.books),
-        "scholars" to stringResource(R.string.scholars),
-    )
 
     BottomSheet(
         title = stringResource(R.string.search_fitler),
@@ -85,23 +81,20 @@ fun SearchFilterSheet(
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
-
-                searchForType.forEach { (key, value) ->
-                    CheckboxItem(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        title = value,
-                        checked = selectedSearchFor.getOrElse(key) { true },
-                        onCheckedChange = {
-                            selectedSearchFor[key] = it
-                        },
-                    )
-                }
             }
 
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp), onClick = {}) {
-                Text(text = "Apply")
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                onClick = {
+                    onApply(
+                        selectedCollections.filter { it.value }.keys,
+                    )
+                    onClose()
+                },
+            ) {
+                Text(text = stringResource(R.string.apply_filter))
             }
         }
     }

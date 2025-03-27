@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.search
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -10,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,43 +21,43 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
+import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
-fun SearchTextField() {
+fun SearchTextField(vm: SearchViewModel) {
     var showSearchFilterSheet by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery = vm.searchQuery.collectAsState().value
 
-    Row {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-            ),
-            trailingIcon = {
-                SimpleTooltip(stringResource(R.string.search_fitler)) {
-                    IconButton(onClick = {
-                        showSearchFilterSheet = true
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_fitler)
-                        )
-                    }
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+        colors = TextFieldDefaults.colors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        ),
+        trailingIcon = {
+            SimpleTooltip(stringResource(R.string.search_fitler)) {
+                IconButton(onClick = {
+                    showSearchFilterSheet = true
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_fitler)
+                    )
                 }
-            },
-            placeholder = { Text(stringResource(R.string.global_search)) },
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            textStyle = MaterialTheme.typography.titleSmall,
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-        )
-    }
+            }
+        },
+        placeholder = { Text(stringResource(R.string.global_search)) },
+        value = searchQuery,
+        onValueChange = vm::onSearchQueryChanged,
+        textStyle = MaterialTheme.typography.titleSmall,
+        shape = MaterialTheme.shapes.medium,
+        singleLine = true,
+    )
 
     SearchFilterSheet(
         isOpen = showSearchFilterSheet,
         onClose = { showSearchFilterSheet = false },
+        onApply = vm::applyFilters,
     )
 }

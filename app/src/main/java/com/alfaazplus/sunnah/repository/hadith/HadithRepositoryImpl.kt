@@ -1,11 +1,28 @@
 package com.alfaazplus.sunnah.repository.hadith
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.core.text.parseAsHtml
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.ScholarsDao
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
+import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
+import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlin.random.Random
 
 class HadithRepositoryImpl(
     private val dao: HadithDao,
@@ -18,15 +35,19 @@ class HadithRepositoryImpl(
     }
 
     override suspend fun getCollectionList(): List<CollectionWithInfo> {
-        return dao.getCollectionList().map {
-            CollectionWithInfo(it, dao.getCollectionInfoById("en", it.id))
-        }
+        return dao
+            .getCollectionList()
+            .map {
+                CollectionWithInfo(it, dao.getCollectionInfoById("en", it.id))
+            }
     }
 
     override suspend fun getBookList(collectionId: Int): List<BookWithInfo> {
-        return dao.getBookList(collectionId).map {
-            BookWithInfo(it, dao.getBookInfoById("en", collectionId, it.id))
-        }
+        return dao
+            .getBookList(collectionId)
+            .map {
+                BookWithInfo(it, dao.getBookInfoById("en", collectionId, it.id))
+            }
     }
 
     override suspend fun getHadithCount(collectionId: Int, bookId: Int): Int {
@@ -34,14 +55,14 @@ class HadithRepositoryImpl(
     }
 
     override suspend fun getHadithList(collectionId: Int, bookId: Int): List<HadithWithTranslation> {
-        return dao.getHadithList(collectionId, bookId).map {
-//            val chapter = it.chapterId?.let { chapterId -> dao.getChapterWithInfoById(chapterId) }
-            HadithWithTranslation(
-                it,
-                dao.getHadithTranslationByArURN(it.urn, "en"),
-//                chapter,
-            )
-        }
+        return dao
+            .getHadithList(collectionId, bookId)
+            .map { //            val chapter = it.chapterId?.let { chapterId -> dao.getChapterWithInfoById(chapterId) }
+                HadithWithTranslation(
+                    it,
+                    dao.getHadithTranslationByArURN(it.urn, "en"), //                chapter,
+                )
+            }
     }
 
     override suspend fun getHadithByOrder(
@@ -62,8 +83,89 @@ class HadithRepositoryImpl(
 
     override suspend fun getNarratorsOfHadith(urn: Int): List<Scholar> {
         val narratorIdsStr = dao.getNarratorIds(urn)
-        val narratorIds = narratorIdsStr.split(",").map { it.toInt() }
+        val narratorIds = narratorIdsStr
+            .split(",")
+            .map { it.toInt() }
 
         return scholarsDao.getScholars(narratorIds)
+    }
+
+    override suspend fun searchHadiths(query: String, collectionIds: Set<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
+        Logger.d("Searching for $query in collections: $collectionIds")
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                initialLoadSize = 10,
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+            ),
+            pagingSourceFactory = {
+                if (query.isBlank()) {
+                    EmptyPagingSource()
+                } else {
+                    dao.searchHadiths(query, collectionIds, "en")
+                }
+            },
+        ).flow.map { pagingData ->
+            pagingData.map { searchResult ->
+                val baseText = searchResult.translation.hadithText
+                    .parseAsHtml()
+                    .toString()
+                val padding = 200
+                val highlightStart = baseText.indexOf(query, ignoreCase = true)
+                val highlightEnd = highlightStart + query.length
+
+                // Ensure the context range is within bounds
+                val preContextStart = (highlightStart - padding).coerceAtLeast(0)
+                val postContextEnd = (highlightEnd + padding).coerceAtMost(baseText.length)
+
+                val preEllipsis = preContextStart > 0
+                val postEllipsis = postContextEnd < baseText.length
+
+                searchResult.translationText = buildAnnotatedString {
+                    if (preEllipsis) append("…")
+                    append(baseText.subSequence(preContextStart, highlightStart))
+
+                    // Highlighted portion
+                    addStyle(
+                        SpanStyle(
+                            color = color,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic,
+                        ),
+                        length,
+                        length + query.length,
+                    )
+                    append(baseText.subSequence(highlightStart, highlightEnd))
+
+                    append(baseText.subSequence(highlightEnd, postContextEnd))
+                    if (postEllipsis) append("…")
+                }
+
+                searchResult
+            }
+        }
+    }
+
+    override suspend fun searchBooks(query: String, collectionIds: Set<Int>?): Flow<PagingData<BooksSearchResult>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                initialLoadSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 3,
+            ),
+            pagingSourceFactory = {
+                if (query.isBlank()) {
+                    EmptyPagingSource()
+                } else {
+                    dao.searchBooks(query, collectionIds, "en")
+                }
+            },
+        ).flow
+    }
+
+    override suspend fun searchScholars(query: String) {
     }
 }

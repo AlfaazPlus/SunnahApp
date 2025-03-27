@@ -131,4 +131,7 @@ dependencies {
     implementation(libs.kotlinxSerialization)
     implementation(libs.kotlinxRetrofit)
     implementation(libs.guava)
+    implementation(libs.paging)
+    implementation(libs.pagingCompose)
+    implementation(libs.roomPaging)
 }

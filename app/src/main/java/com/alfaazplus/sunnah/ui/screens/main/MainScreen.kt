@@ -39,7 +39,7 @@ fun MainScreen() {
     Scaffold(topBar = { MainAppBar(titleRes) }, bottomBar = { MainBottomNavigationBar(navController) }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.HOME,
+            startDestination = Routes.SEARCH,
             modifier = Modifier.padding(innerPadding),
             enterTransition = { enterTransition },
             exitTransition = { exitTransition },

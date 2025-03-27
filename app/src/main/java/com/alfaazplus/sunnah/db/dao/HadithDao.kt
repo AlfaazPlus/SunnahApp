@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -13,6 +14,8 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.ui.models.BooksSearchResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 
 @Dao
 interface HadithDao {
@@ -78,4 +81,45 @@ interface HadithDao {
 
     @Query("SELECT narrators2 from hadith WHERE urn = :urn")
     suspend fun getNarratorIds(urn: Int): String
+
+    // search hadiths in collectionIds
+    @Query(
+        """
+        SELECT
+            hadith.*,
+            hadith_translation.*,
+            collection_info.name
+        FROM hadith
+        INNER JOIN hadith_translation 
+            ON hadith.urn = hadith_translation.ar_urn
+        INNER JOIN collection_info
+            ON hadith.collection_id = collection_info.collection_id
+        WHERE hadith_translation.hadith_text
+            LIKE '%' || :query || '%'
+            AND (:collectionIds IS NULL OR hadith.collection_id IN (:collectionIds))
+            AND hadith_translation.lang_code = :langCode
+            AND collection_info.language_code = :langCode
+        """
+    )
+    fun searchHadiths(query: String, collectionIds: Set<Int>?, langCode: String): PagingSource<Int, HadithSearchResult>
+
+    // search books in collectionIds
+    @Query(
+        """
+            SELECT 
+                book.*,
+                book_info.*,
+                collection_info.name
+            FROM book
+            INNER JOIN book_info
+                ON book.book_id = book_info.book_id AND book.collection_id = book_info.collection_id
+            INNER JOIN collection_info
+                ON book.collection_id = collection_info.collection_id
+            WHERE (book_info.title LIKE '%' || :query || '%' OR book_info.intro LIKE '%' || :query || '%' OR book_info.description LIKE '%' || :query || '%')
+                AND (:collectionIds IS NULL OR book.collection_id IN (:collectionIds))
+                AND book_info.language_code = :langCode
+                AND collection_info.language_code = :langCode
+            """
+    )
+    fun searchBooks(query: String, collectionIds: Set<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
 }

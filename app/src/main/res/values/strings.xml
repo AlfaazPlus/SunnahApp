@@ -24,6 +24,10 @@
     <string name="search_fitler">Search filter</string>
     <string name="search_in">Search in…</string>
     <string name="search_for">Search for…</string>
+    <string name="apply_filter">Apply filter</string>
+    <string name="no_results_found">No results found</string>
+    <string name="one_result_found">1 result found</string>
+    <string name="n_results_found" formatted="false">%d results found</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum

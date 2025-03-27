@@ -37,6 +37,7 @@ retrofit = "2.9.0"
 kotlinxRetrofit = "0.8.0"
 kotlinxSerialization = "1.4.1"
 guava = "33.0.0-jre"
+paging = "3.3.6"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -89,6 +90,9 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 kotlinxRetrofit = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "kotlinxRetrofit" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
+pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+roomPaging = { module = "androidx.room:room-paging", version.ref = "room" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
