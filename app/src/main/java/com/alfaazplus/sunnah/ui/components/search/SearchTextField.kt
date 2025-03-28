@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -31,7 +32,10 @@ fun SearchTextField(vm: SearchViewModel) {
     TextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+            )
+            .padding(start = 16.dp, end = 16.dp, bottom = if (searchQuery.isNotBlank()) 0.dp else 16.dp),
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
@@ -47,7 +51,7 @@ fun SearchTextField(vm: SearchViewModel) {
                 }
             }
         },
-        placeholder = { Text(stringResource(R.string.global_search)) },
+        placeholder = { Text(stringResource(R.string.search_placeholder)) },
         value = searchQuery,
         onValueChange = vm::onSearchQueryChanged,
         textStyle = MaterialTheme.typography.titleSmall,
@@ -58,6 +62,6 @@ fun SearchTextField(vm: SearchViewModel) {
     SearchFilterSheet(
         isOpen = showSearchFilterSheet,
         onClose = { showSearchFilterSheet = false },
-        onApply = vm::applyFilters,
+        searchVm = vm,
     )
 }

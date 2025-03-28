@@ -1,8 +1,15 @@
 package com.alfaazplus.sunnah.helpers
 
 import androidx.compose.ui.graphics.Color
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.repository.hadith.HADITH_COLLECTIONS
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDayHolder
+import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import java.util.Date
 
 
 val GRADE_COLORS = mapOf(
@@ -50,5 +57,27 @@ object HadithHelper {
 
     fun getHadithGradeColor(gradeType: Int): Color {
         return GRADE_COLORS.getOrElse(gradeType) { Color(115, 103, 102) }
+    }
+
+    suspend fun getHadithOfTheDay(repo: HadithRepository): HadithOfTheDay? {
+        val hotdValue = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_OF_THE_DAY), "")
+        val hotdHolder = HadithOfTheDayHolder.parse(hotdValue)
+
+        if (hotdHolder != null) {
+            val hotd = repo.getHotd(hotdHolder.urn)
+            if (hotd != null) {
+                return hotd
+            }
+        }
+
+        while (true) {
+            val hotd = repo.getNewHotd() ?: return null
+
+            val newHotdHolder = HadithOfTheDayHolder(hotd.hadith.urn, Date(System.currentTimeMillis()))
+
+            DataStoreManager.write(stringPreferencesKey(Keys.HADITH_OF_THE_DAY), newHotdHolder.toString())
+
+            return hotd
+        }
     }
 }

@@ -21,24 +21,45 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.CheckboxItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
+import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 
 @Composable
 fun SearchFilterSheet(
     isOpen: Boolean,
     onClose: () -> Unit,
-    onApply: (
-        collectionIds: Set<Int>,
-    ) -> Unit,
+    searchVm: SearchViewModel,
     vm: CollectionListViewModel = hiltViewModel(),
 ) {
     val selectedCollections = remember { mutableStateMapOf<Int, Boolean>() }
     val collections = vm.collections.collectAsState().value
 
+    fun applyFilters() {
+        searchVm.applyFilters(
+            selectedCollections.filter { it.value }.keys.toList(),
+        )
+    }
+
     LaunchedEffect(Unit) {
         vm.loadCollections()
-        vm.collections.value.forEach { c ->
-            selectedCollections[c.collection.id] = true
+
+        if (searchVm.searchCollectionIds.value == null) {
+            vm.collections.value.forEach { c ->
+                if (c.isDownloaded == true) {
+                    selectedCollections[c.collection.id] = true
+                }
+            }
+            applyFilters()
+        }
+
+    }
+
+    LaunchedEffect(isOpen) {
+        if (isOpen) {
+            selectedCollections.clear()
+            searchVm.searchCollectionIds.value?.forEach { c ->
+                selectedCollections[c] = true
+            }
         }
     }
 
@@ -74,13 +95,6 @@ fun SearchFilterSheet(
                         },
                     )
                 }
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                    text = stringResource(R.string.search_for),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
             }
 
             Button(
@@ -88,9 +102,7 @@ fun SearchFilterSheet(
                     .fillMaxWidth()
                     .padding(20.dp),
                 onClick = {
-                    onApply(
-                        selectedCollections.filter { it.value }.keys,
-                    )
+                    applyFilters()
                     onClose()
                 },
             ) {

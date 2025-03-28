@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
@@ -24,11 +25,13 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 @Composable
 fun MainAppBar(
     title: Int?,
+    showActions: Boolean = true,
 ) {
     val navController = LocalNavHostController.current
 
     Surface(
-        color = MaterialTheme.colorScheme.surface, modifier = Modifier
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
     ) {
@@ -45,27 +48,30 @@ fun MainAppBar(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 5.dp),
+                textAlign = if (!showActions) TextAlign.Center else TextAlign.Start,
             )
-            SimpleTooltip(text = stringResource(R.string.manage_collections)) {
-                IconButton(
-                    onClick = { navController.navigate(route = Routes.SETTINGS_MANAGE_COLLECTIONS) },
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_book),
-                        contentDescription = stringResource(R.string.manage_collections),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
+            if (showActions) {
+                SimpleTooltip(text = stringResource(R.string.manage_collections)) {
+                    IconButton(
+                        onClick = { navController.navigate(route = Routes.SETTINGS_MANAGE_COLLECTIONS) },
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_book),
+                            contentDescription = stringResource(R.string.manage_collections),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                 }
-            }
-            SimpleTooltip(text = stringResource(R.string.settings)) {
-                IconButton(
-                    onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) },
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_settings),
-                        contentDescription = stringResource(R.string.settings),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
+                SimpleTooltip(text = stringResource(R.string.settings)) {
+                    IconButton(
+                        onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) },
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = stringResource(R.string.settings),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                 }
             }
         }

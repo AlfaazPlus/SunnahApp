@@ -23,6 +23,7 @@ fun BottomSheet(
     onDismiss: () -> Unit,
     icon: Int? = null,
     title: String?,
+    headerArrangement: Arrangement.Horizontal = Arrangement.Center,
     content: @Composable () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(true)
@@ -39,7 +40,7 @@ fun BottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = headerArrangement,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (icon != null) {

@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.models.hadith.HadithChapter
 import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
 import com.alfaazplus.sunnah.db.models.hadith.entities.HBookInfo
@@ -70,6 +71,9 @@ interface HadithDao {
     @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND order_in_book = :orderInBook")
     suspend fun getHadithByOrder(collectionId: Int, bookId: Int, orderInBook: Int): Hadith
 
+    @Query("SELECT * FROM hadith WHERE urn = :urn")
+    suspend fun getHadithByURN(urn: String): Hadith
+
     @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND lang_code = :langCode")
     suspend fun getHadithTranslationByArURN(arURN: String, langCode: String): HadithTranslation
 
@@ -94,14 +98,14 @@ interface HadithDao {
             ON hadith.urn = hadith_translation.ar_urn
         INNER JOIN collection_info
             ON hadith.collection_id = collection_info.collection_id
-        WHERE hadith_translation.hadith_text
-            LIKE '%' || :query || '%'
-            AND (:collectionIds IS NULL OR hadith.collection_id IN (:collectionIds))
+        WHERE 
+            (hadith_translation.hadith_text LIKE '%' || :query || '%')
+            AND (COALESCE(:collectionIds, '') = '' OR hadith.collection_id IN (:collectionIds))
             AND hadith_translation.lang_code = :langCode
             AND collection_info.language_code = :langCode
         """
     )
-    fun searchHadiths(query: String, collectionIds: Set<Int>?, langCode: String): PagingSource<Int, HadithSearchResult>
+    fun searchHadiths(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, HadithSearchResult>
 
     // search books in collectionIds
     @Query(
@@ -116,10 +120,36 @@ interface HadithDao {
             INNER JOIN collection_info
                 ON book.collection_id = collection_info.collection_id
             WHERE (book_info.title LIKE '%' || :query || '%' OR book_info.intro LIKE '%' || :query || '%' OR book_info.description LIKE '%' || :query || '%')
-                AND (:collectionIds IS NULL OR book.collection_id IN (:collectionIds))
                 AND book_info.language_code = :langCode
                 AND collection_info.language_code = :langCode
+                AND (COALESCE(:collectionIds, '') = '' OR book.collection_id IN (:collectionIds))
             """
     )
-    fun searchBooks(query: String, collectionIds: Set<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
+    fun searchBooks(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
+
+    @Query(
+        """
+            SELECT * FROM hadith_translation
+            INNER JOIN hadith
+                ON hadith.urn = hadith_translation.ar_urn
+            WHERE
+                LENGTH(hadith_translation.hadith_text) <= :maxLength
+                AND hadith_translation.lang_code = :langCode
+                AND hadith_translation.grades LIKE '%sahih%'
+            ORDER BY RANDOM() LIMIT 1                
+        """
+    )
+    fun getNewHotd(maxLength: Int, langCode: String): HadithOfTheDay?
+
+    @Query(
+        """
+            SELECT * FROM hadith_translation
+            INNER JOIN hadith
+                ON hadith.urn = hadith_translation.ar_urn
+            WHERE
+                hadith.urn = :urn
+                AND hadith_translation.lang_code = :langCode
+        """
+    )
+    fun getHotd(urn: String, langCode: String): HadithOfTheDay?
 }

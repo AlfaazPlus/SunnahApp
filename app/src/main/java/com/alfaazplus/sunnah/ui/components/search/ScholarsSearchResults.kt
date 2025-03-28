@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,26 +20,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.helpers.ScholarsHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
-import com.alfaazplus.sunnah.ui.screens.BookMetaInfoCard
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
-private fun BookSearchItem(
-    item: BooksSearchResult,
+private fun ScholarSearchItem(
+    item: Scholar,
     onNavigate: () -> Unit,
 ) {
+    val birthText = item.birthDate?.takeIf { it.isNotBlank() } ?: "—"
+    val deathText = item.deathDate?.takeIf { it.isNotBlank() } ?: "—"
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -47,63 +51,43 @@ private fun BookSearchItem(
         onClick = onNavigate,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                ) {
-                    Text(
-                        "${item.collectionName} : ${item.book.serialNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-            }
-
             Text(
-                text = item.info.title,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 5.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center,
-            )
-
-            Text(
-                text = item.book.title,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.Bold,
+                text = item.shortName ?: "",
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                fontFamily = fontUthmani,
             )
-
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                BookMetaInfoCard("Range: ${item.book.hadithStart} - ${item.book.hadithEnd}")
-                BookMetaInfoCard("Total Hadith: ${item.book.hadithCount}")
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(ScholarsHelper.getScholarRankColor(item.rank))
+                )
+                Text(
+                    text = ScholarsHelper.getScholarRankName(item.rank) ?: "",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
             }
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = "Birth: $birthText\nDeath: $deathText",
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
     }
 }
 
 @Composable
-fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
+fun ScholarsSearchResults(vm: SearchViewModel, listState: LazyListState) {
     val navController = LocalNavHostController.current
-    val booksSearchResults = vm.booksSearchResults.collectAsLazyPagingItems()
-    val isLoading = booksSearchResults.loadState.refresh is LoadState.Loading
+    val scholarsSearchResults = vm.scholarsSearchResults.collectAsLazyPagingItems()
+    val isLoading = scholarsSearchResults.loadState.refresh is LoadState.Loading
 
 
     if (isLoading) {
@@ -112,7 +96,7 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
     }
 
 
-    if (booksSearchResults.itemCount == 0) {
+    if (scholarsSearchResults.itemCount == 0) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -136,30 +120,25 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
     ) {
         item {
             SearchResultCount(
-                text = if (booksSearchResults.itemCount == 1) {
+                text = if (scholarsSearchResults.itemCount == 1) {
                     stringResource(R.string.one_result_found)
                 } else {
-                    stringResource(R.string.n_results_found, booksSearchResults.itemCount)
+                    stringResource(R.string.n_results_found, scholarsSearchResults.itemCount)
                 }
             )
         }
 
         items(
-            booksSearchResults.itemCount,
+            scholarsSearchResults.itemCount,
             key = { index ->
-                val item = booksSearchResults[index]
-                if (item != null) {
-                    return@items "${item.book.id}-${item.book.collectionId}"
-                } else {
-                    index
-                }
+                scholarsSearchResults[index]?.id ?: index
             },
         ) { index ->
-            val item = booksSearchResults[index]
+            val item = scholarsSearchResults[index]
             if (item != null) {
-                BookSearchItem(item) {
+                ScholarSearchItem(item) {
                     navController.navigate(
-                        Routes.READER.args(item.book.collectionId, item.book.id)
+                        Routes.SCHOLAR_INFO.arg(item.id)
                     )
                 }
             }

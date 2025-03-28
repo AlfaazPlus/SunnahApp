@@ -36,6 +36,7 @@ fun MainBottomNavigationBar(navController: NavHostController) {
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 icon = { Icon(painterResource(id = screen.icon), null) },
                 label = { Text(stringResource(screen.resourceId)) },

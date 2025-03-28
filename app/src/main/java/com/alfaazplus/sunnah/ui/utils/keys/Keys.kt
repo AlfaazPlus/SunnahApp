@@ -23,4 +23,5 @@ object Keys {
     const val RESOURCE_DOWNLOAD_SRC = "resource_download_src"
 
     const val SHOW_READER_SETTINGS_ONLY = "show_reader_settings_only"
+    const val HADITH_OF_THE_DAY = "hadith_of_the_day"
 }

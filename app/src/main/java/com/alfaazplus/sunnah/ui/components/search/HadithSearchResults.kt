@@ -20,14 +20,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
@@ -66,6 +72,8 @@ private fun HadithSearchItem(
     item: HadithSearchResult,
     onNavigate: () -> Unit,
 ) {
+    var isMenuOpen by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -94,7 +102,9 @@ private fun HadithSearchItem(
                     modifier = Modifier
                         .padding(0.dp)
                         .size(32.dp),
-                    onClick = { },
+                    onClick = {
+                        isMenuOpen = true
+                    },
                 ) {
                     Icon(
                         modifier = Modifier.padding(6.dp),
@@ -110,12 +120,28 @@ private fun HadithSearchItem(
             )
         }
     }
+
+    HadithSearchItemMenu(
+        item = item,
+        isOpen = isMenuOpen,
+        onClose = {
+            isMenuOpen = false
+        },
+    )
 }
 
 @Composable
 fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
     val navController = LocalNavHostController.current
     val hadithSearchResults = vm.hadithsSearchResults.collectAsLazyPagingItems()
+    val isLoading = hadithSearchResults.loadState.refresh is LoadState.Loading
+
+
+    if (isLoading) {
+        Loader(fill = true)
+        return
+    }
+
 
     if (hadithSearchResults.itemCount == 0) {
         Box(
@@ -153,7 +179,11 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
             hadithSearchResults.itemCount,
             key = { index ->
                 val item = hadithSearchResults[index]
-                "${item?.hadith?.urn}"
+                if (item != null) {
+                    return@items item.hadith.urn
+                } else {
+                    index
+                }
             },
         ) { index ->
             val item = hadithSearchResults[index]

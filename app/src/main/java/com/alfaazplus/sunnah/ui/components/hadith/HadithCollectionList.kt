@@ -108,7 +108,7 @@ fun HadithCollectionList(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 150.dp),
-        modifier = modifier
+        modifier = modifier,
     ) {
         items(collections.size) {
             val cwi = collections[it]

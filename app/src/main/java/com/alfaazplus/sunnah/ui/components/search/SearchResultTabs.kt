@@ -27,7 +27,7 @@ fun SearchResultTabs(
 
     TabRow(
         selectedTabIndex = tabs.keys.indexOf(currentTab.value),
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
         tabs.forEach { (tab, title) ->
             Tab(

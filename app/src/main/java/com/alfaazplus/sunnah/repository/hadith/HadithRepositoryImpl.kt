@@ -13,6 +13,7 @@ import androidx.paging.map
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.ScholarsDao
+import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
@@ -22,7 +23,6 @@ import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlin.random.Random
 
 class HadithRepositoryImpl(
     private val dao: HadithDao,
@@ -90,8 +90,8 @@ class HadithRepositoryImpl(
         return scholarsDao.getScholars(narratorIds)
     }
 
-    override suspend fun searchHadiths(query: String, collectionIds: Set<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
-        Logger.d("Searching for $query in collections: $collectionIds")
+    override suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
+        Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 
         return Pager(
             config = PagingConfig(
@@ -148,7 +148,9 @@ class HadithRepositoryImpl(
         }
     }
 
-    override suspend fun searchBooks(query: String, collectionIds: Set<Int>?): Flow<PagingData<BooksSearchResult>> {
+    override suspend fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>> {
+        Logger.d("Searching for books with query: $query", "CollectionIds: $collectionIds")
+
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -166,6 +168,39 @@ class HadithRepositoryImpl(
         ).flow
     }
 
-    override suspend fun searchScholars(query: String) {
+    override suspend fun searchScholars(query: String): Flow<PagingData<Scholar>> {
+        Logger.d("Searching for scholars with query: $query")
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                initialLoadSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 3,
+            ),
+            pagingSourceFactory = {
+                if (query.isBlank()) {
+                    EmptyPagingSource()
+                } else {
+                    scholarsDao.searchScholars(query)
+                }
+            },
+        ).flow
+    }
+
+    override suspend fun getHotd(urn: String): HadithOfTheDay? {
+        return dao
+            .getHotd(urn, "en")
+            ?.apply {
+                this.collectionName = dao.getCollectionInfoById("en", this.hadith.collectionId).name
+            }
+    }
+
+    override suspend fun getNewHotd(): HadithOfTheDay? {
+        return dao
+            .getNewHotd(300, "en")
+            ?.apply {
+                this.collectionName = dao.getCollectionInfoById("en", this.hadith.collectionId).name
+            }
     }
 }

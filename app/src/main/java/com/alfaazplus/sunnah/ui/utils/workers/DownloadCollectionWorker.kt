@@ -25,15 +25,18 @@ class DownloadCollectionWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val collectionId = inputData.getInt("collectionId", -1)
 
-        if (collectionId == -1) return@withContext Result.failure()
-
-
         try {
-            val (_, baseByteStream) = RetrofitInstance.github.getCollection(collectionId).getContentLengthAndStream()
+            if (collectionId == -1) throw IllegalArgumentException("Invalid collection ID")
+
+            val (_, baseByteStream) = RetrofitInstance.github
+                .getCollection(collectionId)
+                .getContentLengthAndStream()
             DatabaseHelper.importHadithBaseData(database, baseByteStream)
 
 
-            val (_, localeByteStream) = RetrofitInstance.github.getCollectionTranslation(collectionId, "en").getContentLengthAndStream()
+            val (_, localeByteStream) = RetrofitInstance.github
+                .getCollectionTranslation(collectionId, "en")
+                .getContentLengthAndStream()
             DatabaseHelper.importHadithLocaleData(database, localeByteStream)
 
             return@withContext Result.success()

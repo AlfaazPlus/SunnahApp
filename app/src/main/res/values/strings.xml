@@ -20,7 +20,8 @@
     <string name="nextBook">Next Book</string>
 
     <string name="search">Search</string>
-    <string name="global_search">Global search…</string>
+    <string name="global_search">Global Search</string>
+    <string name="search_placeholder">Enter search term…</string>
     <string name="search_fitler">Search filter</string>
     <string name="search_in">Search in…</string>
     <string name="search_for">Search for…</string>
@@ -28,6 +29,7 @@
     <string name="no_results_found">No results found</string>
     <string name="one_result_found">1 result found</string>
     <string name="n_results_found" formatted="false">%d results found</string>
+    <string name="search_result_menu">Search result menu</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum
@@ -113,4 +115,9 @@
     <string name="desc_narrators_chain">View narrators chain</string>
     <string name="scholar_info">Scholar Information</string>
     <string name="scholars">Scholars</string>
+    <string name="copy_hadith_number">Copy hadith number</string>
+    <string name="add_to_bookmarks">Add to Bookmarks</string>
+    <string name="remove_from_bookmarks">Remove from Bookmarks</string>
+    <string name="add_to_collection">Add to Collection</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
 </resources>

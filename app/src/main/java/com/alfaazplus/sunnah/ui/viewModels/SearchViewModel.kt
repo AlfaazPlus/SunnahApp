@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
-import com.alfaazplus.sunnah.ui.models.ScholarsSearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -30,10 +30,10 @@ open class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
-    private var _searchCollectionIds = MutableStateFlow<Set<Int>?>(null)
+    private var _searchCollectionIds = MutableStateFlow<List<Int>?>(null)
 
     val searchQuery: StateFlow<String> = _searchQuery
-    val searchCollectionIds: StateFlow<Set<Int>?> = _searchCollectionIds
+    val searchCollectionIds: StateFlow<List<Int>?> = _searchCollectionIds
 
     val hadithsSearchResults: Flow<PagingData<HadithSearchResult>> = combine(
         _searchCollectionIds
@@ -70,14 +70,25 @@ open class SearchViewModel @Inject constructor(
             initialValue = PagingData.empty(),
         )
 
-    private var scholarsSearchResults = MutableStateFlow<ScholarsSearchResult?>(null)
+    val scholarsSearchResults: Flow<PagingData<Scholar>> = _searchQuery
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            repo.searchScholars(query)
+        }
+        .cachedIn(viewModelScope)
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = PagingData.empty(),
+        )
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
     }
 
     fun applyFilters(
-        searchCollectionIds: Set<Int>,
+        searchCollectionIds: List<Int>,
     ) {
         _searchCollectionIds.value = searchCollectionIds
     }

@@ -25,18 +25,27 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 fun MainScreen() {
     val navController = rememberNavController()
     var titleRes by remember { mutableStateOf<Int?>(R.string.app_name) }
+    var showAppbarActions by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             titleRes = when (destination.route) {
                 Routes.HISTORY -> R.string.history
-                Routes.SEARCH -> R.string.search
+                Routes.SEARCH -> R.string.global_search
                 else -> null
+            }
+
+            showAppbarActions = when (destination.route) {
+                Routes.SEARCH -> false
+                else -> true
             }
         }
     }
 
-    Scaffold(topBar = { MainAppBar(titleRes) }, bottomBar = { MainBottomNavigationBar(navController) }) { innerPadding ->
+    Scaffold(
+        topBar = { MainAppBar(titleRes, showAppbarActions) },
+        bottomBar = { MainBottomNavigationBar(navController) },
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,

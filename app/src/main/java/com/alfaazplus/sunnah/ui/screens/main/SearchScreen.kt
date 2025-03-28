@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.ui.components.search.BookSearchResults
 import com.alfaazplus.sunnah.ui.components.search.HadithSearchResults
+import com.alfaazplus.sunnah.ui.components.search.ScholarsSearchResults
 import com.alfaazplus.sunnah.ui.components.search.SearchResultTabs
 import com.alfaazplus.sunnah.ui.components.search.SearchTextField
 import com.alfaazplus.sunnah.ui.models.SearchResultTab
@@ -29,6 +30,7 @@ fun SearchScreen(
 
     val hadithListState = rememberLazyListState()
     val bookListState = rememberLazyListState()
+    val scholarsListState = rememberLazyListState()
     val searchQuery = vm.searchQuery.collectAsState().value
 
     Column {
@@ -51,9 +53,7 @@ fun SearchScreen(
                 when (tab) {
                     SearchResultTab.Hadiths -> HadithSearchResults(vm, hadithListState)
                     SearchResultTab.Books -> BookSearchResults(vm, bookListState)
-
-                    SearchResultTab.Scholars -> { // ScholarsSearchResults(vm)
-                    }
+                    SearchResultTab.Scholars -> ScholarsSearchResults(vm, scholarsListState)
                 }
             }
         }
