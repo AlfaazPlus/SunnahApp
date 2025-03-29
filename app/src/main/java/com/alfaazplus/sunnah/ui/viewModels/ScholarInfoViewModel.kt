@@ -16,36 +16,32 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class NarratorsViewModel @Inject constructor(
+class ScholarInfoViewModel @Inject constructor(
     private val repo: HadithRepository,
 ) : ViewModel() {
-    private var _urn = MutableStateFlow<Int?>(null)
+    private var _scholarId = MutableStateFlow<Int?>(null)
 
-    val narrators: StateFlow<List<Scholar>> = _urn
-        .flatMapLatest { urn ->
-            if (urn != null) {
+    val scholar: StateFlow<Scholar?> = _scholarId
+        .flatMapLatest { scholarId ->
+            if (scholarId != null) {
                 flow {
-                    emit(repo.getNarratorsOfHadith(urn))
+                    emit(repo.getScholarInfo(scholarId))
                 }
             } else {
-                flow {
-                    val empty = listOf<Scholar>()
-                    emit(empty)
-                }
+                flow { emit(null) }
             }
         }
         .flowOn(Dispatchers.IO)
         .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = listOf(),
+            initialValue = null,
         )
 
 
-    fun setUrn(urn: Int) {
-        _urn.value = urn
+    fun setScholarId(scholarId: Int) {
+        _scholarId.value = scholarId
     }
 }

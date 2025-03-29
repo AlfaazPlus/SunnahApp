@@ -10,6 +10,12 @@ interface ScholarsDao {
     @Query("SELECT * from scholars WHERE id IN (:ids) ORDER BY rank ASC")
     suspend fun getScholars(ids: List<Int>): List<Scholar>
 
+    @Query("SELECT * from scholars WHERE id = :id")
+    suspend fun getScholarById(id: Int): Scholar?
+
+    @Query("SELECT * from scholars WHERE id IN (:ids) ORDER BY rank ASC")
+    suspend fun getScholarsByIds(ids: List<Int>): List<Scholar>
+
 
     // search books in collectionIds
     @Query(

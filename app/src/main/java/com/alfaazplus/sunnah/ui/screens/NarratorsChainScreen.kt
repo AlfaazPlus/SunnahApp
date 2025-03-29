@@ -16,6 +16,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.helpers.ScholarsHelper
@@ -73,12 +74,14 @@ private fun NarratorCard(
 
 @Composable
 private fun NarratorsList(narrators: List<Scholar>) {
-    Logger.d(narrators.map { "${it.shortName} (${it.id})" })
     val totalNarrators = narrators.size
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(
+            start = 20.dp,
+            end = 20.dp,
             top = 50.dp,
             bottom = 50.dp,
         ),
@@ -109,10 +112,10 @@ fun NarratorsChainScreen(
 ) {
 
     LaunchedEffect(Unit) {
-        vm.loadNarrators(hadithUrn)
+        vm.setUrn(hadithUrn)
     }
 
-    val narrators = vm.narrators
+    val narrators by vm.narrators.collectAsState()
 
     Scaffold(
         topBar = { AppBar(title = stringResource(R.string.narrators_chain)) },

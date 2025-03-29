@@ -90,6 +90,54 @@ class HadithRepositoryImpl(
         return scholarsDao.getScholars(narratorIds)
     }
 
+    private suspend fun String.fetchScholarNames(): String {
+        val bullet = "\u2022"
+        var names = mutableSetOf<String>()
+        val ids = mutableSetOf<Int>()
+
+        this
+            .split(",")
+            .forEach { childId ->
+                childId
+                    .toIntOrNull()
+                    ?.let { id ->
+                        ids.add(id)
+                    } ?: names.add(childId)
+            }
+
+        if (ids.isNotEmpty()) {
+            val scholars = scholarsDao.getScholarsByIds(ids.toList())
+            names = LinkedHashSet<String>().apply {
+                addAll(scholars.map { it.shortName ?: "" })
+                addAll(names)
+            }
+        }
+
+        if (names.size <= 1) {
+            return names.firstOrNull() ?: ""
+        }
+
+        return names.joinToString(separator = "\n") { name ->
+            "$bullet\t\t$name"
+        }
+    }
+
+    override suspend fun getScholarInfo(scholarId: Int): Scholar? {
+        Logger.d("Fetching scholar info for ID: $scholarId")
+
+        return scholarsDao
+            .getScholarById(scholarId)
+            ?.apply {
+                this.fatherName = fatherName?.fetchScholarNames()
+                this.motherName = motherName?.fetchScholarNames()
+                this.spouses = spouses?.fetchScholarNames()
+                this.children = children?.fetchScholarNames()
+                this.siblings = siblings?.fetchScholarNames()
+                this.teachers = teachers?.fetchScholarNames()
+                this.students = students?.fetchScholarNames()
+            }
+    }
+
     override suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
         Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 

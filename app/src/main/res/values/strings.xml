@@ -96,6 +96,8 @@
     <string name="hadith_layout">Hadith Layout</string>
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
+    <string name="change_to_horizontal_layout">Change to horizontal layout</string>
+    <string name="change_to_vertical_layout">Change to vertical layout</string>
     <string name="text_size_and_style">Text Size &amp; Style</string>
     <string name="serif_font_style">Serif Font Style</string>
     <string name="arabic_text_size">Arabic Text Size</string>
@@ -120,4 +122,5 @@
     <string name="remove_from_bookmarks">Remove from Bookmarks</string>
     <string name="add_to_collection">Add to Collection</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="hadith_of_the_day">Hadith of the Day</string>
 </resources>

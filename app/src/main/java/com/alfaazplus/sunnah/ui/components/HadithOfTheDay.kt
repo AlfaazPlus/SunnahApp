@@ -23,9 +23,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.text.parseAsHtml
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
@@ -34,6 +36,7 @@ import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import com.alfaazplus.sunnah.ui.viewModels.HotdViewModel
 
 @Composable
@@ -59,7 +62,7 @@ private fun HotdTitle() {
                 tint = Color.White,
             )
             Text(
-                text = "Hadith of the Day",
+                text = stringResource(R.string.hadith_of_the_day),
                 style = MaterialTheme.typography.labelMedium,
             )
         }
@@ -125,7 +128,10 @@ private fun Texts(hotd: HadithOfTheDay) {
         if (showArabic) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = hotd.hadith.hadithText,
+                text = hotd.hadith.hadithText
+                    .parseAsHtml()
+                    .toAnnotatedString(),
+                color = Color.White,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = fontUthmani,
                 textAlign = TextAlign.Center,
@@ -136,7 +142,10 @@ private fun Texts(hotd: HadithOfTheDay) {
         if (showTranslation) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = hotd.translation.hadithText,
+                text = hotd.translation.hadithText
+                    .parseAsHtml()
+                    .toAnnotatedString(),
+                color = Color.White,
                 style = MaterialTheme.typography.bodyMedium,
                 fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
                 textAlign = TextAlign.Center,
@@ -159,6 +168,7 @@ private fun Footer(hotd: HadithOfTheDay) {
             modifier = Modifier.weight(1f),
             text = "${hotd.collectionName}: ${hotd.hadith.hadithNumber}",
             style = MaterialTheme.typography.labelMedium,
+            color = Color.White,
         )
 
         IconButton(onClick = { // todo:

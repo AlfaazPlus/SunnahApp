@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             val isDarkTheme = ThemeUtils.isDarkTheme()
             val colorScheme = ThemeUtils.getColorScheme(this, isDarkTheme)

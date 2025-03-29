@@ -55,6 +55,7 @@ class ReaderViewModel @Inject constructor(
      */
     var initialHadithNumber by mutableStateOf(Pair<String?, Boolean>(null, false))
     var currentHadithNumber by mutableStateOf("")
+    var highlightedHadithNumber by mutableStateOf("")
 
     /**
      * Hadith number, consumed
@@ -134,7 +135,6 @@ class ReaderViewModel @Inject constructor(
 
     private suspend fun loadHadiths() {
         hadithList = repo.getHadithList(collectionId, bookId.value!!)
-        Logger.d("Hadith list size: ${hadithList.size}")
         parseHadiths()
         initialized = true
     }

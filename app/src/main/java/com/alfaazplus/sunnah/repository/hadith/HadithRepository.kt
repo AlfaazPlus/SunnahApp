@@ -20,6 +20,7 @@ interface HadithRepository {
     suspend fun getHadithByOrder(collectionId: Int, bookId: Int, orderInBook: Int): HadithWithTranslation
     suspend fun deleteCollection(collectionId: Int)
     suspend fun getNarratorsOfHadith(urn: Int): List<Scholar>
+    suspend fun getScholarInfo(scholarId: Int): Scholar?
     suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>>
     suspend fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>>
     suspend fun searchScholars(query: String): Flow<PagingData<Scholar>>

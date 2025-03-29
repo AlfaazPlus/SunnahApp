@@ -11,7 +11,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -71,7 +71,13 @@ private fun PageContent(
         items(totalHadiths, key = { hadithList[it].hadith.urn }) { index ->
             val hadithItem = hadithList[index]
 
-            HadithItem(vm.cwi!!, vm.bwi!!, hadithItem, true)
+            HadithItem(
+                vm.cwi!!,
+                vm.bwi!!,
+                hadithItem,
+                true,
+                vm.highlightedHadithNumber == hadithItem.hadith.hadithNumber,
+            )
 
             HorizontalDivider(
                 modifier = Modifier.padding(top = 20.dp)
@@ -124,16 +130,25 @@ fun VerticalReader(vm: ReaderViewModel) {
     }*/
 
     LaunchedEffect(Unit) {
+        vm.highlightedHadithNumber = ""
+
         val initialHNo = vm.initialHadithNumber
         val transientScroll = vm.transientScroll
 
         if (initialHNo.first != null && !initialHNo.second) {
             navigateToHadith(initialHNo.first!!)
             vm.initialHadithNumber = Pair(initialHNo.first, true)
+            vm.highlightedHadithNumber = initialHNo.first!!
+
+            delay(2000)
+
+            vm.highlightedHadithNumber = ""
         } else {
-            transientScroll.get()?.let {
-                navigateToHadith(it)
-            }
+            transientScroll
+                .get()
+                ?.let {
+                    navigateToHadith(it)
+                }
         }
 
         coroutineScope.launch {

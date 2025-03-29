@@ -1,5 +1,8 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,11 +97,23 @@ private fun resolvePage(hadithList: List<ParsedHadith>, hadithNumber: String?): 
         return 0
     }
 
-    return hadithList.indexOfFirst {
-        it.hadith.hadithNumber == hadithNumber
-    }.takeIf { it >= 0 }
+    return hadithList
+        .indexOfFirst {
+            it.hadith.hadithNumber == hadithNumber
+        }
+        .takeIf { it >= 0 }
 }
 
+@Composable
+private fun highlightHadithItem(show: Boolean): Modifier {
+    val alpha by animateFloatAsState(
+        targetValue = if (show) 0.3f else 0f,
+        animationSpec = tween(durationMillis = 1500),
+        label = "",
+    )
+
+    return Modifier.background(MaterialTheme.colorScheme.primary.alpha(alpha))
+}
 
 @Composable
 private fun HadithGrade(hwt: ParsedHadith) {
@@ -223,7 +238,13 @@ private fun HadithActionBar(
 }
 
 @Composable
-fun HadithItem(cwi: CollectionWithInfo, bwi: BookWithInfo, parsedHadith: ParsedHadith, vertical: Boolean) {
+fun HadithItem(
+    cwi: CollectionWithInfo,
+    bwi: BookWithInfo,
+    parsedHadith: ParsedHadith,
+    vertical: Boolean,
+    highlight: Boolean = false,
+) {
     val hadithTextOption = ReaderUtils.getHadithTextOption()
 
     val showSanad = ReaderUtils.getIsSanadEnabled()
@@ -249,13 +270,16 @@ fun HadithItem(cwi: CollectionWithInfo, bwi: BookWithInfo, parsedHadith: ParsedH
     var modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
+        .then(highlightHadithItem(highlight))
         .padding(16.dp)
+
 
     if (!vertical) {
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(top = 10.dp, bottom = 120.dp)
     }
+
 
     Column(
         modifier = modifier
@@ -317,7 +341,10 @@ private fun PageContent(
     pagerState: PagerState,
 ) {
     HorizontalPager(
-        state = pagerState, contentPadding = paddingValues, beyondViewportPageCount = 1, modifier = Modifier
+        state = pagerState,
+        contentPadding = paddingValues,
+        beyondViewportPageCount = 1,
+        modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) { page ->
@@ -346,10 +373,12 @@ fun HorizontalReader(
 
             vm.initialHadithNumber = Pair(initialHNo.first, true)
         } else {
-            transientScroll.get()?.let {
-                val index = resolvePage(hadithList, it)
-                if (index != null) pagerState.scrollToPage(index)
-            }
+            transientScroll
+                .get()
+                ?.let {
+                    val index = resolvePage(hadithList, it)
+                    if (index != null) pagerState.scrollToPage(index)
+                }
         }
 
         DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->

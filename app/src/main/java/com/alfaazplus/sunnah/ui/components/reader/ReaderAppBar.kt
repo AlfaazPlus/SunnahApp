@@ -101,10 +101,13 @@ private fun HadithList(
     currentHadithNumber: String,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
 ) {
-    val hadithListState = rememberLazyListState(hadiths.indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }.takeIf { it != -1 } ?: 0)
+    val hadithListState = rememberLazyListState(hadiths
+                                                    .indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }
+                                                    .takeIf { it != -1 } ?: 0)
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
             .fillMaxHeight()
             .width(140.dp)
     ) {
@@ -283,92 +286,96 @@ fun ReaderAppBar(
     Surface(
         shadowElevation = 4.dp,
     ) {
-        CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrolledContainerColor = MaterialTheme.colorScheme.surface,
-        ), title = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 10.dp)
-                        .clip(MaterialTheme.shapes.large)
-                        .clickable {
-                            showBottomSheet = true
-                        },
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                scrolledContainerColor = MaterialTheme.colorScheme.surface,
+            ),
+            title = {
+                Surface(
+                    modifier = Modifier.fillMaxHeight()
                 ) {
-                    CollectionIcon(
-                        collectionId = collectionId,
-                        height = 40.dp,
-                    )
-
-                    Row {
-                        Text(
-                            modifier = Modifier.widthIn(max = 150.dp),
-                            text = bwi?.info?.title ?: "",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Normal,
-                            lineHeight = 0.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_drop_down),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp),
-                        )
-                    }
-                }
-
-                if (showBottomSheet) {
-                    ModalBottomSheet(
-                        onDismissRequest = { showBottomSheet = false },
-                        sheetState = sheetState,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(horizontal = 10.dp)
+                            .clip(MaterialTheme.shapes.large)
+                            .clickable {
+                                showBottomSheet = true
+                            },
                     ) {
-                        ReaderHadithNavigator(
-                            books = books,
-                            hadiths = hadiths,
-                            currentBookId = bookId.value ?: 0,
-                            currentHadithNumber = currentHadithNumber(),
-                            onJumpToBook = { bwi ->
-                                onJumpToBook(bwi)
-                                showBottomSheet = false
-                            },
-                            onJumpToHadith = { hwt ->
-                                onJumpToHadith(hwt)
-                                showBottomSheet = false
-                            },
+                        CollectionIcon(
+                            collectionId = collectionId,
+                            height = 40.dp,
+                        )
+
+                        Row {
+                            Text(
+                                modifier = Modifier.widthIn(max = 150.dp),
+                                text = bwi?.info?.title ?: "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 0.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_drop_down),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
+
+                    if (showBottomSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showBottomSheet = false },
+                            sheetState = sheetState,
+                        ) {
+                            ReaderHadithNavigator(
+                                books = books,
+                                hadiths = hadiths,
+                                currentBookId = bookId.value ?: 0,
+                                currentHadithNumber = currentHadithNumber(),
+                                onJumpToBook = { bwi ->
+                                    onJumpToBook(bwi)
+                                    showBottomSheet = false
+                                },
+                                onJumpToHadith = { hwt ->
+                                    onJumpToHadith(hwt)
+                                    showBottomSheet = false
+                                },
+                            )
+                        }
+                    }
+                }
+            },
+            navigationIcon = {
+                SimpleTooltip(text = stringResource(R.string.goBack)) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_chevron_left),
+                            contentDescription = stringResource(R.string.goBack),
                         )
                     }
                 }
-            }
-        }, navigationIcon = {
-            SimpleTooltip(text = stringResource(R.string.goBack)) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_chevron_left),
-                        contentDescription = stringResource(R.string.goBack),
-                    )
+            },
+            actions = {
+                LayoutChangerButton()
+                SimpleTooltip(text = stringResource(R.string.settings)) {
+                    IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = stringResource(R.string.settings),
+                        )
+                    }
                 }
-            }
-        }, actions = {
-            SimpleTooltip(text = stringResource(R.string.settings)) {
-                IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_settings),
-                        contentDescription = stringResource(R.string.settings),
-                    )
-                }
-            }
-        }, scrollBehavior = scrollBehavior
+            },
+            scrollBehavior = scrollBehavior,
         )
     }
 }
