@@ -24,7 +24,7 @@ fun MainBottomNavigationBar(navController: NavHostController) {
 
     val items = listOf(
         MainScreenBase.Home,
-        MainScreenBase.History,
+        MainScreenBase.Library,
         MainScreenBase.Search,
     )
 
@@ -35,22 +35,21 @@ fun MainBottomNavigationBar(navController: NavHostController) {
         items.forEach { screen ->
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primary,
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-                icon = { Icon(painterResource(id = screen.icon), null) },
-                label = { Text(stringResource(screen.resourceId)) },
-                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
+                indicatorColor = MaterialTheme.colorScheme.primary,
+                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+                              icon = { Icon(painterResource(id = screen.icon), null) },
+                              label = { Text(stringResource(screen.resourceId)) },
+                              selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                              onClick = {
+                                  navController.navigate(screen.route) {
+                                      popUpTo(navController.graph.findStartDestination().id) {
+                                          saveState = true
+                                      }
+                                      launchSingleTop = true
+                                      restoreState = true
+                                  }
+                              })
         }
     }
 }

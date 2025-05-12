@@ -30,7 +30,7 @@ fun MainScreen() {
     LaunchedEffect(Unit) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             titleRes = when (destination.route) {
-                Routes.HISTORY -> R.string.history
+                Routes.LIBRARY -> R.string.library
                 Routes.SEARCH -> R.string.global_search
                 else -> null
             }
@@ -56,7 +56,7 @@ fun MainScreen() {
             popExitTransition = { popExitTransition },
         ) {
             composable(Routes.HOME) { HomeScreen() }
-            composable(Routes.HISTORY) { HistoryScreen() }
+            composable(Routes.LIBRARY) { LibraryScreen() }
             composable(Routes.SEARCH) { SearchScreen() }
         }
     }

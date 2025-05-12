@@ -67,6 +67,7 @@
 
     <string name="home">Home</string>
     <string name="history">History</string>
+    <string name="library">Library</string>
     <string name="theme_default">Default</string>
     <string name="theme_blue">Blue</string>
     <string name="theme_red">Red</string>
@@ -107,7 +108,7 @@
     <string name="show_only_arabic">Show only Arabic</string>
     <string name="show_only_translation">Show only translation</string>
     <string name="show_sanad">Show Sanad</string>
-    <string name="show_sanad_description">Show the chain of narrators</string>
+    <string name="show_sanad_description">Show the chain of narrators in Hadith texts</string>
     <string name="show_chapter">Show Chapter</string>
     <string name="manage_collections">Manage Collections</string>
     <string name="delete_collection">Delete Collection?</string>

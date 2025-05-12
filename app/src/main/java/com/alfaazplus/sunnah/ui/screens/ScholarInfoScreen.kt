@@ -60,7 +60,12 @@ fun InformationTable(info: Map<String, String>) {
                 Text(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                        .padding(
+                            start = 12.dp,
+                            end = 10.dp,
+                            top = 8.dp,
+                            bottom = 8.dp,
+                        ),
                     text = label,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
@@ -166,7 +171,11 @@ private fun ScholarInfo(scholar: Scholar) {
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(20.dp)
+            .padding(
+                top = 20.dp,
+                start = 10.dp,
+                end = 10.dp,
+            )
             .padding(bottom = 120.dp)
     ) {
         Header(scholar)

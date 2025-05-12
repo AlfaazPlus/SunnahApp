@@ -146,6 +146,7 @@ private fun HadithActionBar(
     hadith: ParsedHadith,
 ) {
     var showReferenceSheet by remember { mutableStateOf(false) }
+    var showHadithMenu by remember { mutableStateOf(false) }
 
     val isDarkTheme = ThemeUtils.isDarkTheme()
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
@@ -171,7 +172,9 @@ private fun HadithActionBar(
                     containerColor = bgColor,
                     contentColor = txtColor,
                 ),
-                onClick = { },
+                onClick = {
+                    showHadithMenu = true
+                },
             ) {
                 Icon(
                     modifier = Modifier.padding(6.dp),
@@ -232,8 +235,15 @@ private fun HadithActionBar(
             }
         }
     }
+
     HadithReferenceSheet(cwi, hadith, showReferenceSheet) {
         showReferenceSheet = false
+    }
+
+    HadithMenu(
+        isOpen = showHadithMenu
+    ){
+        showHadithMenu = false
     }
 }
 

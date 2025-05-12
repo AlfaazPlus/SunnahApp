@@ -25,7 +25,7 @@ data class MultiArgRoute(private val route: String, private val argNames: List<S
 object Routes {
     const val MAIN = "main"
     const val HOME = "home"
-    const val HISTORY = "history"
+    const val LIBRARY = "library"
     const val SEARCH = "search"
     val SETTINGS = SingleArgRoute("settings", Keys.SHOW_READER_SETTINGS_ONLY)
     const val SETTINGS_THEME = "settings_theme"

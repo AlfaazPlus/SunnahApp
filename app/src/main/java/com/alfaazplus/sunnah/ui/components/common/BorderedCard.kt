@@ -19,15 +19,15 @@ import com.alfaazplus.sunnah.ui.theme.alpha
 
 @Composable
 fun BorderedCard(
-    padding: PaddingValues = PaddingValues(15.dp),
+    padding: PaddingValues = PaddingValues(20.dp),
     onClick: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         modifier = Modifier
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.large)
             .clickable(onClick = onClick)
-            .border(2.dp, MaterialTheme.colorScheme.primary.alpha(0.2f), MaterialTheme.shapes.medium)
+            .border(2.dp, MaterialTheme.colorScheme.primary.alpha(0.2f), MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surface)
             .padding(padding)
             .fillMaxWidth(),

@@ -49,14 +49,15 @@ private fun NavGraphBuilder.route(
     deepLinks: List<NavDeepLink> = emptyList(),
     content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    composable(route = route,
-               arguments = arguments,
-               deepLinks = deepLinks,
-               enterTransition = { enterTransition },
-               exitTransition = { exitTransition },
-               popEnterTransition = { popEnterTransition },
-               popExitTransition = { popExitTransition },
-               content = content
+    composable(
+        route = route,
+        arguments = arguments,
+        deepLinks = deepLinks,
+        enterTransition = { enterTransition },
+        exitTransition = { exitTransition },
+        popEnterTransition = { popEnterTransition },
+        popExitTransition = { popExitTransition },
+        content = content
     )
 }
 
@@ -85,13 +86,15 @@ fun MainApp() {
                     BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
                 }
                 route(
-                    Routes.READER(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
-                                                        navArgument(Keys.BOOK_ID) { type = NavType.IntType },
-                                                        navArgument(Keys.HADITH_NUMBER) {
-                                                            type = NavType.StringType
-                                                            defaultValue = null
-                                                            nullable = true
-                                                        })
+                    Routes.READER(), arguments = listOf(
+                        navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
+                        navArgument(Keys.BOOK_ID) { type = NavType.IntType },
+                        navArgument(Keys.HADITH_NUMBER) {
+                            type = NavType.StringType
+                            defaultValue = null
+                            nullable = true
+                        },
+                    )
                 ) { rsEntry ->
                     ReaderScreen(
                         collectionId = rsEntry.arguments?.getInt(Keys.COLLECTION_ID, 1) ?: 1,
