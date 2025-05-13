@@ -31,9 +31,8 @@ import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 fun SearchTextField(vm: SearchViewModel) {
     var showSearchFilterSheet by remember { mutableStateOf(false) }
     val searchQuery = vm.searchQuery.collectAsState().value
-    val isDarkTheme = ThemeUtils.isDarkTheme()
 
-    val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
+    val bgColor = MaterialTheme.colorScheme.background
 
     TextField(
         modifier = Modifier

@@ -1,4 +1,4 @@
-package com.alfaazplus.sunnah.db
+package com.alfaazplus.sunnah.db.databases
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

@@ -59,15 +59,15 @@ private fun HadithCollectionItem(
                 modifier = Modifier
                     .offset {
                         IntOffset(
-                            x = 13.dp
+                            x = 18.dp
                                 .toPx()
                                 .toInt(),
-                            y = 13.dp
+                            y = 18.dp
                                 .toPx()
                                 .toInt()
                         )
                     }
-                    .clip(RoundedCornerShape(topStart = 10.dp, bottomEnd = 10.dp))
+                    .clip(RoundedCornerShape(topStart = 13.dp, bottomEnd = 13.dp))
                     .background(MaterialTheme.colorScheme.primary.alpha(0.2f))
                     .padding(
                         start = 6.dp,
@@ -104,6 +104,7 @@ fun HadithCollectionList(
     val collections by vm.collections.collectAsState()
 
     LazyVerticalGrid(
+        userScrollEnabled = false,
         columns = GridCells.Fixed(integerResource(R.integer.collection_grid_columns)),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

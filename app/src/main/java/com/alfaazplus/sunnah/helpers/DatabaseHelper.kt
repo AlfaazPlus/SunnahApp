@@ -2,7 +2,7 @@ package com.alfaazplus.sunnah.helpers
 
 import android.content.Context
 import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.db.AppDatabase
+import com.alfaazplus.sunnah.db.databases.AppDatabase
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
 import com.alfaazplus.sunnah.db.models.hadith.entities.HBookInfo

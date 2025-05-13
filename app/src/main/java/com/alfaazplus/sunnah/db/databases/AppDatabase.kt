@@ -1,4 +1,4 @@
-package com.alfaazplus.sunnah.db
+package com.alfaazplus.sunnah.db.databases
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -11,7 +11,6 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
 
 @Database(
     entities = [

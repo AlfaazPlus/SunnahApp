@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.db.AppDatabase
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository

@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.alfaazplus.sunnah.api.RetrofitInstance
-import com.alfaazplus.sunnah.db.AppDatabase
+import com.alfaazplus.sunnah.db.databases.AppDatabase
 import com.alfaazplus.sunnah.helpers.DatabaseHelper
 import com.alfaazplus.sunnah.ui.utils.extension.getContentLengthAndStream
 import com.alfaazplus.sunnah.ui.utils.extension.getStackTraceString

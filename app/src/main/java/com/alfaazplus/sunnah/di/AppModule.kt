@@ -2,10 +2,13 @@ package com.alfaazplus.sunnah.di
 
 import android.app.Application
 import androidx.room.Room
-import com.alfaazplus.sunnah.db.AppDatabase
-import com.alfaazplus.sunnah.db.ScholarsDatabase
+import com.alfaazplus.sunnah.db.databases.AppDatabase
+import com.alfaazplus.sunnah.db.databases.ScholarsDatabase
+import com.alfaazplus.sunnah.db.databases.UserDatabase
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
+import com.alfaazplus.sunnah.repository.userdata.UserRepository
+import com.alfaazplus.sunnah.repository.userdata.UserRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +22,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideHadithDatabase(app: Application): AppDatabase {
-        return Room.databaseBuilder(app, AppDatabase::class.java, "sunnah_app_db").build()
+        return Room
+            .databaseBuilder(app, AppDatabase::class.java, "sunnah_app_db")
+            .build()
     }
 
     @Provides
@@ -28,13 +33,30 @@ object AppModule {
         val dbStream = app.assets.open("scholars_info.db.bz2")
         val bz2Stream = BZip2CompressorInputStream(dbStream)
 
-        return Room.databaseBuilder(app, ScholarsDatabase::class.java, "scholars_db").createFromInputStream { bz2Stream }
-            .fallbackToDestructiveMigration().build()
+        return Room
+            .databaseBuilder(app, ScholarsDatabase::class.java, "scholars_db")
+            .createFromInputStream { bz2Stream }
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDatabase(app: Application): UserDatabase {
+        return Room
+            .databaseBuilder(app, UserDatabase::class.java, "user_db")
+            .build()
     }
 
     @Provides
     @Singleton
     fun provideHadithRepository(hadithDb: AppDatabase, scholarsDb: ScholarsDatabase): HadithRepository {
         return HadithRepositoryImpl(hadithDb.hadithDao, scholarsDb.scholarsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(userDb: UserDatabase): UserRepository {
+        return UserRepositoryImpl(userDb.dao)
     }
 }

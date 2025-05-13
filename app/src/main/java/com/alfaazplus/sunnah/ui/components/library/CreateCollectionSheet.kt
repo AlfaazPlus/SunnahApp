@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.library
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,23 +20,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 private fun Content(
     onCancel: () -> Unit,
-    onCreate: (Int) -> Unit,
+    onCreate: (UserCollection) -> Unit,
+    viewModel: UserDataViewModel = hiltViewModel(),
 ) {
     var value by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     val bgColor = MaterialTheme.colorScheme.background
-    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -55,6 +59,24 @@ private fun Content(
             singleLine = true,
             label = { Text("Collection Name") },
             placeholder = { Text("Enter collection name") },
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                unfocusedContainerColor = bgColor,
+                focusedContainerColor = bgColor,
+            )
+        )
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = description,
+            onValueChange = {
+                description = it
+            },
+            maxLines = 5,
+            minLines = 5,
+            label = { Text("Description") },
+            placeholder = { Text("Enter collection description") },
             shape = MaterialTheme.shapes.medium,
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
@@ -84,10 +106,20 @@ private fun Content(
         }
 
         Button(
-            modifier = Modifier.weight(1f), onClick = { // TODO: Handle collection creation logic here
-                onCreate(0) // Replace with actual collection ID
-                MessageUtils.showToast(context, "WIP", Toast.LENGTH_SHORT)
-            }, enabled = value.isNotBlank()
+            modifier = Modifier.weight(1f),
+            onClick = {
+                scope.launch {
+                    val newCollection = viewModel.repo.addUserCollection(
+                        UserCollection(
+                            name = value,
+                            description = if (description.isBlank()) null else description.trim(),
+                        )
+                    )
+
+                    onCreate(newCollection)
+                }
+            },
+            enabled = value.isNotBlank(),
         ) {
             Text("Create")
         }
@@ -99,7 +131,7 @@ private fun Content(
 fun CreateCollectionSheet(
     isOpen: Boolean,
     onCancel: () -> Unit,
-    onCreate: (Int) -> Unit,
+    onCreate: (UserCollection) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(true) { sheetValue ->
         when (sheetValue) {
