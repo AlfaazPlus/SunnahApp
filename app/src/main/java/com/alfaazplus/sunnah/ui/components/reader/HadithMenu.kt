@@ -18,6 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
+import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
+import com.alfaazplus.sunnah.ui.controllers.ModalController
+import com.alfaazplus.sunnah.ui.controllers.rememberModalController
+import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 
 @Composable
 private fun Item(
@@ -52,10 +56,12 @@ private fun Item(
 
 @Composable
 private fun Items(
+    collectionModalController: ModalController<AddToCollectionRequest>,
+    collectionId: Int,
+    bookId: Int,
+    hadithNumber: String,
     onClose: () -> Unit,
-) {
-
-    // TODO: Add actions
+) { // TODO: Add actions
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.padding(16.dp),
@@ -75,6 +81,13 @@ private fun Items(
                 text = "Add to Collection",
                 icon = R.drawable.ic_library,
             ) {
+                collectionModalController.show(
+                    AddToCollectionRequest(
+                        hadithCollectionId = collectionId,
+                        hadithBookId = bookId,
+                        hadithNumber = hadithNumber,
+                    )
+                )
                 onClose()
             }
         }
@@ -107,14 +120,27 @@ private fun Items(
 
 @Composable
 fun HadithMenu(
+    collectionId: Int,
+    bookId: Int,
+    hadithNumber: String,
     isOpen: Boolean,
     onClose: () -> Unit,
 ) {
+    val collectionModalController = rememberModalController<AddToCollectionRequest>()
+
+    AddToCollectionSheet(collectionModalController)
+
     BottomSheetMenu(
         title = "Hadith Options",
         isOpen = isOpen,
         onDismiss = onClose,
     ) {
-        Items(onClose)
+        Items(
+            collectionModalController = collectionModalController,
+            collectionId = collectionId,
+            bookId = bookId,
+            hadithNumber = hadithNumber,
+            onClose = onClose,
+        )
     }
 }

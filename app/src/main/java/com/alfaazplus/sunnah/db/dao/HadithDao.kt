@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
+import androidx.room.Transaction
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.models.hadith.HadithChapter
 import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
@@ -53,12 +55,17 @@ interface HadithDao {
     @Query("SELECT * FROM collection_info WHERE collection_id = :collectionId AND language_code = :langCode")
     suspend fun getCollectionInfoById(langCode: String, collectionId: Int): HCollectionInfo
 
+    @Query("SELECT * FROM book WHERE collection_id = :collectionId AND book_id = :bookId")
+    suspend fun getBookById(collectionId: Int, bookId: Int): HBook
+
     @Query("SELECT * FROM book WHERE collection_id = :collectionId")
     suspend fun getBookList(collectionId: Int): List<HBook>
 
     @Query("SELECT * FROM book_info WHERE collection_id=:collectionId AND book_id = :bookId AND language_code = :langCode")
     suspend fun getBookInfoById(langCode: String, collectionId: Int, bookId: Int): HBookInfo
 
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM chapter INNER JOIN chapter_info ON chapter.chapter_id = chapter_info.chapter_id WHERE chapter.chapter_id = :chapterId")
     suspend fun getChapterWithInfoById(chapterId: Double): HadithChapter
 
@@ -87,6 +94,8 @@ interface HadithDao {
     suspend fun getNarratorIds(urn: Int): String
 
     // search hadiths in collectionIds
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
         SELECT
@@ -108,6 +117,8 @@ interface HadithDao {
     fun searchHadiths(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, HadithSearchResult>
 
     // search books in collectionIds
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
             SELECT 
@@ -127,6 +138,8 @@ interface HadithDao {
     )
     fun searchBooks(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
 
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
             SELECT * FROM hadith_translation
@@ -141,6 +154,8 @@ interface HadithDao {
     )
     fun getNewHotd(maxLength: Int, langCode: String): HadithOfTheDay?
 
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
             SELECT * FROM hadith_translation

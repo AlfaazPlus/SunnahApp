@@ -12,11 +12,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -32,12 +34,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.common.IconButton
+import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
+import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
+import com.alfaazplus.sunnah.ui.controllers.rememberModalController
+import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import com.alfaazplus.sunnah.ui.viewModels.HotdViewModel
+import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 private fun HotdTitle() {
@@ -155,38 +168,88 @@ private fun Texts(hotd: HadithOfTheDay) {
 }
 
 @Composable
-private fun Footer(hotd: HadithOfTheDay) {
+private fun Footer(
+    hotd: HadithOfTheDay,
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    val isBookmarkedFlow = remember { viewModel
+        .isBookmarked(
+            hotd.hadith.collectionId,
+            hotd.hadith.bookId,
+            hotd.hadith.hadithNumber,
+        )}
+    val isBookmarked by isBookmarkedFlow.collectAsState()
+
+    val scope = rememberCoroutineScope()
+
+    val collectionModalController = rememberModalController<AddToCollectionRequest>()
+    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
+
+    AddToCollectionSheet(collectionModalController)
+    AddToBookmarksSheet(bookmarksModalController)
+
     HorizontalDivider(
         color = Color(0xFF3D3D3D),
         thickness = 1.dp,
     )
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Text(
             modifier = Modifier.weight(1f),
             text = "${hotd.collectionName}: ${hotd.hadith.hadithNumber}",
             style = MaterialTheme.typography.labelMedium,
-            color = Color.White,
+            color = Color.LightGray,
         )
+        IconButton(
+            painter = painterResource(id = R.drawable.ic_share),
+            tint = Color.LightGray,
+            small = true,
+        ) {}
+        IconButton(
+            painter = painterResource(id = if (isBookmarked) R.drawable.ic_bookmark_check else R.drawable.ic_bookmark_plus),
+            tint = if (isBookmarked) MaterialTheme.colorScheme.primary else Color.LightGray,
+            small = true,
+        ) {
+            scope.launch {
+                if (!isBookmarked) {
+                    viewModel.repo.addUserBookmark(
+                        UserBookmark(
+                            hadithCollectionId = hotd.hadith.collectionId,
+                            hadithBookId = hotd.hadith.bookId,
+                            hadithNumber = hotd.hadith.hadithNumber,
+                            remark = ""
+                        )
+                    )
+                }
 
-        IconButton(onClick = { // todo:
-        }) {
-            Icon(
-                modifier = Modifier.size(18.dp),
-                painter = painterResource(id = R.drawable.ic_share),
-                contentDescription = null,
-                tint = Color.White,
-            )
+                withContext(Dispatchers.Main) {
+                    bookmarksModalController.show(
+                        AddToBookmarkRequest(
+                            hadithCollectionId = hotd.hadith.collectionId,
+                            hadithBookId = hotd.hadith.bookId,
+                            hadithNumber = hotd.hadith.hadithNumber,
+                        )
+                    )
+                }
+            }
+
         }
-        IconButton(onClick = { // todo:
-        }) {
-            Icon(
-                modifier = Modifier.size(18.dp),
-                painter = painterResource(id = R.drawable.ic_bookmark_plus),
-                contentDescription = null,
-                tint = Color.White,
+        IconButton(
+            painter = painterResource(id = R.drawable.ic_library),
+            tint = Color.LightGray,
+            small = true,
+        ) {
+            collectionModalController.show(
+                AddToCollectionRequest(
+                    hadithCollectionId = hotd.hadith.collectionId,
+                    hadithBookId = hotd.hadith.bookId,
+                    hadithNumber = hotd.hadith.hadithNumber,
+                )
             )
         }
     }

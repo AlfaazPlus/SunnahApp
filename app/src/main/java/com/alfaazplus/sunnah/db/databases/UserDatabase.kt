@@ -7,7 +7,7 @@ import com.alfaazplus.sunnah.db.dao.UserDataDao
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
-import com.alfaazplus.sunnah.helpers.DbConverters
+import com.alfaazplus.sunnah.helpers.UserDbConverters
 
 @Database(
     entities = [
@@ -17,7 +17,7 @@ import com.alfaazplus.sunnah.helpers.DbConverters
     ],
     version = 1,
 )
-@TypeConverters(DbConverters::class)
+@TypeConverters(UserDbConverters::class)
 abstract class UserDatabase : RoomDatabase() {
     abstract val dao: UserDataDao
 }

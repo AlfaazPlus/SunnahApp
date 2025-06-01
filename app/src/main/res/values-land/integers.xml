@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="collection_grid_columns">2</integer>
+    <integer name="collection_grid_columns_2">3</integer>
 </resources>

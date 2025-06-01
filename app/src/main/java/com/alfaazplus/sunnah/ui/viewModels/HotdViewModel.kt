@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HotdViewModel @Inject constructor(
-    private val repo: HadithRepository,
+    private val repo: HadithRepositoryImpl,
 ) : ViewModel() {
     val hotdFlow: StateFlow<HadithOfTheDay?> = flow {
         emit(HadithHelper.getHadithOfTheDay(repo))

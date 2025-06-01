@@ -3,7 +3,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NarratorsViewModel @Inject constructor(
-    private val repo: HadithRepository,
+    private val repo: HadithRepositoryImpl,
 ) : ViewModel() {
     private var _urn = MutableStateFlow<Int?>(null)
 

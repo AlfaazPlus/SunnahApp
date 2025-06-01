@@ -14,7 +14,7 @@ data class UserBookmark(
     @ColumnInfo(name = Columns.ID) @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = Columns.HADITH_COLLECTION_ID) val hadithCollectionId: Int,
     @ColumnInfo(name = Columns.HADITH_BOOK_ID) val hadithBookId: Int,
-    @ColumnInfo(name = Columns.HADITH_NUMBER) val hadithNumber: Int,
+    @ColumnInfo(name = Columns.HADITH_NUMBER) val hadithNumber: String,
     @ColumnInfo(name = Columns.REMARK) val remark: String,
     @ColumnInfo(name = Columns.CREATED_AT) val createdAt: Date = Date(),
     @ColumnInfo(name = Columns.UPDATED_AT) val updatedAt: Date = Date(),

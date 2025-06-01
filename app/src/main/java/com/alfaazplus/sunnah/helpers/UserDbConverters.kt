@@ -1,9 +1,11 @@
 package com.alfaazplus.sunnah.helpers
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.TypeConverter
 import java.util.Date
 
-class DbConverters {
+class UserDbConverters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? = value?.let { Date(it) }
 

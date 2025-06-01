@@ -27,14 +27,14 @@ import kotlinx.coroutines.flow.map
 class HadithRepositoryImpl(
     private val dao: HadithDao,
     private val scholarsDao: ScholarsDao,
-) : HadithRepository {
-    override suspend fun getCollection(collectionId: Int): CollectionWithInfo {
+)  {
+    suspend fun getCollection(collectionId: Int): CollectionWithInfo {
         return CollectionWithInfo(
             dao.getCollectionById(collectionId), dao.getCollectionInfoById("en", collectionId)
         )
     }
 
-    override suspend fun getCollectionList(): List<CollectionWithInfo> {
+    suspend fun getCollectionList(): List<CollectionWithInfo> {
         return dao
             .getCollectionList()
             .map {
@@ -42,7 +42,17 @@ class HadithRepositoryImpl(
             }
     }
 
-    override suspend fun getBookList(collectionId: Int): List<BookWithInfo> {
+    suspend fun getBookById(
+        collectionId: Int,
+        bookId: Int,
+    ): BookWithInfo {
+        val book = dao.getBookById(collectionId, bookId)
+        val info = dao.getBookInfoById("en", collectionId, book.id)
+
+        return BookWithInfo(book, info)
+    }
+
+    suspend fun getBookList(collectionId: Int): List<BookWithInfo> {
         return dao
             .getBookList(collectionId)
             .map {
@@ -50,11 +60,11 @@ class HadithRepositoryImpl(
             }
     }
 
-    override suspend fun getHadithCount(collectionId: Int, bookId: Int): Int {
+    suspend fun getHadithCount(collectionId: Int, bookId: Int): Int {
         return dao.getHadithCount(collectionId, bookId)
     }
 
-    override suspend fun getHadithList(collectionId: Int, bookId: Int): List<HadithWithTranslation> {
+    suspend fun getHadithList(collectionId: Int, bookId: Int): List<HadithWithTranslation> {
         return dao
             .getHadithList(collectionId, bookId)
             .map { //            val chapter = it.chapterId?.let { chapterId -> dao.getChapterWithInfoById(chapterId) }
@@ -65,7 +75,7 @@ class HadithRepositoryImpl(
             }
     }
 
-    override suspend fun getHadithByOrder(
+    suspend fun getHadithByOrder(
         collectionId: Int,
         bookId: Int,
         orderInBook: Int,
@@ -76,12 +86,12 @@ class HadithRepositoryImpl(
         return HadithWithTranslation(hadith, translation)
     }
 
-    override suspend fun deleteCollection(collectionId: Int) {
+    suspend fun deleteCollection(collectionId: Int) {
         dao.deleteCollection(collectionId)
     }
 
 
-    override suspend fun getNarratorsOfHadith(urn: Int): List<Scholar> {
+    suspend fun getNarratorsOfHadith(urn: Int): List<Scholar> {
         val narratorIdsStr = dao.getNarratorIds(urn)
         val narratorIds = narratorIdsStr
             .split(",")
@@ -122,7 +132,7 @@ class HadithRepositoryImpl(
         }
     }
 
-    override suspend fun getScholarInfo(scholarId: Int): Scholar? {
+    suspend fun getScholarInfo(scholarId: Int): Scholar? {
         Logger.d("Fetching scholar info for ID: $scholarId")
 
         return scholarsDao
@@ -138,7 +148,7 @@ class HadithRepositoryImpl(
             }
     }
 
-    override suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
+    suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
         Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 
         return Pager(
@@ -196,7 +206,7 @@ class HadithRepositoryImpl(
         }
     }
 
-    override suspend fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>> {
+    suspend fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>> {
         Logger.d("Searching for books with query: $query", "CollectionIds: $collectionIds")
 
         return Pager(
@@ -216,7 +226,7 @@ class HadithRepositoryImpl(
         ).flow
     }
 
-    override suspend fun searchScholars(query: String): Flow<PagingData<Scholar>> {
+    suspend fun searchScholars(query: String): Flow<PagingData<Scholar>> {
         Logger.d("Searching for scholars with query: $query")
 
         return Pager(
@@ -236,7 +246,7 @@ class HadithRepositoryImpl(
         ).flow
     }
 
-    override suspend fun getHotd(urn: String): HadithOfTheDay? {
+    suspend fun getHotd(urn: String): HadithOfTheDay? {
         return dao
             .getHotd(urn, "en")
             ?.apply {
@@ -244,7 +254,7 @@ class HadithRepositoryImpl(
             }
     }
 
-    override suspend fun getNewHotd(): HadithOfTheDay? {
+    suspend fun getNewHotd(): HadithOfTheDay? {
         return dao
             .getNewHotd(300, "en")
             ?.apply {

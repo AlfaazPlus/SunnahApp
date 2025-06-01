@@ -13,7 +13,7 @@ import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
 import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_CHANNEL_ID
 import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_CHANNEL_NAME
 import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_ID
@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 class HadithOfTheDayWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val repo: HadithRepository,
+    private val repo: HadithRepositoryImpl,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {

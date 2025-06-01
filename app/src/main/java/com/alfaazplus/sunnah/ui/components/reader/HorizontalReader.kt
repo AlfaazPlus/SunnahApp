@@ -241,6 +241,9 @@ private fun HadithActionBar(
     }
 
     HadithMenu(
+        collectionId = cwi.collection.id,
+        bookId = bwi.book.id,
+        hadithNumber = hadith.hadith.hadithNumber,
         isOpen = showHadithMenu
     ){
         showHadithMenu = false

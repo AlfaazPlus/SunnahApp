@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 open class SearchViewModel @Inject constructor(
-    private val repo: HadithRepository,
+    private val repo: HadithRepositoryImpl,
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
