@@ -32,7 +32,7 @@ fun AlertDialog(
     confirmText: String,
     confirmColors: Pair<Color, Color>? = null,
     onConfirm: () -> Unit,
-    content: @Composable () -> Unit,
+    content: (@Composable () -> Unit)? = null,
 ) {
     if (!isOpen) return
 
@@ -55,7 +55,8 @@ fun AlertDialog(
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
-                    content()
+
+                    content?.invoke()
                 }
 
                 Row(

@@ -19,7 +19,11 @@ data class SingleArgRoute(private val route: String, private val argName: String
 data class MultiArgRoute(private val route: String, private val argNames: List<String>) {
     operator fun invoke() = "$route?${argNames.joinToString("&") { "$it={$it}" }}"
 
-    fun args(vararg args: Any) = "$route?${argNames.zip(args).joinToString("&") { "${it.first}=${it.second}" }}"
+    fun args(vararg args: Any) = "$route?${
+        argNames
+            .zip(args)
+            .joinToString("&") { "${it.first}=${it.second}" }
+    }"
 }
 
 object Routes {
@@ -35,4 +39,11 @@ object Routes {
     val READER = MultiArgRoute("reader", listOf(Keys.COLLECTION_ID, Keys.BOOK_ID, Keys.HADITH_NUMBER))
     val NARRATOR_CHAIN = SingleArgRoute("narrators_chain", Keys.HADITH_URN)
     val SCHOLAR_INFO = SingleArgRoute("scholar_info", Keys.SCHOLAR_ID)
+    val BOOKMARKS = "bookmarks"
+    val SINGLE_COLLECTION = MultiArgRoute(
+        "single_collection", listOf(
+            Keys.USER_COLLECTION_ID,
+            Keys.USER_COLLECTION_NAME,
+        )
+    )
 }

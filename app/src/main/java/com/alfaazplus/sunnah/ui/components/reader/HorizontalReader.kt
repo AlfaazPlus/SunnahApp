@@ -244,10 +244,11 @@ private fun HadithActionBar(
         collectionId = cwi.collection.id,
         bookId = bwi.book.id,
         hadithNumber = hadith.hadith.hadithNumber,
-        isOpen = showHadithMenu
-    ){
-        showHadithMenu = false
-    }
+        isOpen = showHadithMenu,
+        onClose = {
+            showHadithMenu = false
+        },
+    )
 }
 
 @Composable
@@ -428,7 +429,8 @@ fun HorizontalReader(
     val isDarkTheme = ThemeUtils.isDarkTheme()
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
-    Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         ReaderAppBar(
             readerVm = vm,
             currentHadithNumber = {

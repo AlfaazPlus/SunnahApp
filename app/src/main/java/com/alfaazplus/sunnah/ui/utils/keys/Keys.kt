@@ -24,4 +24,6 @@ object Keys {
 
     const val SHOW_READER_SETTINGS_ONLY = "show_reader_settings_only"
     const val HADITH_OF_THE_DAY = "hadith_of_the_day"
+    const val USER_COLLECTION_ID = "user_collection_id"
+    const val USER_COLLECTION_NAME = "user_collection_name"
 }

@@ -102,7 +102,11 @@ class UserRepository(
     }
 
     fun observeAllUserBookmarks(): Flow<List<UserBookmark>> {
-        return dao.getUserBookmarks()
+        return dao.observeUserBookmarks()
+    }
+
+    fun observeRecentUserBookmarks(): Flow<List<UserBookmark>> {
+        return dao.observeRecentUserBookmarks()
     }
 
     fun observeUserBookmark(

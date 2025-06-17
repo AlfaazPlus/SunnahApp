@@ -92,9 +92,11 @@ interface UserDataDao {
     @Query("DELETE FROM user_collection_item WHERE u_collection_id = :collectionId")
     suspend fun clearUserCollectionItems(collectionId: Long)
 
-    // User bookmarks
+    @Query("SELECT * from user_bookmark ORDER BY updated_at DESC LIMIT 10")
+    fun observeRecentUserBookmarks(): Flow<List<UserBookmark>>
+
     @Query("SELECT * from user_bookmark ORDER BY updated_at DESC")
-    fun getUserBookmarks(): Flow<List<UserBookmark>>
+    fun observeUserBookmarks(): Flow<List<UserBookmark>>
 
     @Query("SELECT * from user_bookmark WHERE h_collection_id = :hadithCollectionId AND h_book_id = :hadithBookId AND hadith_number = :hadithNumber")
     fun observeUserBookmark(

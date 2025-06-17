@@ -16,6 +16,8 @@ import javax.inject.Inject
 class UserDataViewModel @Inject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
+    private val bookmarkCache = mutableMapOf<String, StateFlow<Boolean>>()
+
     val repo get() = repository
 
     val userCollections: StateFlow<List<UserCollection>> = repository
@@ -26,8 +28,16 @@ class UserDataViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    val userBookmarks: StateFlow<List<UserBookmark>> = repository
+    val allUserBookmarks: StateFlow<List<UserBookmark>> = repository
         .observeAllUserBookmarks()
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
+
+    val recentUserBookmarks: StateFlow<List<UserBookmark>> = repository
+        .observeRecentUserBookmarks()
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -38,16 +48,22 @@ class UserDataViewModel @Inject constructor(
         hadithCollectionId: Int,
         hadithBookId: Int,
         hadithNumber: String,
-    ): StateFlow<Boolean> = repository
-        .observeUserBookmark(
-            hadithCollectionId,
-            hadithBookId,
-            hadithNumber,
-        )
-        .map { it != null }
-        .stateIn(
-            viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = false,
-        )
+    ): StateFlow<Boolean> {
+        val key = "$hadithCollectionId-$hadithBookId-$hadithNumber"
+
+        return bookmarkCache.getOrPut(key) {
+            repository
+                .observeUserBookmark(
+                    hadithCollectionId,
+                    hadithBookId,
+                    hadithNumber,
+                )
+                .map { it != null }
+                .stateIn(
+                    viewModelScope,
+                    started = SharingStarted.Eagerly,
+                    initialValue = false,
+                )
+        }
+    }
 }

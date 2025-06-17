@@ -24,9 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.common.TextButton
 import com.alfaazplus.sunnah.ui.components.common.TextIconButton
@@ -35,13 +37,17 @@ import com.alfaazplus.sunnah.ui.controllers.ModalController
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 private fun Content(
     request: AddToBookmarkRequest,
+    closeSheet: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
     hadithViewModel: HadithRepoViewModel = hiltViewModel(),
 ) {
@@ -61,10 +67,11 @@ private fun Content(
         )
         .collectAsState(initial = null)
 
-    var isEditing by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(request.editMode) }
     var remark by remember { mutableStateOf(oBookmark?.remark ?: "") }
 
     val scope = rememberCoroutineScope()
+    val navController = LocalNavHostController.current
 
     LaunchedEffect(oBookmark) {
         if (remark.isNotEmpty()) {
@@ -85,29 +92,37 @@ private fun Content(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "Bookmarks",
+            text = stringResource(R.string.bookmarks),
             style = MaterialTheme.typography.titleMedium,
         )
 
         if (!isEditing) {
             TextIconButton(
                 painter = painterResource(R.drawable.pencil_line),
-                text = "Edit",
+                text = stringResource(R.string.edit),
                 small = true,
             ) {
                 isEditing = true
             }
 
             IconButton(
-                painter = painterResource(R.drawable.ic_delete), small = true, colors = ButtonDefaults.filledTonalButtonColors(
+                painter = painterResource(R.drawable.ic_delete),
+                small = true,
+                colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError
-                )
+                ),
             ) {
-                // TODO: Show confirmation dialog before deleting
+                scope.launch {
+                    viewModel.repo.deleteUserBookmark(bookmark.id)
+
+                    withContext(Dispatchers.Main) {
+                        closeSheet()
+                    }
+                }
             }
         } else {
             TextButton(
-                text = "Done",
+                text = stringResource(R.string.done),
                 small = true,
                 colors = ButtonDefaults.buttonColors(),
             ) {
@@ -156,8 +171,8 @@ private fun Content(
                     }
                 },
                 minLines = 4,
-                label = "Remark",
-                placeholder = "Optional remark",
+                label = stringResource(R.string.remark),
+                placeholder = stringResource(R.string.optional_remark),
                 bgColor = MaterialTheme.colorScheme.background,
             )
         } else if (bookmark.remark.isNotBlank()) {
@@ -169,13 +184,21 @@ private fun Content(
             )
         }
 
-        /*if (!isEditing) {
+        if (!isEditing && request.openInReader) {
             TextButton(
-                text = "Open in Reader",
+                text = stringResource(R.string.open_in_reader),
                 fullWidth = true,
                 modifier = Modifier.padding(top = 12.dp),
-            ) { }
-        }*/
+            ) {
+                navController.navigate(
+                    Routes.READER.args(
+                        request.hadithCollectionId,
+                        request.hadithBookId,
+                        request.hadithNumber,
+                    )
+                )
+            }
+        }
     }
 }
 
@@ -201,7 +224,9 @@ fun AddToBookmarksSheet(
         dragHandle = {},
     ) {
         if (request != null) {
-            Content(request = request)
+            Content(request = request, closeSheet = {
+                controller.hide()
+            })
         }
     }
 }

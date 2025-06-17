@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -172,13 +171,13 @@ private fun Footer(
     hotd: HadithOfTheDay,
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val isBookmarkedFlow = remember { viewModel
+    val isBookmarked by viewModel
         .isBookmarked(
             hotd.hadith.collectionId,
             hotd.hadith.bookId,
             hotd.hadith.hadithNumber,
-        )}
-    val isBookmarked by isBookmarkedFlow.collectAsState()
+        )
+        .collectAsState()
 
     val scope = rememberCoroutineScope()
 

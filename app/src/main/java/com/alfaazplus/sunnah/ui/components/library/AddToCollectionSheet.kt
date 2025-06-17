@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
@@ -97,13 +98,13 @@ private fun Content(
             },
             maxLines = 4,
             minLines = 2,
-            label = "Remark",
-            placeholder = "Optional remark",
+            label = stringResource(R.string.remark),
+            placeholder = stringResource(R.string.optional_remark),
             bgColor = MaterialTheme.colorScheme.background,
         )
 
         Text(
-            "Select Collections",
+            stringResource(R.string.select_collections),
             modifier = Modifier.padding(vertical = 8.dp),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
@@ -166,7 +167,7 @@ private fun Content(
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         ) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
         }
 
         Button(
@@ -216,9 +217,9 @@ private fun Content(
             ),
         ) {
             Text(
-                if (isDeleting) "Remove"
-                else if (initialCollectionIds.isEmpty()) "Add to Collection"
-                else "Update"
+                if (isDeleting) stringResource(R.string.remove)
+                else if (initialCollectionIds.isEmpty()) stringResource(R.string.add_to_collection)
+                else stringResource(R.string.update)
             )
         }
     }
@@ -263,7 +264,7 @@ fun AddToCollectionSheet(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Add to collection",
+                text = stringResource(R.string.add_to_collection),
                 style = MaterialTheme.typography.titleMedium,
             )
 

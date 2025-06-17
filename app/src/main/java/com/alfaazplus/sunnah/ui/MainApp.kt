@@ -19,10 +19,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
+import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
@@ -86,7 +88,8 @@ fun MainApp() {
                     BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
                 }
                 route(
-                    Routes.READER(), arguments = listOf(
+                    Routes.READER(),
+                    arguments = listOf(
                         navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
                         navArgument(Keys.BOOK_ID) { type = NavType.IntType },
                         navArgument(Keys.HADITH_NUMBER) {
@@ -94,7 +97,7 @@ fun MainApp() {
                             defaultValue = null
                             nullable = true
                         },
-                    )
+                    ),
                 ) { rsEntry ->
                     ReaderScreen(
                         collectionId = rsEntry.arguments?.getInt(Keys.COLLECTION_ID, 1) ?: 1,
@@ -104,14 +107,31 @@ fun MainApp() {
                 }
 
                 route(
-                    Routes.NARRATOR_CHAIN(), arguments = listOf(navArgument(Keys.HADITH_URN) { type = NavType.IntType })
+                    Routes.NARRATOR_CHAIN(),
+                    arguments = listOf(
+                        navArgument(Keys.HADITH_URN) { type = NavType.IntType },
+                    ),
                 ) { bsEntry ->
                     NarratorsChainScreen(hadithUrn = bsEntry.arguments?.getInt(Keys.HADITH_URN) ?: 0)
                 }
                 route(
-                    Routes.SCHOLAR_INFO(), arguments = listOf(navArgument(Keys.SCHOLAR_ID) { type = NavType.IntType })
+                    Routes.SCHOLAR_INFO(),
+                    arguments = listOf(navArgument(Keys.SCHOLAR_ID) { type = NavType.IntType }),
                 ) { bsEntry ->
                     ScholarInfoScreen(scholarId = bsEntry.arguments?.getInt(Keys.SCHOLAR_ID) ?: 0)
+                }
+                route(Routes.BOOKMARKS) { BookmarksScreen() }
+                route(
+                    Routes.SINGLE_COLLECTION(),
+                    arguments = listOf(
+                        navArgument(Keys.USER_COLLECTION_ID) { type = NavType.IntType },
+                        navArgument(Keys.USER_COLLECTION_NAME) { type = NavType.StringType },
+                    ),
+                ) { bsEntry ->
+                    SingleUserCollectionScreen(
+                        userCollectionId = bsEntry.arguments?.getInt(Keys.USER_COLLECTION_ID) ?: 0,
+                        userCollectionName = bsEntry.arguments?.getString(Keys.USER_COLLECTION_NAME) ?: ""
+                    )
                 }
             }
         }

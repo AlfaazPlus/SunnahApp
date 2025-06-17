@@ -5,4 +5,5 @@ data class AddToBookmarkRequest(
     val hadithBookId: Int,
     val hadithNumber: String,
     val editMode: Boolean = false,
+    val openInReader: Boolean = true,
 )
