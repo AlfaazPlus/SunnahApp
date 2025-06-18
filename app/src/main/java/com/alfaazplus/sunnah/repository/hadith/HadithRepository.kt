@@ -266,14 +266,25 @@ class HadithRepository(
         return if (suffix != null) "$number$suffix" else number
     }
 
-    suspend fun getQuickHadithSearchResults(query: String): List<HadithSearchQuickResult> {
+    suspend fun getQuickHadithSearchResults(query: String): List<HadithSearchQuickResult> { // check if colon is present in the query
+        val parts = query.split(":")
+
+        if (parts.size > 1) {
+            val bookSerial = parseNumber(parts[0])
+            val hadithOrder = parseNumber(parts[1])
+
+            if (bookSerial != null && hadithOrder != null) {
+                return dao.searchQuickHadithsByBook(bookSerial, hadithOrder.toInt())
+            }
+        }
+
         val hadithNumber = parseNumber(query)
 
         if (hadithNumber == null) {
             return emptyList()
         }
 
-        return dao.searchQuickHadiths(hadithNumber)
+        return dao.searchQuickHadithsByHadithNumber(hadithNumber)
     }
 
     suspend fun getQuickBookSearchResults(query: String): List<BookSearchQuickResult> {
@@ -295,10 +306,7 @@ class HadithRepository(
     }
 
     suspend fun getNewHotd(): HadithOfTheDay? {
-        return dao
-            .getNewHotd(300, "en")
-            ?.apply {
-                this.collectionName = dao.getCollectionInfoById("en", this.hadith.collectionId).name
-            }
+        val urn = dao.getNewHotdUrn(300, "en") ?: return null
+        return getHotd(urn)
     }
 }

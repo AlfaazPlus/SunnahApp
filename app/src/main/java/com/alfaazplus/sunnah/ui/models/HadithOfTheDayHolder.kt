@@ -19,7 +19,8 @@ data class HadithOfTheDayHolder(
 
             try {
                 val hotd = HadithOfTheDayHolder(
-                    urn = parts[0], createdAt = Date(parts[1].toLong())
+                    urn = parts[0],
+                    createdAt = Date(parts[1].toLong()),
                 )
 
                 // check if needs refresh

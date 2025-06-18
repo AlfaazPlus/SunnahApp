@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Card
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -42,7 +45,7 @@ import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 @Composable
 fun QuickHadithSearchResult(
     title: String,
-    description: String?,
+    description: @Composable ColumnScope.() -> Unit,
     onClick: () -> Unit,
 ) {
     Card(
@@ -56,13 +59,12 @@ fun QuickHadithSearchResult(
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Icon(
                 painter = painterResource(R.drawable.bolt),
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.padding(top = 5.dp).size(20.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
             Column(
@@ -73,12 +75,8 @@ fun QuickHadithSearchResult(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                 )
-                if (description != null) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
+
+                description()
             }
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
@@ -227,8 +225,38 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
             val item = quickSearchResults[index]
 
             QuickHadithSearchResult(
-                title = "${item.collectionName}: ${item.hadithNumber}", description = "Book: ${item.bookTitle}"
-            ) {
+                title = "${item.collectionName}: ${item.hadithNumber}", description = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_book),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Text(
+                            text = "Book ${item.bookSerial}: ${item.bookTitle}",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_hash),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Text(
+                            text = "Hadith: ${item.hadithOrder}",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
+                }) {
                 navController.navigate(
                     Routes.READER.args(
                         item.collectionId,

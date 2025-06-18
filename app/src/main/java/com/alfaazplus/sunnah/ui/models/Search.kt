@@ -113,15 +113,15 @@ data class HadithSearchQuickResult(
     @ColumnInfo(name = CollectionInfoContract.Columns.NAME) val collectionName: String,
     @ColumnInfo(name = BookInfoContract.Columns.TITLE) val bookTitle: String,
     @ColumnInfo(name = HadithContract.Columns.HADITH_NUMBER) val hadithNumber: String,
+    @ColumnInfo(name = HadithContract.Columns.ORDER_IN_BOOK) val hadithOrder: Int,
     @ColumnInfo(name = HadithContract.Columns.COLLECTION_ID) val collectionId: Int,
     @ColumnInfo(name = HadithContract.Columns.BOOK_ID) val bookId: Int,
+    @ColumnInfo(name = BookContract.Columns.SERIAL_NUMBER) val bookSerial: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is HadithSearchQuickResult) return false
 
-        if (collectionName != other.collectionName) return false
-        if (bookTitle != other.bookTitle) return false
         if (hadithNumber != other.hadithNumber) return false
         if (collectionId != other.collectionId) return false
         if (bookId != other.bookId) return false
@@ -130,9 +130,7 @@ data class HadithSearchQuickResult(
     }
 
     override fun hashCode(): Int {
-        var result = collectionName.hashCode()
-        result = 31 * result + bookTitle.hashCode()
-        result = 31 * result + hadithNumber.hashCode()
+        var result = hadithNumber.hashCode()
         result = 31 * result + collectionId
         result = 31 * result + bookId
         return result
@@ -148,10 +146,8 @@ data class BookSearchQuickResult(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is HadithSearchQuickResult) return false
+        if (other !is BookSearchQuickResult) return false
 
-        if (collectionName != other.collectionName) return false
-        if (bookTitle != other.bookTitle) return false
         if (collectionId != other.collectionId) return false
         if (bookId != other.bookId) return false
 
@@ -159,9 +155,7 @@ data class BookSearchQuickResult(
     }
 
     override fun hashCode(): Int {
-        var result = collectionName.hashCode()
-        result = 31 * result + bookTitle.hashCode()
-        result = 31 * result + collectionId
+        var result = collectionId
         result = 31 * result + bookId
         return result
     }

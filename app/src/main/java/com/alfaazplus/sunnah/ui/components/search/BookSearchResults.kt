@@ -146,7 +146,13 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
             val item = quickSearchResults[index]
             QuickHadithSearchResult(
                 title = "${item.serialNumber}. ${item.bookTitle}",
-                description = item.collectionName,
+                description = {
+                    Text(
+                        text = item.collectionName,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Normal,
+                    )
+                },
             ) {
                 navController.navigate(Routes.READER.args(item.collectionId, item.bookId))
             }

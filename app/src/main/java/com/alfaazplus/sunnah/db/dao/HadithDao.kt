@@ -86,13 +86,15 @@ interface HadithDao {
     @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND lang_code = :langCode")
     suspend fun getHadithTranslationByArURN(arURN: String, langCode: String): HadithTranslation
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM hadith_translation 
         WHERE ar_urn = (
             SELECT urn FROM hadith 
             WHERE collection_id = :collectionId AND book_id = :bookId AND hadith_number = :hadithNumber
         ) AND lang_code = :langCode
-    """)
+    """
+    )
     suspend fun getHadithTranslationByHadithNumber(
         collectionId: Int,
         bookId: Int,
@@ -162,18 +164,48 @@ interface HadithDao {
             hadith.hadith_number,
             hadith.collection_id,
             hadith.book_id,
+            hadith.order_in_book,
             collection_info.name,
+            book.serial_number,
             book_info.title
         FROM hadith
         INNER JOIN collection_info
             ON hadith.collection_id = collection_info.collection_id
+        INNER JOIN book
+            ON hadith.collection_id = book.collection_id AND hadith.book_id = book.book_id
         INNER JOIN book_info
             ON hadith.collection_id = book_info.collection_id AND hadith.book_id = book_info.book_id
         WHERE 
             hadith.hadith_number = :hadithNumber
         """
     )
-    suspend fun searchQuickHadiths(hadithNumber: String): List<HadithSearchQuickResult>
+    suspend fun searchQuickHadithsByHadithNumber(hadithNumber: String): List<HadithSearchQuickResult>
+
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+        SELECT
+            hadith.hadith_number,
+            hadith.collection_id,
+            hadith.book_id,
+            hadith.order_in_book,
+            collection_info.name,
+            book.serial_number,
+            book_info.title
+        FROM book
+        INNER JOIN collection_info
+            ON book.collection_id = collection_info.collection_id
+        INNER JOIN book_info
+            ON book.collection_id = book_info.collection_id AND book.book_id = book_info.book_id
+        INNER JOIN hadith
+            ON book.collection_id = hadith.collection_id AND book.book_id = hadith.book_id
+        WHERE
+            book.serial_number = :bookSerial
+            AND hadith.order_in_book = :orderInBook
+        """
+    )
+    suspend fun searchQuickHadithsByBook(bookSerial: String, orderInBook: Int): List<HadithSearchQuickResult>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
@@ -196,23 +228,18 @@ interface HadithDao {
     )
     suspend fun searchQuickBooks(serialNumber: String): List<BookSearchQuickResult>
 
-    @Transaction
-    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-            SELECT * FROM hadith
-            INNER JOIN hadith_translation
-                ON hadith.urn = hadith_translation.ar_urn
+            SELECT ar_urn FROM hadith_translation
             WHERE
-                LENGTH(hadith_translation.hadith_text) <= :maxLength
-                AND hadith_translation.lang_code = :langCode
-                AND hadith_translation.grades LIKE '%sahih%'
+                LENGTH(hadith_text) <= :maxLength
+                AND lang_code = :langCode
+                AND grades LIKE '%sahih%'
             ORDER BY RANDOM() LIMIT 1                
         """
     )
-    fun getNewHotd(maxLength: Int, langCode: String): HadithOfTheDay?
+    fun getNewHotdUrn(maxLength: Int, langCode: String): String?
 
-    @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """

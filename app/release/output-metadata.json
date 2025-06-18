@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 10,
-      "versionName": "0.1.0-alpha.10",
-      "outputFile": "0.1.0-alpha.10-release.apk"
+      "versionCode": 11,
+      "versionName": "0.1.0-alpha.11",
+      "outputFile": "0.1.0-alpha.11-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/0.1.0-alpha.10-release.dm"
+        "baselineProfiles/1/0.1.0-alpha.11-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/0.1.0-alpha.10-release.dm"
+        "baselineProfiles/0/0.1.0-alpha.11-release.dm"
       ]
     }
   ],
