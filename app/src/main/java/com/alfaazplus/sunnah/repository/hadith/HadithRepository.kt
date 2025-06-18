@@ -24,10 +24,10 @@ import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class HadithRepositoryImpl(
+class HadithRepository(
     private val dao: HadithDao,
     private val scholarsDao: ScholarsDao,
-)  {
+) {
     suspend fun getCollection(collectionId: Int): CollectionWithInfo {
         return CollectionWithInfo(
             dao.getCollectionById(collectionId), dao.getCollectionInfoById("en", collectionId)
@@ -148,7 +148,7 @@ class HadithRepositoryImpl(
             }
     }
 
-    suspend fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
+    fun searchHadiths(query: String, collectionIds: List<Int>?, color: Color): Flow<PagingData<HadithSearchResult>> {
         Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 
         return Pager(
@@ -206,7 +206,7 @@ class HadithRepositoryImpl(
         }
     }
 
-    suspend fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>> {
+    fun searchBooks(query: String, collectionIds: List<Int>?): Flow<PagingData<BooksSearchResult>> {
         Logger.d("Searching for books with query: $query", "CollectionIds: $collectionIds")
 
         return Pager(
@@ -226,7 +226,7 @@ class HadithRepositoryImpl(
         ).flow
     }
 
-    suspend fun searchScholars(query: String): Flow<PagingData<Scholar>> {
+    fun searchScholars(query: String): Flow<PagingData<Scholar>> {
         Logger.d("Searching for scholars with query: $query")
 
         return Pager(

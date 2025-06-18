@@ -124,13 +124,12 @@ fun MainApp() {
                 route(
                     Routes.SINGLE_COLLECTION(),
                     arguments = listOf(
-                        navArgument(Keys.USER_COLLECTION_ID) { type = NavType.IntType },
+                        navArgument(Keys.USER_COLLECTION_ID) { type = NavType.LongType },
                         navArgument(Keys.USER_COLLECTION_NAME) { type = NavType.StringType },
                     ),
                 ) { bsEntry ->
                     SingleUserCollectionScreen(
-                        userCollectionId = bsEntry.arguments?.getInt(Keys.USER_COLLECTION_ID) ?: 0,
-                        userCollectionName = bsEntry.arguments?.getString(Keys.USER_COLLECTION_NAME) ?: ""
+                        userCollectionId = bsEntry.arguments?.getLong(Keys.USER_COLLECTION_ID) ?: 0L,
                     )
                 }
             }

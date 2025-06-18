@@ -84,6 +84,20 @@ interface HadithDao {
     @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND lang_code = :langCode")
     suspend fun getHadithTranslationByArURN(arURN: String, langCode: String): HadithTranslation
 
+    @Query("""
+        SELECT * FROM hadith_translation 
+        WHERE ar_urn = (
+            SELECT urn FROM hadith 
+            WHERE collection_id = :collectionId AND book_id = :bookId AND hadith_number = :hadithNumber
+        ) AND lang_code = :langCode
+    """)
+    suspend fun getHadithTranslationByHadithNumber(
+        collectionId: Int,
+        bookId: Int,
+        hadithNumber: String,
+        langCode: String,
+    ): HadithTranslation
+
     @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND chapter_id = :chapterId")
     suspend fun getHadithListByChapter(collectionId: Int, bookId: Int, chapterId: Int): List<Hadith>
 
@@ -142,8 +156,8 @@ interface HadithDao {
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-            SELECT * FROM hadith_translation
-            INNER JOIN hadith
+            SELECT * FROM hadith
+            INNER JOIN hadith_translation
                 ON hadith.urn = hadith_translation.ar_urn
             WHERE
                 LENGTH(hadith_translation.hadith_text) <= :maxLength
@@ -158,12 +172,12 @@ interface HadithDao {
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-            SELECT * FROM hadith_translation
-            INNER JOIN hadith
-                ON hadith.urn = hadith_translation.ar_urn
-            WHERE
-                hadith.urn = :urn
-                AND hadith_translation.lang_code = :langCode
+    SELECT * FROM hadith
+    INNER JOIN hadith_translation
+      ON hadith.urn = hadith_translation.ar_urn
+    WHERE
+      hadith.urn = :urn
+      AND hadith_translation.lang_code = :langCode
         """
     )
     fun getHotd(urn: String, langCode: String): HadithOfTheDay?

@@ -98,8 +98,8 @@ private fun Content(
             },
             maxLines = 4,
             minLines = 2,
-            label = stringResource(R.string.remark),
-            placeholder = stringResource(R.string.optional_remark),
+            label = stringResource(R.string.note),
+            placeholder = stringResource(R.string.optional_note),
             bgColor = MaterialTheme.colorScheme.background,
         )
 

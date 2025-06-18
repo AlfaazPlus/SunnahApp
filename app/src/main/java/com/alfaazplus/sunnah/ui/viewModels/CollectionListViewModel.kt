@@ -3,7 +3,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.helpers.HadithHelper.getIncludedCollections
-import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CollectionListViewModel @Inject constructor(
-    private val repo: HadithRepositoryImpl,
+    private val repo: HadithRepository,
 ) : ViewModel() {
 
     private val _collections = MutableStateFlow<List<CollectionWithInfo>>(emptyList())

@@ -26,6 +26,7 @@ fun SunnahAppTheme(
                 navigationBarColor = colorScheme.background.toArgb()
             }
 
+
             WindowCompat.getInsetsController(window, view).apply {
                 isAppearanceLightStatusBars = !darkTheme
                 isAppearanceLightNavigationBars = !darkTheme

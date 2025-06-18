@@ -42,6 +42,7 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,7 +55,7 @@ import com.alfaazplus.sunnah.ui.components.common.SectionEmptyMessage
 import com.alfaazplus.sunnah.ui.components.common.SectionHeaderActionButton
 import com.alfaazplus.sunnah.ui.components.common.SectionHeaderViewAll
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
-import com.alfaazplus.sunnah.ui.components.library.CreateCollectionSheet
+import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.controllers.rememberModalController
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
@@ -104,6 +105,7 @@ fun UserBookmarkCard(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                 maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(end = 6.dp)
             )
         }
@@ -305,12 +307,9 @@ private fun SectionCollections(
         }
     }
 
-    CreateCollectionSheet(
+    CreateUpdateCollectionSheet(
         showCreateCollectionSheet,
-        onCancel = {
-            showCreateCollectionSheet = false
-        },
-        onCreate = {
+        onClose = {
             showCreateCollectionSheet = false
         },
     )

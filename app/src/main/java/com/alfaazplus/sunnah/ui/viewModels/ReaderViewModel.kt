@@ -11,9 +11,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
@@ -33,7 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val repo: HadithRepositoryImpl,
+    private val repo: HadithRepository,
 ) : ViewModel() {
     var primaryColor by mutableStateOf(Color(0xFF000000))
     var onPrimaryColor by mutableStateOf(Color(0xFF000000))

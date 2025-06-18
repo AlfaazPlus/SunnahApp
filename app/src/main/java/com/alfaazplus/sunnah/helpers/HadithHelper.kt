@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.repository.hadith.HADITH_COLLECTIONS
-import com.alfaazplus.sunnah.repository.hadith.HadithRepositoryImpl
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDayHolder
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
@@ -59,7 +59,7 @@ object HadithHelper {
         return GRADE_COLORS.getOrElse(gradeType) { Color(115, 103, 102) }
     }
 
-    suspend fun getHadithOfTheDay(repo: HadithRepositoryImpl): HadithOfTheDay? {
+    suspend fun getHadithOfTheDay(repo: HadithRepository): HadithOfTheDay? {
         val hotdValue = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_OF_THE_DAY), "")
         val hotdHolder = HadithOfTheDayHolder.parse(hotdValue)
 

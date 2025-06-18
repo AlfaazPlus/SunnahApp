@@ -44,7 +44,8 @@ fun AlertDialog(
                 .wrapContentWidth()
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
-            tonalElevation = AlertDialogDefaults.TonalElevation
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             Column {
                 Column(modifier = Modifier.padding(20.dp)) {

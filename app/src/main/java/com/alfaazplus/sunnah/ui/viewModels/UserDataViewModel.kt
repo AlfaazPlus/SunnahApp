@@ -5,11 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
+import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
+import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,7 +32,7 @@ class UserDataViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    val allUserBookmarks: StateFlow<List<UserBookmark>> = repository
+    val allUserBookmarks: StateFlow<List<UserBookmarkNormalized>> = repository
         .observeAllUserBookmarks()
         .stateIn(
             viewModelScope,
@@ -43,6 +47,9 @@ class UserDataViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList(),
         )
+
+    private val _collectionItems = MutableStateFlow<List<UserCollectionItemNormalized>>(emptyList())
+    val collectionItems: StateFlow<List<UserCollectionItemNormalized>> = _collectionItems
 
     fun isBookmarked(
         hadithCollectionId: Int,
@@ -64,6 +71,18 @@ class UserDataViewModel @Inject constructor(
                     started = SharingStarted.Eagerly,
                     initialValue = false,
                 )
+        }
+    }
+
+    fun loadCollectionItems(
+        collectionId: Long,
+    ) {
+        viewModelScope.launch {
+            repository
+                .observeUserCollectionItems(collectionId)
+                .collect { items ->
+                    _collectionItems.value = items
+                }
         }
     }
 }

@@ -1,18 +1,23 @@
 package com.alfaazplus.sunnah.repository.userdata
 
+import androidx.core.text.parseAsHtml
+import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.UserDataDao
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
+import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
+import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import java.util.Date
 
 class UserRepository(
+    private val hadithDao: HadithDao,
     private val dao: UserDataDao,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,15 +28,25 @@ class UserRepository(
                 if (collections.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<UserCollection>> = collections.map { collection ->
-                    dao
-                        .observeUserCollectionItemsCount(collection.id)
-                        .map { count ->
-                            collection.itemsCount = flowOf(count)
-                            collection
-                        }
+                    collection.itemsCount = dao.observeUserCollectionItemsCount(collection.id)
+
+                    flowOf(collection)
                 }
 
                 combine(flows) { it.toList() }
+            }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeUserCollectionById(id: Long): Flow<UserCollection?> {
+        return dao
+            .observeUserCollectionById(id)
+            .flatMapLatest { collection ->
+                if (collection == null) return@flatMapLatest flowOf(null)
+
+                collection.itemsCount = dao.observeUserCollectionItemsCount(collection.id)
+
+                flowOf(collection)
             }
     }
 
@@ -39,13 +54,41 @@ class UserRepository(
         return dao.getUserCollectionsForHadith(hadithCollectionId, hadithBookId, hadithNumber)
     }
 
-    fun loadUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItem>> {
-        return dao.getUserCollectionItems(collectionId)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItemNormalized>> {
+        return dao
+            .observeUserCollectionItems(collectionId)
+            .flatMapLatest { items ->
+                if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
+
+                val flows: List<Flow<UserCollectionItemNormalized>> = items.map { item ->
+                    val translation = hadithDao.getHadithTranslationByHadithNumber(
+                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                    )
+
+                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+
+
+                    val translationText = translation.hadithText
+                        .parseAsHtml()
+                        .toAnnotatedString()
+
+                    flowOf(
+                        UserCollectionItemNormalized(
+                            item = item,
+                            translation = translation,
+                            collectionName = collectionName,
+                            translationText = translationText,
+                        )
+                    )
+                }
+
+                combine(flows) { it.toList() }
+            }
     }
 
-    suspend fun addUserCollection(userCollection: UserCollection): UserCollection {
-        val id = dao.createUserCollection(userCollection)
-        return dao.getUserCollectionById(id)
+    suspend fun addUserCollection(userCollection: UserCollection) {
+        dao.createUserCollection(userCollection)
     }
 
     suspend fun updateUserCollection(userCollection: UserCollection) {
@@ -101,8 +144,37 @@ class UserRepository(
         dao.clearUserCollectionItems(collectionId)
     }
 
-    fun observeAllUserBookmarks(): Flow<List<UserBookmark>> {
-        return dao.observeUserBookmarks()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeAllUserBookmarks(): Flow<List<UserBookmarkNormalized>> {
+        return dao
+            .observeUserBookmarks()
+            .flatMapLatest { items ->
+                if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
+
+                val flows: List<Flow<UserBookmarkNormalized>> = items.map { item ->
+                    val translation = hadithDao.getHadithTranslationByHadithNumber(
+                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                    )
+
+                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+
+
+                    val translationText = translation.hadithText
+                        .parseAsHtml()
+                        .toAnnotatedString()
+
+                    flowOf(
+                        UserBookmarkNormalized(
+                            item = item,
+                            translation = translation,
+                            collectionName = collectionName,
+                            translationText = translationText,
+                        )
+                    )
+                }
+
+                combine(flows) { it.toList() }
+            }
     }
 
     fun observeRecentUserBookmarks(): Flow<List<UserBookmark>> {

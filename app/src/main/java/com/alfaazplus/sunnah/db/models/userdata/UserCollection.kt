@@ -8,7 +8,6 @@ import com.alfaazplus.sunnah.db.contracts.userdata.UserCollectionContract
 import com.alfaazplus.sunnah.db.contracts.userdata.UserCollectionContract.Columns
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 
 @Entity(

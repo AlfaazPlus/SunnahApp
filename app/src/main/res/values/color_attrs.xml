@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <attr format="color" name="colorPrimary80" />
-    <attr format="color" name="colorPrimary50" />
-    <attr format="color" name="colorPrimary40" />
-    <attr format="color" name="colorPrimary30" />
-    <attr format="color" name="colorPrimary20" />
-    <attr format="color" name="colorPrimary10" />
-</resources>

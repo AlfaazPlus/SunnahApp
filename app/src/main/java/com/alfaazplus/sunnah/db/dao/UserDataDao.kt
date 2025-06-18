@@ -19,7 +19,7 @@ interface UserDataDao {
     fun observeUserCollectionItemsCount(collectionId: Long): Flow<Int>
 
     @Query("SELECT * from user_collection WHERE id = :id")
-    suspend fun getUserCollectionById(id: Long): UserCollection
+    fun observeUserCollectionById(id: Long): Flow<UserCollection?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun createUserCollection(userCollection: UserCollection): Long
@@ -44,9 +44,12 @@ interface UserDataDao {
     ): Flow<List<UserCollection>>
 
 
-    // User collection items
-    @Query("SELECT * from user_collection_item WHERE u_collection_id = :collectionId ORDER BY updated_at DESC")
-    fun getUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItem>>
+    @Query("""
+        SELECT * from user_collection_item
+        WHERE u_collection_id = :collectionId
+        ORDER BY updated_at DESC
+    """)
+    fun observeUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItem>>
 
     @Query("SELECT * from user_collection_item WHERE id = :id")
     suspend fun getUserCollectionItemById(id: Long): UserCollectionItem
