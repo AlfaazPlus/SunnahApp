@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,56 @@ import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
+
+@Composable
+fun QuickHadithSearchResult(
+    title: String,
+    description: String?,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        border = CardDefaults.outlinedCardBorder(),
+        onClick = onClick,
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.bolt),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                if (description != null) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+    }
+}
 
 @Composable
 fun SearchResultCount(text: String) {
@@ -134,6 +185,7 @@ private fun HadithSearchItem(
 fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
     val navController = LocalNavHostController.current
     val hadithSearchResults = vm.hadithsSearchResults.collectAsLazyPagingItems()
+    val quickSearchResults by vm.quickHadithResults.collectAsState()
     val isLoading = hadithSearchResults.loadState.refresh is LoadState.Loading
 
 
@@ -143,7 +195,7 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
     }
 
 
-    if (hadithSearchResults.itemCount == 0) {
+    if (hadithSearchResults.itemCount == 0 && quickSearchResults.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -165,6 +217,28 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 100.dp),
     ) {
+        items(
+            count = quickSearchResults.size,
+            key = { index ->
+                val item = quickSearchResults[index]
+                "${item.hadithNumber}-${item.collectionId}-quick"
+            },
+        ) { index ->
+            val item = quickSearchResults[index]
+
+            QuickHadithSearchResult(
+                title = "${item.collectionName}: ${item.hadithNumber}", description = "Book: ${item.bookTitle}"
+            ) {
+                navController.navigate(
+                    Routes.READER.args(
+                        item.collectionId,
+                        item.bookId,
+                        item.hadithNumber,
+                    )
+                )
+            }
+        }
+
         item {
             SearchResultCount(
                 text = if (hadithSearchResults.itemCount == 1) {

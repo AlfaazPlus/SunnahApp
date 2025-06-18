@@ -16,9 +16,11 @@ import com.alfaazplus.sunnah.db.dao.ScholarsDao
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
+import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
+import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import kotlinx.coroutines.flow.Flow
@@ -244,6 +246,44 @@ class HadithRepository(
                 }
             },
         ).flow
+    }
+
+    fun parseNumber(query: String): String? {
+        val cleaned = query
+            .lowercase()
+            .replace("\\s+".toRegex(), "")
+        val match = Regex("(\\d+)([a-zA-Z]?)").find(cleaned)
+
+        if (match == null) {
+            return null
+        }
+
+        val number = match.groupValues[1]
+        val suffix = match.groupValues
+            .getOrNull(2)
+            ?.firstOrNull()
+
+        return if (suffix != null) "$number$suffix" else number
+    }
+
+    suspend fun getQuickHadithSearchResults(query: String): List<HadithSearchQuickResult> {
+        val hadithNumber = parseNumber(query)
+
+        if (hadithNumber == null) {
+            return emptyList()
+        }
+
+        return dao.searchQuickHadiths(hadithNumber)
+    }
+
+    suspend fun getQuickBookSearchResults(query: String): List<BookSearchQuickResult> {
+        val serialNumber = parseNumber(query)
+
+        if (serialNumber == null) {
+            return emptyList()
+        }
+
+        return dao.searchQuickBooks(serialNumber)
     }
 
     suspend fun getHotd(urn: String): HadithOfTheDay? {

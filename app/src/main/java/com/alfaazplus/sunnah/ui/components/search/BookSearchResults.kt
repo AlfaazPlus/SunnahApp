@@ -15,6 +15,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -103,6 +105,7 @@ private fun BookSearchItem(
 fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
     val navController = LocalNavHostController.current
     val booksSearchResults = vm.booksSearchResults.collectAsLazyPagingItems()
+    val quickSearchResults by vm.quickBookResults.collectAsState()
     val isLoading = booksSearchResults.loadState.refresh is LoadState.Loading
 
 
@@ -112,12 +115,11 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
     }
 
 
-    if (booksSearchResults.itemCount == 0) {
+    if (booksSearchResults.itemCount == 0 && quickSearchResults.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center,
+                .padding(16.dp), contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "No results found",
@@ -134,6 +136,22 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 100.dp),
     ) {
+        items(
+            count = quickSearchResults.size,
+            key = { index ->
+                val item = quickSearchResults[index]
+                "${item.bookId}-${item.collectionId}-quick"
+            },
+        ) { index ->
+            val item = quickSearchResults[index]
+            QuickHadithSearchResult(
+                title = "${item.serialNumber}. ${item.bookTitle}",
+                description = item.collectionName,
+            ) {
+                navController.navigate(Routes.READER.args(item.collectionId, item.bookId))
+            }
+        }
+
         item {
             SearchResultCount(
                 text = if (booksSearchResults.itemCount == 1) {

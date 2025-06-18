@@ -12,6 +12,7 @@ import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import java.util.Date
@@ -24,6 +25,7 @@ class UserRepository(
     fun observeAllUserCollections(): Flow<List<UserCollection>> {
         return dao
             .observeUserCollections()
+            .distinctUntilChanged()
             .flatMapLatest { collections ->
                 if (collections.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
@@ -41,6 +43,7 @@ class UserRepository(
     fun observeUserCollectionById(id: Long): Flow<UserCollection?> {
         return dao
             .observeUserCollectionById(id)
+            .distinctUntilChanged()
             .flatMapLatest { collection ->
                 if (collection == null) return@flatMapLatest flowOf(null)
 
@@ -58,6 +61,7 @@ class UserRepository(
     fun observeUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItemNormalized>> {
         return dao
             .observeUserCollectionItems(collectionId)
+            .distinctUntilChanged()
             .flatMapLatest { items ->
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
@@ -148,6 +152,7 @@ class UserRepository(
     fun observeAllUserBookmarks(): Flow<List<UserBookmarkNormalized>> {
         return dao
             .observeUserBookmarks()
+            .distinctUntilChanged()
             .flatMapLatest { items ->
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 

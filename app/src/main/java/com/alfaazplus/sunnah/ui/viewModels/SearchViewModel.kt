@@ -7,7 +7,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -81,6 +84,30 @@ open class SearchViewModel @Inject constructor(
             viewModelScope,
             started = SharingStarted.Lazily,
             initialValue = PagingData.empty(),
+        )
+
+    val quickHadithResults: StateFlow<List<HadithSearchQuickResult>> = _searchQuery
+        .debounce(300)
+        .distinctUntilChanged()
+        .mapLatest { query ->
+            repo.getQuickHadithSearchResults(query)
+        }
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = emptyList(),
+        )
+
+    val quickBookResults: StateFlow<List<BookSearchQuickResult>> = _searchQuery
+        .debounce(300)
+        .distinctUntilChanged()
+        .mapLatest { query ->
+            repo.getQuickBookSearchResults(query)
+        }
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = emptyList(),
         )
 
     fun onSearchQueryChanged(query: String) {

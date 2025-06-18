@@ -17,7 +17,9 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
 import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
 import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
 import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 
 @Dao
@@ -151,6 +153,48 @@ interface HadithDao {
             """
     )
     fun searchBooks(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
+
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+        SELECT
+            hadith.hadith_number,
+            hadith.collection_id,
+            hadith.book_id,
+            collection_info.name,
+            book_info.title
+        FROM hadith
+        INNER JOIN collection_info
+            ON hadith.collection_id = collection_info.collection_id
+        INNER JOIN book_info
+            ON hadith.collection_id = book_info.collection_id AND hadith.book_id = book_info.book_id
+        WHERE 
+            hadith.hadith_number = :hadithNumber
+        """
+    )
+    suspend fun searchQuickHadiths(hadithNumber: String): List<HadithSearchQuickResult>
+
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+        SELECT
+            book.book_id,
+            book.collection_id,
+            book.serial_number,
+            collection_info.name,
+            book_info.title
+        FROM book
+        INNER JOIN collection_info
+            ON book.collection_id = collection_info.collection_id
+        INNER JOIN book_info
+            ON book.collection_id = book_info.collection_id AND book.book_id = book_info.book_id
+        WHERE 
+            book.serial_number = :serialNumber
+        """
+    )
+    suspend fun searchQuickBooks(serialNumber: String): List<BookSearchQuickResult>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
