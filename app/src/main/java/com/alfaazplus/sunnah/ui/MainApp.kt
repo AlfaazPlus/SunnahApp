@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
+import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
@@ -120,6 +121,7 @@ fun MainApp() {
                 ) { bsEntry ->
                     ScholarInfoScreen(scholarId = bsEntry.arguments?.getInt(Keys.SCHOLAR_ID) ?: 0)
                 }
+                route(Routes.READING_HISTORY) { ReadingHistoryScreen() }
                 route(Routes.BOOKMARKS) { BookmarksScreen() }
                 route(
                     Routes.SINGLE_COLLECTION(),

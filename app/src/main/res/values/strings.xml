@@ -141,7 +141,7 @@
     <string name="select_collections">Select Collections</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="delete_all_bookmarks">Delete all bookmarks?</string>
-    <string name="all_bookmarks_deleted">All bookmarks deleted?</string>
+    <string name="all_bookmarks_deleted">All bookmarks deleted.</string>
     <string name="collections">Collections</string>
     <string name="no_collections">No collections created yet.</string>
     <string name="no_collection_items">
@@ -163,5 +163,7 @@
     <string name="no_bookmarks">No bookmarks yet.</string>
     <string name="reading_history">Reading History</string>
     <string name="no_reading_history">Your reading history appears here.</string>
+    <string name="clear_reading_history">Clear Reading History?</string>
+    <string name="reading_history_cleared">Reading history cleared.</string>
     <string name="action_cannot_be_undone">This action cannot be undone.</string>
 </resources>

@@ -22,7 +22,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
@@ -352,26 +352,24 @@ fun ReaderAppBar(
                         }
                     }
 
-                    if (showBottomSheet) {
-                        ModalBottomSheet(
-                            onDismissRequest = { showBottomSheet = false },
-                            sheetState = sheetState,
-                        ) {
-                            ReaderHadithNavigator(
-                                books = books,
-                                hadiths = hadiths,
-                                currentBookId = bookId.value ?: 0,
-                                currentHadithNumber = currentHadithNumber(),
-                                onJumpToBook = { bwi ->
-                                    onJumpToBook(bwi)
-                                    showBottomSheet = false
-                                },
-                                onJumpToHadith = { hwt ->
-                                    onJumpToHadith(hwt)
-                                    showBottomSheet = false
-                                },
-                            )
-                        }
+                    BottomSheet(
+                        isOpen = showBottomSheet,
+                        onDismiss = { showBottomSheet = false },
+                    ) {
+                        ReaderHadithNavigator(
+                            books = books,
+                            hadiths = hadiths,
+                            currentBookId = bookId.value ?: 0,
+                            currentHadithNumber = currentHadithNumber(),
+                            onJumpToBook = { bwi ->
+                                onJumpToBook(bwi)
+                                showBottomSheet = false
+                            },
+                            onJumpToHadith = { hwt ->
+                                onJumpToHadith(hwt)
+                                showBottomSheet = false
+                            },
+                        )
                     }
                 }
             },

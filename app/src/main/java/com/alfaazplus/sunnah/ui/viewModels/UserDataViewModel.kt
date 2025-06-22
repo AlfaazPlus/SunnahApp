@@ -2,9 +2,11 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
+import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,22 @@ class UserDataViewModel @Inject constructor(
     private val bookmarkCache = mutableMapOf<String, StateFlow<Boolean>>()
 
     val repo get() = repository
+
+    val allReadHistory: StateFlow<List<ReadHistoryNormalized>> = repository
+        .observeAllReadHistory()
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
+
+    val recentReadHistory: StateFlow<List<ReadHistory>> = repository
+        .observeRecentReadHistory()
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
 
     val userCollections: StateFlow<List<UserCollection>> = repository
         .observeAllUserCollections()

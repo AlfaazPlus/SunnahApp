@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val repo: HadithRepository,
+    private val userRepo: UserRepository,
 ) : ViewModel() {
     var primaryColor by mutableStateOf(Color(0xFF000000))
     var onPrimaryColor by mutableStateOf(Color(0xFF000000))
@@ -96,7 +98,9 @@ class ReaderViewModel @Inject constructor(
                 parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(hadith.hadithPrefix)
             }
 
-            parsedHadith.hadithText = HadithTextHelper.prepareText(hadith.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+            parsedHadith.hadithText = HadithTextHelper
+                .prepareText(hadith.hadithText)
+                .toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
             if (!hadith.hadithSuffix.isNullOrEmpty()) {
                 parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(hadith.hadithSuffix)
@@ -106,8 +110,9 @@ class ReaderViewModel @Inject constructor(
                 parsedHadith.translationNarrator = buildAnnotatedString {
                     append(translation.narratorPrefix?.parseAsHtml())
                 }
-                parsedHadith.translationText =
-                    HadithTextHelper.prepareText(translation.hadithText).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                parsedHadith.translationText = HadithTextHelper
+                    .prepareText(translation.hadithText)
+                    .toHadithAnnotatedString(primaryColor, onPrimaryColor)
 
                 parsedHadith.gradeType = HadithHelper.getHadithGradeText(translation.grades, translation.gradedBy)
             }
@@ -116,13 +121,15 @@ class ReaderViewModel @Inject constructor(
                 val parsedChapter = ParsedChapter(it.chapter)
 
                 if (!it.chapter.chapter.intro.isNullOrEmpty()) {
-                    parsedChapter.chapterIntro =
-                        HadithTextHelper.prepareText(it.chapter.chapter.intro).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                    parsedChapter.chapterIntro = HadithTextHelper
+                        .prepareText(it.chapter.chapter.intro)
+                        .toHadithAnnotatedString(primaryColor, onPrimaryColor)
                 }
 
                 if (!it.chapter.info.intro.isNullOrEmpty()) {
-                    parsedChapter.chapterIntroEn =
-                        HadithTextHelper.prepareText(it.chapter.info.intro).toHadithAnnotatedString(primaryColor, onPrimaryColor)
+                    parsedChapter.chapterIntroEn = HadithTextHelper
+                        .prepareText(it.chapter.info.intro)
+                        .toHadithAnnotatedString(primaryColor, onPrimaryColor)
                 }
 
                 parsedHadith.chapter = parsedChapter
@@ -136,5 +143,17 @@ class ReaderViewModel @Inject constructor(
         hadithList = repo.getHadithList(collectionId, bookId.value!!)
         parseHadiths()
         initialized = true
+    }
+
+    fun saveReadHistory() {
+        val bookIdValue = bookId.value ?: return
+
+        viewModelScope.launch {
+            userRepo.saveReadHistory(
+                collectionId,
+                bookIdValue,
+                currentHadithNumber,
+            )
+        }
     }
 }

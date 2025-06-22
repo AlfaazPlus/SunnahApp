@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
+import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
@@ -44,11 +46,13 @@ interface UserDataDao {
     ): Flow<List<UserCollection>>
 
 
-    @Query("""
+    @Query(
+        """
         SELECT * from user_collection_item
         WHERE u_collection_id = :collectionId
         ORDER BY updated_at DESC
-    """)
+    """
+    )
     fun observeUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItem>>
 
     @Query("SELECT * from user_collection_item WHERE id = :id")
@@ -122,4 +126,29 @@ interface UserDataDao {
 
     @Query("DELETE FROM user_bookmark")
     suspend fun clearUserBookmarks()
+
+    @Query("SELECT * from read_history ORDER BY created_at DESC LIMIT 10")
+    fun observeRecentReadHistory(): Flow<List<ReadHistory>>
+
+
+    @Query("SELECT * from read_history ORDER BY created_at DESC")
+    fun observeReadHistory(): Flow<List<ReadHistory>>
+
+    @Upsert
+    suspend fun upsertReadHistory(readHistory: ReadHistory)
+
+    @Query("DELETE FROM read_history")
+    suspend fun clearReadHistory()
+
+    @Query(
+        """
+        DELETE FROM read_history
+        WHERE rowid NOT IN (
+            SELECT rowid FROM read_history
+            ORDER BY created_at DESC
+            LIMIT :keepCount
+        )
+    """
+    )
+    suspend fun deleteOldReadHistory(keepCount: Int)
 }

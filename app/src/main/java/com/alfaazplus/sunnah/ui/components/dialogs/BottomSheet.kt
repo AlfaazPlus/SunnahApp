@@ -22,7 +22,7 @@ fun BottomSheet(
     isOpen: Boolean,
     onDismiss: () -> Unit,
     icon: Int? = null,
-    title: String?,
+    title: String? = null,
     headerArrangement: Arrangement.Horizontal = Arrangement.Center,
     content: @Composable () -> Unit,
 ) {

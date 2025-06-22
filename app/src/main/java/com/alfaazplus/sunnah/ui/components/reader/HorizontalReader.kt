@@ -105,14 +105,14 @@ private fun resolvePage(hadithList: List<ParsedHadith>, hadithNumber: String?): 
 }
 
 @Composable
-private fun highlightHadithItem(show: Boolean): Modifier {
+private fun Modifier.highlightHadithItem(show: Boolean): Modifier {
     val alpha by animateFloatAsState(
         targetValue = if (show) 0.3f else 0f,
         animationSpec = tween(durationMillis = 1500),
         label = "",
     )
 
-    return Modifier.background(MaterialTheme.colorScheme.primary.alpha(alpha))
+    return this.background(MaterialTheme.colorScheme.primary.alpha(alpha))
 }
 
 @Composable
@@ -284,7 +284,7 @@ fun HadithItem(
     var modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
-        .then(highlightHadithItem(highlight))
+        .highlightHadithItem(highlight)
         .padding(16.dp)
 
 
@@ -430,39 +430,42 @@ fun HorizontalReader(
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-        ReaderAppBar(
-            readerVm = vm,
-            currentHadithNumber = {
-                Logger.d("REQUEST CURRRENT HADITH NUM")
-                currentHadithNumber
-            },
-            scrollBehavior = scrollBehavior,
-            onJumpToBook = { navigateToBook(it.book.id) },
-            onJumpToHadith = {
-                val index = resolvePage(hadithList, it.hadith.hadithNumber)
-                if (index != null) {
-                    navigateToIndex(index)
-                }
-            },
-        )
-    }, bottomBar = {
-        HorizontalReaderBottomBar(
-            prevHadithNumber = previousHadithNumber,
-            nextHadithNumber = nextHadithNumber,
-            onPreviousClick = {/*if (previousHadithNumber == "book") {
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            ReaderAppBar(
+                readerVm = vm,
+                currentHadithNumber = {
+                    currentHadithNumber
+                },
+                scrollBehavior = scrollBehavior,
+                onJumpToBook = { navigateToBook(it.book.id) },
+                onJumpToHadith = {
+                    val index = resolvePage(hadithList, it.hadith.hadithNumber)
+                    if (index != null) {
+                        navigateToIndex(index)
+                    }
+                },
+            )
+        },
+        bottomBar = {
+            HorizontalReaderBottomBar(
+                prevHadithNumber = previousHadithNumber,
+                nextHadithNumber = nextHadithNumber,
+                onPreviousClick = {/*if (previousHadithNumber == "book") {
                         getPreviousBookId(vm.books, vm.bookId.value)?.let { navigateToBook(it) }
                     } else {
                     }*/
-                navigateToIndex(pagerState.currentPage - 1)
-            },
-            onNextClick = {/*if (nextHadithNumber == "book") {
+                    navigateToIndex(pagerState.currentPage - 1)
+                },
+                onNextClick = {/*if (nextHadithNumber == "book") {
                         getNextBookId(vm.books, vm.bookId.value)?.let { navigateToBook(it) }
                     } else {
                     }*/
-                navigateToIndex(pagerState.currentPage + 1)
-            },
-        )
-    }, containerColor = bgColor, contentColor = txtColor
+                    navigateToIndex(pagerState.currentPage + 1)
+                },
+            )
+        },
+        containerColor = bgColor,
+        contentColor = txtColor,
     ) { PageContent(vm.cwi!!, vm.bwi!!, it, hadithList, pagerState) }
 }

@@ -3,9 +3,11 @@ package com.alfaazplus.sunnah.repository.userdata
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.UserDataDao
+import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
@@ -209,5 +211,64 @@ class UserRepository(
 
     suspend fun clearUserBookmarks() {
         dao.clearUserBookmarks()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeAllReadHistory(): Flow<List<ReadHistoryNormalized>> {
+        return dao
+            .observeReadHistory()
+            .distinctUntilChanged()
+            .flatMapLatest { items ->
+                if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
+
+                val flows: List<Flow<ReadHistoryNormalized>> = items.map { item ->
+                    val translation = hadithDao.getHadithTranslationByHadithNumber(
+                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                    )
+
+                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+
+
+                    val translationText = translation.hadithText
+                        .parseAsHtml()
+                        .toAnnotatedString()
+
+                    flowOf(
+                        ReadHistoryNormalized(
+                            item = item,
+                            translation = translation,
+                            collectionName = collectionName,
+                            translationText = translationText,
+                        )
+                    )
+                }
+
+                combine(flows) { it.toList() }
+            }
+    }
+
+    fun observeRecentReadHistory(): Flow<List<ReadHistory>> {
+        return dao.observeRecentReadHistory()
+    }
+
+    suspend fun saveReadHistory(
+        hadithCollectionId: Int,
+        hadithBookId: Int,
+        hadithNumber: String,
+    ) {
+        dao.upsertReadHistory(
+            ReadHistory(
+                hadithCollectionId = hadithCollectionId,
+                hadithBookId = hadithBookId,
+                hadithNumber = hadithNumber,
+                createdAt = Date(),
+            )
+        )
+
+        dao.deleteOldReadHistory(100)
+    }
+
+    suspend fun clearReadHistory() {
+        dao.clearReadHistory()
     }
 }

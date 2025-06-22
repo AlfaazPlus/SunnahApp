@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.db.models.userdata.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
@@ -65,9 +66,102 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
+@Composable
+private fun ReadHistoryItemCard(
+    item: ReadHistory,
+    onClick: () -> Unit,
+    hadithViewModel: HadithRepoViewModel = hiltViewModel(),
+) {
+    val hadithCollection = produceState<CollectionWithInfo?>(null) {
+        value = hadithViewModel.repo.getCollection(item.hadithCollectionId)
+    }.value
+
+    val hadithBook = produceState<BookWithInfo?>(null) {
+        value = hadithViewModel.repo.getBookById(item.hadithCollectionId, item.hadithBookId)
+    }.value
+
+    Box(
+        modifier = Modifier
+            .width(250.dp)
+            .height(70.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable {
+                onClick()
+            }
+            .padding(12.dp),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = "${hadithCollection?.info?.name} : ${item.hadithNumber}",
+                style = MaterialTheme.typography.titleSmall,
+            )
+
+            Text(
+                text = "Book: ${hadithBook?.info?.title}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(end = 6.dp)
+            )
+        }
+    }
+}
 
 @Composable
-fun UserBookmarkCard(
+private fun SectionReadHistory(
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    val readHistory by viewModel.recentReadHistory.collectAsState()
+    val navController = LocalNavHostController.current
+
+    Section(
+        icon = R.drawable.ic_history,
+        title = stringResource(R.string.reading_history),
+        headerRightContent = {
+            SectionHeaderViewAll {
+                navController.navigate(Routes.READING_HISTORY)
+            }
+        },
+    ) {
+        if (readHistory.isEmpty()) {
+            SectionEmptyMessage(
+                stringResource(R.string.no_reading_history),
+            )
+        } else {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+            ) {
+                items(
+                    readHistory.size, key = { readHistory[it].key() }) { index ->
+                    val item = readHistory[index]
+
+                    ReadHistoryItemCard(
+                        item,
+                        onClick = {
+                            navController.navigate(
+                                Routes.READER.args(
+                                    item.hadithCollectionId,
+                                    item.hadithBookId,
+                                    item.hadithNumber,
+                                )
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun UserBookmarkCard(
     bookmark: UserBookmark,
     onClick: () -> Unit,
     hadithViewModel: HadithRepoViewModel = hiltViewModel(),
@@ -124,7 +218,7 @@ fun UserBookmarkCard(
 }
 
 @Composable
-fun SectionBookmarks(
+private fun SectionBookmarks(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
     val userBookmarks by viewModel.recentUserBookmarks.collectAsState()
@@ -324,14 +418,7 @@ fun LibraryScreen() {
             .padding(vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Section(
-            icon = R.drawable.ic_history,
-            title = stringResource(R.string.reading_history),
-        ) {
-            SectionEmptyMessage(
-                stringResource(R.string.no_reading_history),
-            )
-        }
+        SectionReadHistory()
         SectionBookmarks()
         SectionCollections()
     }

@@ -4,11 +4,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.reader.HorizontalReader
 import com.alfaazplus.sunnah.ui.components.reader.VerticalReader
@@ -58,11 +62,28 @@ fun ReaderScreen(
         }
     }
 
-    val layoutOption = vm.hadithLayout
 
-    if (layoutOption == ReaderUtils.HADITH_LAYOUT_VERTICAL) {
-        VerticalReader(vm)
-    } else {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                vm.saveReadHistory()
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    val isHorizontal = vm.hadithLayout == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+
+    if (isHorizontal) {
         HorizontalReader(vm)
+    } else {
+        VerticalReader(vm)
     }
 }

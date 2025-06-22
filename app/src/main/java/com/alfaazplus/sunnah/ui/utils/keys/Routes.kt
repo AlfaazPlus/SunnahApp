@@ -39,6 +39,7 @@ object Routes {
     val READER = MultiArgRoute("reader", listOf(Keys.COLLECTION_ID, Keys.BOOK_ID, Keys.HADITH_NUMBER))
     val NARRATOR_CHAIN = SingleArgRoute("narrators_chain", Keys.HADITH_URN)
     val SCHOLAR_INFO = SingleArgRoute("scholar_info", Keys.SCHOLAR_ID)
+    val READING_HISTORY = "reading_history"
     val BOOKMARKS = "bookmarks"
     val SINGLE_COLLECTION = MultiArgRoute(
         "single_collection", listOf(

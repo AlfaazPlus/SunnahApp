@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
@@ -34,14 +34,20 @@ private fun ItemRow(
     val context = LocalContext.current
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = modifier.fillMaxWidth()
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.width(120.dp),
         )
-        Text(":", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(20.dp), textAlign = TextAlign.Center)
+        Text(
+            ":",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.width(20.dp),
+            textAlign = TextAlign.Center,
+        )
         SelectionContainer {
             Text(
                 text = value,
@@ -62,18 +68,24 @@ private fun ItemRow(
 fun HadithReferenceSheet(
     cwi: CollectionWithInfo,
     hadith: ParsedHadith,
-    isOpen: Boolean, onClose: () -> Unit,
+    isOpen: Boolean,
+    onClose: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
-    val englishReference = hadith.translation?.refEn?.takeIf { it.trim().isNotBlank() }
-    val uscMsaReference = hadith.translation?.refUscMsa?.takeIf { it.trim().isNotBlank() }
+    val englishReference = hadith.translation?.refEn?.takeIf {
+        it
+            .trim()
+            .isNotBlank()
+    }
+    val uscMsaReference = hadith.translation?.refUscMsa?.takeIf {
+        it
+            .trim()
+            .isNotBlank()
+    }
 
-    if (!isOpen) return
 
-
-    ModalBottomSheet(
-        onDismissRequest = onClose,
-        sheetState = sheetState,
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onClose,
     ) {
         Column(
             modifier = Modifier
@@ -93,6 +105,6 @@ fun HadithReferenceSheet(
                 )
             }
         }
-
     }
+
 }
