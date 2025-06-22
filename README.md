@@ -1,8 +1,14 @@
 # SunnahApp
  
-It is an app for exploring the Sunnah of the Prophet (peace be upon him) which is currently under development. It will have an interface similar to that of the [QuranApp](https://github.com/AlfaazPlus/QuranApp), InshaAllah.
+It is an app for exploring the Sunnah of the Prophet (peace be upon him).
 
-> THIS APP IS UNDER DEVELOPMENT
+> THIS APP IS UNDER DEVELOPMENT. It will be available on the Play Store soon, Insha Allah.
+
+[<img src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png"
+alt='Get it on GitHub'
+height="80">](https://github.com/alfaazplus/sunnahapp/releases)
+
+## Screenshots
 
 <div align="center" style="width:100%; display:flex; justify-content:space-between;">
       <img src="repo_assets/screenshots/1_homepage.png" alt='Screenshot 1' width='30%' />
