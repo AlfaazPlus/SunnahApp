@@ -6,7 +6,6 @@ import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
-import com.alfaazplus.sunnah.Logger
 import org.xml.sax.Attributes
 
 class HadithTagHandler : HtmlTagHandler {

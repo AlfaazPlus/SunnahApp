@@ -1,7 +1,5 @@
 package com.alfaazplus.sunnah.helpers
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.room.TypeConverter
 import java.util.Date
 

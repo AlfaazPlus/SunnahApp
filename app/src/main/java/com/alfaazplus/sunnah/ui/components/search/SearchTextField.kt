@@ -3,8 +3,6 @@ package com.alfaazplus.sunnah.ui.components.search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
-import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable

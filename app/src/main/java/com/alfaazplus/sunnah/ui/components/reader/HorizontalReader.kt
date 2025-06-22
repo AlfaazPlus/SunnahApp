@@ -51,7 +51,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController

@@ -9,8 +9,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.getSpans
-import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.ui.theme.alpha
 
 fun CharSequence.toHadithAnnotatedString(primaryColor: Color, onPrimary: Color): AnnotatedString {
     return if (this is Spanned) {

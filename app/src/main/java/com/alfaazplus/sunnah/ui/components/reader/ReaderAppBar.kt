@@ -300,7 +300,6 @@ fun ReaderAppBar(
     val bwi = readerVm.bwi
     val hadiths = readerVm.hadithList
 
-    val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     val navController = LocalNavHostController.current
 

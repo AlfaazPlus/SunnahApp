@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.helpers
 
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.repository.hadith.HADITH_COLLECTIONS
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository

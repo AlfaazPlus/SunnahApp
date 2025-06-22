@@ -22,8 +22,8 @@ import androidx.navigation.navArgument
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
-import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
+import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen

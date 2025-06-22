@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.models.SearchResultTab
