@@ -24,13 +24,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.text.parseAsHtml
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.common.AlertCard
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,6 +99,16 @@ fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
         icon = R.drawable.ic_square_menu,
         title = stringResource(R.string.hadith_layout),
     ) {
+        AlertCard(
+            modifier = Modifier.padding(horizontal = 12.dp),
+        ) {
+            Text(
+                stringResource(R.string.hadith_layout_description),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Start,
+            )
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()

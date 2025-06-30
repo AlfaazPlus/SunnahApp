@@ -34,10 +34,12 @@ import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import kotlinx.coroutines.launch
 
 @Composable
-private fun TextPreview(
-    key: String, previewText: String, isSerif: Boolean,
+fun HadithTextPreview(
+    isArabic: Boolean,
+    previewText: String,
+    isSerif: Boolean,
 ) {
-    val (fontSize, fontLineHeight) = if (key == Keys.TEXT_SIZE_ARABIC) {
+    val (fontSize, fontLineHeight) = if (isArabic) {
         getArabicTextSize()
     } else {
         getTranslationTextSize()
@@ -47,7 +49,7 @@ private fun TextPreview(
         previewText,
         fontSize = fontSize,
         lineHeight = fontLineHeight,
-        fontFamily = if (key == Keys.TEXT_SIZE_ARABIC) fontUthmani else if (isSerif) FontFamily.Serif else FontFamily.SansSerif,
+        fontFamily = if (isArabic) fontUthmani else if (isSerif) FontFamily.Serif else FontFamily.SansSerif,
     )
 }
 
@@ -84,7 +86,7 @@ private fun TextSizeSlider(key: String, title: Int, previewText: String, isSerif
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides if (key == Keys.TEXT_SIZE_ARABIC) LayoutDirection.Rtl else LayoutDirection.Ltr) {
-            TextPreview(key, previewText, isSerif)
+            HadithTextPreview(key == Keys.TEXT_SIZE_ARABIC, previewText, isSerif)
         }
     }
 }

@@ -42,11 +42,12 @@ object Logger {
 
     fun d(vararg messages: Any?) {
         if (!BuildConfig.DEBUG) return
-        Log.d(TAG, prepareMessage(*messages))
+        println("$TAG: ${prepareMessage(*messages)}")
     }
 
     fun e(e: Throwable, vararg messages: Any?) {
-        Log.e(TAG, prepareMessage(*messages), e)
+        e.printStackTrace()
+        println("$TAG: ${prepareMessage(*messages)}")
     }
 
     fun saveCrash(ctx: Context, e: Throwable?) {

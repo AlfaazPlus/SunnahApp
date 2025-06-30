@@ -7,5 +7,4 @@ data class CollectionWithInfo(
     val collection: HCollection,
     val info: HCollectionInfo?,
     var isDownloaded: Boolean? = null,
-    var isDownloading: Boolean? = null
 )

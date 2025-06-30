@@ -27,9 +27,8 @@ object DownloadSourceUtils {
         return getDownloadSourceName(src)
     }
 
-    @Composable
-    fun observeDownloadSourceBaseUrl(): String {
-        val src = observeResourceDownloadSrc()
+    fun getDownloadSourceBaseUrl(): String {
+        val src = DataStoreManager.read(stringPreferencesKey(Keys.RESOURCE_DOWNLOAD_SRC), DOWNLOAD_SRC_DEFAULT)
 
         return when (src) {
             DOWNLOAD_SRC_GITHUB -> ApiConfig.GITHUB_ROOT_URL
@@ -38,19 +37,8 @@ object DownloadSourceUtils {
         }
     }
 
-    @Composable
-    fun observeDownloadSourceId(): Int {
-        val src = observeResourceDownloadSrc()
-
-        return when (src) {
-            DOWNLOAD_SRC_GITHUB -> R.id.srcGithub
-            DOWNLOAD_SRC_JSDELIVR -> R.id.srcJsDelivr
-            else -> R.id.srcAlfaazPlus
-        }
-    }
-
     fun resetDownloadSourceBaseUrl() {
-        val downloadSrcUrl = DataStoreManager.read(stringPreferencesKey(Keys.RESOURCE_DOWNLOAD_SRC), DOWNLOAD_SRC_DEFAULT)
+        val downloadSrcUrl = getDownloadSourceBaseUrl()
 
         if (RetrofitInstance.githubResDownloadUrl != downloadSrcUrl) {
             RetrofitInstance.githubResDownloadUrl = downloadSrcUrl

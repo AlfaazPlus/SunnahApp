@@ -65,7 +65,7 @@ private fun PageContent(
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(top = 20.dp, bottom = 120.dp),
+        contentPadding = PaddingValues(bottom = 120.dp),
         state = listState,
     ) {
         items(totalHadiths, key = { hadithList[it].hadith.urn }) { index ->
@@ -93,6 +93,7 @@ private fun PageContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VerticalReader(vm: ReaderViewModel) {
+    val hadithList = vm.parsedHadithList
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
@@ -100,11 +101,10 @@ fun VerticalReader(vm: ReaderViewModel) {
 
     val navigateToHadith = remember {
         { hadithNumber: String ->
-            val index = vm.parsedHadithList.indexOfFirst { parsedHadith ->
+            val index = hadithList.indexOfFirst { parsedHadith ->
                 parsedHadith.hadith.hadithNumber == hadithNumber
             }
             if (index >= 0) {
-                vm.currentHadithNumber = hadithNumber
                 coroutineScope.launch {
                     listState.scrollToItem(index)
                 }
@@ -122,12 +122,14 @@ fun VerticalReader(vm: ReaderViewModel) {
         }
     }
 
-    /*LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.firstVisibleItemIndex
-        }.collect { index ->
+    LaunchedEffect(Unit) {
+        vm.currentHadithNumberRetriever = {
+            val visibleItems = listState.layoutInfo.visibleItemsInfo
+            val fullVisibleItem = visibleItems.firstOrNull { it.offset >= -250 } ?: visibleItems.firstOrNull()
+
+            fullVisibleItem?.let { hadithList.getOrNull(it.index)?.hadith?.hadithNumber }
         }
-    }*/
+    }
 
     LaunchedEffect(Unit) {
         vm.highlightedHadithNumber = ""
@@ -154,17 +156,13 @@ fun VerticalReader(vm: ReaderViewModel) {
         coroutineScope.launch {
             DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
                 if (vm.hadithLayout != layout) {
-                    val index = listState.firstVisibleItemIndex
-                    val hadithNumber = vm.parsedHadithList.getOrNull(index)?.hadith?.hadithNumber
-
-                    vm.transientScroll.set(hadithNumber)
+                    vm.transientScroll.set(vm.currentHadithNumberRetriever())
                     vm.hadithLayout = layout
                 }
             }
         }
     }
 
-    val hadithList = vm.parsedHadithList
     val isDarkTheme = ThemeUtils.isDarkTheme()
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
@@ -174,15 +172,7 @@ fun VerticalReader(vm: ReaderViewModel) {
         topBar = {
             ReaderAppBar(
                 readerVm = vm,
-                currentHadithNumber = {
-                    val fullVisibleItem = listState.layoutInfo.visibleItemsInfo.first {
-                        it.offset >= -250
-                    }
-                    val index = fullVisibleItem.index
-                    val hadithNumber = hadithList.getOrNull(index)?.hadith?.hadithNumber
-
-                    hadithNumber ?: vm.currentHadithNumber
-                },
+                currentHadithNumber = vm.currentHadithNumberRetriever,
                 scrollBehavior = scrollBehavior,
                 onJumpToBook = { navigateToBook(it.book.id) },
                 onJumpToHadith = {

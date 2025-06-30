@@ -288,7 +288,7 @@ fun ReaderHadithNavigator(
 @Composable
 fun ReaderAppBar(
     readerVm: ReaderViewModel,
-    currentHadithNumber: () -> String,
+    currentHadithNumber: () -> String?,
     scrollBehavior: TopAppBarScrollBehavior,
     onJumpToBook: (BookWithInfo) -> Unit,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
@@ -358,7 +358,7 @@ fun ReaderAppBar(
                             books = books,
                             hadiths = hadiths,
                             currentBookId = bookId.value ?: 0,
-                            currentHadithNumber = currentHadithNumber(),
+                            currentHadithNumber = currentHadithNumber() ?: "",
                             onJumpToBook = { bwi ->
                                 onJumpToBook(bwi)
                                 showBottomSheet = false

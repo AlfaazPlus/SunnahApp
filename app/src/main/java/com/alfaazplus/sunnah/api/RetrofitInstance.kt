@@ -22,6 +22,8 @@ object RetrofitInstance {
 
     val github: GithubApi
         get() {
+            Logger.d(githubResDownloadUrl)
+
             if (githubApi == null) {
                 githubApi = Retrofit.Builder()
                     .baseUrl(githubResDownloadUrl)

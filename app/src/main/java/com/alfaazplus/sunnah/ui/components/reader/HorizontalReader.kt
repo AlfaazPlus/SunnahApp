@@ -284,15 +284,14 @@ fun HadithItem(
         .fillMaxWidth()
         .fillMaxHeight()
         .highlightHadithItem(highlight)
-        .padding(16.dp)
-
 
     if (!vertical) {
         modifier = modifier
             .verticalScroll(rememberScrollState())
-            .padding(top = 10.dp, bottom = 120.dp)
+            .padding(bottom = 120.dp)
     }
 
+    modifier = modifier.padding(16.dp)
 
     Column(
         modifier = modifier
@@ -377,6 +376,13 @@ fun HorizontalReader(
     )
 
     LaunchedEffect(Unit) {
+        vm.currentHadithNumberRetriever = {
+            hadithList[pagerState.currentPage].hadith.hadithNumber
+        }
+    }
+
+
+    LaunchedEffect(Unit) {
         val initialHNo = vm.initialHadithNumber
         val transientScroll = vm.transientScroll
 
@@ -396,7 +402,7 @@ fun HorizontalReader(
 
         DataStoreManager.observeWithCallback(stringPreferencesKey(Keys.HADITH_LAYOUT)) { layout ->
             if (vm.hadithLayout != layout) {
-                vm.transientScroll.set(vm.currentHadithNumber)
+                vm.transientScroll.set(vm.currentHadithNumberRetriever())
                 vm.hadithLayout = layout
             }
         }
@@ -420,11 +426,7 @@ fun HorizontalReader(
 
     val previousHadithNumber = getPreviousHadithNumber(pagerState.currentPage, hadithList)
     val nextHadithNumber = getNextHadithNumber(pagerState.currentPage, hadithList)
-    val currentHadithNumber = hadithList[pagerState.currentPage].hadith.hadithNumber
 
-    LaunchedEffect(currentHadithNumber) {
-        vm.currentHadithNumber = currentHadithNumber
-    }
     val isDarkTheme = ThemeUtils.isDarkTheme()
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
@@ -433,9 +435,7 @@ fun HorizontalReader(
         topBar = {
             ReaderAppBar(
                 readerVm = vm,
-                currentHadithNumber = {
-                    currentHadithNumber
-                },
+                currentHadithNumber = vm.currentHadithNumberRetriever,
                 scrollBehavior = scrollBehavior,
                 onJumpToBook = { navigateToBook(it.book.id) },
                 onJumpToHadith = {

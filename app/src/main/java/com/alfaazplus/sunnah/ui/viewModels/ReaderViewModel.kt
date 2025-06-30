@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
@@ -55,13 +56,15 @@ class ReaderViewModel @Inject constructor(
      * Hadith number, consumed
      */
     var initialHadithNumber by mutableStateOf(Pair<String?, Boolean>(null, false))
-    var currentHadithNumber by mutableStateOf("")
     var highlightedHadithNumber by mutableStateOf("")
 
     /**
      * Hadith number, consumed
      */
     val transientScroll = ReadOnce<String?>()
+
+    // a callback
+    var currentHadithNumberRetriever by mutableStateOf<() -> String?>({ null })
 
     init {
         bookId.observeForever {
@@ -146,9 +149,13 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun saveReadHistory() {
+        val currentHadithNumber = currentHadithNumberRetriever()
+
+        Logger.d("SAVING READING HISTORY", collectionId, bookId.value, currentHadithNumber)
+
         val bookIdValue = bookId.value ?: return
 
-        if (currentHadithNumber == "") return
+        if (currentHadithNumber.isNullOrEmpty()) return
 
         viewModelScope.launch {
             userRepo.saveReadHistory(

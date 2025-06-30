@@ -126,7 +126,7 @@ interface HadithDao {
         INNER JOIN collection_info
             ON hadith.collection_id = collection_info.collection_id
         WHERE 
-            (hadith_translation.hadith_text LIKE '%' || :query || '%')
+            (hadith_translation.hadith_text LIKE '%' || :query || '%' COLLATE NOCASE)
             AND (COALESCE(:collectionIds, '') = '' OR hadith.collection_id IN (:collectionIds))
             AND hadith_translation.lang_code = :langCode
             AND collection_info.language_code = :langCode
@@ -148,7 +148,11 @@ interface HadithDao {
                 ON book.book_id = book_info.book_id AND book.collection_id = book_info.collection_id
             INNER JOIN collection_info
                 ON book.collection_id = collection_info.collection_id
-            WHERE (book_info.title LIKE '%' || :query || '%' OR book_info.intro LIKE '%' || :query || '%' OR book_info.description LIKE '%' || :query || '%')
+            WHERE (
+                    book_info.title LIKE '%' || :query || '%' COLLATE NOCASE OR
+                    book_info.intro LIKE '%' || :query || '%' COLLATE NOCASE OR
+                    book_info.description LIKE '%' || :query || '%' COLLATE NOCASE
+                )
                 AND book_info.language_code = :langCode
                 AND collection_info.language_code = :langCode
                 AND (COALESCE(:collectionIds, '') = '' OR book.collection_id IN (:collectionIds))
@@ -176,7 +180,7 @@ interface HadithDao {
         INNER JOIN book_info
             ON hadith.collection_id = book_info.collection_id AND hadith.book_id = book_info.book_id
         WHERE 
-            hadith.hadith_number = :hadithNumber
+            hadith.hadith_number = :hadithNumber COLLATE NOCASE
         """
     )
     suspend fun searchQuickHadithsByHadithNumber(hadithNumber: String): List<HadithSearchQuickResult>
