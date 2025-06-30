@@ -15,8 +15,10 @@ import com.alfaazplus.sunnah.ui.components.settings.SettingsItemContent
 @Composable
 fun RadioItem(
     modifier: Modifier = Modifier,
-    title: Int,
+    title: Int? = null,
+    titleStr: String? = null,
     subtitle: Int? = null,
+    subtitleStr: String? = null,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -29,7 +31,9 @@ fun RadioItem(
     ) {
         SettingsItemContent(
             title = title,
+            titleStr= titleStr,
             subtitle = subtitle,
+            subtitleStr = subtitleStr,
             modifier = Modifier.weight(1f)
         )
         RadioButton(

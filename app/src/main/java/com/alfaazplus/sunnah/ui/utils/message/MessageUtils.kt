@@ -17,7 +17,7 @@ object MessageUtils {
             mToast
                 ?.get()
                 ?.cancel()
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
         mToast = WeakReference(Toast.makeText(context, msg, duration))
         mToast

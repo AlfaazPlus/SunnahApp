@@ -148,6 +148,8 @@ class ReaderViewModel @Inject constructor(
     fun saveReadHistory() {
         val bookIdValue = bookId.value ?: return
 
+        if (currentHadithNumber == "") return
+
         viewModelScope.launch {
             userRepo.saveReadHistory(
                 collectionId,

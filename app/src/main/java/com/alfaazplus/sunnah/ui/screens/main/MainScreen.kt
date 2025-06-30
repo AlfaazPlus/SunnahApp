@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.LastCrashReportDialog
 import com.alfaazplus.sunnah.ui.components.appbars.MainAppBar
 import com.alfaazplus.sunnah.ui.components.appbars.MainBottomNavigationBar
 import com.alfaazplus.sunnah.ui.enterTransition
@@ -60,4 +61,6 @@ fun MainScreen() {
             composable(Routes.SEARCH) { SearchScreen() }
         }
     }
+
+    LastCrashReportDialog()
 }

@@ -2,4 +2,7 @@
 <resources>
     <item name="collectionIcon" type="id" />
     <item name="collectionTitle" type="id" />
+    <item name="srcGithub" type="id" />
+    <item name="srcJsDelivr" type="id" />
+    <item name="srcAlfaazPlus" type="id" />
 </resources>

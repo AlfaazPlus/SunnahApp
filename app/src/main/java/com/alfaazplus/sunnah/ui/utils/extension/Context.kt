@@ -45,22 +45,6 @@ fun Context.getTypedArray(@ArrayRes arrayResId: Int): TypedArray = resources.obt
     arrayResId
 )
 
-@ColorInt
-fun Context.color(@ColorRes colorResId: Int): Int = ContextCompat.getColor(this, colorResId)
-
-@ColorInt
-fun Context.obtainPrimaryColor(): Int {
-    return MaterialColors.getColor(this, android.R.attr.colorPrimary, 0)
-}
-
-@ColorInt
-fun Context.materialColor(@AttrRes colorResId: Int): Int {
-    return MaterialColors.getColor(this, colorResId, 0)
-}
-
-fun Context.colorStateList(@ColorRes colorResId: Int): ColorStateList? =
-    ContextCompat.getColorStateList(this, colorResId)
-
 fun Context.getFont(@FontRes fontResId: Int): Typeface? {
     return try {
         ResourcesCompat.getFont(this, fontResId)
@@ -74,8 +58,6 @@ fun Context.drawable(@DrawableRes drawableResId: Int): Drawable {
     return AppCompatResources.getDrawable(this, drawableResId)!!
 }
 
-fun Context.getDimension(@DimenRes dimenResId: Int): Int = getDimenPx(dimenResId)
-
 fun Context.copyToClipboard(text: CharSequence): Boolean {
     val clipboard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
     clipboard?.let {
@@ -85,55 +67,3 @@ fun Context.copyToClipboard(text: CharSequence): Boolean {
     }
     return false
 }
-
-fun Context.getDisplayMetrics(): DisplayMetrics = resources.displayMetrics
-
-@Dimension
-fun Context.getDimenPx(@DimenRes dimenRes: Int): Int {
-    return resources.getDimensionPixelSize(dimenRes)
-}
-
-@Dimension(unit = Dimension.SP)
-fun Context.getDimenSp(@DimenRes dimenRes: Int): Float {
-    return px2sp(getDimenPx(dimenRes).toFloat())
-}
-
-fun Context.getFraction(@FractionRes dimenRes: Int): Float {
-    return resources.getFraction(dimenRes, 1, 1)
-}
-
-@Dimension
-fun Context.dp2px(@Dimension(unit = Dimension.DP) dpValue: Float): Int {
-    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, getDisplayMetrics()).toInt()
-}
-
-@Dimension
-fun Context.px2dp(@Dimension pxValue: Float): Float = pxValue / getDisplayMetrics().density
-
-/**
- * @param spValue int value in SP
- * @return int value in [Px]
- * @see [px2sp]
- */
-@Dimension
-fun Context.sp2px(@Dimension(unit = Dimension.SP) spValue: Float): Int {
-    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue, getDisplayMetrics()).toInt()
-}
-
-/**
- * @param pxValue float value in [Px]
- * @return float value in SP
- * @see [sp2px]
- */
-fun Context.px2sp(@Dimension pxValue: Float): Float = pxValue / getDisplayMetrics().scaledDensity
-
-fun Context.getWindowHeight(): Int {
-    return getDisplayMetrics().heightPixels
-}
-
-fun Context.getWindowWidth(): Int {
-    return getDisplayMetrics().widthPixels
-}
-
-val Context.layoutInflater: LayoutInflater
-    get() = LayoutInflater.from(this)

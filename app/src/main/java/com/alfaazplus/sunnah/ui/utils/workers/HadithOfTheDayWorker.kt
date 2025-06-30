@@ -1,9 +1,7 @@
 package com.alfaazplus.sunnah.ui.utils.workers
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.parseAsHtml
@@ -14,9 +12,7 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
-import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_CHANNEL_ID
-import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_CHANNEL_NAME
-import com.alfaazplus.sunnah.ui.utils.notification.NOTIFICATION_HOTD_ID
+import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.CHANNEL_ID_HOTD
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -40,31 +36,22 @@ class HadithOfTheDayWorker @AssistedInject constructor(
 
     private fun sendNotification(hotd: HadithOfTheDay) {
         val context = applicationContext
-        val channelId = NOTIFICATION_HOTD_CHANNEL_ID
 
         val manager = ContextCompat.getSystemService(
             context, NotificationManager::class.java
         ) ?: return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(
-                NotificationChannel(
-                    channelId, NOTIFICATION_HOTD_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH
-                )
-            )
-        }
-
         val notification = NotificationCompat
-            .Builder(applicationContext, channelId)
+            .Builder(applicationContext, CHANNEL_ID_HOTD)
             .setContentTitle(context.getString(R.string.hadith_of_the_day))
             .setContentText(
                 hotd.translation.hadithText
                     .parseAsHtml()
                     .toAnnotatedString()
             )
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(android.R.drawable.ic_dialog_info) // todo: logo
             .build()
 
-        manager.notify(NOTIFICATION_HOTD_ID, notification)
+        manager.notify(10, notification)
     }
 }

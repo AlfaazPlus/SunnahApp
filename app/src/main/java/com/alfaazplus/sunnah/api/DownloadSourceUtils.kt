@@ -1,34 +1,56 @@
 package com.alfaazplus.sunnah.api
 
-import android.content.Context
-import com.alfaazplus.sunnah.ui.utils.shared_preference.SPAppConfigs
+import androidx.compose.runtime.Composable
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 
 object DownloadSourceUtils {
+    const val DOWNLOAD_SRC_ALFAAZ_PLUS = "alfaazplus"
     const val DOWNLOAD_SRC_GITHUB = "github"
     const val DOWNLOAD_SRC_JSDELIVR = "jsdelivr"
-    const val DOWNLOAD_SRC_DEFAULT = DOWNLOAD_SRC_GITHUB
+    const val DOWNLOAD_SRC_DEFAULT = DOWNLOAD_SRC_ALFAAZ_PLUS
 
-    @JvmStatic
-    fun getCurrentSourceName(context: Context): String {
-        return when (SPAppConfigs.getResourceDownloadSrc(context)) {
+    fun getDownloadSourceName(src: String): String {
+        return when (src) {
             DOWNLOAD_SRC_GITHUB -> "raw.githubusercontent.com"
             DOWNLOAD_SRC_JSDELIVR -> "cdn.jsdelivr.net"
-            else -> "cdn.jsdelivr.net"
+            else -> "gh-proxy.alfaazplus.com"
         }
     }
 
-    @JvmStatic
-    fun getDownloadSourceBaseUrl(context: Context): String {
-        return when (SPAppConfigs.getResourceDownloadSrc(context)) {
+    @Composable
+    fun observeCurrentDownloadSourceName(): String {
+        val src = observeResourceDownloadSrc()
+
+        return getDownloadSourceName(src)
+    }
+
+    @Composable
+    fun observeDownloadSourceBaseUrl(): String {
+        val src = observeResourceDownloadSrc()
+
+        return when (src) {
             DOWNLOAD_SRC_GITHUB -> ApiConfig.GITHUB_ROOT_URL
             DOWNLOAD_SRC_JSDELIVR -> ApiConfig.JS_DELIVR_ROOT_URL
-            else -> ApiConfig.JS_DELIVR_ROOT_URL
+            else -> ApiConfig.GH_PROXY_ROOT_URL
         }
     }
 
-    @JvmStatic
-    fun resetDownloadSourceBaseUrl(ctx: Context) {
-        val downloadSrcUrl = getDownloadSourceBaseUrl(ctx)
+    @Composable
+    fun observeDownloadSourceId(): Int {
+        val src = observeResourceDownloadSrc()
+
+        return when (src) {
+            DOWNLOAD_SRC_GITHUB -> R.id.srcGithub
+            DOWNLOAD_SRC_JSDELIVR -> R.id.srcJsDelivr
+            else -> R.id.srcAlfaazPlus
+        }
+    }
+
+    fun resetDownloadSourceBaseUrl() {
+        val downloadSrcUrl = DataStoreManager.read(stringPreferencesKey(Keys.RESOURCE_DOWNLOAD_SRC), DOWNLOAD_SRC_DEFAULT)
 
         if (RetrofitInstance.githubResDownloadUrl != downloadSrcUrl) {
             RetrofitInstance.githubResDownloadUrl = downloadSrcUrl
@@ -36,11 +58,13 @@ object DownloadSourceUtils {
         }
     }
 
-    fun changeDownloadSource(ctx: Context) {
-        val currentSrc = SPAppConfigs.getResourceDownloadSrc(ctx)
-        val newSrc = if (currentSrc == DOWNLOAD_SRC_GITHUB) DOWNLOAD_SRC_JSDELIVR else DOWNLOAD_SRC_GITHUB
+    @Composable
+    fun observeResourceDownloadSrc(): String {
+        return DataStoreManager.observe(stringPreferencesKey(Keys.RESOURCE_DOWNLOAD_SRC), DOWNLOAD_SRC_DEFAULT)
+    }
 
-        SPAppConfigs.setResourceDownloadSrc(ctx, newSrc)
-        resetDownloadSourceBaseUrl(ctx)
+    suspend fun setResourceDownloadSrc(src: String) {
+        DataStoreManager.write(stringPreferencesKey(Keys.RESOURCE_DOWNLOAD_SRC), src)
+        resetDownloadSourceBaseUrl()
     }
 }

@@ -10,9 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,19 +22,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoQuranAppAlert(isOpen: Boolean, onClose: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
 
-    if (!isOpen) return
-
-    ModalBottomSheet(
-        onDismissRequest = onClose,
-        sheetState = sheetState,
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onClose,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,8 +60,7 @@ fun NoQuranAppAlert(isOpen: Boolean, onClose: () -> Unit) {
                 modifier = Modifier.padding(top = 15.dp)
             )
             Text(
-                text = stringResource(R.string.install_quranapp_description),
-                modifier = Modifier.padding(bottom = 15.dp)
+                text = stringResource(R.string.install_quranapp_description), modifier = Modifier.padding(bottom = 15.dp)
             )
             Button(onClick = {
                 NavigationHelper.openQuranAppPlayStoreListing(context)

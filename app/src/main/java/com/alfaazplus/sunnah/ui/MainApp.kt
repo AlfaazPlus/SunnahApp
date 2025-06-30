@@ -27,6 +27,7 @@ import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
+import com.alfaazplus.sunnah.ui.screens.settings.AppLogsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsThemeScreen
@@ -82,6 +83,7 @@ fun MainApp() {
                 ) { rsEntry -> SettingsScreen(rsEntry.arguments?.getBoolean(Keys.SHOW_READER_SETTINGS_ONLY) ?: false) }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
                 route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
+                route(Routes.APP_LOGS) { AppLogsScreen() }
 
                 route(
                     Routes.BOOKS_INDEX(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })

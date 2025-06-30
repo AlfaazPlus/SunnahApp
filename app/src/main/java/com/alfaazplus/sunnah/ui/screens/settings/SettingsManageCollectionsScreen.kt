@@ -51,12 +51,14 @@ fun ManageHadithCollectionItem(
     val isDownloaded = cwi.isDownloaded == true
     val isDownloading = cwi.isDownloading == true
 
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-        .clickable(enabled = !isDownloading) {
-            onClick()
-        }
-        .alpha(if (isDownloading) 0.5f else 1f)
-        .padding(horizontal = 22.dp, vertical = 10.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable(enabled = !isDownloading) {
+                onClick()
+            }
+            .alpha(if (isDownloading) 0.5f else 1f)
+            .padding(horizontal = 22.dp, vertical = 10.dp)) {
         Column(
             modifier = Modifier.weight(1f),
         ) {
@@ -164,22 +166,23 @@ fun SettingsManageCollectionsScreen(
             }
         }
 
-        AlertDialog(isOpen = lastDownloadError != null,
-                    onClose = { lastDownloadError = null },
-                    title = "Download Error",
-                    cancelText = stringResource(R.string.cancel),
-                    confirmText = "Done",
-                    onConfirm = {},
-                    content = {
-                        Column(
-                            modifier = Modifier
-                                .height(300.dp)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            Text(
-                                text = lastDownloadError ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    })
+        AlertDialog(
+            isOpen = lastDownloadError != null,
+            onClose = { lastDownloadError = null },
+            title = "Download Error",
+            cancelText = stringResource(R.string.cancel),
+            confirmText = "Done",
+            onConfirm = {},
+            content = {
+                Column(
+                    modifier = Modifier
+                        .height(300.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = lastDownloadError ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error
+                    )
+                }
+            })
     }
 }

@@ -9,10 +9,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,53 +23,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutCollectionSheet(cwi: CollectionWithInfo) {
     var showSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(true)
 
     Row(
         modifier = Modifier
             .padding(top = 20.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(color = MaterialTheme.colorScheme.surfaceVariant)
+            .clip(shapes.small)
+            .background(color = colorScheme.surfaceVariant)
             .clickable { showSheet = true }
             .padding(horizontal = 10.dp, vertical = 6.dp)
-            .alpha(0.8f),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+            .alpha(0.8f), verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(id = R.drawable.ic_info),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = colorScheme.onSurface,
             modifier = Modifier
                 .padding(end = 5.dp)
                 .size(16.dp)
         )
         Text(
-            text = "About this collection",
-            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(R.string.about_collection),
+            style = typography.labelMedium,
         )
     }
 
-    if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState,
-        ) {
-            Text(
-                text = cwi.info!!.intro!!.parseAsHtml().toString().replace("\\n", "\n").replace("\\r", "\r"),
-                modifier = Modifier
-                    .padding(20.dp)
-                    .padding(bottom = 100.dp)
-                    .verticalScroll(rememberScrollState())
-            )
-        }
+    BottomSheet(
+        isOpen = showSheet,
+        onDismiss = {
+            showSheet = false
+        },
+    ) {
+        Text(
+            text = cwi.info!!.intro!!
+                .parseAsHtml()
+                .toString()
+                .replace("\\n", "\n")
+                .replace("\\r", "\r"),
+            modifier = Modifier
+                .padding(20.dp)
+                .padding(bottom = 100.dp)
+                .verticalScroll(rememberScrollState())
+        )
     }
 }

@@ -16,7 +16,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.BorderedCard
+import com.alfaazplus.sunnah.ui.components.common.StatusBar
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
 import com.alfaazplus.sunnah.ui.components.reader.AboutCollectionSheet
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
@@ -44,18 +47,17 @@ import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
 @Composable
 fun BookMetaInfoCard(
-    text: String
+    text: String,
 ) {
     Box(
         modifier = Modifier
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clip(shapes.extraSmall)
+            .background(colorScheme.surfaceVariant)
             .padding(PaddingValues(horizontal = 5.dp, vertical = 2.dp)),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium
+            text = text, style = typography.bodyMedium
         )
     }
 }
@@ -74,8 +76,7 @@ fun BookItem(
             .padding(horizontal = 12.dp)
     ) {
         BorderedCard(
-            padding = PaddingValues(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 15.dp),
-            onClick = onClick
+            padding = PaddingValues(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 15.dp), onClick = onClick
         ) {
             Column {
                 Row(
@@ -86,14 +87,12 @@ fun BookItem(
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
-                            painterResource(R.drawable.vector_bg2),
-                            null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                            painterResource(R.drawable.vector_bg2), null, colorFilter = ColorFilter.tint(colorScheme.primary)
                         )
                         Text(
                             text = book.serialNumber,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.labelSmall,
+                            color = colorScheme.onPrimary,
+                            style = typography.labelSmall,
                         )
                     }
                     Text(
@@ -102,7 +101,7 @@ fun BookItem(
                             .weight(1f)
                             .padding(start = 8.dp, end = 8.dp, top = 5.dp),
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = typography.titleMedium,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.size(38.dp))
@@ -111,7 +110,7 @@ fun BookItem(
                     text = book.title,
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = typography.titleMedium,
                     textAlign = TextAlign.Center,
                     fontFamily = fontUthmani,
                 )
@@ -133,7 +132,7 @@ fun BookItem(
 private fun ScreenContent(
     collectionId: Int,
     onBookItemClick: (Int) -> Unit,
-    vm: BookListViewModel = hiltViewModel()
+    vm: BookListViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(collectionId) {
         vm.setCollectionId(collectionId)
@@ -153,7 +152,7 @@ private fun ScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp)
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(colorScheme.surface)
                     .padding(25.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -171,7 +170,7 @@ private fun ScreenContent(
                         modifier = Modifier.padding(top = 5.dp),
                         text = "Total Books: ${books.size} • Total Hadiths: $totalHadiths",
                         style = type.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = colorScheme.onSurfaceVariant,
                     )
 
                     if (cwi?.info?.intro != null) {
@@ -180,10 +179,9 @@ private fun ScreenContent(
                 }
             }
         }
+
         items(
-            books,
-            key = { bookWithInfo -> bookWithInfo.book.id }
-        ) { bookWithInfo ->
+            books, key = { bookWithInfo -> bookWithInfo.book.id }) { bookWithInfo ->
             BookItem(
                 bookWithInfo,
             ) { onBookItemClick(bookWithInfo.book.id) }
@@ -196,45 +194,44 @@ private fun ScreenContent(
 fun BooksIndexScreen(collectionId: Int) {
     val navController = LocalNavHostController.current
 
-    Scaffold {
+    Scaffold(
+        topBar = { StatusBar() },
+    ) {
         Box(
             modifier = Modifier.padding(it)
         ) {
             ScreenContent(
-                collectionId,
-                onBookItemClick = { bookId ->
+                collectionId, onBookItemClick = { bookId ->
                     navController.navigate(Routes.READER.args(collectionId, bookId))
-                }
-            )
+                })
             IconButton(
                 onClick = {
                     navController.popBackStack()
                 },
                 modifier = Modifier
                     .padding(10.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                    .background(colorScheme.surfaceVariant, CircleShape)
                     .size(38.dp)
                     .align(Alignment.TopStart)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_left),
                     contentDescription = stringResource(R.string.goBack),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = colorScheme.onSurfaceVariant
                 )
             }
             IconButton(
-                onClick = {
-                },
+                onClick = {},
                 modifier = Modifier
                     .padding(10.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                    .background(colorScheme.surfaceVariant, CircleShape)
                     .size(38.dp)
                     .align(Alignment.TopEnd)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),
                     contentDescription = stringResource(R.string.search),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = colorScheme.onSurfaceVariant
                 )
             }
         }
