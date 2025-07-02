@@ -240,9 +240,9 @@ private fun HadithActionBar(
     }
 
     HadithMenu(
-        collectionId = cwi.collection.id,
+        cwi = cwi,
         bookId = bwi.book.id,
-        hadithNumber = hadith.hadith.hadithNumber,
+        hadith = hadith,
         isOpen = showHadithMenu,
         onClose = {
             showHadithMenu = false
@@ -466,5 +466,5 @@ fun HorizontalReader(
         },
         containerColor = bgColor,
         contentColor = txtColor,
-    ) { PageContent(vm.cwi!!, vm.bwi!!, it, hadithList, pagerState) }
+    ) { PageContent(vm.cwi!!.getOrThrow(), vm.bwi!!.getOrThrow(), it, hadithList, pagerState) }
 }

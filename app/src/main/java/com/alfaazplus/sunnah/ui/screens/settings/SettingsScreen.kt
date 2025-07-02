@@ -37,6 +37,7 @@ import com.alfaazplus.sunnah.ui.components.ListItem
 import com.alfaazplus.sunnah.ui.components.ListItemIcon
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.common.SwitchItem
+import com.alfaazplus.sunnah.ui.components.settings.DailyReminderSheet
 import com.alfaazplus.sunnah.ui.components.settings.HadithTextOptionsSheet
 import com.alfaazplus.sunnah.ui.components.settings.LayoutOptionSheet
 import com.alfaazplus.sunnah.ui.components.settings.ListItemCategoryLabel
@@ -44,6 +45,7 @@ import com.alfaazplus.sunnah.ui.components.settings.ResourceDownloadSrcSheet
 import com.alfaazplus.sunnah.ui.components.settings.SettingsItem
 import com.alfaazplus.sunnah.ui.components.settings.TextSizeSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
+import com.alfaazplus.sunnah.ui.utils.AppUtils
 import com.alfaazplus.sunnah.ui.utils.ReaderUtils
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
@@ -93,6 +95,7 @@ fun SettingsScreen(
 
     val themeMode = ThemeUtils.getThemeMode()
 
+    var showDailyReminderSheet by remember { mutableStateOf(false) }
     var showLayoutOptionSheet by remember { mutableStateOf(false) }
     var showTextSizesSheet by remember { mutableStateOf(false) }
     var showHadithTextOptionsSheet by remember { mutableStateOf(false) }
@@ -114,6 +117,11 @@ fun SettingsScreen(
                     subtitle = ThemeUtils.resolveThemeModeLabel(themeMode),
                     icon = R.drawable.ic_theme,
                 ) { navController.navigate(Routes.SETTINGS_THEME) }
+                SettingsItem(
+                    title = R.string.daily_reminder,
+                    subtitle = AppUtils.observeDailyReminderEnabled(),
+                    icon = R.drawable.bell,
+                ) { showDailyReminderSheet = true }
             }
 
             ListItemCategoryLabel(title = stringResource(R.string.reader_settings))
@@ -189,7 +197,9 @@ fun SettingsScreen(
                 ListItem(
                     title = R.string.share_app,
                     leading = { ListItemIcon(R.drawable.ic_share) },
-                ) { }
+                ) {
+                    NavigationHelper.shareApp(context)
+                }
                 ListItem(
                     title = R.string.install_quranapp,
                     subtitle = R.string.install_quranapp_description,
@@ -208,6 +218,12 @@ fun SettingsScreen(
                 AppVersionFooter()
             }
 
+            DailyReminderSheet(
+                isOpen = showDailyReminderSheet,
+                onClose = {
+                    showDailyReminderSheet = false
+                },
+            )
             LayoutOptionSheet(isOpen = showLayoutOptionSheet) {
                 showLayoutOptionSheet = false
             }

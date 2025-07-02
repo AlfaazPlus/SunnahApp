@@ -135,4 +135,6 @@ dependencies {
     implementation(libs.paging)
     implementation(libs.pagingCompose)
     implementation(libs.roomPaging)
+
+    implementation(libs.accompanist.permissions)
 }

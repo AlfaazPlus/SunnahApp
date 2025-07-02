@@ -21,9 +21,12 @@ object Keys {
     const val TEXT_SIZE_ARABIC = "text_size_arabic"
     const val TEXT_SIZE_TRANSLATION = "text_size_translation"
     const val RESOURCE_DOWNLOAD_SRC = "resource_download_src"
+    const val DAILY_REMINDER = "daily_reminder"
 
     const val SHOW_READER_SETTINGS_ONLY = "show_reader_settings_only"
     const val HADITH_OF_THE_DAY = "hadith_of_the_day"
     const val USER_COLLECTION_ID = "user_collection_id"
     const val USER_COLLECTION_NAME = "user_collection_name"
+
+    const val NAV_DESTINATION = "nav_destination"
 }

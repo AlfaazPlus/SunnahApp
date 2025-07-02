@@ -73,7 +73,7 @@ private fun CollectionItemMenu(
     val scope = rememberCoroutineScope()
 
     BottomSheetMenu(
-        title = "${item.collectionName}: ${item.item.hadithNumber}",
+        title = "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Center,
@@ -119,7 +119,7 @@ private fun CollectionItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName}: ${item.item.hadithNumber}",
+                        "${item.collectionName  ?: "? "}: ${item.item.hadithNumber}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -141,9 +141,14 @@ private fun CollectionItemCard(
                 }
             }
 
-            Text(
-                text = item.translationText, style = MaterialTheme.typography.bodyMedium, maxLines = 8, overflow = TextOverflow.Ellipsis
-            )
+            if (!item.translationText.isNullOrEmpty()) {
+                Text(
+                    text = item.translationText!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 8,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 

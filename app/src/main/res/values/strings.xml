@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SunnahApp</string>
+    <string name="app_description">SunnahApp</string>
 
     <string name="next">Next</string>
     <string name="previous">Previous</string>
@@ -9,6 +10,11 @@
     <string name="create">Create</string>
     <string name="goBack">Go back</string>
     <string name="copy">Copy</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="allow">Allow</string>
 
     <string name="hadithNumber">Hadith %s</string>
     <string name="hadithNumberFull">Hadith number %s</string>
@@ -95,6 +101,7 @@
     <string name="about_us">About Us</string>
     <string name="rate_app">Rate App</string>
     <string name="share_app">Share App</string>
+    <string name="share_app_msg">SunnahApp is a free and open-source app to read and explore the Sunnah of the Prophet ﷺ. This app has a nice and clean interface with features like translation, advanced search, reminder and many more. \n\nDOWNLOAD NOW:\n%s</string>
     <string name="install_quranapp">Install QuranApp</string>
     <string name="install_quranapp_description">Free, secure &amp; open source</string>
     <string name="hadith_layout">Hadith Layout</string>
@@ -156,6 +163,7 @@
     <string name="msg_delete_user_collection">Are you sure you want to delete this collection? All your saved hadiths in this collection will be deleted.</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="paste_log_github_issue">Log has been copied to clipboard. Please paste it in the GitHub issue.</string>
+    <string name="paste_reference_github_issue">Hadith reference has been copied to clipboard. Please paste it in the GitHub issue.</string>
     <string name="hadith_of_the_day">Hadith of the Day</string>
     <string name="hadith_options">Hadith Options</string>
     <string name="share_this_hadith">Share this Hadith</string>
@@ -184,4 +192,15 @@
         Use this option to download Hadith resources from a different source if one is not working.
     </string>
     <string name="open_github_issues">Open GitHub issues</string>
+    <string name="daily_reminder">Daily Reminder</string>
+    <string name="daily_reminder_desc">Get a daily reminder for Hadith.</string>
+    <string name="notification_permission">
+        Notification Permission
+    </string>
+    <string name="notification_permission_desc">
+        Please allow notification permission to receive daily Hadith reminders.
+    </string>
+    <string name="download_collection_first">
+        To use this feature, please download at least one Hadith collection first.
+    </string>
 </resources>

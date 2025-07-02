@@ -1,8 +1,12 @@
 package com.alfaazplus.sunnah.helpers
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.ui.graphics.Color
+import androidx.core.text.parseAsHtml
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
 import com.alfaazplus.sunnah.repository.hadith.HADITH_COLLECTIONS
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
@@ -79,5 +83,27 @@ object HadithHelper {
 
             return hotd
         }
+    }
+
+    fun shareHadith(context: Context, translation: HadithTranslation, collectionName: String, hadithNumber: String) {
+        val textToShare = buildString {
+            if (!translation.narratorPrefix.isNullOrBlank()) {
+                appendLine(translation.narratorPrefix.parseAsHtml())
+                appendLine()
+            }
+
+            appendLine(translation.hadithText.parseAsHtml())
+            appendLine()
+            appendLine("— $collectionName: $hadithNumber")
+        }
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, textToShare)
+        }
+
+        context.startActivity(
+            Intent.createChooser(intent, "Share via")
+        )
     }
 }

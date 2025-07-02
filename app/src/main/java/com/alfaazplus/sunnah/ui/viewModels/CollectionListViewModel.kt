@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.helpers.HadithHelper.getIncludedCollections
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CollectionListViewModel @Inject constructor(
     private val repo: HadithRepository,
+    private val userRepo: UserRepository,
 ) : ViewModel() {
 
     private val _collections = MutableStateFlow<List<CollectionWithInfo>>(emptyList())
@@ -24,25 +26,17 @@ class CollectionListViewModel @Inject constructor(
     suspend fun loadCollections() {
         val collections = getIncludedCollections()
         collections.forEach {
-            it.isDownloaded = isCollectionDownloaded(it.collection.id)
+            it.isDownloaded = repo.isCollectionDownloaded(it.collection.id)
         }
 
         _collections.value = collections
-    }
-
-    private suspend fun isCollectionDownloaded(collectionId: Int): Boolean {
-        return try {
-            repo.getCollection(collectionId)
-            true
-        } catch (e: Exception) {
-            false
-        }
     }
 
     fun deleteCollection(collectionId: Int, onDeleted: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteCollection(collectionId)
             loadCollections()
+            userRepo.clearUserDataForCollection(collectionId)
 
             withContext(Dispatchers.Main) {
                 onDeleted()

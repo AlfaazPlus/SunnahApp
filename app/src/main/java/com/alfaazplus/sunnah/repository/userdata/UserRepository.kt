@@ -10,6 +10,7 @@ import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
+import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -68,16 +69,20 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<UserCollectionItemNormalized>> = items.map { item ->
-                    val translation = hadithDao.getHadithTranslationByHadithNumber(
-                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                    )
 
-                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    val collectionName = tryOrNull {
+                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    }
 
+                    val translation = tryOrNull {
+                        hadithDao.getHadithTranslationByHadithNumber(
+                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                        )
+                    }
 
-                    val translationText = translation.hadithText
-                        .parseAsHtml()
-                        .toAnnotatedString()
+                    val translationText = translation?.hadithText
+                        ?.parseAsHtml()
+                        ?.toAnnotatedString()
 
                     flowOf(
                         UserCollectionItemNormalized(
@@ -159,16 +164,20 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<UserBookmarkNormalized>> = items.map { item ->
-                    val translation = hadithDao.getHadithTranslationByHadithNumber(
-                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                    )
-
-                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    val collectionName = tryOrNull {
+                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    }
 
 
-                    val translationText = translation.hadithText
-                        .parseAsHtml()
-                        .toAnnotatedString()
+                    val translation = tryOrNull {
+                        hadithDao.getHadithTranslationByHadithNumber(
+                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                        )
+                    }
+
+                    val translationText = translation?.hadithText
+                        ?.parseAsHtml()
+                        ?.toAnnotatedString()
 
                     flowOf(
                         UserBookmarkNormalized(
@@ -222,16 +231,20 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<ReadHistoryNormalized>> = items.map { item ->
-                    val translation = hadithDao.getHadithTranslationByHadithNumber(
-                        item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                    )
+                    val collectionName = tryOrNull {
+                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    }
 
-                    val collectionName = hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
+                    val translation = tryOrNull {
+                        hadithDao.getHadithTranslationByHadithNumber(
+                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
+                        )
+                    }
 
 
-                    val translationText = translation.hadithText
-                        .parseAsHtml()
-                        .toAnnotatedString()
+                    val translationText = translation?.hadithText
+                        ?.parseAsHtml()
+                        ?.toAnnotatedString()
 
                     flowOf(
                         ReadHistoryNormalized(
@@ -270,5 +283,9 @@ class UserRepository(
 
     suspend fun clearReadHistory() {
         dao.clearReadHistory()
+    }
+
+    suspend fun clearUserDataForCollection(collectionId: Int) {
+        dao.deleteReadHistoryForCollection(collectionId)
     }
 }

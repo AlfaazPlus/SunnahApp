@@ -19,18 +19,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.text.parseAsHtml
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
+import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
 import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
 import com.alfaazplus.sunnah.ui.controllers.rememberModalController
+import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
+import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
+import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
+import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
+import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,7 +89,7 @@ private fun Item(
 private fun Items(
     isBookmarked: Boolean,
     onItemClick: (String) -> Unit,
-) { // TODO: Add actions
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.padding(16.dp),
@@ -140,13 +148,16 @@ private fun Items(
 
 @Composable
 fun HadithMenu(
-    collectionId: Int,
+    cwi: CollectionWithInfo,
     bookId: Int,
-    hadithNumber: String,
+    hadith: ParsedHadith,
     isOpen: Boolean,
     onClose: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
+    val collectionId = cwi.collection.id
+    val hadithNumber = hadith.hadith.hadithNumber
+
     val isBookmarked by viewModel
         .isBookmarked(collectionId, bookId, hadithNumber)
         .collectAsState()
@@ -154,6 +165,7 @@ fun HadithMenu(
     val collectionModalController = rememberModalController<AddToCollectionRequest>()
     val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     AddToCollectionSheet(collectionModalController)
     AddToBookmarksSheet(bookmarksModalController)
@@ -203,7 +215,41 @@ fun HadithMenu(
 
                 }
 
-                else -> { // Handle other actions if needed
+                ACTION_SHARE_HADITH -> {
+                    val translation = hadith.translation
+                    if (translation != null) {
+                        HadithHelper.shareHadith(
+                            context,
+                            translation,
+                            cwi.info?.name ?: "? ",
+                            hadithNumber,
+                        )
+                    }
+                }
+
+                ACTION_COPY_HADITH_TEXT -> {
+                    val translation = hadith.translation
+                    if (translation != null) {
+                        val textToCopy = buildString {
+                            if (!translation.narratorPrefix.isNullOrBlank()) {
+                                appendLine(translation.narratorPrefix.parseAsHtml())
+                                appendLine()
+                            }
+
+                            appendLine(translation.hadithText.parseAsHtml())
+                            appendLine()
+                            appendLine("— ${cwi.info?.name ?: "? "}: $hadithNumber")
+                        }
+
+                        context.copyToClipboard(textToCopy)
+                        MessageUtils.showClipboardMessage(context, context.getString(R.string.copied_to_clipboard))
+                    }
+                }
+
+                ACTION_REPORT_ISSUE -> {
+                    context.copyToClipboard("${cwi.info?.name ?: "? "}: $hadithNumber")
+                    MessageUtils.showClipboardMessage(context, context.getString(R.string.paste_reference_github_issue))
+                    NavigationHelper.openGithubIssuesHadithReport(context)
                 }
             }
 

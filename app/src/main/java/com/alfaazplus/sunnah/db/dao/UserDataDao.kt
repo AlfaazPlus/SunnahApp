@@ -151,4 +151,9 @@ interface UserDataDao {
     """
     )
     suspend fun deleteOldReadHistory(keepCount: Int)
+
+    // delete read history for collection
+    @Query("DELETE FROM read_history WHERE h_collection_id = :collectionId")
+    suspend fun deleteReadHistoryForCollection(collectionId: Int)
+
 }

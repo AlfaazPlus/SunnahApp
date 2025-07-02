@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "51d12ecf204e2b52df9173bbe316d2af",
+    "entities": [
+      {
+        "tableName": "scholars",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `status` INTEGER, `short_name` TEXT, `full_name` TEXT, `arabic` TEXT, `father_name` TEXT, `mother_name` TEXT, `bio` TEXT, `city` TEXT, `rank` INTEGER, `birth_date` TEXT, `birth_place` TEXT, `death_date` TEXT, `death_place` TEXT, `death_cause` TEXT, `siblings` TEXT, `spouses` TEXT, `children` TEXT, `teachers` TEXT, `students` TEXT, `interests` TEXT, `kunya` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "shortName",
+            "columnName": "short_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fullName",
+            "columnName": "full_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "arabic",
+            "columnName": "arabic",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fatherName",
+            "columnName": "father_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "motherName",
+            "columnName": "mother_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "bio",
+            "columnName": "bio",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "city",
+            "columnName": "city",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "rank",
+            "columnName": "rank",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "birthDate",
+            "columnName": "birth_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "birthPlace",
+            "columnName": "birth_place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "deathDate",
+            "columnName": "death_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "deathPlace",
+            "columnName": "death_place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "deathCause",
+            "columnName": "death_cause",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "siblings",
+            "columnName": "siblings",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "spouses",
+            "columnName": "spouses",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "children",
+            "columnName": "children",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "teachers",
+            "columnName": "teachers",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "students",
+            "columnName": "students",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "interests",
+            "columnName": "interests",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kunya",
+            "columnName": "kunya",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51d12ecf204e2b52df9173bbe316d2af')"
+    ]
+  }
+}

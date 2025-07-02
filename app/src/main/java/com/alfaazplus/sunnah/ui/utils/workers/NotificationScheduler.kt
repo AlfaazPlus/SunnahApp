@@ -1,4 +1,5 @@
-package com.alfaazplus.sunnah.ui.utils.workers // NotificationScheduler.kt
+package com.alfaazplus.sunnah.ui.utils.workers
+
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -15,7 +16,7 @@ object HadithOfTheDayScheduler {
         WorkManager
             .getInstance(context)
             .enqueueUniquePeriodicWork(
-                "daily_quote_notification",
+                "hotd_reminder",
                 ExistingPeriodicWorkPolicy.KEEP,
                 workRequest,
             )
@@ -24,6 +25,6 @@ object HadithOfTheDayScheduler {
     fun cancelDailyNotification(context: Context) {
         WorkManager
             .getInstance(context)
-            .cancelUniqueWork("daily_quote_notification")
+            .cancelUniqueWork("hotd_reminder")
     }
 }

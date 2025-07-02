@@ -36,6 +36,19 @@ class HadithRepository(
         )
     }
 
+    suspend fun isCollectionDownloaded(collectionId: Int): Boolean {
+        return try {
+            getCollection(collectionId)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    suspend fun isAnyCollectionDownloaded(): Boolean {
+        return dao.getCollectionList().isNotEmpty()
+    }
+
     suspend fun getCollectionList(): List<CollectionWithInfo> {
         return dao
             .getCollectionList()

@@ -1,5 +1,7 @@
 package com.alfaazplus.sunnah.ui
 
+import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -9,7 +11,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
@@ -19,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
@@ -33,6 +40,7 @@ import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsThemeScreen
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import kotlinx.coroutines.flow.StateFlow
 
 val enterTransition = slideInHorizontally(
     initialOffsetX = { fullWidth -> fullWidth }, animationSpec = tween(durationMillis = 100)
@@ -66,8 +74,20 @@ private fun NavGraphBuilder.route(
 }
 
 @Composable
-fun MainApp() {
+fun MainApp(intentFlow: StateFlow<Intent?>) {
     val navController = rememberNavController()
+    val intentState = intentFlow.collectAsState(initial = null)
+
+    LaunchedEffect(intentState.value) {
+        val startDestination = intentState.value?.getStringExtra(Keys.NAV_DESTINATION)
+
+        if (startDestination != null) {
+            navController.navigate(startDestination) {
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
 
     CompositionLocalProvider(LocalNavHostController provides navController) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

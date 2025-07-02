@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -34,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
+import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
@@ -180,6 +182,7 @@ private fun Footer(
         .collectAsState()
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val collectionModalController = rememberModalController<AddToCollectionRequest>()
     val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
@@ -208,7 +211,14 @@ private fun Footer(
             painter = painterResource(id = R.drawable.ic_share),
             tint = Color.LightGray,
             small = true,
-        ) {}
+        ) {
+            HadithHelper.shareHadith(
+                context,
+                hotd.translation,
+                hotd.collectionName,
+                hotd.hadith.hadithNumber,
+            )
+        }
         IconButton(
             painter = painterResource(id = if (isBookmarked) R.drawable.ic_bookmark_check else R.drawable.ic_bookmark_plus),
             tint = if (isBookmarked) MaterialTheme.colorScheme.primary else Color.LightGray,

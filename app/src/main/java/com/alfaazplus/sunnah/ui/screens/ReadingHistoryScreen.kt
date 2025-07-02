@@ -67,16 +67,21 @@ private fun ItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName}: ${item.item.hadithNumber}",
+                        "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }
 
-            Text(
-                text = item.translationText, style = MaterialTheme.typography.bodyMedium, maxLines = 8, overflow = TextOverflow.Ellipsis
-            )
+            if (!item.translationText.isNullOrEmpty()) {
+                Text(
+                    text = item.translationText!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 8,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

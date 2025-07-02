@@ -7,9 +7,9 @@ import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
 
 data class UserCollectionItemNormalized(
     val item: UserCollectionItem,
-    val translation: HadithTranslation,
-    val collectionName: String,
-    var translationText: AnnotatedString,
+    val translation: HadithTranslation?,
+    val collectionName: String?,
+    var translationText: AnnotatedString?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -18,7 +18,6 @@ data class UserCollectionItemNormalized(
         if (item.hadithCollectionId != other.item.hadithCollectionId) return false
         if (item.hadithBookId != other.item.hadithBookId) return false
         if (item.hadithNumber != other.item.hadithNumber) return false
-        if (translation.arUrn != other.translation.arUrn) return false
 
         return true
     }

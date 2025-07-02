@@ -44,6 +44,14 @@ fun ReaderScreen(
         }
     }
 
+    if (vm.cwi?.isFailure == true || vm.bwi?.isFailure == true) {
+        return Box(
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Not found")
+        }
+    }
+
     val hadithList = vm.parsedHadithList
 
     if (vm.cwi == null || vm.bwi == null || !vm.initialized) {

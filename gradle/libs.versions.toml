@@ -37,6 +37,7 @@ kotlinxRetrofit = "0.8.0"
 kotlinxSerialization = "1.7.3"
 guava = "33.2.1-jre"
 paging = "3.3.6"
+accompanist = "0.37.3"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -93,6 +94,7 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 roomPaging = { module = "androidx.room:room-paging", version.ref = "room" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

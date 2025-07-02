@@ -49,8 +49,8 @@ class ReaderViewModel @Inject constructor(
     var parsedHadithList by mutableStateOf(listOf<ParsedHadith>())
 
     var books: MutableLiveData<List<BookWithInfo>> = MutableLiveData(listOf())
-    var cwi by mutableStateOf<CollectionWithInfo?>(null)
-    var bwi by mutableStateOf<BookWithInfo?>(null)
+    var cwi by mutableStateOf<Result<CollectionWithInfo>?>(null)
+    var bwi by mutableStateOf<Result<BookWithInfo>?>(null)
 
     /**
      * Hadith number, consumed
@@ -82,13 +82,25 @@ class ReaderViewModel @Inject constructor(
     }
 
     private fun setCurrentBookInfo(books: List<BookWithInfo>?) {
-        bwi = books?.firstOrNull { it.book.id == bookId.value }
+        books
+            ?.firstOrNull { it.book.id == bookId.value }
+            ?.let {
+                bwi = Result.success(it)
+            }
     }
 
     suspend fun loadEssentials() {
         hadithLayout = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_LAYOUT), ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
-        cwi = repo.getCollection(collectionId)
-        books.value = repo.getBookList(collectionId)
+
+        try {
+            cwi = Result.success(repo.getCollection(collectionId))
+            books.value = repo.getBookList(collectionId)
+        } catch (e: Exception) {
+            cwi = Result.failure(e)
+            bwi = Result.failure(e)
+            Logger.saveError(e, "ReaderViewModel:loadEssentials")
+            return
+        }
     }
 
     private fun parseHadiths() {

@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,11 +29,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
@@ -59,25 +67,65 @@ private fun BookmarkItemCard(
         border = CardDefaults.outlinedCardBorder(),
         onClick = { onClick(bookmark) },
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
+        Column {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row {
+                    Card(
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) {
+                        Text(
+                            "${bookmark.collectionName ?: "? "}: ${bookmark.item.hadithNumber}",
+                            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+
+                if (!bookmark.translationText.isNullOrEmpty()) {
                     Text(
-                        "${bookmark.collectionName}: ${bookmark.item.hadithNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
+                        text = bookmark.translationText!!,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = if (bookmark.item.remark.isNotBlank()) 5 else 8,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
+
             }
 
-            Text(
-                text = bookmark.translationText, style = MaterialTheme.typography.bodyMedium, maxLines = 8, overflow = TextOverflow.Ellipsis
-            )
+            if (bookmark.item.remark.isNotBlank()) {
+                HorizontalDivider()
+
+                Text(
+                    text = buildAnnotatedString {
+                        appendInlineContent("user_note", "[icon]")
+                        append(" ")
+                        append(bookmark.item.remark)
+                    },
+                    inlineContent = mapOf(
+                        "user_note" to InlineTextContent(
+                            Placeholder(
+                                width = 16.sp,
+                                height = 16.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.pencil_line),
+                                contentDescription = null,
+                                tint = Color.Gray,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         }
     }
 }

@@ -333,7 +333,7 @@ fun ReaderAppBar(
                         Row {
                             Text(
                                 modifier = Modifier.widthIn(max = 150.dp),
-                                text = bwi?.info?.title ?: "",
+                                text = bwi!!.getOrThrow().info?.title ?: "",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Normal,

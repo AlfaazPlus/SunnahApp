@@ -38,6 +38,7 @@ import com.alfaazplus.sunnah.ui.controllers.ModalController
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -54,11 +55,11 @@ private fun Content(
     hadithViewModel: HadithRepoViewModel = hiltViewModel(),
 ) {
     val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = hadithViewModel.repo.getCollection(request.hadithCollectionId)
+        value = tryOrNull { hadithViewModel.repo.getCollection(request.hadithCollectionId) }
     }.value
 
     val hadithBook = produceState<BookWithInfo?>(null) {
-        value = hadithViewModel.repo.getBookById(request.hadithCollectionId, request.hadithBookId)
+        value = tryOrNull { hadithViewModel.repo.getBookById(request.hadithCollectionId, request.hadithBookId) }
     }.value
 
     val oBookmark by viewModel.repo
@@ -156,11 +157,11 @@ private fun Content(
                 ) {
 
                     Text(
-                        text = "${hadithCollection?.info?.name} : ${request.hadithNumber}",
+                        text = "${hadithCollection?.info?.name ?: "? "} : ${request.hadithNumber}",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "Book: ${hadithBook?.info?.title}",
+                        text = "Book: ${hadithBook?.info?.title ?: "? "}",
                     )
                 }
             }

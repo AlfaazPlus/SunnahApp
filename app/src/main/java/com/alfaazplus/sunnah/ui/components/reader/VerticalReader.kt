@@ -72,8 +72,8 @@ private fun PageContent(
             val hadithItem = hadithList[index]
 
             HadithItem(
-                vm.cwi!!,
-                vm.bwi!!,
+                vm.cwi!!.getOrThrow(),
+                vm.bwi!!.getOrThrow(),
                 hadithItem,
                 true,
                 vm.highlightedHadithNumber == hadithItem.hadith.hadithNumber,

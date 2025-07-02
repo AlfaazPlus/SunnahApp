@@ -2,11 +2,15 @@ package com.alfaazplus.sunnah.ui.helpers
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import com.alfaazplus.sunnah.Logger
+import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.api.ApiConfig
 import com.alfaazplus.sunnah.ui.models.QuranReference
+import com.alfaazplus.sunnah.ui.utils.browseLink
 
 object NavigationHelper {
+    const val PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.alfaazplus.sunnah"
+
     /**
      * Open Quran reference in the QuranApp if installed, otherwise throw/prompt the user to install it.
      */
@@ -25,22 +29,53 @@ object NavigationHelper {
     }
 
     fun openGithubRepo(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(ApiConfig.GITHUB_REPOSITORY_URL)))
+        browseLink(context, ApiConfig.GITHUB_REPOSITORY_URL)
+    }
+
+    fun openGithubIssuesHadithReport(context: Context) {
+        browseLink(context, ApiConfig.GITHUB_ISSUES_HADITH_REPORT_URL)
     }
 
     fun openPlayStoreListing(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.alfaazplus.sunnah")))
+        browseLink(context, PLAY_STORE_URL)
     }
 
     fun openQuranAppPlayStoreListing(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.quranapp.android")))
+        browseLink(context, "https://play.google.com/store/apps/details?id=com.quranapp.android")
     }
 
     fun openAboutUs(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://sunnah.alfaazplus.com/about")))
+        browseLink(context, "https://sunnah.alfaazplus.com/about")
     }
 
     fun openPrivacyPolicy(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://sunnah.alfaazplus.com/privacy")))
+        browseLink(context, "https://sunnah.alfaazplus.com/privacy")
+    }
+
+    fun openAppSettings(context: Context) {
+        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Logger.saveError(e, "openAppSettings")
+        }
+    }
+
+    fun shareApp(context: Context) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(
+                Intent.EXTRA_TEXT,
+                context.getString(R.string.share_app_msg, PLAY_STORE_URL),
+            )
+        }
+
+        context.startActivity(
+            Intent.createChooser(intent, "Share via")
+        )
     }
 }

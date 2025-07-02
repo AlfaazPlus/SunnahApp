@@ -13,13 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +42,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
@@ -62,6 +67,7 @@ import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.theme.alpha
+import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -73,11 +79,11 @@ private fun ReadHistoryItemCard(
     hadithViewModel: HadithRepoViewModel = hiltViewModel(),
 ) {
     val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = hadithViewModel.repo.getCollection(item.hadithCollectionId)
+        value = tryOrNull { hadithViewModel.repo.getCollection(item.hadithCollectionId) }
     }.value
 
     val hadithBook = produceState<BookWithInfo?>(null) {
-        value = hadithViewModel.repo.getBookById(item.hadithCollectionId, item.hadithBookId)
+        value = tryOrNull { hadithViewModel.repo.getBookById(item.hadithCollectionId, item.hadithBookId) }
     }.value
 
     Box(
@@ -95,12 +101,12 @@ private fun ReadHistoryItemCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "${hadithCollection?.info?.name} : ${item.hadithNumber}",
+                text = "${hadithCollection?.info?.name ?: "?"} : ${item.hadithNumber}",
                 style = MaterialTheme.typography.titleSmall,
             )
 
             Text(
-                text = "Book: ${hadithBook?.info?.title}",
+                text = "Book: ${hadithBook?.info?.title ?: " ?"}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                 maxLines = 2,
@@ -168,11 +174,11 @@ private fun UserBookmarkCard(
 ) {
 
     val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = hadithViewModel.repo.getCollection(bookmark.hadithCollectionId)
+        value = tryOrNull { hadithViewModel.repo.getCollection(bookmark.hadithCollectionId) }
     }.value
 
     val hadithBook = produceState<BookWithInfo?>(null) {
-        value = hadithViewModel.repo.getBookById(bookmark.hadithCollectionId, bookmark.hadithBookId)
+        value = tryOrNull { hadithViewModel.repo.getBookById(bookmark.hadithCollectionId, bookmark.hadithBookId) }
     }.value
 
     Box(
@@ -190,29 +196,51 @@ private fun UserBookmarkCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "${hadithCollection?.info?.name} : ${bookmark.hadithNumber}",
+                text = "${hadithCollection?.info?.name ?: "? "}: ${bookmark.hadithNumber}",
                 style = MaterialTheme.typography.titleSmall,
             )
 
-            Text(
-                text = "Book: ${hadithBook?.info?.title}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(end = 6.dp)
-            )
-        }
+            if (bookmark.remark.isNotEmpty()) {
+                Text(
+                    text = buildAnnotatedString {
+                        appendInlineContent("user_note", "[icon]")
+                        append(" ")
+                        append(bookmark.remark)
+                    },
+                    inlineContent = mapOf(
+                        "user_note" to InlineTextContent(
+                            Placeholder(
+                                width = 16.sp,
+                                height = 16.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.pencil_line),
+                                contentDescription = null,
+                                tint = Color.Gray,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(end = 6.dp),
+                )
+            } else {
 
-        if (bookmark.remark.isNotBlank()) {
-            Icon(
-                painter = painterResource(R.drawable.ic_hadith_text_option),
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(18.dp),
-            )
+                Text(
+                    text = "Book: ${hadithBook?.info?.title ?: " ?"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(end = 6.dp)
+                )
+            }
+
         }
     }
 }

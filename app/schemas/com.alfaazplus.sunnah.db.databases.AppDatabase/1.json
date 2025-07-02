@@ -1,0 +1,936 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "f3704c1f81394e6bad4c525ad971b789",
+    "entities": [
+      {
+        "tableName": "collection",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`collection_id` INTEGER NOT NULL, `type` TEXT NOT NULL, `has_volumes` INTEGER NOT NULL, `has_books` INTEGER NOT NULL, `has_chapters` INTEGER NOT NULL, `name` TEXT NOT NULL, `intro` TEXT, `description` TEXT, `numbering_source` TEXT, PRIMARY KEY(`collection_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasVolumes",
+            "columnName": "has_volumes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasBooks",
+            "columnName": "has_books",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasChapters",
+            "columnName": "has_chapters",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "numberingSource",
+            "columnName": "numbering_source",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "collection_id"
+          ]
+        }
+      },
+      {
+        "tableName": "collection_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`collection_info_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `intro` TEXT, `description` TEXT, `numbering_source` TEXT, `language_code` TEXT NOT NULL, PRIMARY KEY(`collection_info_id`), FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "collection_info_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "numberingSource",
+            "columnName": "numbering_source",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "languageCode",
+            "columnName": "language_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "collection_info_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_collection_info_collection_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_collection_info_collection_id` ON `${TABLE_NAME}` (`collection_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "book",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `serial_number` TEXT NOT NULL, `order_in_collection` INTEGER NOT NULL, `hadith_start` INTEGER NOT NULL, `hadith_end` INTEGER NOT NULL, `hadith_count` INTEGER NOT NULL, `title` TEXT NOT NULL, `intro` TEXT, `description` TEXT, PRIMARY KEY(`book_id`, `collection_id`), FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serialNumber",
+            "columnName": "serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderInCollection",
+            "columnName": "order_in_collection",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadithStart",
+            "columnName": "hadith_start",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadithEnd",
+            "columnName": "hadith_end",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadithCount",
+            "columnName": "hadith_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "book_id",
+            "collection_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_book_collection_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_book_collection_id` ON `${TABLE_NAME}` (`collection_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "book_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_info_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `intro` TEXT, `description` TEXT, `language_code` TEXT NOT NULL, PRIMARY KEY(`book_info_id`), FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "book_info_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "languageCode",
+            "columnName": "language_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "book_info_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_book_info_book_id",
+            "unique": false,
+            "columnNames": [
+              "book_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_book_info_book_id` ON `${TABLE_NAME}` (`book_id`)"
+          },
+          {
+            "name": "index_book_info_book_id_collection_id",
+            "unique": false,
+            "columnNames": [
+              "book_id",
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_book_info_book_id_collection_id` ON `${TABLE_NAME}` (`book_id`, `collection_id`)"
+          },
+          {
+            "name": "index_book_info_collection_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_book_info_collection_id` ON `${TABLE_NAME}` (`collection_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "book",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id",
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "book_id",
+              "collection_id"
+            ]
+          },
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chapter",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_id` REAL NOT NULL, `collection_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `serial_number` TEXT NOT NULL, `title` TEXT NOT NULL, `intro` TEXT, `description` TEXT, `ending` TEXT, PRIMARY KEY(`chapter_id`, `collection_id`, `book_id`), FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "chapter_id",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serialNumber",
+            "columnName": "serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ending",
+            "columnName": "ending",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chapter_id",
+            "collection_id",
+            "book_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chapter_book_id",
+            "unique": false,
+            "columnNames": [
+              "book_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_book_id` ON `${TABLE_NAME}` (`book_id`)"
+          },
+          {
+            "name": "index_chapter_book_id_collection_id",
+            "unique": false,
+            "columnNames": [
+              "book_id",
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_book_id_collection_id` ON `${TABLE_NAME}` (`book_id`, `collection_id`)"
+          },
+          {
+            "name": "index_chapter_collection_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_collection_id` ON `${TABLE_NAME}` (`collection_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "book",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id",
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "book_id",
+              "collection_id"
+            ]
+          },
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chapter_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_info_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `chapter_id` REAL NOT NULL, `serial_number` TEXT NOT NULL, `title` TEXT NOT NULL, `intro` TEXT, `description` TEXT, `ending` TEXT, `language_code` TEXT NOT NULL, PRIMARY KEY(`chapter_info_id`), FOREIGN KEY(`chapter_id`, `collection_id`, `book_id`) REFERENCES `chapter`(`chapter_id`, `collection_id`, `book_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "chapter_info_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chapterId",
+            "columnName": "chapter_id",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serialNumber",
+            "columnName": "serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intro",
+            "columnName": "intro",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ending",
+            "columnName": "ending",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "languageCode",
+            "columnName": "language_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chapter_info_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chapter_info_chapter_id",
+            "unique": false,
+            "columnNames": [
+              "chapter_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_info_chapter_id` ON `${TABLE_NAME}` (`chapter_id`)"
+          },
+          {
+            "name": "index_chapter_info_chapter_id_collection_id_book_id",
+            "unique": false,
+            "columnNames": [
+              "chapter_id",
+              "collection_id",
+              "book_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_info_chapter_id_collection_id_book_id` ON `${TABLE_NAME}` (`chapter_id`, `collection_id`, `book_id`)"
+          },
+          {
+            "name": "index_chapter_info_book_id",
+            "unique": false,
+            "columnNames": [
+              "book_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_info_book_id` ON `${TABLE_NAME}` (`book_id`)"
+          },
+          {
+            "name": "index_chapter_info_book_id_collection_id",
+            "unique": false,
+            "columnNames": [
+              "book_id",
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_info_book_id_collection_id` ON `${TABLE_NAME}` (`book_id`, `collection_id`)"
+          },
+          {
+            "name": "index_chapter_info_collection_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chapter_info_collection_id` ON `${TABLE_NAME}` (`collection_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chapter",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chapter_id",
+              "collection_id",
+              "book_id"
+            ],
+            "referencedColumns": [
+              "chapter_id",
+              "collection_id",
+              "book_id"
+            ]
+          },
+          {
+            "table": "book",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id",
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "book_id",
+              "collection_id"
+            ]
+          },
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "hadith",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `collection_id` INTEGER NOT NULL, `book_id` INTEGER NOT NULL, `chapter_id` REAL, `hadith_number` TEXT NOT NULL, `order_in_book` INTEGER NOT NULL, `hadith_prefix` TEXT, `hadith_text` TEXT NOT NULL, `hadith_suffix` TEXT, `comments` TEXT, `grades` TEXT, `graded_by` TEXT, `narrators` TEXT, `narrators2` TEXT, `related` TEXT, PRIMARY KEY(`hadith_id`), FOREIGN KEY(`collection_id`) REFERENCES `collection`(`collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`book_id`, `collection_id`) REFERENCES `book`(`book_id`, `collection_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`collection_id`, `book_id`, `chapter_id`) REFERENCES `chapter`(`collection_id`, `book_id`, `chapter_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "hadith_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "urn",
+            "columnName": "urn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chapterId",
+            "columnName": "chapter_id",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "hadithNumber",
+            "columnName": "hadith_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderInBook",
+            "columnName": "order_in_book",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadithPrefix",
+            "columnName": "hadith_prefix",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "hadithText",
+            "columnName": "hadith_text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadithSuffix",
+            "columnName": "hadith_suffix",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "comments",
+            "columnName": "comments",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "grades",
+            "columnName": "grades",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gradedBy",
+            "columnName": "graded_by",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "narrators",
+            "columnName": "narrators",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "narrators2",
+            "columnName": "narrators2",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "related",
+            "columnName": "related",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "hadith_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_hadith_urn",
+            "unique": true,
+            "columnNames": [
+              "urn"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_hadith_urn` ON `${TABLE_NAME}` (`urn`)"
+          },
+          {
+            "name": "index_hadith_chapter_id",
+            "unique": false,
+            "columnNames": [
+              "chapter_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hadith_chapter_id` ON `${TABLE_NAME}` (`chapter_id`)"
+          },
+          {
+            "name": "index_hadith_book_id_collection_id",
+            "unique": false,
+            "columnNames": [
+              "book_id",
+              "collection_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hadith_book_id_collection_id` ON `${TABLE_NAME}` (`book_id`, `collection_id`)"
+          },
+          {
+            "name": "index_hadith_collection_id_book_id_chapter_id",
+            "unique": false,
+            "columnNames": [
+              "collection_id",
+              "book_id",
+              "chapter_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hadith_collection_id_book_id_chapter_id` ON `${TABLE_NAME}` (`collection_id`, `book_id`, `chapter_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "collection",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "collection_id"
+            ]
+          },
+          {
+            "table": "book",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id",
+              "collection_id"
+            ],
+            "referencedColumns": [
+              "book_id",
+              "collection_id"
+            ]
+          },
+          {
+            "table": "chapter",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "collection_id",
+              "book_id",
+              "chapter_id"
+            ],
+            "referencedColumns": [
+              "collection_id",
+              "book_id",
+              "chapter_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "hadith_translation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hadith_translation_id` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL, `urn` TEXT NOT NULL, `ar_urn` TEXT NOT NULL, `hadith_prefix` TEXT, `hadith_text` TEXT NOT NULL, `hadith_suffix` TEXT, `comments` TEXT, `grades` TEXT, `graded_by` TEXT, `reference` TEXT, `ref_in_book` TEXT, `ref_usc_msa` TEXT, `ref_eng` TEXT, `lang_code` TEXT NOT NULL, PRIMARY KEY(`hadith_translation_id`), FOREIGN KEY(`ar_urn`) REFERENCES `hadith`(`urn`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "hadith_translation_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "urn",
+            "columnName": "urn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "arUrn",
+            "columnName": "ar_urn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "narratorPrefix",
+            "columnName": "hadith_prefix",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "hadithText",
+            "columnName": "hadith_text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "narratorSuffix",
+            "columnName": "hadith_suffix",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "comments",
+            "columnName": "comments",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "grades",
+            "columnName": "grades",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gradedBy",
+            "columnName": "graded_by",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "refInBook",
+            "columnName": "ref_in_book",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "refUscMsa",
+            "columnName": "ref_usc_msa",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "refEn",
+            "columnName": "ref_eng",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "langCode",
+            "columnName": "lang_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "hadith_translation_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_hadith_translation_urn",
+            "unique": true,
+            "columnNames": [
+              "urn"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_hadith_translation_urn` ON `${TABLE_NAME}` (`urn`)"
+          },
+          {
+            "name": "index_hadith_translation_ar_urn",
+            "unique": true,
+            "columnNames": [
+              "ar_urn"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_hadith_translation_ar_urn` ON `${TABLE_NAME}` (`ar_urn`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "hadith",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "ar_urn"
+            ],
+            "referencedColumns": [
+              "urn"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3704c1f81394e6bad4c525ad971b789')"
+    ]
+  }
+}

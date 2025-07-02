@@ -7,18 +7,17 @@ import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 
 data class UserBookmarkNormalized(
     val item: UserBookmark,
-    val translation: HadithTranslation,
-    val collectionName: String,
-    var translationText: AnnotatedString,
+    val translation: HadithTranslation?,
+    val collectionName: String?,
+    var translationText: AnnotatedString?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is UserCollectionItemNormalized) return false
+        if (other !is UserBookmarkNormalized) return false
 
         if (item.hadithCollectionId != other.item.hadithCollectionId) return false
         if (item.hadithBookId != other.item.hadithBookId) return false
         if (item.hadithNumber != other.item.hadithNumber) return false
-        if (translation.arUrn != other.translation.arUrn) return false
 
         return true
     }

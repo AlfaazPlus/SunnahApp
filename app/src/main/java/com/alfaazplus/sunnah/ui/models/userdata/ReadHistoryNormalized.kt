@@ -7,9 +7,9 @@ import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
 
 data class ReadHistoryNormalized(
     val item: ReadHistory,
-    val translation: HadithTranslation,
-    val collectionName: String,
-    var translationText: AnnotatedString,
+    val translation: HadithTranslation?,
+    val collectionName: String?,
+    var translationText: AnnotatedString?,
 ) {
     fun key() = item.key()
 
@@ -20,7 +20,6 @@ data class ReadHistoryNormalized(
         if (item.hadithCollectionId != other.item.hadithCollectionId) return false
         if (item.hadithBookId != other.item.hadithBookId) return false
         if (item.hadithNumber != other.item.hadithNumber) return false
-        if (translation.arUrn != other.translation.arUrn) return false
 
         return true
     }
