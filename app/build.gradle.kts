@@ -15,8 +15,8 @@ android {
         applicationId = "com.alfaazplus.sunnah"
         minSdk = 21
         targetSdk = 35
-        versionCode = 14
-        versionName = "0.1.0-alpha.14"
+        versionCode = 15
+        versionName = "0.1.0"
 
         setProperty("archivesBaseName", versionName)
 
