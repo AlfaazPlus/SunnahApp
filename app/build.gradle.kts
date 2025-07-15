@@ -20,7 +20,7 @@ android {
 
         setProperty("archivesBaseName", versionName)
 
-        resValue("string", "app_name", "SunnahApp (Alpha)")
+        resValue("string", "app_name_generated", "SunnahApp")
         resValue("string", "cleartextTrafficPermitted", "false")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -45,7 +45,7 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
 
-            resValue("string", "app_name", "SunnahApp Debug")
+            resValue("string", "app_name_generated", "SunnahApp Debug")
             resValue("string", "cleartextTrafficPermitted", "true")
         }
 
