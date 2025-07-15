@@ -1,12 +1,32 @@
-# SunnahApp
- 
-It is an app for exploring the Sunnah of the Prophet (peace be upon him).
+<div align="center">
+
+<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt='SunnahApp logo' height="140"/>
+
+### SunnahApp
+
+The SunnahApp is an ad-free and privacy-focused mobile application that facilitates exploring the Sunnah of the Prophet (peace be upon him).
+
+[![Version](https://img.shields.io/github/v/release/AlfaazPlus/SunnahApp?include_prereleases&sort=semver&color=025e3e&style=flat-square)](https://github.com/AlfaazPlus/SunnahApp/releases/latest)
+[![Downloads (SunnahApp)](https://img.shields.io/github/downloads/AlfaazPlus/SunnahApp/total?logo=github&color=025e3e&style=flat-square)](https://github.com/AlfaazPlus/SunnahApp/releases/latest)
+[![License](https://img.shields.io/github/license/AlfaazPlus/SunnahApp?color=025e3e&style=flat-square)](https://github.com/AlfaazPlus/SunnahApp/blob/master/LICENSE)
+
+<hr />
+
+Join the community:
+
+[![Discord](repo_assets/widgets/discord.svg)](https://discord.com/invite/vtutnwzxRb)
+[![Matrix](repo_assets/widgets/matrix.svg)](https://matrix.to/#/#AlfaazPlus-ot:matrix.org)
+[![Telegram](repo_assets/widgets/telegram.svg)](https://t.me/thequranapp)
+
+Download:
 
 > THIS APP IS UNDER DEVELOPMENT. It will be available on the Play Store soon, Insha Allah.
 
 [<img src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png"
 alt='Get it on GitHub'
 height="80">](https://github.com/alfaazplus/sunnahapp/releases)
+
+</div>
 
 ## Screenshots
 
