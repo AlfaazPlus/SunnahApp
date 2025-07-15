@@ -12,6 +12,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Singleton
 
 @Module
@@ -29,14 +31,34 @@ object AppModule {
     @Provides
     @Singleton
     fun provideScholarsDatabase(app: Application): ScholarsDatabase {
-        val dbStream = app.assets.open("scholars_info.db.bz2")
-        val bz2Stream = BZip2CompressorInputStream(dbStream)
+        val databaseFile = File(app.getDatabasePath("scholars_db").absolutePath)
+
+        if (databaseFile.exists()) {
+            return Room
+                .databaseBuilder(app, ScholarsDatabase::class.java, "scholars_db")
+                .fallbackToDestructiveMigration(false)
+                .build()
+        }
+
+        val outFile = File(app.filesDir, "scholars_temp.db")
+        val assetStream = app.assets.open("scholars_info.db.bz2")
+
+        BZip2CompressorInputStream(assetStream).use { input ->
+            FileOutputStream(outFile).use { output ->
+                input.copyTo(output)
+            }
+        }
 
         return Room
             .databaseBuilder(app, ScholarsDatabase::class.java, "scholars_db")
-            .createFromInputStream { bz2Stream }
+            .createFromFile(outFile)
             .fallbackToDestructiveMigration(false)
             .build()
+            .also { // Clean up the temporary file after database creation
+                if (outFile.exists()) {
+                    outFile.delete()
+                }
+            }
     }
 
     @Provides
