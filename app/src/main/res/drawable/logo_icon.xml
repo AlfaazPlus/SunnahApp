@@ -2,6 +2,7 @@
     android:width="32dp"
     android:height="32dp"
     android:viewportWidth="32"
+        android:tint="@color/primary"
     android:viewportHeight="32">
   <path
       android:fillColor="#FF000000"

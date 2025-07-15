@@ -85,7 +85,7 @@ class HadithOfTheDayWorker @AssistedInject constructor(
                     .bigText(hadithText)
             )
             .setSubText(hadithReference)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // todo: logo
+            .setSmallIcon(R.drawable.logo_icon)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()

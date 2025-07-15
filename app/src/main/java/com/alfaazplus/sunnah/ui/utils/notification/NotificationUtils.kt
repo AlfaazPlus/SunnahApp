@@ -94,7 +94,7 @@ object NotificationUtils {
             .Builder(ctx, channelId)
             .apply {
                 setContentTitle("")
-                setSmallIcon(android.R.drawable.ic_dialog_info) // todo: logo
+                setSmallIcon(R.drawable.logo_icon)
                 setContentText("")
             }
             .build()
@@ -115,7 +115,7 @@ object NotificationUtils {
             .Builder(ctx, CHANNEL_ID_DEFAULT)
             .apply {
                 setContentTitle(ctx.getString(R.string.last_crash_log))
-                setSmallIcon(android.R.drawable.ic_dialog_info) // todo: logo
+                setSmallIcon(R.drawable.logo_icon)
                 setContentText(stackTraceString)
                 setStyle(
                     NotificationCompat
