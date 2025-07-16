@@ -20,11 +20,12 @@ Join the community:
 
 Download:
 
-> THIS APP IS UNDER DEVELOPMENT. It will be available on the Play Store soon, Insha Allah.
-
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+alt='Get it on Google Play'
+height="80">](https://play.google.com/store/apps/details?id=com.alfaazplus.sunnah)
 [<img src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png"
 alt='Get it on GitHub'
-height="80">](https://github.com/alfaazplus/sunnahapp/releases)
+height="80">](https://github.com/alfaazplus/sunnahapp/releases/latest)
 
 </div>
 
