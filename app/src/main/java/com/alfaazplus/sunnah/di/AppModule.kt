@@ -40,25 +40,20 @@ object AppModule {
                 .build()
         }
 
-        val outFile = File(app.filesDir, "scholars_temp.db")
+        val tempFile = File.createTempFile("scholars_temp", ".db", app.cacheDir)
         val assetStream = app.assets.open("scholars_info.db.bz2")
 
         BZip2CompressorInputStream(assetStream).use { input ->
-            FileOutputStream(outFile).use { output ->
+            FileOutputStream(tempFile).use { output ->
                 input.copyTo(output)
             }
         }
 
         return Room
             .databaseBuilder(app, ScholarsDatabase::class.java, "scholars_db")
-            .createFromFile(outFile)
+            .createFromFile(tempFile)
             .fallbackToDestructiveMigration(false)
             .build()
-            .also { // Clean up the temporary file after database creation
-                if (outFile.exists()) {
-                    outFile.delete()
-                }
-            }
     }
 
     @Provides

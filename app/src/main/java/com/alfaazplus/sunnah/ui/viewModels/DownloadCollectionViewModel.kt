@@ -9,7 +9,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.utils.workers.DownloadCollectionWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -83,11 +82,11 @@ class DownloadCollectionViewModel @Inject constructor(
 
     private fun observeWorkState(collectionId: Int, workId: UUID) {
         val observer = object : Observer<WorkInfo?> {
-            override fun onChanged(workInfo: WorkInfo?) {
-                if (workInfo != null) {
-                    setDownloadState(collectionId, workInfo)
+            override fun onChanged(value: WorkInfo?) {
+                if (value != null) {
+                    setDownloadState(collectionId, value)
 
-                    if (workInfo.state.isFinished) {
+                    if (value.state.isFinished) {
                         workManager
                             .getWorkInfoByIdLiveData(workId)
                             .removeObserver(this)

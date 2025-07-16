@@ -25,13 +25,31 @@ import java.io.InputStreamReader
 
 object DatabaseHelper {
     suspend fun populateHadithDataFromAssets(database: AppDatabase, context: Context) {
-        context.assets.open("prebuilt-hadiths/bukhari/base.tar.bz2").use {
-            importHadithBaseData(database, it)
-        }
-        context.assets.open("prebuilt-hadiths/bukhari/en.tar.bz2").use {
-            importHadithLocaleData(database, it)
-        }
-        SPHadithConfigs.setAssetHadithsImported(context, true)
+        context.assets
+            .open("prebuilt-hadiths/bukhari/base.tar.bz2")
+            .use {
+                importHadithBaseData(database, it)
+            }
+
+        context.assets
+            .open("prebuilt-hadiths/bukhari/en.tar.bz2")
+            .use {
+                importHadithLocaleData(database, it)
+            }
+
+        context.assets
+            .open("prebuilt-hadiths/muslim/base.tar.bz2")
+            .use {
+                importHadithBaseData(database, it)
+            }
+
+        context.assets
+            .open("prebuilt-hadiths/muslim/en.tar.bz2")
+            .use {
+                importHadithLocaleData(database, it)
+            }
+
+        SPHadithConfigs.setAssetHadithsImported(true)
     }
 
     /**
@@ -81,7 +99,10 @@ object DatabaseHelper {
             val reader = BufferedReader(InputStreamReader(stream))
 
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 dao.insertCollection(toHCollection(line!!))
             }
         }
@@ -92,7 +113,10 @@ object DatabaseHelper {
             val reader = BufferedReader(InputStreamReader(stream))
 
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 dao.insertCollectionInfo(toHCollectionInfo(line!!))
             }
         }
@@ -109,7 +133,9 @@ object DatabaseHelper {
     private fun doubleColumn(columns: JSONArray, index: Int): Double {
         if (columns[index] is Double) return columns[index] as Double
 
-        return columns[index].toString().toDouble()
+        return columns[index]
+            .toString()
+            .toDouble()
     }
 
     private suspend fun importBookBase(dao: HadithDao, stream: InputStream) {
@@ -118,7 +144,10 @@ object DatabaseHelper {
 
             var lineNum = 0
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 lineNum++
                 val columns = JSONArray(line)
 
@@ -151,7 +180,10 @@ object DatabaseHelper {
 
             var lineNum = 0
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 lineNum++
                 val columns = JSONArray(line)
 
@@ -180,7 +212,10 @@ object DatabaseHelper {
             val reader = BufferedReader(InputStreamReader(stream))
 
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 val columns = JSONArray(line)
 
                 dao.insertChapter(
@@ -204,7 +239,10 @@ object DatabaseHelper {
             val reader = BufferedReader(InputStreamReader(stream))
 
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 val columns = JSONArray(line)
 
                 dao.insertChapterInfo(
@@ -230,7 +268,10 @@ object DatabaseHelper {
             val reader = BufferedReader(InputStreamReader(stream))
 
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 val columns = JSONArray(line)
 
                 try {
@@ -268,7 +309,10 @@ object DatabaseHelper {
 
             var lineNum = 0
             var line: String?
-            while (reader.readLine().also { line = it } != null) {
+            while (reader
+                    .readLine()
+                    .also { line = it } != null
+            ) {
                 lineNum++
                 val columns = JSONArray(line)
 
