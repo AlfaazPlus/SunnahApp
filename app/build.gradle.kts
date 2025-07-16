@@ -1,4 +1,3 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -9,14 +8,14 @@ plugins {
 
 android {
     namespace = "com.alfaazplus.sunnah"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.alfaazplus.sunnah"
         minSdk = 21
-        targetSdk = 35
-        versionCode = 15
-        versionName = "0.1.0"
+        targetSdk = 36
+        versionCode = 16
+        versionName = "0.1.1"
 
         setProperty("archivesBaseName", versionName)
 
@@ -78,6 +77,7 @@ android {
         viewBinding = true
         compose = true
     }
+    buildToolsVersion = "36.0.0"
 } // Allow references to generated code
 kapt {
     correctErrorTypes = true
