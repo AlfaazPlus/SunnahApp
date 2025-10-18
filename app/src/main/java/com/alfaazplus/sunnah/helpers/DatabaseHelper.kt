@@ -37,18 +37,6 @@ object DatabaseHelper {
                 importHadithLocaleData(database, it)
             }
 
-        context.assets
-            .open("prebuilt-hadiths/muslim/base.tar.bz2")
-            .use {
-                importHadithBaseData(database, it)
-            }
-
-        context.assets
-            .open("prebuilt-hadiths/muslim/en.tar.bz2")
-            .use {
-                importHadithLocaleData(database, it)
-            }
-
         SPHadithConfigs.setAssetHadithsImported(true)
     }
 
