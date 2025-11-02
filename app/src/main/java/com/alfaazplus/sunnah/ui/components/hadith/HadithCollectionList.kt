@@ -31,16 +31,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.BorderedCard
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
+import com.alfaazplus.sunnah.ui.viewModels.DownloadCollectionViewModel
 
 
 @Composable
 private fun HadithCollectionItem(
+    isDownloading: Boolean,
     cwi: CollectionWithInfo,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     BorderedCard(onClick = onClick) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -54,7 +57,7 @@ private fun HadithCollectionItem(
         }
 
         // Download icon at bottom right
-        if (cwi.isDownloaded == false) {
+        if (isDownloading || cwi.isDownloaded == false) {
             Box(
                 modifier = Modifier
                     .offset {
@@ -70,22 +73,22 @@ private fun HadithCollectionItem(
                     .clip(RoundedCornerShape(topStart = 13.dp, bottomEnd = 13.dp))
                     .background(MaterialTheme.colorScheme.primary.alpha(0.2f))
                     .padding(
-                        start = 6.dp,
-                        top = 6.dp,
-                        end = 4.dp,
-                        bottom = 4.dp
+                        start = 6.dp, top = 6.dp, end = 4.dp, bottom = 4.dp
                     )
                     .size(20.dp)
-                    .align(Alignment.BottomEnd)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_download),
-                    contentDescription = null,
-                    alpha = 0.8f,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                )
+                    .align(Alignment.BottomEnd)) {
+
+                if (isDownloading) {
+                    Loader(size = 16.dp)
+                } else if (cwi.isDownloaded == false) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_download),
+                        contentDescription = null,
+                        alpha = 0.8f,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
     }
@@ -95,13 +98,20 @@ private fun HadithCollectionItem(
 fun HadithCollectionList(
     modifier: Modifier,
     onCollectionClick: (collectionId: Int) -> Unit,
-    vm: CollectionListViewModel = hiltViewModel()
+    vm: CollectionListViewModel = hiltViewModel(),
+    downloadVm: DownloadCollectionViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavHostController.current
 
-    LaunchedEffect(Unit) { vm.loadCollections() }
+    LaunchedEffect(Unit) {
+        vm.loadCollections()
+        downloadVm.refreshDownloadStates()
+    }
 
     val collections by vm.collections.collectAsState()
+    val downloadStates by downloadVm
+        .getAllDownloadStates()
+        .collectAsState(initial = emptyMap())
 
     LazyVerticalGrid(
         userScrollEnabled = false,
@@ -113,11 +123,14 @@ fun HadithCollectionList(
     ) {
         items(collections.size) {
             val cwi = collections[it]
-            HadithCollectionItem(cwi) {
-                if (cwi.isDownloaded == true) {
-                    onCollectionClick(cwi.collection.id)
-                } else {
+            val workInfo = downloadStates[cwi.collection.id]
+            val isDownloading = workInfo?.state?.isFinished != null && !workInfo.state.isFinished
+
+            HadithCollectionItem(isDownloading, cwi) {
+                if (isDownloading || cwi.isDownloaded != true) {
                     navController.navigate(Routes.SETTINGS_MANAGE_COLLECTIONS)
+                } else {
+                    onCollectionClick(cwi.collection.id)
                 }
             }
         }

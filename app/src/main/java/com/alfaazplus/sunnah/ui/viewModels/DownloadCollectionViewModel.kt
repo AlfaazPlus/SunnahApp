@@ -32,6 +32,10 @@ class DownloadCollectionViewModel @Inject constructor(
     private val _downloadStates = MutableStateFlow<Map<Int, WorkInfo>>(emptyMap())
 
     init {
+        refreshDownloadStates()
+    }
+
+    fun refreshDownloadStates() { // refresh states and observers
         viewModelScope.launch {
             val infos = withContext(Dispatchers.IO) {
                 workManager
@@ -72,6 +76,10 @@ class DownloadCollectionViewModel @Inject constructor(
         )
 
         observeWorkState(collectionId, workRequest.id)
+    }
+
+    fun getAllDownloadStates(): Flow<Map<Int, WorkInfo>> {
+        return _downloadStates
     }
 
     fun getDownloadStateFlow(collectionId: Int): Flow<WorkInfo?> {
