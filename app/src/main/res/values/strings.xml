@@ -32,7 +32,9 @@
     <string name="search">Search</string>
     <string name="global_search">Global Search</string>
     <string name="search_placeholder">Enter search term…</string>
-    <string name="search_fitler">Search filter</string>
+    <string name="search_book">Search book…</string>
+    <string name="search_hadith">Search hadith…</string>
+    <string name="search_filter">Search filter</string>
     <string name="search_in">Search in…</string>
     <string name="search_for">Search for…</string>
     <string name="apply_filter">Apply filter</string>
@@ -40,6 +42,7 @@
     <string name="one_result_found">1 result found</string>
     <string name="n_results_found" formatted="false">%d results found</string>
     <string name="search_result_menu">Search result menu</string>
+    <string name="clear_search">Clear search</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum

@@ -1,6 +1,8 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -36,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +60,50 @@ import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
+
+
+@Composable
+private fun SearchBox(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    @StringRes placeholder: Int,
+) {
+    val bgColor = MaterialTheme.colorScheme.background
+
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+            )
+            .padding(start = 12.dp, end = 12.dp, top = 12.dp),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = bgColor,
+            focusedContainerColor = bgColor,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        ),
+        trailingIcon = {
+            if (query.isNotBlank()) {
+                SimpleTooltip(stringResource(R.string.clear_search)) {
+                    IconButton(onClick = {
+                        onQueryChange("")
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_x), contentDescription = stringResource(R.string.clear_search)
+                        )
+                    }
+                }
+            }
+        },
+        placeholder = { Text(stringResource(placeholder)) },
+        value = query,
+        onValueChange = onQueryChange,
+        textStyle = MaterialTheme.typography.titleSmall,
+        shape = MaterialTheme.shapes.medium,
+        singleLine = true,
+    )
+}
 
 @Composable
 private fun HadithItem(
@@ -78,13 +127,13 @@ private fun HadithItem(
         ) {
             Text(
                 text = "Hadith: ${hwt.hadith.hadithNumber}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             )
             Text(
                 text = hwt.translation?.refInBook ?: "",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.alpha(0.8f),
             )
@@ -99,25 +148,44 @@ private fun HadithList(
     currentHadithNumber: String,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredHadiths = remember(searchQuery, hadiths) {
+        if (searchQuery.isBlank()) hadiths
+        else {
+            hadiths.filter {
+                val searchString =
+                    "${it.hadith.hadithNumber} ${it.translation?.refInBook ?: ""} ${it.translation?.refEn ?: ""} ${it.translation?.refUscMsa ?: ""}"
+
+                searchString.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+
     val hadithListState =
         rememberLazyListState(
-            hadiths
+            filteredHadiths
                 .indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }
                 .takeIf { it != -1 } ?: 0)
 
-
-    LazyColumn(
-        modifier = modifier,
-        state = hadithListState,
-        contentPadding = PaddingValues(12.dp),
-    ) {
-        items(
-            hadiths.size,
+    Column {
+        SearchBox(
+            query = searchQuery, onQueryChange = { searchQuery = it }, placeholder = R.string.search_hadith
+        )
+        LazyColumn(
+            modifier = modifier,
+            state = hadithListState,
+            contentPadding = PaddingValues(12.dp),
         ) {
-            HadithItem(
-                hwt = hadiths[it],
-                isActive = hadiths[it].hadith.hadithNumber == currentHadithNumber,
-            ) { onJumpToHadith(hadiths[it]) }
+            items(
+                filteredHadiths.size,
+            ) {
+                HadithItem(
+                    hwt = filteredHadiths[it],
+                    isActive = filteredHadiths[it].hadith.hadithNumber == currentHadithNumber,
+                ) { onJumpToHadith(filteredHadiths[it]) }
+            }
         }
     }
 }
@@ -192,19 +260,38 @@ private fun BookList(
     onJumpToBook: (BookWithInfo) -> Unit,
     modifier: Modifier,
 ) {
-    val bookListState = rememberLazyListState(books.indexOfFirst { it.book.id == currentBookId })
+    var searchQuery by remember { mutableStateOf("") }
 
-    LazyColumn(
-        modifier = modifier,
-        state = bookListState,
-        contentPadding = PaddingValues(12.dp),
-    ) {
-        items(books.size, key = { index -> books[index].book.id }) {
-            BookItem(
-                bwi = books[it],
-                isActive = books[it].book.id == currentBookId,
-            ) {
-                onJumpToBook(books[it])
+    val filteredBooks = remember(searchQuery, books) {
+        if (searchQuery.isBlank()) books
+        else {
+            books.filter {
+                val searchString =
+                    "${it.book.serialNumber} ${it.book.title} ${it.book.intro} ${it.book.description} ${it.info?.title ?: ""} ${it.info?.intro ?: ""} ${it.info?.description ?: ""}"
+                searchString.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    val bookListState = rememberLazyListState(filteredBooks.indexOfFirst { it.book.id == currentBookId })
+
+    Column {
+        SearchBox(
+            query = searchQuery, onQueryChange = { searchQuery = it }, placeholder = R.string.search_book
+        )
+
+        LazyColumn(
+            modifier = modifier,
+            state = bookListState,
+            contentPadding = PaddingValues(12.dp),
+        ) {
+            items(filteredBooks.size, key = { index -> filteredBooks[index].book.id }) {
+                BookItem(
+                    bwi = filteredBooks[it],
+                    isActive = filteredBooks[it].book.id == currentBookId,
+                ) {
+                    onJumpToBook(filteredBooks[it])
+                }
             }
         }
     }

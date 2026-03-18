@@ -45,12 +45,12 @@ fun SearchTextField(vm: SearchViewModel) {
             focusedIndicatorColor = Color.Transparent,
         ),
         trailingIcon = {
-            SimpleTooltip(stringResource(R.string.search_fitler)) {
+            SimpleTooltip(stringResource(R.string.search_filter)) {
                 IconButton(onClick = {
                     showSearchFilterSheet = true
                 }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_fitler)
+                        painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_filter)
                     )
                 }
             }

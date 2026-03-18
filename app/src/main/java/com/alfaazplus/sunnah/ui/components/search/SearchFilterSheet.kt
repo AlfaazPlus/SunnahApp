@@ -64,7 +64,7 @@ fun SearchFilterSheet(
     }
 
     BottomSheet(
-        title = stringResource(R.string.search_fitler),
+        title = stringResource(R.string.search_filter),
         icon = R.drawable.ic_filter,
         isOpen = isOpen,
         onDismiss = onClose,
