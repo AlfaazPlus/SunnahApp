@@ -1,7 +1,6 @@
 package com.alfaazplus.sunnah.ui
 
 import android.content.Intent
-import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -13,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
@@ -25,7 +22,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen

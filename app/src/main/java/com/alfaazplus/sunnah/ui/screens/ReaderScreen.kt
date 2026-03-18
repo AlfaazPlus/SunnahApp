@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,9 +90,13 @@ fun ReaderScreen(
 
     val isHorizontal = vm.hadithLayout == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
 
-    if (isHorizontal) {
-        HorizontalReader(vm)
-    } else {
-        VerticalReader(vm)
+    BoxWithConstraints {
+        val isWideScreen = maxWidth > 600.dp
+
+        if (isHorizontal) {
+            HorizontalReader(vm, isWideScreen)
+        } else {
+            VerticalReader(vm, isWideScreen)
+        }
     }
 }

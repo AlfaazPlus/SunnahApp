@@ -16,7 +16,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -93,37 +92,32 @@ private fun PageContent(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun VerticalReader(vm: ReaderViewModel) {
+fun VerticalReader(vm: ReaderViewModel, isWideScreen: Boolean) {
     val hadithList = vm.parsedHadithList
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
 
-
-    val navigateToHadith = remember {
-        { hadithNumber: String ->
-            val index = hadithList.indexOfFirst { parsedHadith ->
-                parsedHadith.hadith.hadithNumber == hadithNumber
-            }
-            if (index >= 0) {
-                coroutineScope.launch {
-                    listState.scrollToItem(index)
-                }
-            }
+    fun navigateToHadith(hadithNumber: String) {
+        val index = hadithList.indexOfFirst { parsedHadith ->
+            parsedHadith.hadith.hadithNumber == hadithNumber
         }
-    }
-
-    val navigateToBook = remember {
-        { bookId: Int ->
-            vm.bookId.value = bookId
-
+        if (index >= 0) {
             coroutineScope.launch {
-                listState.scrollToItem(0)
+                listState.scrollToItem(index)
             }
         }
     }
 
-    LaunchedEffect(Unit) {
+    fun navigateToBook(bookId: Int) {
+        vm.bookId.value = bookId
+
+        coroutineScope.launch {
+            listState.scrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(listState, hadithList) {
         vm.currentHadithNumberRetriever = {
             val visibleItems = listState.layoutInfo.visibleItemsInfo
             val fullVisibleItem = visibleItems.firstOrNull { it.offset >= -250 } ?: visibleItems.firstOrNull()
@@ -168,11 +162,14 @@ fun VerticalReader(vm: ReaderViewModel) {
     val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surface
     val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
+
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ReaderAppBar(
                 readerVm = vm,
+                isWideScreen = isWideScreen,
                 currentHadithNumber = vm.currentHadithNumberRetriever,
                 scrollBehavior = scrollBehavior,
                 onJumpToBook = { navigateToBook(it.book.id) },
@@ -187,7 +184,20 @@ fun VerticalReader(vm: ReaderViewModel) {
         Box(
             modifier = Modifier.padding(it)
         ) {
-            PageContent(vm, hadithList, listState)
+            if (isWideScreen) {
+                ReaderLayout(
+                    readerVm = vm,
+                    currentHadithNumber = vm.currentHadithNumberRetriever,
+                    onJumpToBook = { navigateToBook(it.book.id) },
+                    onJumpToHadith = { hwt ->
+                        navigateToHadith(hwt.hadith.hadithNumber)
+                    },
+                ) {
+                    PageContent(vm, hadithList, listState)
+                }
+            } else {
+                PageContent(vm, hadithList, listState)
+            }
         }
     }
 }

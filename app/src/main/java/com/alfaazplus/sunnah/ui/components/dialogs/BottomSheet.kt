@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ fun BottomSheet(
     icon: Int? = null,
     title: String? = null,
     headerArrangement: Arrangement.Horizontal = Arrangement.Center,
+    dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     content: @Composable () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(true)
@@ -34,6 +36,7 @@ fun BottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = dragHandle,
     ) {
         if (icon != null || title != null) {
             Row(

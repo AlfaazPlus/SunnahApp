@@ -5,12 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,11 +18,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -35,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -94,6 +94,7 @@ private fun HadithItem(
 
 @Composable
 private fun HadithList(
+    modifier: Modifier,
     hadiths: List<HadithWithTranslation>,
     currentHadithNumber: String,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
@@ -104,43 +105,19 @@ private fun HadithList(
                 .indexOfFirst { it.hadith.hadithNumber == currentHadithNumber }
                 .takeIf { it != -1 } ?: 0)
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxHeight()
-            .width(140.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_hash),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .size(20.dp)
-                    .alpha(0.8f)
-            )
-            Text(
-                "Hadiths",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Start,
-            )
-        }
 
-        LazyColumn(state = hadithListState) {
-            items(
-                hadiths.size,
-            ) {
-                HadithItem(
-                    hwt = hadiths[it],
-                    isActive = hadiths[it].hadith.hadithNumber == currentHadithNumber,
-                ) { onJumpToHadith(hadiths[it]) }
-            }
+    LazyColumn(
+        modifier = modifier,
+        state = hadithListState,
+        contentPadding = PaddingValues(12.dp),
+    ) {
+        items(
+            hadiths.size,
+        ) {
+            HadithItem(
+                hwt = hadiths[it],
+                isActive = hadiths[it].hadith.hadithNumber == currentHadithNumber,
+            ) { onJumpToHadith(hadiths[it]) }
         }
     }
 }
@@ -216,42 +193,18 @@ private fun BookList(
     modifier: Modifier,
 ) {
     val bookListState = rememberLazyListState(books.indexOfFirst { it.book.id == currentBookId })
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+
+    LazyColumn(
         modifier = modifier,
+        state = bookListState,
+        contentPadding = PaddingValues(12.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    bottom = 16.dp,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_book),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(20.dp)
-                    .alpha(0.8f)
-            )
-            Text(
-                "Books",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Start,
-            )
-        }
-        LazyColumn(state = bookListState) {
-            items(books.size, key = { index -> books[index].book.id }) {
-                BookItem(
-                    bwi = books[it],
-                    isActive = books[it].book.id == currentBookId,
-                ) {
-                    onJumpToBook(books[it])
-                }
+        items(books.size, key = { index -> books[index].book.id }) {
+            BookItem(
+                bwi = books[it],
+                isActive = books[it].book.id == currentBookId,
+            ) {
+                onJumpToBook(books[it])
             }
         }
     }
@@ -259,28 +212,54 @@ private fun BookList(
 
 @Composable
 fun ReaderHadithNavigator(
+    modifier: Modifier = Modifier,
+    isInBottomSheet: Boolean,
     books: List<BookWithInfo>,
     hadiths: List<HadithWithTranslation>,
     currentBookId: Int,
     currentHadithNumber: String,
+    currentNavigatorTab: Int,
+    onChangeNavigatorTab: (Int) -> Unit,
     onJumpToBook: (BookWithInfo) -> Unit,
     onJumpToHadith: (HadithWithTranslation) -> Unit,
 ) {
+    val tabs = listOf("Books", "Hadiths")
 
-    Row(modifier = Modifier.padding(5.dp)) {
-        BookList(
-            books = books, currentBookId = currentBookId, onJumpToBook = onJumpToBook, modifier = Modifier.weight(1f)
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(6.dp), color = Color.Transparent
-        )
-        HadithList(
-            hadiths = hadiths,
-            currentHadithNumber = currentHadithNumber,
-            onJumpToHadith = onJumpToHadith,
-        )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        TabRow(
+            selectedTabIndex = currentNavigatorTab,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    text = { Text(title) },
+                    selected = currentNavigatorTab == index,
+                    onClick = {
+                        onChangeNavigatorTab(index)
+                    },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+
+        when (currentNavigatorTab) {
+            0 -> BookList(
+                modifier = Modifier.fillMaxHeight(if (isInBottomSheet) 0.75f else 1f),
+                books = books,
+                currentBookId = currentBookId,
+                onJumpToBook = onJumpToBook,
+            )
+
+            1 -> HadithList(
+                modifier = Modifier.fillMaxHeight(if (isInBottomSheet) 0.75f else 1f),
+                hadiths = hadiths,
+                currentHadithNumber = currentHadithNumber,
+                onJumpToHadith = onJumpToHadith,
+            )
+        }
     }
 }
 
@@ -288,6 +267,7 @@ fun ReaderHadithNavigator(
 @Composable
 fun ReaderAppBar(
     readerVm: ReaderViewModel,
+    isWideScreen: Boolean,
     currentHadithNumber: () -> String?,
     scrollBehavior: TopAppBarScrollBehavior,
     onJumpToBook: (BookWithInfo) -> Unit,
@@ -317,7 +297,9 @@ fun ReaderAppBar(
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .clip(MaterialTheme.shapes.large)
-                        .clickable {
+                        .clickable(
+                            enabled = !isWideScreen,
+                        ) {
                             showBottomSheet = true
                         },
                 ) {
@@ -326,35 +308,39 @@ fun ReaderAppBar(
                         height = 40.dp,
                     )
 
-                    Row {
-                        Text(
-                            modifier = Modifier.widthIn(max = 150.dp),
-                            text = bwi!!.getOrThrow().info?.title ?: "",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Normal,
-                            lineHeight = 0.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_drop_down),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp),
-                        )
+                    if (!isWideScreen) {
+                        Row {
+                            Text(
+                                modifier = Modifier.widthIn(max = 150.dp),
+                                text = bwi!!.getOrThrow().info?.title ?: "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 0.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_drop_down),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                     }
                 }
 
                 BottomSheet(
-                    isOpen = showBottomSheet,
-                    onDismiss = { showBottomSheet = false },
+                    isOpen = showBottomSheet, onDismiss = { showBottomSheet = false }, dragHandle = null
                 ) {
                     ReaderHadithNavigator(
+                        isInBottomSheet = true,
                         books = books,
                         hadiths = hadiths,
                         currentBookId = bookId.value ?: 0,
                         currentHadithNumber = currentHadithNumber() ?: "",
+                        currentNavigatorTab = readerVm.currentNavigatorTab,
+                        onChangeNavigatorTab = { readerVm.currentNavigatorTab = it },
                         onJumpToBook = { bwi ->
                             onJumpToBook(bwi)
                             showBottomSheet = false

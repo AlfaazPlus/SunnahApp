@@ -66,6 +66,8 @@ class ReaderViewModel @Inject constructor(
     // a callback
     var currentHadithNumberRetriever by mutableStateOf<() -> String?>({ null })
 
+    var currentNavigatorTab by mutableIntStateOf(0)
+
     init {
         bookId.observeForever {
             if (it != null) {

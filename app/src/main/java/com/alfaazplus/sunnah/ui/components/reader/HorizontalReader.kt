@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -348,13 +347,11 @@ fun HadithItem(
 private fun PageContent(
     cwi: CollectionWithInfo,
     bwi: BookWithInfo,
-    paddingValues: PaddingValues,
     hadithList: List<ParsedHadith>,
     pagerState: PagerState,
 ) {
     HorizontalPager(
         state = pagerState,
-        contentPadding = paddingValues,
         beyondViewportPageCount = 1,
         modifier = Modifier
             .fillMaxWidth()
@@ -368,6 +365,7 @@ private fun PageContent(
 @Composable
 fun HorizontalReader(
     vm: ReaderViewModel,
+    isWideScreen: Boolean,
 ) {
     val hadithList = vm.parsedHadithList
     val pagerState = rememberPagerState(
@@ -375,7 +373,7 @@ fun HorizontalReader(
         pageCount = { hadithList.size },
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(pagerState, hadithList) {
         vm.currentHadithNumberRetriever = {
             hadithList[pagerState.currentPage].hadith.hadithNumber
         }
@@ -412,6 +410,7 @@ fun HorizontalReader(
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+
     fun navigateToIndex(index: Int, animate: Boolean = true) {
         coroutineScope.launch {
             if (animate) pagerState.animateScrollToPage(index)
@@ -422,6 +421,13 @@ fun HorizontalReader(
     fun navigateToBook(bookId: Int) {
         vm.bookId.value = bookId
         navigateToIndex(0, false)
+    }
+
+    fun navigateToHadith(hadithNumber: String) {
+        val index = resolvePage(hadithList, hadithNumber)
+        if (index != null) {
+            navigateToIndex(index)
+        }
     }
 
     val previousHadithNumber = getPreviousHadithNumber(pagerState.currentPage, hadithList)
@@ -435,14 +441,12 @@ fun HorizontalReader(
         topBar = {
             ReaderAppBar(
                 readerVm = vm,
+                isWideScreen = isWideScreen,
                 currentHadithNumber = vm.currentHadithNumberRetriever,
                 scrollBehavior = scrollBehavior,
                 onJumpToBook = { navigateToBook(it.book.id) },
                 onJumpToHadith = {
-                    val index = resolvePage(hadithList, it.hadith.hadithNumber)
-                    if (index != null) {
-                        navigateToIndex(index)
-                    }
+                    navigateToHadith(it.hadith.hadithNumber)
                 },
             )
         },
@@ -466,5 +470,35 @@ fun HorizontalReader(
         },
         containerColor = bgColor,
         contentColor = txtColor,
-    ) { PageContent(vm.cwi!!.getOrThrow(), vm.bwi!!.getOrThrow(), it, hadithList, pagerState) }
+    ) {
+        Box(
+            modifier = Modifier.padding(it)
+        ) {
+            if (isWideScreen) {
+                ReaderLayout(
+                    readerVm = vm,
+                    currentHadithNumber = vm.currentHadithNumberRetriever,
+                    onJumpToBook = { navigateToBook(it.book.id) },
+                    onJumpToHadith = { hwt ->
+                        navigateToHadith(hwt.hadith.hadithNumber)
+                    },
+                ) {
+                    PageContent(
+                        vm.cwi!!.getOrThrow(),
+                        vm.bwi!!.getOrThrow(),
+                        hadithList,
+                        pagerState,
+                    )
+                }
+            } else {
+                PageContent(
+                    vm.cwi!!.getOrThrow(),
+                    vm.bwi!!.getOrThrow(),
+                    hadithList,
+                    pagerState,
+                )
+            }
+        }
+
+    }
 }
