@@ -12,12 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "com.alfaazplus.sunnah"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 17
         versionName = "0.1.2"
-
-        setProperty("archivesBaseName", versionName)
 
         resValue("string", "app_name_generated", "SunnahApp")
         resValue("string", "cleartextTrafficPermitted", "false")
@@ -56,17 +54,16 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -76,11 +73,22 @@ android {
     buildFeatures {
         viewBinding = true
         compose = true
+        buildConfig = true
     }
+
     buildToolsVersion = "36.0.0"
 } // Allow references to generated code
+
+base {
+    archivesName = android.defaultConfig.versionName
+}
+
 kapt {
     correctErrorTypes = true
+
+    javacOptions {
+        option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+    }
 }
 
 dependencies {
@@ -137,4 +145,5 @@ dependencies {
     implementation(libs.roomPaging)
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.material3.adaptive)
 }

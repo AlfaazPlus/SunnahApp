@@ -311,64 +311,59 @@ fun ReaderAppBar(
                 scrolledContainerColor = MaterialTheme.colorScheme.surface,
             ),
             title = {
-                Surface(
-                    modifier = Modifier.fillMaxHeight()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .clickable {
+                            showBottomSheet = true
+                        },
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(horizontal = 10.dp)
-                            .clip(MaterialTheme.shapes.large)
-                            .clickable {
-                                showBottomSheet = true
-                            },
-                    ) {
-                        CollectionIcon(
-                            collectionId = collectionId,
-                            height = 40.dp,
+                    CollectionIcon(
+                        collectionId = collectionId,
+                        height = 40.dp,
+                    )
+
+                    Row {
+                        Text(
+                            modifier = Modifier.widthIn(max = 150.dp),
+                            text = bwi!!.getOrThrow().info?.title ?: "",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 0.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-
-                        Row {
-                            Text(
-                                modifier = Modifier.widthIn(max = 150.dp),
-                                text = bwi!!.getOrThrow().info?.title ?: "",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Normal,
-                                lineHeight = 0.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Icon(
-                                painter = painterResource(R.drawable.ic_arrow_drop_down),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
-                    }
-
-                    BottomSheet(
-                        isOpen = showBottomSheet,
-                        onDismiss = { showBottomSheet = false },
-                    ) {
-                        ReaderHadithNavigator(
-                            books = books,
-                            hadiths = hadiths,
-                            currentBookId = bookId.value ?: 0,
-                            currentHadithNumber = currentHadithNumber() ?: "",
-                            onJumpToBook = { bwi ->
-                                onJumpToBook(bwi)
-                                showBottomSheet = false
-                            },
-                            onJumpToHadith = { hwt ->
-                                onJumpToHadith(hwt)
-                                showBottomSheet = false
-                            },
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_drop_down),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
                         )
                     }
+                }
+
+                BottomSheet(
+                    isOpen = showBottomSheet,
+                    onDismiss = { showBottomSheet = false },
+                ) {
+                    ReaderHadithNavigator(
+                        books = books,
+                        hadiths = hadiths,
+                        currentBookId = bookId.value ?: 0,
+                        currentHadithNumber = currentHadithNumber() ?: "",
+                        onJumpToBook = { bwi ->
+                            onJumpToBook(bwi)
+                            showBottomSheet = false
+                        },
+                        onJumpToHadith = { hwt ->
+                            onJumpToHadith(hwt)
+                            showBottomSheet = false
+                        },
+                    )
                 }
             },
             navigationIcon = {

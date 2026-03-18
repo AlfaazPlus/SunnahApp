@@ -111,7 +111,7 @@ private fun Content(
         )
         LazyVerticalGrid(
             userScrollEnabled = false,
-            columns = GridCells.Fixed(integerResource(R.integer.collection_grid_columns_2)),
+            columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.heightIn(max = 1000.dp)

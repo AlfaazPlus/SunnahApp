@@ -4,15 +4,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +68,8 @@ fun BookMetaInfoCard(
 @Composable
 fun BookItem(
     bookWithInfo: BookWithInfo,
+    leftPad: Int = 0,
+    rightPad: Int = 0,
     onClick: () -> Unit,
 ) {
     val book = bookWithInfo.book
@@ -72,8 +77,10 @@ fun BookItem(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
+            .fillMaxSize()
+            .padding(
+                start = leftPad.dp, end = rightPad.dp
+            )
     ) {
         BorderedCard(
             padding = PaddingValues(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 15.dp), onClick = onClick
@@ -114,6 +121,11 @@ fun BookItem(
                     textAlign = TextAlign.Center,
                     fontFamily = fontUthmani,
                 )
+
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,48 +155,66 @@ private fun ScreenContent(
 
     val totalHadiths = books.sumOf { it.book.hadithCount }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(bottom = 100.dp),
-    ) {
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-                    .background(colorScheme.surface)
-                    .padding(25.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CollectionIcon(collectionId, height = 70.dp)
-                    Text(
-                        modifier = Modifier.padding(top = 10.dp),
-                        text = cwi?.info?.name ?: "",
-                        style = type.titleSmall,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        modifier = Modifier.padding(top = 5.dp),
-                        text = "Total Books: ${books.size} • Total Hadiths: $totalHadiths",
-                        style = type.bodyMedium,
-                        color = colorScheme.onSurfaceVariant,
-                    )
+    BoxWithConstraints {
+        val columnCount = maxOf(1, (maxWidth / 300.dp).toInt())
 
-                    if (cwi?.info?.intro != null) {
-                        AboutCollectionSheet(cwi)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columnCount),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 100.dp),
+        ) {
+            item(
+                span = { GridItemSpan(maxLineSpan) }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                        .background(colorScheme.surface)
+                        .padding(25.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CollectionIcon(collectionId, height = 70.dp)
+                        Text(
+                            modifier = Modifier.padding(top = 10.dp),
+                            text = cwi?.info?.name ?: "",
+                            style = type.titleSmall,
+                            textAlign = TextAlign.Center,
+                        )
+                        Text(
+                            modifier = Modifier.padding(top = 5.dp),
+                            text = "Total Books: ${books.size} • Total Hadiths: $totalHadiths",
+                            style = type.bodyMedium,
+                            color = colorScheme.onSurfaceVariant,
+                        )
+
+                        if (cwi?.info?.intro != null) {
+                            AboutCollectionSheet(cwi)
+                        }
                     }
                 }
             }
-        }
 
-        items(
-            books, key = { bookWithInfo -> bookWithInfo.book.id }) { bookWithInfo ->
-            BookItem(
-                bookWithInfo,
-            ) { onBookItemClick(bookWithInfo.book.id) }
+            items(
+                count = books.size,
+                key = { index ->
+                    val bwi = books[index]
+                    bwi.book.id
+                },
+            ) { index ->
+                val bwi = books[index]
+                val leftPad = if (index % columnCount == 0) 12 else 0
+                val rightPad = if (index % columnCount == columnCount - 1) 12 else 0
+
+                BookItem(
+                    bwi,
+                    leftPad = leftPad,
+                    rightPad = rightPad,
+                ) { onBookItemClick(bwi.book.id) }
+            }
         }
     }
 

@@ -3,15 +3,16 @@ package com.alfaazplus.sunnah.api
 import com.alfaazplus.sunnah.Logger
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
 @OptIn(ExperimentalSerializationApi::class)
 object RetrofitInstance {
-    private val client: OkHttpClient = OkHttpClient.Builder()
+    private val client: OkHttpClient = OkHttpClient
+        .Builder()
         .addInterceptor { chain ->
-            Logger.d(chain.request().url())
+            Logger.d(chain.request().url)
             return@addInterceptor chain.proceed(chain.request())
         }
         .cache(null)
@@ -25,10 +26,11 @@ object RetrofitInstance {
             Logger.d(githubResDownloadUrl)
 
             if (githubApi == null) {
-                githubApi = Retrofit.Builder()
+                githubApi = Retrofit
+                    .Builder()
                     .baseUrl(githubResDownloadUrl)
                     .addConverterFactory(
-                        JsonHelper.json.asConverterFactory(MediaType.get("application/json"))
+                        JsonHelper.json.asConverterFactory("application/json".toMediaType())
                     )
                     .client(client)
                     .build()

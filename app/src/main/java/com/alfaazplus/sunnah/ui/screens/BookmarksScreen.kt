@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.Card
@@ -153,7 +155,8 @@ private fun Content(
         return
     }
 
-    LazyColumn(
+    LazyVerticalGrid (
+        columns = GridCells.Adaptive(minSize = 300.dp),
         contentPadding = paddingValues,
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier

@@ -38,10 +38,11 @@ class SunnahApp : Application(), Configuration.Provider {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
     }
 
-    override fun getWorkManagerConfiguration() = Configuration
-        .Builder()
-        .setWorkerFactory(workerFactory)
-        .build()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration
+            .Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     private fun beforeAttachBaseContext(base: Context) {
         appFilesDir = base.filesDir

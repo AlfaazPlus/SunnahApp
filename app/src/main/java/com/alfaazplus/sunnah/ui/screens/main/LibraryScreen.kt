@@ -414,7 +414,7 @@ private fun SectionCollections(
         } else {
             LazyVerticalGrid(
                 userScrollEnabled = false,
-                columns = GridCells.Fixed(integerResource(R.integer.collection_grid_columns_2)),
+                columns = GridCells.Adaptive(160.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 150.dp),

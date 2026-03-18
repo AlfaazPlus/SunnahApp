@@ -115,7 +115,7 @@ fun HadithCollectionList(
 
     LazyVerticalGrid(
         userScrollEnabled = false,
-        columns = GridCells.Fixed(integerResource(R.integer.collection_grid_columns)),
+        columns = GridCells.Adaptive(360.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 150.dp),
