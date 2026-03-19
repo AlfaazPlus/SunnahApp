@@ -251,7 +251,9 @@ fun BooksIndexScreen(collectionId: Int) {
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = {
+                    navController.navigate(Routes.SEARCH)
+                },
                 modifier = Modifier
                     .padding(10.dp)
                     .background(colorScheme.surfaceVariant, CircleShape)

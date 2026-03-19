@@ -46,7 +46,9 @@ class HadithRepository(
     }
 
     suspend fun isAnyCollectionDownloaded(): Boolean {
-        return dao.getCollectionList().isNotEmpty()
+        return dao
+            .getCollectionList()
+            .isNotEmpty()
     }
 
     suspend fun getCollectionList(): List<CollectionWithInfo> {
@@ -185,19 +187,30 @@ class HadithRepository(
                 val baseText = searchResult.translation.hadithText
                     .parseAsHtml()
                     .toString()
-                val padding = 200
                 val highlightStart = baseText.indexOf(query, ignoreCase = true)
+
+                // in some cases, the query might not be found in the hadith text (e.g., it could be in the narrator prefix or some other field),
+                // so we need to handle that gracefully
+                if (highlightStart == -1) {
+                    searchResult.translationText = buildAnnotatedString {
+                        append(baseText.take(400))
+                        if (baseText.length > 400) append("…")
+                    }
+                    return@map searchResult
+                }
+
                 val highlightEnd = highlightStart + query.length
+                val padding = 200
 
                 // Ensure the context range is within bounds
                 val preContextStart = (highlightStart - padding).coerceAtLeast(0)
                 val postContextEnd = (highlightEnd + padding).coerceAtMost(baseText.length)
 
-                val preEllipsis = preContextStart > 0
-                val postEllipsis = postContextEnd < baseText.length
+                val shouldAddPreEllipsis = preContextStart > 0
+                val shouldAddPostEllipsis = postContextEnd < baseText.length
 
                 searchResult.translationText = buildAnnotatedString {
-                    if (preEllipsis) append("…")
+                    if (shouldAddPreEllipsis) append("…")
                     append(baseText.subSequence(preContextStart, highlightStart))
 
                     // Highlighted portion
@@ -213,7 +226,7 @@ class HadithRepository(
                     append(baseText.subSequence(highlightStart, highlightEnd))
 
                     append(baseText.subSequence(highlightEnd, postContextEnd))
-                    if (postEllipsis) append("…")
+                    if (shouldAddPostEllipsis) append("…")
                 }
 
                 searchResult
@@ -261,22 +274,21 @@ class HadithRepository(
         ).flow
     }
 
-    fun parseNumber(query: String): String? {
+    fun parseNumber(query: String): Pair<String, Int>? {
         val cleaned = query
             .lowercase()
             .replace("\\s+".toRegex(), "")
-        val match = Regex("(\\d+)([a-zA-Z]?)").find(cleaned)
-
-        if (match == null) {
-            return null
-        }
+        val match = Regex("(\\d+)([a-zA-Z]?)").find(cleaned) ?: return null
 
         val number = match.groupValues[1]
         val suffix = match.groupValues
             .getOrNull(2)
             ?.firstOrNull()
 
-        return if (suffix != null) "$number$suffix" else number
+        val numString = if (suffix != null) "$number$suffix" else number
+        val numInt = number.toIntOrNull() ?: return null
+
+        return Pair(numString, numInt)
     }
 
     suspend fun getQuickHadithSearchResults(query: String): List<HadithSearchQuickResult> { // check if colon is present in the query
@@ -287,27 +299,19 @@ class HadithRepository(
             val hadithOrder = parseNumber(parts[1])
 
             if (bookSerial != null && hadithOrder != null) {
-                return dao.searchQuickHadithsByBook(bookSerial, hadithOrder.toInt())
+                return dao.searchQuickHadithsByBook(bookSerial.first, hadithOrder.second)
             }
         }
 
-        val hadithNumber = parseNumber(query)
-
-        if (hadithNumber == null) {
-            return emptyList()
-        }
+        val hadithNumber = parseNumber(query)?.first ?: return emptyList()
 
         return dao.searchQuickHadithsByHadithNumber(hadithNumber)
     }
 
     suspend fun getQuickBookSearchResults(query: String): List<BookSearchQuickResult> {
-        val serialNumber = parseNumber(query)
+        val serialNumber = parseNumber(query) ?: return emptyList()
 
-        if (serialNumber == null) {
-            return emptyList()
-        }
-
-        return dao.searchQuickBooks(serialNumber)
+        return dao.searchQuickBooks(serialNumber.first)
     }
 
     suspend fun getHotd(urn: String): HadithOfTheDay? {

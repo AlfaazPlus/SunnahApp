@@ -8,16 +8,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.search.BookSearchResults
 import com.alfaazplus.sunnah.ui.components.search.HadithSearchResults
 import com.alfaazplus.sunnah.ui.components.search.ScholarsSearchResults
@@ -28,7 +31,18 @@ import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
+fun SearchScreenScaffold(
+) {
+    Scaffold(topBar = { AppBar(title = stringResource(R.string.global_search)) }) { paddingValues ->
+        SearchScreen(
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+@Composable
 fun SearchScreen(
+    modifier: Modifier = Modifier,
     vm: SearchViewModel = hiltViewModel(),
 ) {
     vm.primaryColor = MaterialTheme.colorScheme.primary
@@ -38,16 +52,15 @@ fun SearchScreen(
     val scholarsListState = rememberLazyListState()
     val searchQuery = vm.searchQuery.collectAsState().value
 
-    Column {
+    Column(modifier = modifier) {
         SearchTextField(vm)
 
         if (searchQuery.isBlank()) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(32.dp)
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(28.dp, Alignment.CenterVertically)
+                    .padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(28.dp, Alignment.CenterVertically)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),

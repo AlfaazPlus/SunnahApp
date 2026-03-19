@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.components.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -10,13 +11,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,6 +33,13 @@ import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 @Composable
 fun SearchTextField(vm: SearchViewModel) {
     var showSearchFilterSheet by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     val searchQuery = vm.searchQuery.collectAsState().value
 
     val bgColor = MaterialTheme.colorScheme.background
@@ -37,7 +50,14 @@ fun SearchTextField(vm: SearchViewModel) {
             .background(
                 color = MaterialTheme.colorScheme.surface,
             )
-            .padding(start = 16.dp, end = 16.dp, bottom = if (searchQuery.isNotBlank()) 0.dp else 16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = if (searchQuery.isNotBlank()) 0.dp else 16.dp)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onFocusChanged {
+                if (it.isFocused) {
+                    keyboardController?.show()
+                }
+            },
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = bgColor,
             focusedContainerColor = bgColor,

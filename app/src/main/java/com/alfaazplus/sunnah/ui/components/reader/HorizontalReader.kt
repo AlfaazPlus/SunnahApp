@@ -73,6 +73,8 @@ import kotlinx.coroutines.launch
 
 
 private fun getPreviousHadithNumber(currentPage: Int, hadithList: List<ParsedHadith>): String? {
+    if (hadithList.isEmpty()) return null
+
     if (currentPage > 0) {
         return "Hadith ${hadithList[currentPage - 1].hadith.hadithNumber}"
     }

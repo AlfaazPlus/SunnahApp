@@ -30,6 +30,7 @@ import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
+import com.alfaazplus.sunnah.ui.screens.main.SearchScreenScaffold
 import com.alfaazplus.sunnah.ui.screens.settings.AppLogsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
@@ -92,6 +93,7 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                 startDestination = Routes.MAIN,
             ) {
                 route(Routes.MAIN) { MainScreen() }
+                route(Routes.SEARCH) { SearchScreenScaffold() }
                 route(
                     Routes.SETTINGS(), arguments = listOf(
                         navArgument(Keys.SHOW_READER_SETTINGS_ONLY) { type = NavType.BoolType },
