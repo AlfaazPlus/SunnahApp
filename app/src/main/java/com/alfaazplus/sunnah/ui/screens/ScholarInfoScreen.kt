@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.parseAsHtml
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.scholars.Scholar
 import com.alfaazplus.sunnah.helpers.ScholarsHelper

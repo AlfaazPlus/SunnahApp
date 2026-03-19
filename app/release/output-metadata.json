@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 17,
-      "versionName": "0.1.2",
-      "outputFile": "0.1.2-release.apk"
+      "versionCode": 18,
+      "versionName": "0.1.3",
+      "outputFile": "0.1.3-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,16 +22,16 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/0.1.2-release.dm"
+        "baselineProfiles/1/0.1.3-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/0.1.2-release.dm"
+        "baselineProfiles/0/0.1.3-release.dm"
       ]
     }
   ],
-  "minSdkVersionForDexing": 21
+  "minSdkVersionForDexing": 23
 }

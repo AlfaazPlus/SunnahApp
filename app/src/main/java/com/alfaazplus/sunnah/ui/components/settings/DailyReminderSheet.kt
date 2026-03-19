@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog

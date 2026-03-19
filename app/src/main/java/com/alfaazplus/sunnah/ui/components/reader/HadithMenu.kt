@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.helpers.HadithHelper

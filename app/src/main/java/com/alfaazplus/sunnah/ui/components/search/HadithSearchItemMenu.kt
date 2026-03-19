@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
