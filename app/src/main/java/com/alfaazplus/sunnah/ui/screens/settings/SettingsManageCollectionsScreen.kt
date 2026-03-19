@@ -58,7 +58,7 @@ fun ManageHadithCollectionItem(
         .collectAsState(null)
     val workInfo = _info
 
-    val isDownloaded = cwi.isDownloaded == true
+    val isDownloaded = cwi.isDownloaded == true || workInfo?.state == WorkInfo.State.SUCCEEDED
     val isDownloading = workInfo?.state?.isFinished != null && !workInfo.state.isFinished
 
     LaunchedEffect(workInfo) {

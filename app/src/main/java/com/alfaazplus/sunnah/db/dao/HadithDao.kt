@@ -31,22 +31,25 @@ interface HadithDao {
     suspend fun insertCollectionInfo(collectionInfo: HCollectionInfo): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBook(book: HBook): Long
+    suspend fun insertBooksBulk(book: List<HBook>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBookInfo(bookInfo: HBookInfo): Long
+    suspend fun insertBookInfosBulk(bookInfo: List<HBookInfo>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChapter(chapter: HChapter): Long
+    suspend fun insertChaptersBulk(chapter: List<HChapter>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChapterInfo(chapterInfo: HChapterInfo): Long
+    suspend fun insertChapterInfosBulk(chapterInfo: List<HChapterInfo>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHadith(hadith: Hadith): Long
+    suspend fun insertHadithsBulk(hadiths: List<Hadith>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHadithTranslation(hadithTranslation: HadithTranslation): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertHadithTranslationsBulk(hadithTranslations: List<HadithTranslation>)
 
     @Query("SELECT * FROM collection")
     suspend fun getCollectionList(): List<HCollection>

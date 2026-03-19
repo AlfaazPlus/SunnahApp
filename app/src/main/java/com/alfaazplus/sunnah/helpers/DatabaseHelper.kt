@@ -1,6 +1,8 @@
 package com.alfaazplus.sunnah.helpers
 
 import android.content.Context
+import android.os.Build
+import androidx.room.withTransaction
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.databases.AppDatabase
@@ -24,7 +26,12 @@ import java.io.InputStreamReader
 
 
 object DatabaseHelper {
-    suspend fun populateHadithDataFromAssets(database: AppDatabase, context: Context) {
+    val BATCH_SIZE = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) 1000 else 500
+
+    suspend fun populateHadithDataFromAssets(database: AppDatabase, context: Context) { // calculate time taken to import hadith data
+        val startTime = System.currentTimeMillis()
+        Logger.d("Hadith data import started")
+
         context.assets
             .open("prebuilt-hadiths/bukhari/base.tar.bz2")
             .use {
@@ -38,6 +45,8 @@ object DatabaseHelper {
             }
 
         SPHadithConfigs.setAssetHadithsImported(true)
+        val endTime = System.currentTimeMillis()
+        Logger.d("Hadith data imported in ${endTime - startTime} ms")
     }
 
     /**
@@ -51,10 +60,27 @@ object DatabaseHelper {
             var entry = tarInput.nextEntry
             while (entry != null) {
                 when (entry.name) {
-                    "1_collection.jsontxt" -> importCollectionBase(database.hadithDao, tarInput)
-                    "2_books.jsontxt" -> importBookBase(database.hadithDao, tarInput)
-                    "3_chapters.jsontxt" -> importChapterBase(database.hadithDao, tarInput)
-                    "4_hadiths.jsontxt" -> importHadithBase(database.hadithDao, tarInput)
+                    "1_collection.jsontxt" -> {
+                        importCollectionBase(database.hadithDao, tarInput)
+                    }
+
+                    "2_books.jsontxt" -> {
+                        database.withTransaction {
+                            importBookBase(database.hadithDao, tarInput)
+                        }
+                    }
+
+                    "3_chapters.jsontxt" -> {
+                        database.withTransaction {
+                            importChapterBase(database.hadithDao, tarInput)
+                        }
+                    }
+
+                    "4_hadiths.jsontxt" -> {
+                        database.withTransaction {
+                            importHadithBase(database.hadithDao, tarInput)
+                        }
+                    }
                 }
                 entry = tarInput.nextEntry
             }
@@ -72,10 +98,27 @@ object DatabaseHelper {
             var entry = tarInput.nextEntry
             while (entry != null) {
                 when (entry.name) {
-                    "1_collection.jsontxt" -> importCollectionInfo(database.hadithDao, tarInput)
-                    "2_books.jsontxt" -> importBookInfo(database.hadithDao, tarInput)
-                    "3_chapters.jsontxt" -> importChapterInfo(database.hadithDao, tarInput)
-                    "4_hadiths.jsontxt" -> importHadithTranslations(database.hadithDao, tarInput)
+                    "1_collection.jsontxt" -> {
+                        importCollectionInfo(database.hadithDao, tarInput)
+                    }
+
+                    "2_books.jsontxt" -> {
+                        database.withTransaction {
+                            importBookInfo(database.hadithDao, tarInput)
+                        }
+                    }
+
+                    "3_chapters.jsontxt" -> {
+                        database.withTransaction {
+                            importChapterInfo(database.hadithDao, tarInput)
+                        }
+                    }
+
+                    "4_hadiths.jsontxt" -> {
+                        database.withTransaction {
+                            importHadithTranslations(database.hadithDao, tarInput)
+                        }
+                    }
                 }
                 entry = tarInput.nextEntry
             }
@@ -130,6 +173,8 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            val rows = mutableListOf<HBook>()
+
             var lineNum = 0
             var line: String?
             while (reader
@@ -140,7 +185,7 @@ object DatabaseHelper {
                 val columns = JSONArray(line)
 
                 try {
-                    dao.insertBook(
+                    rows.add(
                         HBook(
                             id = columns[0] as Int,
                             collectionId = columns[1] as Int,
@@ -159,12 +204,18 @@ object DatabaseHelper {
                     throw e
                 }
             }
+
+            if (rows.isNotEmpty()) {
+                dao.insertBooksBulk(rows)
+            }
         }
     }
 
     private suspend fun importBookInfo(dao: HadithDao, stream: InputStream) {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
+
+            val rows = mutableListOf<HBookInfo>()
 
             var lineNum = 0
             var line: String?
@@ -176,7 +227,7 @@ object DatabaseHelper {
                 val columns = JSONArray(line)
 
                 try {
-                    dao.insertBookInfo(
+                    rows.add(
                         HBookInfo(
                             id = columns[0] as Int,
                             bookId = columns[1] as Int,
@@ -192,12 +243,18 @@ object DatabaseHelper {
                     throw e
                 }
             }
+
+            if (rows.isNotEmpty()) {
+                dao.insertBookInfosBulk(rows)
+            }
         }
     }
 
     private suspend fun importChapterBase(dao: HadithDao, stream: InputStream) {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
+
+            val batch = mutableListOf<HChapter>()
 
             var line: String?
             while (reader
@@ -206,7 +263,7 @@ object DatabaseHelper {
             ) {
                 val columns = JSONArray(line)
 
-                dao.insertChapter(
+                batch.add(
                     HChapter(
                         id = doubleColumn(columns, 0),
                         collectionId = columns[1] as Int,
@@ -218,6 +275,15 @@ object DatabaseHelper {
                         ending = stringColumn(columns, 7),
                     )
                 )
+
+                if (batch.size >= BATCH_SIZE) {
+                    dao.insertChaptersBulk(batch)
+                    batch.clear()
+                }
+            }
+
+            if (batch.isNotEmpty()) {
+                dao.insertChaptersBulk(batch)
             }
         }
     }
@@ -226,6 +292,8 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            val batch = mutableListOf<HChapterInfo>()
+
             var line: String?
             while (reader
                     .readLine()
@@ -233,7 +301,7 @@ object DatabaseHelper {
             ) {
                 val columns = JSONArray(line)
 
-                dao.insertChapterInfo(
+                batch.add(
                     HChapterInfo(
                         id = columns[0] as Int,
                         collectionId = columns[1] as Int,
@@ -247,6 +315,15 @@ object DatabaseHelper {
                         languageCode = columns[9] as String,
                     )
                 )
+
+                if (batch.size >= BATCH_SIZE) {
+                    dao.insertChapterInfosBulk(batch)
+                    batch.clear()
+                }
+            }
+
+            if (batch.isNotEmpty()) {
+                dao.insertChapterInfosBulk(batch)
             }
         }
     }
@@ -255,15 +332,19 @@ object DatabaseHelper {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
 
+            val batch = mutableListOf<Hadith>()
+
+            var lineNum = 0
             var line: String?
             while (reader
                     .readLine()
                     .also { line = it } != null
             ) {
+                lineNum++
                 val columns = JSONArray(line)
 
                 try {
-                    dao.insertHadith(
+                    batch.add(
                         Hadith(
                             id = columns[0] as Int,
                             urn = stringColumn(columns, 1),
@@ -284,9 +365,18 @@ object DatabaseHelper {
                         )
                     )
                 } catch (e: Exception) {
-                    Logger.d("ERROR: importHadithBase: ", columns)
+                    Logger.d("ERROR: importHadithBase (line $lineNum): ", columns)
                     throw e
                 }
+
+                if (batch.size >= BATCH_SIZE) {
+                    dao.insertHadithsBulk(batch)
+                    batch.clear()
+                }
+            }
+
+            if (batch.isNotEmpty()) {
+                dao.insertHadithsBulk(batch)
             }
         }
     }
@@ -294,6 +384,8 @@ object DatabaseHelper {
     private suspend fun importHadithTranslations(dao: HadithDao, stream: InputStream) {
         withContext(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(stream))
+
+            val batch = mutableListOf<HadithTranslation>()
 
             var lineNum = 0
             var line: String?
@@ -305,7 +397,7 @@ object DatabaseHelper {
                 val columns = JSONArray(line)
 
                 try {
-                    dao.insertHadithTranslation(
+                    batch.add(
                         HadithTranslation(
                             id = columns[0] as Int,
                             collectionId = columns[1] as Int,
@@ -324,10 +416,19 @@ object DatabaseHelper {
                             langCode = columns[14] as String,
                         )
                     )
+
+                    if (batch.size >= BATCH_SIZE) {
+                        dao.insertHadithTranslationsBulk(batch)
+                        batch.clear()
+                    }
                 } catch (e: Exception) {
                     Logger.d("ERROR: importHadithTranslations (line $lineNum): ", columns)
                     throw e
                 }
+            }
+
+            if (batch.isNotEmpty()) {
+                dao.insertHadithTranslationsBulk(batch)
             }
         }
     }
