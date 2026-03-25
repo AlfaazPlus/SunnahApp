@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -214,6 +215,13 @@ fun SettingsScreen(
                         )
                     },
                 ) { NavigationHelper.openQuranAppPlayStoreListing(context) }
+
+                ListItem(
+                    title = R.string.donate,
+                    leading = {
+                        ListItemIcon(R.drawable.ic_donate, tint = colorScheme.primary)
+                    },
+                ) { NavigationHelper.openDonationPage(context) }
 
                 AppVersionFooter()
             }

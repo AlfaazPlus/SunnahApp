@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,12 +25,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ListItemIcon(
     icon: Int,
-    contentDescription: String? = null
+    contentDescription: String? = null,
+    tint: Color = Color.Unspecified
 ) {
     Icon(
         painter = painterResource(id = icon),
         contentDescription = contentDescription,
-        modifier = Modifier.padding(end = 15.dp)
+        modifier = Modifier.padding(end = 15.dp),
+        tint = tint,
     )
 }
 

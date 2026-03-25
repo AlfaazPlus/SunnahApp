@@ -52,6 +52,10 @@ object NavigationHelper {
         browseLink(context, "https://sunnah.alfaazplus.com/privacy")
     }
 
+    fun openDonationPage(context: Context) {
+        browseLink(context, "https://donate.alfaazplus.com?ref=sunnahapp")
+    }
+
     fun openAppSettings(context: Context) {
         val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = android.net.Uri.fromParts("package", context.packageName, null)

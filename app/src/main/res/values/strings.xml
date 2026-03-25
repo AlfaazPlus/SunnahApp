@@ -108,6 +108,7 @@
     <string name="share_app_msg">SunnahApp is a free and open-source app to read and explore the Sunnah of the Prophet ﷺ. This app has a nice and clean interface with features like translation, advanced search, reminder and many more. \n\nDOWNLOAD NOW:\n%s</string>
     <string name="install_quranapp">Install QuranApp</string>
     <string name="install_quranapp_description">Free, secure &amp; open source</string>
+    <string name="donate">Donate</string>
     <string name="hadith_layout">Hadith Layout</string>
     <string name="hadith_layout_description">Horizontal — Hadiths are scrollable left and right.\nVertical — Hadiths are scrollable up and down.</string>
     <string name="horizontal">Horizontal</string>
