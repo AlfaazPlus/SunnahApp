@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 18,
-      "versionName": "0.1.3",
-      "outputFile": "0.1.3-release.apk"
+      "versionCode": 19,
+      "versionName": "0.1.4",
+      "outputFile": "0.1.4-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/0.1.3-release.dm"
+        "baselineProfiles/1/0.1.4-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/0.1.3-release.dm"
+        "baselineProfiles/0/0.1.4-release.dm"
       ]
     }
   ],

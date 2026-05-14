@@ -15,17 +15,31 @@ object NavigationHelper {
      * Open Quran reference in the QuranApp if installed, otherwise throw/prompt the user to install it.
      */
     fun openQuranReference(context: Context, reference: QuranReference) {
-        val intent = Intent("com.quranapp.android.action.OPEN_READER").apply {
-            putExtra("chapterNo", reference.chapter)
-            if (reference.isSingleVerse()) {
-                putExtra("verseNo", reference.fromVerse)
-            } else {
-                putExtra("verses", intArrayOf(reference.fromVerse, reference.toVerse))
-            }
-        }
+        try {
+            val intent = Intent(QuranAppContract.ACTION_SHOW_POPUP).apply {
+                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapter)
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+                if (reference.isSingleVerse()) {
+                    putExtra(QuranAppContract.EXTRA_VERSES, "${reference.fromVerse}")
+                } else {
+                    putExtra(QuranAppContract.EXTRA_VERSES, "${reference.fromVerse}-${reference.toVerse}")
+                }
+            }
+
+            context.startActivity(intent)
+        } catch (_: Exception) {
+            val intent = Intent(QuranAppContract.ACTION_OPEN_READER).apply {
+                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapter)
+                if (reference.isSingleVerse()) {
+                    putExtra(QuranAppContract.EXTRA_VERSE_NO, reference.fromVerse)
+                } else {
+                    putExtra(QuranAppContract.EXTRA_VERSES, intArrayOf(reference.fromVerse, reference.toVerse))
+                }
+            }
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        }
     }
 
     fun openGithubRepo(context: Context) {
@@ -82,4 +96,16 @@ object NavigationHelper {
             Intent.createChooser(intent, "Share via")
         )
     }
+}
+
+object QuranAppContract {
+    const val PACKAGE_NAME = "com.quranapp.android"
+    const val POPUP_ACTIVITY = "com.quranapp.android.activities.popup.PopupQuranActivity"
+
+    const val ACTION_SHOW_POPUP = "com.quranapp.android.action.SHOW_POPUP"
+    const val ACTION_OPEN_READER = "com.quranapp.android.action.OPEN_READER"
+    const val EXTRA_CHAPTER_NUMBER = "chapterNo"
+    const val EXTRA_VERSE_NO = "verseNo"
+    const val EXTRA_VERSES = "verses"
+    const val EXTRA_TRANSLATION_SLUGS = "translationSlugs"
 }
