@@ -391,7 +391,7 @@ fun ReaderAppBar(
                         },
                 ) {
                     CollectionIcon(
-                        collectionId = collectionId,
+                        collectionId = collectionId.toString(), // fixme
                         height = 40.dp,
                     )
 

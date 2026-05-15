@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.launch
 import java.util.Date

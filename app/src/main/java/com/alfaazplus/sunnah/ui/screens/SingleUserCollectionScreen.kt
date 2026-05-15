@@ -48,7 +48,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog

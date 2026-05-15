@@ -29,7 +29,7 @@ class DownloadCollectionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val workManager = WorkManager.getInstance(application)
 
-    private val _downloadStates = MutableStateFlow<Map<Int, WorkInfo>>(emptyMap())
+    private val _downloadStates = MutableStateFlow<Map<String, WorkInfo>>(emptyMap())
 
     init {
         refreshDownloadStates()
@@ -50,9 +50,8 @@ class DownloadCollectionViewModel @Inject constructor(
                     val collectionId = tags
                         .find { it.startsWith("DownloadCollection:") }
                         ?.substringAfter(":")
-                        ?.toIntOrNull() ?: -1
 
-                    if (collectionId != -1) {
+                    if (collectionId != null) {
                         setDownloadState(collectionId, workInfo)
                         observeWorkState(collectionId, workInfo.id)
                     }
@@ -60,7 +59,7 @@ class DownloadCollectionViewModel @Inject constructor(
         }
     }
 
-    fun startDownload(collectionId: Int) {
+    fun startDownload(collectionId: String) {
         val data = workDataOf("collectionId" to collectionId)
 
         val workRequest = OneTimeWorkRequestBuilder<DownloadCollectionWorker>()
@@ -78,17 +77,17 @@ class DownloadCollectionViewModel @Inject constructor(
         observeWorkState(collectionId, workRequest.id)
     }
 
-    fun getAllDownloadStates(): Flow<Map<Int, WorkInfo>> {
+    fun getAllDownloadStates(): Flow<Map<String, WorkInfo>> {
         return _downloadStates
     }
 
-    fun getDownloadStateFlow(collectionId: Int): Flow<WorkInfo?> {
+    fun getDownloadStateFlow(collectionId: String): Flow<WorkInfo?> {
         return _downloadStates
             .map { it[collectionId] }
             .distinctUntilChanged()
     }
 
-    private fun observeWorkState(collectionId: Int, workId: UUID) {
+    private fun observeWorkState(collectionId: String, workId: UUID) {
         val observer = object : Observer<WorkInfo?> {
             override fun onChanged(value: WorkInfo?) {
                 if (value != null) {
@@ -108,7 +107,7 @@ class DownloadCollectionViewModel @Inject constructor(
             .observeForever(observer)
     }
 
-    private fun setDownloadState(collectionId: Int, workInfo: WorkInfo) {
+    private fun setDownloadState(collectionId: String, workInfo: WorkInfo) {
         val currentStates = _downloadStates.value.toMutableMap()
         currentStates[collectionId] = workInfo
         _downloadStates.value = currentStates

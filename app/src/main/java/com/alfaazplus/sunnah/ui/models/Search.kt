@@ -13,11 +13,11 @@ import com.alfaazplus.sunnah.db.contracts.BookInfoContract
 import com.alfaazplus.sunnah.db.contracts.CollectionInfoContract
 import com.alfaazplus.sunnah.db.contracts.HadithContract
 import com.alfaazplus.sunnah.db.contracts.HadithTranslationContract
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBookInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
-import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.Hadith
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 
 enum class SearchResultTab(val type: Int) {
     Hadiths(0),

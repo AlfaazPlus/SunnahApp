@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet

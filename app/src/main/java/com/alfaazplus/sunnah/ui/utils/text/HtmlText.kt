@@ -313,17 +313,20 @@ fun Spanned.toAnnotatedString(
 ): AnnotatedString {
     return buildAnnotatedString {
         append(this@toAnnotatedString.toString())
+
         val urlSpans = getSpans<URLSpan>()
         val styleSpans = getSpans<StyleSpan>()
         val colorSpans = getSpans<ForegroundColorSpan>()
         val underlineSpans = getSpans<UnderlineSpan>()
         val strikethroughSpans = getSpans<StrikethroughSpan>()
+
         urlSpans.forEach { urlSpan ->
             val start = getSpanStart(urlSpan)
             val end = getSpanEnd(urlSpan)
             addStyle(urlSpanStyle, start, end)
             addStringAnnotation("url", urlSpan.url, start, end) // NON-NLS
         }
+
         colorSpans.forEach { colorSpan ->
             val start = getSpanStart(colorSpan)
             val end = getSpanEnd(colorSpan)
@@ -333,9 +336,11 @@ fun Spanned.toAnnotatedString(
                 end
             )
         }
+
         styleSpans.forEach { styleSpan ->
             val start = getSpanStart(styleSpan)
             val end = getSpanEnd(styleSpan)
+
             when (styleSpan.style) {
                 Typeface.BOLD -> addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
                 Typeface.ITALIC -> addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
@@ -346,11 +351,13 @@ fun Spanned.toAnnotatedString(
                 )
             }
         }
+
         underlineSpans.forEach { underlineSpan ->
             val start = getSpanStart(underlineSpan)
             val end = getSpanEnd(underlineSpan)
             addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
         }
+
         strikethroughSpans.forEach { strikethroughSpan ->
             val start = getSpanStart(strikethroughSpan)
             val end = getSpanEnd(strikethroughSpan)

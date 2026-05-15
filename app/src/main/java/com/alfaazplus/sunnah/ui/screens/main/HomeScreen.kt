@@ -23,8 +23,10 @@ fun HomeScreen() {
             .verticalScroll(rememberScrollState())
     ) {
         HadithOfTheDay()
-        HadithCollectionList(modifier = Modifier.heightIn(max = 1000.dp), onCollectionClick = { collectionId ->
-            navController.navigate(route = Routes.BOOKS_INDEX.arg(collectionId))
-        })
+        HadithCollectionList(
+            onCollectionClick = { collectionId ->
+                navController.navigate(route = Routes.BOOKS_INDEX.arg(collectionId))
+            },
+        )
     }
 }

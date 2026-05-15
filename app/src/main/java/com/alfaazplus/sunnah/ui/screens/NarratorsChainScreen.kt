@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.helpers.ScholarsHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
@@ -107,12 +107,12 @@ private fun NarratorsList(narrators: List<Scholar>) {
 
 @Composable
 fun NarratorsChainScreen(
-    hadithUrn: Int,
+    hadithId: String,
     vm: NarratorsViewModel = hiltViewModel(),
 ) {
 
     LaunchedEffect(Unit) {
-        vm.setUrn(hadithUrn)
+        vm.setUrn(hadithId)
     }
 
     val narrators by vm.narrators.collectAsState()

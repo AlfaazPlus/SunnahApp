@@ -13,16 +13,46 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
-import com.alfaazplus.sunnah.ui.models.ParsedHadith
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HadithReferenceSheet(
+    hadithId: String?,
+    onClose: () -> Unit,
+) {
+
+    BottomSheet(
+        isOpen = hadithId != null,
+        onDismiss = onClose,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            /*fixme ItemRow(title = "Reference", value = "${cwi.info?.name} ${hadith.hadith.hadithNumber}")
+            ItemRow(title = "In-book reference", value = hadith.translation?.refInBook ?: "")
+            if (englishReference != null) {
+                ItemRow(
+                    title = "English reference", value = englishReference
+                )
+            }
+            if (uscMsaReference != null) {
+                ItemRow(
+                    modifier = Modifier.alpha(0.5f), title = "USC-MSA web (English) reference", value = "${uscMsaReference} (deprecated)"
+                )
+            }*/
+        }
+    }
+
+}
 
 @Composable
 private fun ItemRow(
@@ -60,50 +90,4 @@ private fun ItemRow(
             )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HadithReferenceSheet(
-    cwi: CollectionWithInfo,
-    hadith: ParsedHadith,
-    isOpen: Boolean,
-    onClose: () -> Unit,
-) {
-    val englishReference = hadith.translation?.refEn?.takeIf {
-        it
-            .trim()
-            .isNotBlank()
-    }
-    val uscMsaReference = hadith.translation?.refUscMsa?.takeIf {
-        it
-            .trim()
-            .isNotBlank()
-    }
-
-
-    BottomSheet(
-        isOpen = isOpen,
-        onDismiss = onClose,
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            ItemRow(title = "Reference", value = "${cwi.info?.name} ${hadith.hadith.hadithNumber}")
-            ItemRow(title = "In-book reference", value = hadith.translation?.refInBook ?: "")
-            if (englishReference != null) {
-                ItemRow(
-                    title = "English reference", value = englishReference
-                )
-            }
-            if (uscMsaReference != null) {
-                ItemRow(
-                    modifier = Modifier.alpha(0.5f), title = "USC-MSA web (English) reference", value = "${uscMsaReference} (deprecated)"
-                )
-            }
-        }
-    }
-
 }

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.helpers.ScholarsHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader

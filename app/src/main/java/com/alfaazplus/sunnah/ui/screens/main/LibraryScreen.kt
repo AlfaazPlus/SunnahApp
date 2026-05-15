@@ -39,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -52,9 +51,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Section
 import com.alfaazplus.sunnah.ui.components.common.SectionEmptyMessage
@@ -150,13 +149,13 @@ private fun SectionReadHistory(
                     ReadHistoryItemCard(
                         item,
                         onClick = {
-                            navController.navigate(
+                            /*navController.navigate(
                                 Routes.READER.args(
                                     item.hadithCollectionId,
                                     item.hadithBookId,
                                     item.hadithNumber,
                                 )
-                            )
+                            )fixme*/
                         },
                     )
                 }

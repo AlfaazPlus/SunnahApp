@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.alfaazplus.sunnah.BuildConfig
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
@@ -47,10 +46,10 @@ import com.alfaazplus.sunnah.ui.components.settings.SettingsItem
 import com.alfaazplus.sunnah.ui.components.settings.TextSizeSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 import com.alfaazplus.sunnah.ui.utils.AppUtils
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_IS_SANAD_ENABLED
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
@@ -129,7 +128,7 @@ fun SettingsScreen(
             SettingsItem(
                 title = R.string.hadith_layout,
                 icon = R.drawable.ic_square_menu,
-                subtitle = ReaderUtils.resolveHadithLayoutLabel(),
+                subtitle = ReaderPreferences.resolveHadithLayoutLabel(),
             ) { showLayoutOptionSheet = true }
             SettingsItem(
                 title = R.string.text_size_and_style,
@@ -137,16 +136,16 @@ fun SettingsScreen(
             ) { showTextSizesSheet = true }
             SettingsItem(
                 title = R.string.hadith_text_option,
-                subtitle = ReaderUtils.resolveHadithTextOptionLabel(),
+                subtitle = ReaderPreferences.resolveHadithTextOptionLabel(),
                 icon = R.drawable.ic_hadith_text_option,
             ) { showHadithTextOptionsSheet = true }
             SwitchItem(
                 title = R.string.show_sanad,
                 subtitle = R.string.show_sanad_description,
-                checked = ReaderUtils.getIsSanadEnabled(),
+                checked = ReaderPreferences.observeIsSanadEnabled(),
             ) {
                 coroutineScope.launch {
-                    DataStoreManager.write(booleanPreferencesKey(Keys.SHOW_SANAD), it)
+                    DataStoreManager.write(KEY_IS_SANAD_ENABLED, it)
                 }
             }
 

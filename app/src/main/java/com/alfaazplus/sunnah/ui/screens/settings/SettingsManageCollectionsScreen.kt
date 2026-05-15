@@ -1,55 +1,41 @@
 package com.alfaazplus.sunnah.ui.screens.settings
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.work.WorkInfo
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.relations.CollectionWithTranslations
 import com.alfaazplus.sunnah.ui.components.common.AppBar
-import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
-import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
 import com.alfaazplus.sunnah.ui.viewModels.DownloadCollectionViewModel
 
 @Composable
 fun ManageHadithCollectionItem(
-    cwi: CollectionWithInfo,
+    cwi: CollectionWithTranslations,
     vm: CollectionListViewModel,
     downloadVm: DownloadCollectionViewModel,
     setLastDownloadError: (String?) -> Unit,
-) {
-    val collectionId = cwi.collection.id
+) {/*val collectionId = cwi.collection.id
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -58,7 +44,7 @@ fun ManageHadithCollectionItem(
         .collectAsState(null)
     val workInfo = _info
 
-    val isDownloaded = cwi.isDownloaded == true || workInfo?.state == WorkInfo.State.SUCCEEDED
+    val isDownloaded = cwi.isDownloaded || workInfo?.state == WorkInfo.State.SUCCEEDED
     val isDownloading = workInfo?.state?.isFinished != null && !workInfo.state.isFinished
 
     LaunchedEffect(workInfo) {
@@ -137,7 +123,7 @@ fun ManageHadithCollectionItem(
                 style = MaterialTheme.typography.bodyMedium
             )
         },
-    )
+    )*/
 }
 
 @Composable
@@ -149,17 +135,14 @@ fun SettingsManageCollectionsScreen(
     val collections by vm.collections.collectAsState()
     var lastDownloadError by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
-        vm.loadCollections()
-    }
-
     Scaffold(topBar = { AppBar(title = stringResource(R.string.manage_collections)) }) { paddingValues ->
         LazyColumn(
             modifier = Modifier.padding(paddingValues), contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
         ) {
-            items(collections.size, key = { collections[it].collection.id }) {
-                val cwi = collections[it]
-                ManageHadithCollectionItem(cwi, vm, downloadVm) {
+            items(collections.size, key = { collections[it].collection.id }) { index ->
+                val cwt = collections[index]
+
+                ManageHadithCollectionItem(cwt, vm, downloadVm) {
                     lastDownloadError = it
                 }
             }

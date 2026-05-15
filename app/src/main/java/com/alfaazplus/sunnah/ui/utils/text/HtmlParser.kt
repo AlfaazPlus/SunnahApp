@@ -13,6 +13,7 @@ class HtmlParser(
     private val tagStatus = ArrayDeque<Boolean>()
     private var wrapped: ContentHandler? = null
     private var text: Editable? = null
+
     override fun handleTag(opening: Boolean, tag: String, output: Editable, xmlReader: XMLReader) {
         if (wrapped == null) {
             // record result object

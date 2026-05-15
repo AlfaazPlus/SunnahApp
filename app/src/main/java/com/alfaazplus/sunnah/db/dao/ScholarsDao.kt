@@ -3,7 +3,7 @@ package com.alfaazplus.sunnah.db.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 
 @Dao
 interface ScholarsDao {

@@ -13,8 +13,8 @@ import androidx.paging.map
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.ScholarsDao
-import com.alfaazplus.sunnah.db.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
@@ -26,6 +26,7 @@ import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+@Deprecated("v2")
 class HadithRepository(
     private val dao: HadithDao,
     private val scholarsDao: ScholarsDao,

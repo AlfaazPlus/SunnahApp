@@ -8,6 +8,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
 
@@ -23,10 +24,16 @@ val fontUthmani = FontFamily(
     Font(
         R.font.kfgqpc_uthman_taha_naskh,
         weight = FontWeight.Normal,
-    ),
-    Font(
+    ), Font(
         R.font.kfgqpc_uthman_taha_naskh_bold,
         weight = FontWeight.Bold,
+    )
+)
+
+val tightTextStyle = TextStyle(
+    lineHeightStyle = LineHeightStyle.Default.copy(
+        mode = LineHeightStyle.Mode.Tight,
+        alignment = LineHeightStyle.Alignment.Center,
     )
 )
 

@@ -15,15 +15,15 @@ import javax.inject.Inject
 class BookListViewModel @Inject constructor(
     private val repo: HadithRepository,
 ) : ViewModel() {
-    var collectionId by mutableIntStateOf(0)
+    var collectionId by mutableStateOf("")
     var collectionWithInfo by mutableStateOf<CollectionWithInfo?>(null)
     var books by mutableStateOf(listOf<BookWithInfo>())
 
-    suspend fun setCollectionId(collectionId: Int) {
+    suspend fun setCollectionId(collectionId: String) {
         if (this.collectionId == collectionId) return
 
         this.collectionId = collectionId
-        collectionWithInfo = repo.getCollection(collectionId)
-        books = repo.getBookList(collectionId)
+//        collectionWithInfo = repo.getCollection(collectionId)
+//        books = repo.getBookList(collectionId)
     }
 }

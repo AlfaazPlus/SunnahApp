@@ -17,16 +17,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.reader.HorizontalReader
 import com.alfaazplus.sunnah.ui.components.reader.VerticalReader
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun ReaderScreen(
-    collectionId: Int = 1,
-    bookId: Int = 1,
-    hadithNumber: String? = null,
+    bookId: String,
+    hadithId: String? = null,
     vm: ReaderViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -35,7 +34,7 @@ fun ReaderScreen(
 
     LaunchedEffect(collectionId, bookId) {
         if (!vm.initialized) {
-            vm.initialHadithNumber = Pair(hadithNumber, false)
+            vm.initialHadithId = Pair(hadithId, false)
             vm.collectionId = collectionId
             vm.bookId.value = bookId
 
@@ -88,7 +87,7 @@ fun ReaderScreen(
         }
     }
 
-    val isHorizontal = vm.hadithLayout == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+    val isHorizontal = vm.hadithLayout == ReaderPreferences.HADITH_LAYOUT_HORIZONTAL
 
     BoxWithConstraints {
         val isWideScreen = maxWidth > 600.dp

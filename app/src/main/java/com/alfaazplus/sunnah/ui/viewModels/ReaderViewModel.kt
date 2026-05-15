@@ -1,181 +1,92 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.core.text.parseAsHtml
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
-import com.alfaazplus.sunnah.ui.helpers.HadithTextHelper
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
-import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
-import com.alfaazplus.sunnah.ui.models.ParsedChapter
-import com.alfaazplus.sunnah.ui.models.ParsedHadith
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
-import com.alfaazplus.sunnah.ui.utils.datatype.ReadOnce
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
-import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
-import com.alfaazplus.sunnah.ui.utils.text.toHadithAnnotatedString
+import com.alfaazplus.sunnah.ui.components.reader.HadithActions
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderChangeManager
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderPreparedData
+import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
+import com.alfaazplus.sunnah.ui.utils.text.TextBuilderParams
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val repo: HadithRepository,
+    private val repo: HadithRepository2,
     private val userRepo: UserRepository,
 ) : ViewModel() {
-    var primaryColor by mutableStateOf(Color(0xFF000000))
-    var onPrimaryColor by mutableStateOf(Color(0xFF000000))
-    var initialized by mutableStateOf(false)
 
-    var hadithLayout by mutableStateOf(ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
+    private val _activeBookId = MutableStateFlow<String?>(null)
+    val activeBookId: StateFlow<String?> = _activeBookId.asStateFlow()
 
-    var collectionId by mutableIntStateOf(0)
-    val bookId = MutableLiveData(0)
-    var hadithList by mutableStateOf(listOf<HadithWithTranslation>())
-    var parsedHadithList by mutableStateOf(listOf<ParsedHadith>())
+    private val _preparedData = MutableStateFlow<ReaderPreparedData?>(null)
+    val preparedData: StateFlow<ReaderPreparedData?> = _preparedData.asStateFlow()
 
-    var books: MutableLiveData<List<BookWithInfo>> = MutableLiveData(listOf())
-    var cwi by mutableStateOf<Result<CollectionWithInfo>?>(null)
-    var bwi by mutableStateOf<Result<BookWithInfo>?>(null)
+    private val _navigateToHadith = MutableStateFlow<String?>(null)
+    val navigateToHadith: StateFlow<String?> = _navigateToHadith.asStateFlow()
 
     /**
-     * Hadith number, consumed
+     * Collects UI-driving prefs and rebuilds reader content. Intended to run only while this
+     * screen is visible.
      */
-    var initialHadithNumber by mutableStateOf(Pair<String?, Boolean>(null, false))
-    var highlightedHadithNumber by mutableStateOf("")
+    suspend fun observeChanges(
+        uiConfig: ComposeUiConfig,
+        hadithActions: HadithActions,
+    ) {
+        combine(
+            activeBookId, ReaderChangeManager.changeFlow()
+        ) { bookId, config ->
+            Pair(bookId, config)
+        }.collectLatest { (bookId, config) ->
+            val params = TextBuilderParams(
+                uiConfig = uiConfig,
+                hadithActions = hadithActions,
+                arabicSizePercent = config.txtSizePercentArabic,
+                translationSizePercent = config.txtSizePercentTranslation,
+                hadithTextOption = config.hadithTextOption,
+                isSanadEnabled = config.isSanadEnabled,
+                isSerifFontStyle = config.isSerifFontStyle,
+            )
 
-    /**
-     * Hadith number, consumed
-     */
-    val transientScroll = ReadOnce<String?>()
+            if (bookId == null) return@collectLatest
 
-    // a callback
-    var currentHadithNumberRetriever by mutableStateOf<() -> String?>({ null })
-
-    var currentNavigatorTab by mutableIntStateOf(1)
-
-    init {
-        bookId.observeForever {
-            if (it != null) {
-                viewModelScope.launch(Dispatchers.Main) {
-                    loadHadiths()
-                    setCurrentBookInfo(books.value)
-                }
-            }
-        }
-
-        books.observeForever { books ->
-            setCurrentBookInfo(books)
-        }
-    }
-
-    private fun setCurrentBookInfo(books: List<BookWithInfo>?) {
-        books
-            ?.firstOrNull { it.book.id == bookId.value }
-            ?.let {
-                bwi = Result.success(it)
-            }
-    }
-
-    suspend fun loadEssentials() {
-        hadithLayout = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_LAYOUT), ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
-
-        try {
-            cwi = Result.success(repo.getCollection(collectionId))
-            books.value = repo.getBookList(collectionId)
-        } catch (e: Exception) {
-            cwi = Result.failure(e)
-            bwi = Result.failure(e)
-            Logger.saveError(e, "ReaderViewModel:loadEssentials")
-            return
+            buildItems(
+                bookId = bookId,
+                params = params,
+            )
         }
     }
 
-    private fun parseHadiths() {
-        parsedHadithList = hadithList.map {
-            val hadith = it.hadith
-            val translation = it.translation
-            val parsedHadith = ParsedHadith(it)
-
-            if (!hadith.hadithPrefix.isNullOrEmpty()) {
-                parsedHadith.narratorPrefixText = HadithTextHelper.prepareText(hadith.hadithPrefix)
-            }
-
-            parsedHadith.hadithText = HadithTextHelper
-                .prepareText(hadith.hadithText)
-                .toHadithAnnotatedString(primaryColor, onPrimaryColor)
-
-            if (!hadith.hadithSuffix.isNullOrEmpty()) {
-                parsedHadith.narratorSuffixText = HadithTextHelper.prepareText(hadith.hadithSuffix)
-            }
-
-            if (translation != null) {
-                parsedHadith.translationNarrator = buildAnnotatedString {
-                    append(translation.narratorPrefix?.parseAsHtml())
-                }
-                parsedHadith.translationText = HadithTextHelper
-                    .prepareText(translation.hadithText)
-                    .toHadithAnnotatedString(primaryColor, onPrimaryColor)
-
-                parsedHadith.gradeType = HadithHelper.getHadithGradeText(translation.grades, translation.gradedBy)
-            }
-
-            if (it.chapter != null) {
-                val parsedChapter = ParsedChapter(it.chapter)
-
-                if (!it.chapter.chapter.intro.isNullOrEmpty()) {
-                    parsedChapter.chapterIntro = HadithTextHelper
-                        .prepareText(it.chapter.chapter.intro)
-                        .toHadithAnnotatedString(primaryColor, onPrimaryColor)
-                }
-
-                if (!it.chapter.info.intro.isNullOrEmpty()) {
-                    parsedChapter.chapterIntroEn = HadithTextHelper
-                        .prepareText(it.chapter.info.intro)
-                        .toHadithAnnotatedString(primaryColor, onPrimaryColor)
-                }
-
-                parsedHadith.chapter = parsedChapter
-            }
-
-            return@map parsedHadith
-        }
+    private suspend fun buildItems(
+        bookId: String,
+        params: TextBuilderParams,
+    ) {
+        _preparedData.value = ReaderItemsBuilder.build(
+            repo,
+            bookId,
+            params,
+        )
     }
 
-    private suspend fun loadHadiths() {
-        hadithList = repo.getHadithList(collectionId, bookId.value!!)
-        parseHadiths()
-        initialized = true
+    fun consumeNavigation(): String? {
+        val current = _navigateToHadith.value
+        _navigateToHadith.value = null
+        return current
     }
 
-    fun saveReadHistory() {
-        val currentHadithNumber = currentHadithNumberRetriever()
-
-        Logger.d("SAVING READING HISTORY", collectionId, bookId.value, currentHadithNumber)
-
-        val bookIdValue = bookId.value ?: return
-
-        if (currentHadithNumber.isNullOrEmpty()) return
-
+    fun saveReadHistory(currentHadithId: String) {
         viewModelScope.launch {
             userRepo.saveReadHistory(
-                collectionId,
-                bookIdValue,
-                currentHadithNumber,
+                hadithId = currentHadithId,
             )
         }
     }

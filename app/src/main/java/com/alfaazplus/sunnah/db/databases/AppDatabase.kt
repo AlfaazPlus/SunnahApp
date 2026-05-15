@@ -3,14 +3,14 @@ package com.alfaazplus.sunnah.db.databases
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.alfaazplus.sunnah.db.dao.HadithDao
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBookInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.HChapter
-import com.alfaazplus.sunnah.db.models.hadith.entities.HChapterInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
-import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapter
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapterInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollection
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollectionInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.Hadith
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
 
 @Database(
     entities = [
@@ -25,6 +25,7 @@ import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
     ],
     version = 1,
 )
+@Deprecated("v2")
 abstract class AppDatabase : RoomDatabase() {
     abstract val hadithDao: HadithDao
 }

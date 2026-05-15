@@ -3,10 +3,10 @@ package com.alfaazplus.sunnah.repository.userdata
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.UserDataDao
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionItem
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
@@ -265,9 +265,7 @@ class UserRepository(
     }
 
     suspend fun saveReadHistory(
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
+        hadithId: String,
     ) {
         dao.upsertReadHistory(
             ReadHistory(

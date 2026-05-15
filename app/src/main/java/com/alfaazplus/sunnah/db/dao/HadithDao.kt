@@ -7,21 +7,22 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
-import com.alfaazplus.sunnah.db.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.models.hadith.HadithChapter
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBook
-import com.alfaazplus.sunnah.db.models.hadith.entities.HBookInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.HChapter
-import com.alfaazplus.sunnah.db.models.hadith.entities.HChapterInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
-import com.alfaazplus.sunnah.db.models.hadith.entities.Hadith
-import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.entities.hadith.HadithChapter
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapter
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapterInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollection
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollectionInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.Hadith
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 
+@Deprecated("v2")
 @Dao
 interface HadithDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -2,9 +2,9 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized

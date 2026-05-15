@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,8 +32,8 @@ fun SearchFilterSheet(
     searchVm: SearchViewModel,
     vm: CollectionListViewModel = hiltViewModel(),
 ) {
-    val selectedCollections = remember { mutableStateMapOf<Int, Boolean>() }
-    val collections = vm.collections.collectAsState().value
+    val selectedCollections = remember { mutableStateMapOf<String, Boolean>() }
+    val collections by vm.collections.collectAsState()
 
     fun applyFilters() {
         searchVm.applyFilters(
@@ -40,12 +41,10 @@ fun SearchFilterSheet(
         )
     }
 
-    LaunchedEffect(Unit) {
-        vm.loadCollections()
-
+    LaunchedEffect(Unit, collections) {
         if (searchVm.searchCollectionIds.value == null) {
-            vm.collections.value.forEach { c ->
-                if (c.isDownloaded == true) {
+            collections.forEach { c ->
+                if (c.isDownloaded) {
                     selectedCollections[c.collection.id] = true
                 }
             }
@@ -87,9 +86,9 @@ fun SearchFilterSheet(
                 collections.forEach { c ->
                     CheckboxItem(
                         modifier = Modifier.padding(horizontal = 10.dp),
-                        title = c.info?.name ?: "",
-                        enabled = c.isDownloaded == true,
-                        checked = if (c.isDownloaded == true) selectedCollections.getOrElse(c.collection.id) { false } else false,
+                        title = "${c.getTitle("en") ?: ""} (${c.getTitle("ar") ?: ""})",
+                        enabled = c.isDownloaded,
+                        checked = if (c.isDownloaded) selectedCollections.getOrElse(c.collection.id) { false } else false,
                         onCheckedChange = {
                             selectedCollections[c.collection.id] = it
                         },

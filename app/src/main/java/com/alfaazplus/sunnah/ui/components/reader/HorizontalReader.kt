@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,10 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -51,17 +49,16 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
-import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.HadithText
 import com.alfaazplus.sunnah.ui.models.BookWithInfo
 import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.ParsedHadith
+import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.composable.getArabicTextSize
 import com.alfaazplus.sunnah.ui.utils.composable.getTranslationTextSize
@@ -116,23 +113,20 @@ private fun Modifier.highlightHadithItem(show: Boolean): Modifier {
 }
 
 @Composable
-private fun HadithGrade(hwt: ParsedHadith) {
-    val gradeT = hwt.gradeType ?: return
+private fun HadithGrade(hadithUi: ReaderLayoutItem.HadithUI) {
+    val gradeText = hadithUi.gradeText ?: return
 
-    val gradeType = gradeT.first
-    val gradeText = gradeT.second
-
-    val color = HadithHelper.getHadithGradeColor(gradeType)
+    // todo: show description
 
     Card(
         modifier = Modifier.padding(top = 16.dp),
         shape = MaterialTheme.shapes.extraSmall,
         colors = CardDefaults.cardColors(
-            containerColor = color.alpha(0.2f)
+            containerColor = gradeText.colors.first, contentColor = gradeText.colors.second
         ),
     ) {
         Text(
-            "Grade: $gradeText", color = color,
+            "Grade: ${gradeText.label}",
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
         )
@@ -141,16 +135,11 @@ private fun HadithGrade(hwt: ParsedHadith) {
 
 @Composable
 private fun HadithActionBar(
-    cwi: CollectionWithInfo,
-    bwi: BookWithInfo,
-    hadith: ParsedHadith,
+    hadithUi: ReaderLayoutItem.HadithUI,
 ) {
-    var showReferenceSheet by remember { mutableStateOf(false) }
-    var showHadithMenu by remember { mutableStateOf(false) }
-
-    val isDarkTheme = ThemeUtils.isDarkTheme()
-    val bgColor = if (isDarkTheme) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
-    val txtColor = if (isDarkTheme) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onBackground
+    val actions = LocalHadithActions.current
+    val bgColor = MaterialTheme.colorScheme.surfaceContainer
+    val txtColor = MaterialTheme.colorScheme.onSurface
 
     val navController = LocalNavHostController.current
 
@@ -173,7 +162,7 @@ private fun HadithActionBar(
                     contentColor = txtColor,
                 ),
                 onClick = {
-                    showHadithMenu = true
+                    actions.onHadithOption(hadithUi.hadithId)
                 },
             ) {
                 Icon(
@@ -184,7 +173,7 @@ private fun HadithActionBar(
             }
         }
 
-        if (!hadith.hadith.narrators2.isNullOrEmpty()) {
+        if (!hadithUi.hasNarratorsChain) {
             SimpleTooltip(
                 text = stringResource(R.string.desc_narrators_chain)
             ) {
@@ -197,7 +186,7 @@ private fun HadithActionBar(
                         contentColor = txtColor,
                     ),
                     onClick = {
-                        navController.navigate(route = Routes.NARRATOR_CHAIN.arg(hadith.hadith.urn))
+                        navController.navigate(route = Routes.NARRATOR_CHAIN.arg(hadithUi.hadithId))
                     },
                 ) {
                     Icon(
@@ -209,9 +198,9 @@ private fun HadithActionBar(
             }
         }
 
-        Box(
+        Spacer(
             modifier = Modifier.weight(1f)
-        ) { }
+        )
 
         Card(
             shape = MaterialTheme.shapes.small,
@@ -219,14 +208,14 @@ private fun HadithActionBar(
                 containerColor = bgColor,
                 contentColor = txtColor,
             ),
-            onClick = { showReferenceSheet = true },
+            onClick = { actions.onNumberReferenceRequest(hadithUi.hadithId) },
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
             ) {
                 Text(
-                    "${cwi.info?.name}: ${hadith.hadith.hadithNumber}",
+                    hadithUi.visibleNumbering,
                     style = MaterialTheme.typography.labelMedium,
                 )
                 Icon(
@@ -236,38 +225,24 @@ private fun HadithActionBar(
         }
     }
 
-    HadithReferenceSheet(cwi, hadith, showReferenceSheet) {
-        showReferenceSheet = false
-    }
-
-    HadithMenu(
-        cwi = cwi,
-        bookId = bwi.book.id,
-        hadith = hadith,
-        isOpen = showHadithMenu,
-        onClose = {
-            showHadithMenu = false
-        },
-    )
 }
 
 @Composable
 fun HadithItem(
     cwi: CollectionWithInfo,
     bwi: BookWithInfo,
-    parsedHadith: ParsedHadith,
+    hadithUi: ReaderLayoutItem.HadithUI,
     vertical: Boolean,
     highlight: Boolean = false,
 ) {
-    val hadithTextOption = ReaderUtils.getHadithTextOption()
+    val hadithTextOption = ReaderPreferences.observeHadithTextOption()
 
-    val showSanad = ReaderUtils.getIsSanadEnabled()
-    var showNoQuranAppBottomSheet by remember { mutableStateOf(false) }
+    val showSanad = ReaderPreferences.observeIsSanadEnabled()
     val arabicTextSize = getArabicTextSize()
     val translationTextSize = getTranslationTextSize()
-    val isSerifFontStyle = ReaderUtils.getIsSerifFontStyle()
+    val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
 
-    val arabicHadithText = if (parsedHadith.hadithText == null || hadithTextOption == ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION) null
+    val arabicHadithText = if (parsedHadith.hadithText == null || hadithTextOption == ReaderPreferences.HADITH_TEXT_OPTION_ONLY_TRANSLATION) null
     else buildAnnotatedString {
         if (!parsedHadith.narratorPrefixText.isNullOrEmpty() && showSanad) {
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground.alpha(0.7f))) { append(parsedHadith.narratorPrefixText) }
@@ -297,9 +272,7 @@ fun HadithItem(
     Column(
         modifier = modifier
     ) {
-        HadithActionBar(
-            cwi = cwi, bwi = bwi, hadith = parsedHadith
-        )
+        HadithActionBar(hadithUi)
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             HadithText(
@@ -308,12 +281,10 @@ fun HadithItem(
                 fontSize = arabicTextSize.first,
                 lineHeight = arabicTextSize.second,
                 modifier = Modifier.padding(bottom = 20.dp),
-                quranAppNotInstallCallback = {
-                    showNoQuranAppBottomSheet = true
-                },
             )
         }
-        if (translationHadithText != null && hadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC) {
+
+        if (translationHadithText != null && hadithTextOption != ReaderPreferences.HADITH_TEXT_OPTION_ONLY_ARABIC) {
             if (!translationNarrator.isNullOrEmpty()) {
                 Text(
                     translationNarrator,
@@ -331,17 +302,10 @@ fun HadithItem(
                 fontSize = translationTextSize.first,
                 fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
                 lineHeight = translationTextSize.second,
-                quranAppNotInstallCallback = {
-                    showNoQuranAppBottomSheet = true
-                },
             )
         }
 
-        HadithGrade(parsedHadith)
-
-        NoQuranAppAlert(showNoQuranAppBottomSheet) {
-            showNoQuranAppBottomSheet = false
-        }
+        HadithGrade(hadithUi)
     }
 }
 
@@ -371,7 +335,7 @@ fun HorizontalReader(
 ) {
     val hadithList = vm.parsedHadithList
     val pagerState = rememberPagerState(
-        initialPage = resolvePage(hadithList, vm.initialHadithNumber.first) ?: 0,
+        initialPage = resolvePage(hadithList, vm.initialHadithId.first) ?: 0,
         pageCount = { hadithList.size },
     )
 
@@ -383,14 +347,14 @@ fun HorizontalReader(
 
 
     LaunchedEffect(Unit) {
-        val initialHNo = vm.initialHadithNumber
+        val initialHNo = vm.initialHadithId
         val transientScroll = vm.transientScroll
 
         if (initialHNo.first != null && !initialHNo.second) {
             val index = resolvePage(hadithList, initialHNo.first)
             if (index != null) pagerState.scrollToPage(index)
 
-            vm.initialHadithNumber = Pair(initialHNo.first, true)
+            vm.initialHadithId = Pair(initialHNo.first, true)
         } else {
             transientScroll
                 .get()

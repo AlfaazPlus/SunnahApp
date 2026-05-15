@@ -33,8 +33,8 @@ import androidx.core.text.parseAsHtml
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.IconButton
@@ -44,7 +44,7 @@ import com.alfaazplus.sunnah.ui.controllers.rememberModalController
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import com.alfaazplus.sunnah.ui.viewModels.HotdViewModel
@@ -97,11 +97,7 @@ private fun ReadButton(
         shape = MaterialTheme.shapes.small,
         onClick = {
             navController.navigate(
-                Routes.READER.args(
-                    hotd.hadith.collectionId,
-                    hotd.hadith.bookId,
-                    hotd.hadith.hadithNumber,
-                )
+                Routes.READER.arg(hotd.hwc.hadithId)
             )
         },
     ) {
@@ -127,11 +123,11 @@ private fun ReadButton(
 
 @Composable
 private fun Texts(hotd: HadithOfTheDay) {
-    val hadithTextOption = ReaderUtils.getHadithTextOption()
-    val isSerifFontStyle = ReaderUtils.getIsSerifFontStyle()
+    val hadithTextOption = ReaderPreferences.observeHadithTextOption()
+    val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
 
-    val showArabic = hadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION
-    val showTranslation = hadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC
+    val showArabic = hadithTextOption != ReaderPreferences.HADITH_TEXT_OPTION_ONLY_TRANSLATION
+    val showTranslation = hadithTextOption != ReaderPreferences.HADITH_TEXT_OPTION_ONLY_ARABIC
 
     Column(
         modifier = Modifier

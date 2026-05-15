@@ -4,11 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.alfaazplus.sunnah.db.dao.UserDataDao
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
-import com.alfaazplus.sunnah.helpers.UserDbConverters
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.db.converters.UserDbConverters
 
 @Database(
     entities = [

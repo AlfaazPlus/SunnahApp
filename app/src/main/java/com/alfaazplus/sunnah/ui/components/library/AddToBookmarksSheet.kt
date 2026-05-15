@@ -212,13 +212,13 @@ private fun Content(
                 fullWidth = true,
                 modifier = Modifier.padding(16.dp),
             ) {
-                navController.navigate(
+                /*fixme navController.navigate(
                     Routes.READER.args(
                         request.hadithCollectionId,
                         request.hadithBookId,
                         request.hadithNumber,
                     )
-                )
+                )*/
             }
         }
     }

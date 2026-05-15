@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
@@ -33,10 +33,10 @@ open class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
-    private var _searchCollectionIds = MutableStateFlow<List<Int>?>(null)
+    private var _searchCollectionIds = MutableStateFlow<List<String>?>(null)
 
     val searchQuery: StateFlow<String> = _searchQuery
-    val searchCollectionIds: StateFlow<List<Int>?> = _searchCollectionIds
+    val searchCollectionIds: StateFlow<List<String>?> = _searchCollectionIds
 
     val hadithsSearchResults: Flow<PagingData<HadithSearchResult>> = combine(
         _searchCollectionIds
@@ -47,7 +47,7 @@ open class SearchViewModel @Inject constructor(
             .distinctUntilChanged(),
     ) { collectionIds, query -> Pair(collectionIds, query) }
         .flatMapLatest { (collectionIds, query) ->
-            repo.searchHadiths(query, collectionIds, primaryColor)
+            repo.searchHadiths(query, /*fixme collectionIds*/ emptyList(), primaryColor)
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -64,7 +64,7 @@ open class SearchViewModel @Inject constructor(
             .distinctUntilChanged(),
     ) { collectionIds, query -> Pair(collectionIds, query) }
         .flatMapLatest { (collectionIds, query) ->
-            repo.searchBooks(query, collectionIds)
+            repo.searchBooks(query, /*fixme collectionIds*/ emptyList())
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -115,7 +115,7 @@ open class SearchViewModel @Inject constructor(
     }
 
     fun applyFilters(
-        searchCollectionIds: List<Int>,
+        searchCollectionIds: List<String>,
     ) {
         _searchCollectionIds.value = searchCollectionIds
     }

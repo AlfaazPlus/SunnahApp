@@ -1,8 +1,8 @@
 package com.alfaazplus.sunnah.ui.models.userdata
 
 import androidx.compose.ui.text.AnnotatedString
-import com.alfaazplus.sunnah.db.models.hadith.entities.HadithTranslation
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
 
 
 data class ReadHistoryNormalized(

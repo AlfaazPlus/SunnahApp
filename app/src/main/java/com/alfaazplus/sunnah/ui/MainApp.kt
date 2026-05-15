@@ -32,7 +32,6 @@ import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
 import com.alfaazplus.sunnah.ui.screens.main.SearchScreenScaffold
 import com.alfaazplus.sunnah.ui.screens.settings.AppLogsScreen
-import com.alfaazplus.sunnah.ui.screens.settings.SettingsManageCollectionsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsThemeScreen
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
@@ -100,20 +99,21 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                     )
                 ) { rsEntry -> SettingsScreen(rsEntry.arguments?.getBoolean(Keys.SHOW_READER_SETTINGS_ONLY) ?: false) }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
-                route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
+                // route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
                 route(Routes.APP_LOGS) { AppLogsScreen() }
 
                 route(
-                    Routes.BOOKS_INDEX(), arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.IntType })
+                    Routes.BOOKS_INDEX(),
+                    arguments = listOf(navArgument(Keys.COLLECTION_ID) { type = NavType.StringType }),
                 ) { bsEntry ->
-                    BooksIndexScreen(collectionId = bsEntry.arguments?.getInt(Keys.COLLECTION_ID) ?: 0)
+                    BooksIndexScreen(collectionId = bsEntry.arguments?.getString(Keys.COLLECTION_ID) ?: "")
                 }
+
                 route(
                     Routes.READER(),
                     arguments = listOf(
-                        navArgument(Keys.COLLECTION_ID) { type = NavType.IntType },
-                        navArgument(Keys.BOOK_ID) { type = NavType.IntType },
-                        navArgument(Keys.HADITH_NUMBER) {
+                        navArgument(Keys.BOOK_ID) { type = NavType.StringType },
+                        navArgument(Keys.HADITH_ID) {
                             type = NavType.StringType
                             defaultValue = null
                             nullable = true
@@ -121,19 +121,18 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                     ),
                 ) { rsEntry ->
                     ReaderScreen(
-                        collectionId = rsEntry.arguments?.getInt(Keys.COLLECTION_ID, 1) ?: 1,
-                        bookId = rsEntry.arguments?.getInt(Keys.BOOK_ID, 1) ?: 1,
-                        hadithNumber = rsEntry.arguments?.getString(Keys.HADITH_NUMBER)
+                        bookId = rsEntry.arguments?.getString(Keys.BOOK_ID) ?: "",
+                        hadithId = rsEntry.arguments?.getString(Keys.HADITH_ID),
                     )
                 }
 
                 route(
                     Routes.NARRATOR_CHAIN(),
                     arguments = listOf(
-                        navArgument(Keys.HADITH_URN) { type = NavType.IntType },
+                        navArgument(Keys.HADITH_ID) { type = NavType.StringType },
                     ),
                 ) { bsEntry ->
-                    NarratorsChainScreen(hadithUrn = bsEntry.arguments?.getInt(Keys.HADITH_URN) ?: 0)
+                    NarratorsChainScreen(hadithId = bsEntry.arguments?.getString(Keys.HADITH_ID) ?: "")
                 }
                 route(
                     Routes.SCHOLAR_INFO(),

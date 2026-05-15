@@ -55,17 +55,6 @@ fun MainAppBar(
         },
         actions = {
             if (showActions) {
-                SimpleTooltip(text = stringResource(R.string.manage_collections)) {
-                    IconButton(
-                        onClick = { navController.navigate(route = Routes.SETTINGS_MANAGE_COLLECTIONS) },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_book),
-                            contentDescription = stringResource(R.string.manage_collections),
-                            tint = colorScheme.onSurface,
-                        )
-                    }
-                }
                 SimpleTooltip(text = stringResource(R.string.settings)) {
                     IconButton(
                         onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) },

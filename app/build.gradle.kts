@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -77,7 +80,15 @@ android {
     }
 
     buildToolsVersion = "36.0.0"
-} // Allow references to generated code
+
+    sourceSets.named("main") {
+        java.srcDir(
+            layout.buildDirectory
+                .dir("generated/java/generateDebugProto/java")
+                .get().asFile
+        )
+    }
+}
 
 base {
     archivesName = android.defaultConfig.versionName
@@ -88,6 +99,20 @@ kapt {
 
     javacOptions {
         option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {}
+            }
+        }
     }
 }
 
@@ -146,4 +171,15 @@ dependencies {
 
     implementation(libs.accompanist.permissions)
     implementation(libs.material3.adaptive)
+    implementation(libs.protobuf.java)
 }
+
+tasks
+    .withType<KotlinCompile>()
+    .configureEach {
+        if (name.contains("Debug", ignoreCase = true)) {
+            dependsOn("generateDebugProto")
+        } else if (name.contains("Release", ignoreCase = true)) {
+            dependsOn("generateReleaseProto")
+        }
+    }

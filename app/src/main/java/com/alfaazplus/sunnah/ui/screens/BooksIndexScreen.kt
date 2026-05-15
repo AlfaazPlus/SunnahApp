@@ -142,7 +142,7 @@ fun BookItem(
 
 @Composable
 private fun ScreenContent(
-    collectionId: Int,
+    collectionId: String,
     onBookItemClick: (Int) -> Unit,
     vm: BookListViewModel = hiltViewModel(),
 ) {
@@ -221,7 +221,7 @@ private fun ScreenContent(
 }
 
 @Composable
-fun BooksIndexScreen(collectionId: Int) {
+fun BooksIndexScreen(collectionId: String) {
     val navController = LocalNavHostController.current
 
     Scaffold(
@@ -231,9 +231,11 @@ fun BooksIndexScreen(collectionId: Int) {
             modifier = Modifier.padding(it)
         ) {
             ScreenContent(
-                collectionId, onBookItemClick = { bookId ->
+                collectionId,
+                onBookItemClick = { bookId ->
                     navController.navigate(Routes.READER.args(collectionId, bookId))
-                })
+                },
+            )
             IconButton(
                 onClick = {
                     navController.popBackStack()

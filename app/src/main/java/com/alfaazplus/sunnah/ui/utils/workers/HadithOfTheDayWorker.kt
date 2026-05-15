@@ -11,9 +11,10 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.HadithOfTheDay
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
 import com.alfaazplus.sunnah.ui.activities.MainActivity
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
@@ -25,9 +26,11 @@ import kotlinx.coroutines.withContext
 
 @HiltWorker
 class HadithOfTheDayWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
-    private val repo: HadithRepository,
+    @Assisted
+    context: Context,
+    @Assisted
+    params: WorkerParameters,
+    private val repo: HadithRepository2,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -41,28 +44,28 @@ class HadithOfTheDayWorker @AssistedInject constructor(
     private fun sendNotification(hotd: HadithOfTheDay) {
         val notificationId = 10
         val context = applicationContext
-        val translation = hotd.translation
+        val blocks = hotd.hwc.contents.firstOrNull { it.lang == "en" }?.blocks ?: return
 
         val manager = ContextCompat.getSystemService(
             context, NotificationManager::class.java
         ) ?: return
 
         val hadithText = buildString {
-            if (!translation.narratorPrefix.isNullOrBlank()) {
-                appendLine(translation.narratorPrefix.parseAsHtml())
+            blocks.forEach {
+                if ((it.type == HadithBlockType.NARRATOR || it.type == HadithBlockType.MATN) && !it.text.isNullOrEmpty()) {
+                    appendLine(it.text.parseAsHtml())
+                }
             }
-            appendLine(translation.hadithText.parseAsHtml())
         }
 
-        val hadithReference = "${hotd.collectionName} : ${hotd.hadith.hadithNumber}"
+        val hadithReference = "${hotd.collectionName} : ${hotd.hwc.hadith.number}"
 
         val intent = Intent(context, MainActivity::class.java).apply {
             putExtra(
                 Keys.NAV_DESTINATION,
                 Routes.READER.args(
-                    hotd.hadith.collectionId,
-                    hotd.hadith.bookId,
-                    hotd.hadith.hadithNumber,
+                    hotd.hwc.collectionId,
+                    hotd.hwc.hadithId,
                 ),
             )
         }

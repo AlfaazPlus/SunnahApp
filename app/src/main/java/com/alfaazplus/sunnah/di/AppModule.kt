@@ -3,9 +3,11 @@ package com.alfaazplus.sunnah.di
 import android.app.Application
 import androidx.room.Room
 import com.alfaazplus.sunnah.db.databases.AppDatabase
+import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.ScholarsDatabase
 import com.alfaazplus.sunnah.db.databases.UserDatabase
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -21,9 +23,18 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideHadithDatabase(app: Application): AppDatabase {
+    fun provideAppDatabase(app: Application): AppDatabase {
         return Room
             .databaseBuilder(app, AppDatabase::class.java, "sunnah_app_db")
+            .fallbackToDestructiveMigration(false)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHadithDatabase(app: Application): HadithDatabase {
+        return Room
+            .databaseBuilder(app, HadithDatabase::class.java, "sunnahapp_db")
             .fallbackToDestructiveMigration(false)
             .build()
     }
@@ -68,6 +79,12 @@ object AppModule {
     @Singleton
     fun provideHadithRepository(hadithDb: AppDatabase, scholarsDb: ScholarsDatabase): HadithRepository {
         return HadithRepository(hadithDb.hadithDao, scholarsDb.scholarsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHadithRepository2(hadithDb: HadithDatabase, scholarsDb: ScholarsDatabase): HadithRepository2 {
+        return HadithRepository2(hadithDb, scholarsDb.scholarsDao)
     }
 
     @Provides

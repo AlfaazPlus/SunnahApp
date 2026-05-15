@@ -6,10 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao

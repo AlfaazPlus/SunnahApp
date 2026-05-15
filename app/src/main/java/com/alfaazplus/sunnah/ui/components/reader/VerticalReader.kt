@@ -129,12 +129,12 @@ fun VerticalReader(vm: ReaderViewModel, isWideScreen: Boolean) {
     LaunchedEffect(Unit) {
         vm.highlightedHadithNumber = ""
 
-        val initialHNo = vm.initialHadithNumber
+        val initialHNo = vm.initialHadithId
         val transientScroll = vm.transientScroll
 
         if (initialHNo.first != null && !initialHNo.second) {
             navigateToHadith(initialHNo.first!!)
-            vm.initialHadithNumber = Pair(initialHNo.first, true)
+            vm.initialHadithId = Pair(initialHNo.first, true)
             vm.highlightedHadithNumber = initialHNo.first!!
 
             delay(2000)
