@@ -5,8 +5,10 @@
 
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="top">Top</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="clear">Clear</string>
     <string name="delete">Delete</string>
     <string name="create">Create</string>
     <string name="goBack">Go back</string>
@@ -23,7 +25,8 @@
     <string name="books">Books</string>
     <string name="hadiths">Hadiths</string>
     <string name="hadithRangeValue" formatted="false">%d to %d</string>
-    <string name="hadithCountValue" formatted="false">Total Hadiths: %d</string>
+    <string name="totalBooks" formatted="false">Total books: %d</string>
+    <string name="totalHadiths" formatted="false">Total hadiths: %d</string>
     <string name="previousHadith">Previous Hadith</string>
     <string name="nextHadith">Next Hadith</string>
     <string name="previousBook">Previous Book</string>
@@ -37,6 +40,7 @@
     <string name="search_filter">Search filter</string>
     <string name="search_in">Search in…</string>
     <string name="search_for">Search for…</string>
+    <string name="search_hint">Search…</string>
     <string name="apply_filter">Apply filter</string>
     <string name="no_results_found">No results found</string>
     <string name="one_result_found">1 result found</string>
@@ -193,19 +197,14 @@
     <string name="create_issue">Create issue</string>
     <string name="no_logs_found">No logs found</string>
     <string name="resource_download_source">Resource Download Source</string>
-    <string name="resource_download_source_desc">
-        Use this option to download Hadith resources from a different source if one is not working.
-    </string>
+    <string name="resource_download_source_desc">Use this option to download Hadith resources from a different source if one is not working.</string>
     <string name="open_github_issues">Open GitHub issues</string>
     <string name="daily_reminder">Daily Reminder</string>
     <string name="daily_reminder_desc">Get a daily reminder for Hadith.</string>
-    <string name="notification_permission">
-        Notification Permission
-    </string>
-    <string name="notification_permission_desc">
-        Please allow notification permission to receive daily Hadith reminders.
-    </string>
-    <string name="download_collection_first">
-        To use this feature, please download at least one Hadith collection first.
-    </string>
+    <string name="notification_permission">Notification Permission</string>
+    <string name="notification_permission_desc">Please allow notification permission to receive daily Hadith reminders.</string>
+    <string name="download_collection_first">To use this feature, please download at least one Hadith collection first.</string>
+    <string name="setting_up">Setting up… This will take a few seconds.</string>
+    <string name="selectABook">Select a book first.</string>
+    <string name="chapter">Chapter</string>
 </resources>

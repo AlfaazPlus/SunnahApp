@@ -18,16 +18,19 @@ import com.alfaazplus.sunnah.R
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 val fontName = GoogleFont("Inter")*/
-val fontFamilyTitle = FontFamily.Default
-val fontFamily = FontFamily.Default
+
+val appFontFamilyTitle = FontFamily.Default
+val appFontFamily = FontFamily.Default
+
 val fontUthmani = FontFamily(
     Font(
         R.font.kfgqpc_uthman_taha_naskh,
         weight = FontWeight.Normal,
-    ), Font(
+    ),
+    Font(
         R.font.kfgqpc_uthman_taha_naskh_bold,
         weight = FontWeight.Bold,
-    )
+    ),
 )
 
 val tightTextStyle = TextStyle(
@@ -37,105 +40,112 @@ val tightTextStyle = TextStyle(
     )
 )
 
+
 private val platformTextStyle = PlatformTextStyle(false)
 
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.sp
-    ),
-    bodyMedium = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.sp
-    ),
-    bodySmall = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.sp
-    ),
-    titleLarge = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    titleMedium = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.sp
-    ),
-    titleSmall = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.sp
-    ),
-    labelLarge = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.sp
-    ),
-    labelMedium = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.sp
-    ),
-    displayLarge = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp,
-        letterSpacing = 0.sp
-    ),
-    displayMedium = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp
-    ),
-    displaySmall = TextStyle(
-        platformStyle = platformTextStyle,
-        fontFamily = fontFamilyTitle,
-        fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
-    ),
-)
+@Composable
+fun getAppTypography(): Typography {
+    val baseFont = appFontFamily
+    val titleFont = appFontFamilyTitle
+
+    return Typography(
+        bodyLarge = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            letterSpacing = 0.sp
+        ),
+        bodyMedium = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.sp
+        ),
+        bodySmall = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.sp
+        ),
+        titleLarge = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            lineHeight = 28.sp,
+            letterSpacing = 0.sp
+        ),
+        titleMedium = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 17.sp,
+            lineHeight = 24.sp,
+            letterSpacing = 0.sp
+        ),
+        titleSmall = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.sp
+        ),
+        labelLarge = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.sp
+        ),
+        labelMedium = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.sp
+        ),
+        labelSmall = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = baseFont,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.sp
+        ),
+        displayLarge = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            lineHeight = 40.sp,
+            letterSpacing = 0.sp
+        ),
+        displayMedium = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 28.sp,
+            lineHeight = 36.sp,
+            letterSpacing = 0.sp
+        ),
+        displaySmall = TextStyle(
+            platformStyle = platformTextStyle,
+            fontFamily = titleFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp,
+            lineHeight = 32.sp,
+            letterSpacing = 0.sp
+        ),
+    )
+}
 
 val type @Composable get() = MaterialTheme.typography

@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    val themeMode = ThemeUtils.getThemeMode()
+    val themeMode = ThemeUtils.observeThemeMode()
 
     val items = listOf(
         Triple(ThemeUtils.THEME_DEFAULT, R.string.system_default, R.string.theme_default_description),

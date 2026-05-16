@@ -1,60 +1,51 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.models.HadithWithTranslation
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.alfaazplus.sunnah.ui.components.common.Loader
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithLayout
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 @Composable
 fun ReaderLayout(
     readerVm: ReaderViewModel,
-    currentHadithNumber: () -> String?,
-    onJumpToBook: (BookWithInfo) -> Unit,
-    onJumpToHadith: (HadithWithTranslation) -> Unit,
-    content: @Composable () -> Unit,
+    nestedScrollConnection: NestedScrollConnection,
 ) {
-    val bookId = readerVm.bookId
-    val books = readerVm.books.value!!
-    val hadiths = readerVm.hadithList
+    val currentBookId by readerVm.activeBookId.collectAsStateWithLifecycle()
 
-    Row {
-        ReaderHadithNavigator(
-            modifier = Modifier.widthIn(
-                max = 260.dp
-            ),
-            isInBottomSheet = false,
-            books = books,
-            hadiths = hadiths,
-            currentBookId = bookId.value ?: 0,
-            currentHadithNumber = currentHadithNumber() ?: "",
-            currentNavigatorTab = readerVm.currentNavigatorTab,
-            onChangeNavigatorTab = { readerVm.currentNavigatorTab = it },
-            onJumpToBook = { bwi ->
-                onJumpToBook(bwi)
-            },
-            onJumpToHadith = { hwt ->
-                onJumpToHadith(hwt)
-            },
-        )
+    val _layoutMode by readerVm.layoutMode.collectAsStateWithLifecycle()
+    val layoutMode = _layoutMode ?: return Loader(fill = true)
 
-        VerticalDivider(
-            modifier = Modifier
-                .width(1.dp)
-                .fillMaxHeight()
-        )
+    val prevLayoutMode = remember { mutableStateOf(layoutMode) }
 
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            content()
+    LaunchedEffect(layoutMode) {
+        val prev = prevLayoutMode.value
+        prevLayoutMode.value = layoutMode
+
+        if (prev != layoutMode) {
+            readerVm.handleHadithLayoutTransition(layoutMode)
+        }
+    }
+
+    val _preparedData by readerVm.preparedData.collectAsStateWithLifecycle()
+    val preparedData = _preparedData
+
+    if (preparedData == null || currentBookId != preparedData.bookId) {
+        return Loader(fill = true)
+    }
+
+    when (layoutMode) {
+        HadithLayout.HORIZONTAL -> {
+            HorizontalReader(readerVm, preparedData, nestedScrollConnection)
+        }
+
+        HadithLayout.VERTICAL -> {
+            VerticalReader(readerVm, preparedData, nestedScrollConnection)
         }
     }
 }

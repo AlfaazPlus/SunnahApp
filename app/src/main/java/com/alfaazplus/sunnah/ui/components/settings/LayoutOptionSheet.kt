@@ -76,7 +76,7 @@ private fun RowScope.LayoutButton(
 @Composable
 fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    val selectedLayoutOption = ReaderPreferences.observeHadithLayoutOption()
+    val selectedLayoutOption = ReaderPreferences.observeHadithLayout()
 
     fun onSelected(option: HadithLayout) {
         if (option == selectedLayoutOption) return

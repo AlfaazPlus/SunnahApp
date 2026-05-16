@@ -235,29 +235,4 @@ interface HadithDao {
         """
     )
     suspend fun searchQuickBooks(serialNumber: String): List<BookSearchQuickResult>
-
-    @Query(
-        """
-            SELECT ar_urn FROM hadith_translation
-            WHERE
-                LENGTH(hadith_text) <= :maxLength
-                AND lang_code = :langCode
-                AND grades LIKE '%sahih%'
-            ORDER BY RANDOM() LIMIT 1                
-        """
-    )
-    fun getNewHotdUrn(maxLength: Int, langCode: String): String?
-
-    @RewriteQueriesToDropUnusedColumns
-    @Query(
-        """
-    SELECT * FROM hadith
-    INNER JOIN hadith_translation
-      ON hadith.urn = hadith_translation.ar_urn
-    WHERE
-      hadith.urn = :urn
-      AND hadith_translation.lang_code = :langCode
-        """
-    )
-    fun getHotd(urn: String, langCode: String): HadithOfTheDay?
 }

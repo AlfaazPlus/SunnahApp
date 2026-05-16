@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.utils
 
 import android.content.Context
 import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -18,13 +19,17 @@ import com.alfaazplus.sunnah.ui.theme.colors.ThemePurpleColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeRedColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeVioletColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeYellowColors
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import com.alfaazplus.sunnah.ui.utils.shared_preference.PrefKey
 
 object ThemeUtils {
     const val THEME_DEFAULT = "default"
     const val THEME_LIGHT = "light"
     const val THEME_DARK = "dark"
+
+    private val KEY_THEME_MODE = PrefKey(stringPreferencesKey("theme_mode"), THEME_DEFAULT)
+    private val KEY_THEME_COLOR = PrefKey(stringPreferencesKey("theme_color"), THEME_COLOR_DEFAULT)
+    private val KEY_THEME_DYNAMIC_COLOR = PrefKey(booleanPreferencesKey("theme_dynamic_color"), DEFAULT_DYNAMIC_COLOR)
 
     const val THEME_COLOR_DEFAULT = "default"
     const val THEME_COLOR_BLUE = "blue"
@@ -34,19 +39,7 @@ object ThemeUtils {
     const val THEME_COLOR_VIOLET = "violet"
     const val THEME_COLOR_YELLOW = "yellow"
 
-    fun getThemeId(): Int {
-        /* val themeId = when (DataStoreManager.read(stringPreferencesKey(Keys.THEME_COLOR), THEME_COLOR_DEFAULT)) {
-             THEME_COLOR_BLUE -> R.style.Theme_Blue
-             THEME_COLOR_RED -> R.style.Theme_Red
-             THEME_COLOR_PURPLE -> R.style.Theme_Purple
-             THEME_COLOR_MONO -> R.style.Theme_Monochrome
-             THEME_COLOR_VIOLET -> R.style.Theme_Violet
-             THEME_COLOR_YELLOW -> R.style.Theme_Yellow
-             else -> R.style.Theme_Base
-         }*/
-
-        return R.style.Theme_Base
-    }
+    const val DEFAULT_DYNAMIC_COLOR = false
 
     fun isDynamicColorSupported(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -61,8 +54,8 @@ object ThemeUtils {
     }
 
     @Composable
-    fun isDarkTheme(): Boolean {
-        val themeMode = getThemeMode()
+    fun observeDarkTheme(): Boolean {
+        val themeMode = observeThemeMode()
 
         return when (themeMode) {
             THEME_LIGHT -> false
@@ -72,36 +65,40 @@ object ThemeUtils {
     }
 
     @Composable
+    fun observeThemeMode(): String {
+        return DataStoreManager.observe(KEY_THEME_MODE)
+    }
+
     fun getThemeMode(): String {
-        return DataStoreManager.observe(stringPreferencesKey(Keys.THEME_MODE), THEME_DEFAULT)
+        return DataStoreManager.read(KEY_THEME_MODE)
     }
 
     suspend fun setThemeMode(themeMode: String) {
-        DataStoreManager.write(stringPreferencesKey(Keys.THEME_MODE), themeMode)
+        DataStoreManager.write(KEY_THEME_MODE, themeMode)
     }
 
     @Composable
-    fun getThemeColor(): String {
-        return DataStoreManager.observe(stringPreferencesKey(Keys.THEME_COLOR), THEME_COLOR_DEFAULT)
+    fun observeThemeColor(): String {
+        return DataStoreManager.observe(KEY_THEME_COLOR)
     }
 
     suspend fun setThemeColor(themeColor: String) {
-        DataStoreManager.write(stringPreferencesKey(Keys.THEME_COLOR), themeColor)
+        DataStoreManager.write(KEY_THEME_COLOR, themeColor)
     }
 
     @Composable
-    fun isDynamicColor(): Boolean {
-        return DataStoreManager.observe(booleanPreferencesKey(Keys.THEME_DYNAMIC_COLOR), false)
+    fun observeIsDynamicColor(): Boolean {
+        return DataStoreManager.observe(KEY_THEME_DYNAMIC_COLOR)
     }
 
     suspend fun setDynamicColor(isDynamicColor: Boolean) {
-        DataStoreManager.write(booleanPreferencesKey(Keys.THEME_DYNAMIC_COLOR), isDynamicColor)
+        DataStoreManager.write(KEY_THEME_DYNAMIC_COLOR, isDynamicColor)
     }
 
     @Composable
-    fun getColorScheme(context: Context, isDarkTheme: Boolean = isDarkTheme()): ColorScheme {
-        val themeColor = getThemeColor()
-        val isDynamicColor = isDynamicColor()
+    fun getColorScheme(context: Context, isDarkTheme: Boolean = observeDarkTheme()): ColorScheme {
+        val themeColor = observeThemeColor()
+        val isDynamicColor = observeIsDynamicColor()
 
         // Dynamic color is available on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isDynamicColor) {
@@ -119,5 +116,14 @@ object ThemeUtils {
         }
 
         return if (isDarkTheme) preferredColor.darkColors() else preferredColor.lightColors()
+    }
+
+
+    fun resolveThemeModeForDelegate(themeMode: String? = null): Int {
+        return when (themeMode ?: getThemeMode()) {
+            THEME_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            THEME_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
     }
 }

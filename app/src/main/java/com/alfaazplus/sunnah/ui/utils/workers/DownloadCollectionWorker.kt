@@ -9,7 +9,6 @@ import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.api.RetrofitInstance
 import com.alfaazplus.sunnah.api.RetrofitInstance.githubResDownloadUrl
 import com.alfaazplus.sunnah.db.databases.AppDatabase
-import com.alfaazplus.sunnah.helpers.DatabaseHelper
 import com.alfaazplus.sunnah.ui.utils.extension.getContentLengthAndStream
 import com.alfaazplus.sunnah.ui.utils.extension.getStackTraceString
 import dagger.assisted.Assisted
@@ -19,8 +18,10 @@ import kotlinx.coroutines.withContext
 
 @HiltWorker
 class DownloadCollectionWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
+    @Assisted
+    context: Context,
+    @Assisted
+    params: WorkerParameters,
     private val database: AppDatabase,
 ) : CoroutineWorker(context, params) {
 
@@ -36,13 +37,13 @@ class DownloadCollectionWorker @AssistedInject constructor(
             val (_, baseByteStream) = RetrofitInstance.github
                 .getCollection(collectionId)
                 .getContentLengthAndStream()
-            DatabaseHelper.importHadithBaseData(database, baseByteStream)
+//            DatabaseHelper.importHadithBaseData(database, baseByteStream)
 
 
             val (_, localeByteStream) = RetrofitInstance.github
                 .getCollectionTranslation(collectionId, "en")
                 .getContentLengthAndStream()
-            DatabaseHelper.importHadithLocaleData(database, localeByteStream)
+//            DatabaseHelper.importHadithLocaleData(database, localeByteStream)
 
 
             return@withContext Result.success()

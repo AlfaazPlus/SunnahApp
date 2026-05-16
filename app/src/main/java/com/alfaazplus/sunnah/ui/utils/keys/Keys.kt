@@ -2,11 +2,6 @@ package com.alfaazplus.sunnah.ui.utils.keys
 
 object Keys {
     const val LOCALE = "locale"
-    const val THEME_MODE = "theme_mode"
-    const val THEME_COLOR = "theme_color"
-    const val THEME_DYNAMIC_COLOR = "theme_dynamic_color"
-
-    const val ASSET_HADITHS_IMPORTED = "asset_hadiths_imported"
 
     const val COLLECTION_ID = "collection_id"
     const val BOOK_ID = "book_id"

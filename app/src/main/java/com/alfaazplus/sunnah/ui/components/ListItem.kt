@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,20 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-@Composable
-fun ListItemIcon(
-    icon: Int,
-    contentDescription: String? = null,
-    tint: Color = Color.Unspecified
-) {
-    Icon(
-        painter = painterResource(id = icon),
-        contentDescription = contentDescription,
-        modifier = Modifier.padding(end = 15.dp),
-        tint = tint,
-    )
-}
 
 @Composable
 fun ListItemContent(
@@ -89,7 +76,8 @@ fun ListItem(
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
                 .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (leading != null) leading()
 

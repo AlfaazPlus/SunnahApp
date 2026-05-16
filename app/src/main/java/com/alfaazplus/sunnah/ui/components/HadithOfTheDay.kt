@@ -97,7 +97,7 @@ private fun ReadButton(
         shape = MaterialTheme.shapes.small,
         onClick = {
             navController.navigate(
-                Routes.READER.arg(hotd.hwc.hadithId)
+                Routes.READER.args(hotd.hwc.bookId, hotd.hwc.hadithId)
             )
         },
     ) {
@@ -120,7 +120,7 @@ private fun ReadButton(
         }
     }
 }
-
+/*
 @Composable
 private fun Texts(hotd: HadithOfTheDay) {
     val hadithTextOption = ReaderPreferences.observeHadithTextOption()
@@ -258,7 +258,7 @@ private fun Footer(
             )
         }
     }
-}
+}*/
 
 @Composable
 fun HadithOfTheDay(
@@ -299,8 +299,8 @@ fun HadithOfTheDay(
                 HotdTitle()
                 ReadButton(hotd)
             }
-            Texts(hotd)
-            Footer(hotd)
+//            Texts(hotd)
+//            Footer(hotd)
         }
     }
 }

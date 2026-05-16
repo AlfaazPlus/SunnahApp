@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.db.entities.v2.CollectionType
-import com.alfaazplus.sunnah.db.relations.CollectionWithTranslations
+import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
@@ -35,7 +35,7 @@ import com.alfaazplus.sunnah.ui.viewModels.DownloadCollectionViewModel
 @Composable
 private fun HadithCollectionItem(
     isDownloading: Boolean,
-    cwt: CollectionWithTranslations,
+    cwt: CollectionWithTranslation,
     onClick: () -> Unit,
 ) {
     Surface(

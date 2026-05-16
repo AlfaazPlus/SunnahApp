@@ -7,9 +7,9 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.alfaazplus.sunnah.api.JsonHelper
-import com.alfaazplus.sunnah.db.interfaces.HadithMethods
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Entity(
     tableName = "hadiths",
@@ -51,16 +51,14 @@ data class HadithEntity(
     @ColumnInfo(name = "urn")
     val urn: Long?,
     @ColumnInfo(name = "collection_id")
-    override val collectionId: String,
+    val collectionId: String,
     @ColumnInfo(name = "book_id")
-    override val bookId: String,
+    val bookId: String,
     @ColumnInfo(name = "chapter_id")
     val chapterId: String?,
     @ColumnInfo(name = "number")
     val number: String?,
-) : HadithMethods {
-    override val hadithId get() = id
-}
+)
 
 enum class HadithBlockType(val type: String) {
     NARRATOR("narrator"),
@@ -83,6 +81,7 @@ data class HadithBlock(
     @SerialName("text")
     val text: String? = null,
 ) {
+    @Transient
     val type = HadithBlockType.fromValue(_type)
 }
 

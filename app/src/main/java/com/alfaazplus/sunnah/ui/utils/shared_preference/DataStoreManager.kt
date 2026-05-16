@@ -168,11 +168,4 @@ object DataStoreManager {
 
         return flow.collectAsStateWithLifecycle(initialValue = defaultValue).value
     }
-
-    suspend fun <T> observeWithCallback(key: Preferences.Key<T>, onChange: (T) -> Unit) {
-        appContext.dataStore.data.collect { preferences ->
-            val value = preferences[key]
-            value?.let { onChange(it) }
-        }
-    }
 }

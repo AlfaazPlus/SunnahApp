@@ -20,19 +20,7 @@ fun SettingsItemArrow() {
     Icon(
         painter = painterResource(id = R.drawable.ic_chevron_right),
         contentDescription = null,
-        modifier = Modifier.padding(start = 15.dp)
-    )
-}
-
-@Composable
-fun SettingsItemIcon(
-    icon: Int,
-    contentDescription: String
-) {
-    Icon(
-        painter = painterResource(id = icon),
-        contentDescription = contentDescription,
-        modifier = Modifier.padding(end = 15.dp)
+        modifier = Modifier.padding(start = 15.dp),
     )
 }
 
@@ -42,7 +30,7 @@ fun SettingsItemContent(
     titleStr: String? = null,
     subtitle: Int? = null,
     subtitleStr: String? = null,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val titleText = titleStr ?: if (title != null) stringResource(title) else null
     val subtitleText = subtitleStr ?: if (subtitle != null) stringResource(subtitle) else null
@@ -50,8 +38,7 @@ fun SettingsItemContent(
     Column(modifier = modifier) {
         if (titleText != null) {
             Text(
-                text = titleText,
-                style = MaterialTheme.typography.titleSmall
+                text = titleText, style = MaterialTheme.typography.titleSmall
             )
         }
         if (subtitleText != null) {
@@ -75,12 +62,15 @@ fun SettingsItem(
     subtitleStr: String? = null,
     icon: Int? = null,
     iconImage: (@Composable () -> Unit)? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     ListItem(
         modifier = modifier,
         leading = {
-            if (icon != null) SettingsItemIcon(icon = icon, contentDescription = stringResource(title))
+            if (icon != null) Icon(
+                painter = painterResource(id = icon),
+                contentDescription = stringResource(title),
+            )
             else if (iconImage != null) iconImage()
         },
         trailing = {
@@ -89,6 +79,6 @@ fun SettingsItem(
         title = title,
         subtitle = subtitle,
         subtitleStr = subtitleStr,
-        onClick = onClick
+        onClick = onClick,
     )
 }

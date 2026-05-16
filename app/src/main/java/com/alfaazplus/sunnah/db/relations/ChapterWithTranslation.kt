@@ -13,4 +13,22 @@ data class ChapterWithTranslation(
         entityColumn = "chapter_id",
     )
     val translations: List<ChapterTranslationEntity>,
-)
+) {
+    fun getTranslation(langCode: String): ChapterTranslationEntity? {
+        return translations.firstOrNull { it.lang == langCode }
+    }
+
+    fun getTitle(): String? {
+        return sequenceOf("en", "ar").firstNotNullOfOrNull {
+            getTranslation(it)?.title?.takeIf { it.isNotEmpty() }
+        }
+    }
+
+    fun getTitle(langCode: String = "en"): String? {
+        return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
+    }
+
+    fun getIntro(langCode: String = "en"): String? {
+        return getTranslation(langCode)?.intro?.takeIf { it.isNotEmpty() }
+    }
+}

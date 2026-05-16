@@ -19,9 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_HADITH_TEXT_OPTION
-import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,13 +32,13 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
     val items = listOf(
-        Pair(ReaderPreferences.HADITH_TEXT_OPTION_BOTH, R.string.show_arabic_and_translation),
-        Pair(ReaderPreferences.HADITH_TEXT_OPTION_ONLY_ARABIC, R.string.show_only_arabic),
-        Pair(ReaderPreferences.HADITH_TEXT_OPTION_ONLY_TRANSLATION, R.string.show_only_translation),
+        Pair(HadithTextOption.BOTH, R.string.show_arabic_and_translation),
+        Pair(HadithTextOption.ONLY_ARABIC, R.string.show_only_arabic),
+        Pair(HadithTextOption.ONLY_TRANSLATION, R.string.show_only_translation),
     )
 
-    val showArabic = selectedHadithTextOption != ReaderPreferences.HADITH_TEXT_OPTION_ONLY_TRANSLATION
-    val showTranslation = selectedHadithTextOption != ReaderPreferences.HADITH_TEXT_OPTION_ONLY_ARABIC
+    val showArabic = selectedHadithTextOption != HadithTextOption.ONLY_TRANSLATION
+    val showTranslation = selectedHadithTextOption != HadithTextOption.ONLY_ARABIC
 
     BottomSheet(
         isOpen = isOpen,
@@ -83,12 +82,12 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                 }
             }
 
-            items.forEach { (key, title) ->
+            items.forEach { (option, title) ->
                 RadioItem(
-                    title = title, selected = key == selectedHadithTextOption,
+                    title = title, selected = option == selectedHadithTextOption,
                     onClick = {
                         coroutineScope.launch {
-                            DataStoreManager.write(KEY_HADITH_TEXT_OPTION, key)
+                            ReaderPreferences.setHadithTextOption(option)
                         }
                     },
                 )

@@ -6,13 +6,18 @@ import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.helpers.HadithGradeText
 
+data class HadithChapterUi(
+    val chapter: ChapterWithTranslation,
+    val titles: Map<String, AnnotatedString>,
+    val intros: Map<String, AnnotatedString>,
+)
+
 sealed class ReaderLayoutItem {
     abstract val key: String
 
-    data class Chapter(val cwt: ChapterWithTranslation, override val key: String) : ReaderLayoutItem()
-
     data class HadithUI(
         val hwc: HadithWithContents,
+        val chapterUi: HadithChapterUi?,
         // based on user preferences
         val parsedArabicText: AnnotatedString?,
         val parsedTranslationText: AnnotatedString?,

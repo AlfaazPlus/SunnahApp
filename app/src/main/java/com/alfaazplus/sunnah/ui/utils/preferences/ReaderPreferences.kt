@@ -55,7 +55,7 @@ object ReaderPreferences {
 
     @Composable
     fun resolveHadithLayoutLabel(): Int {
-        val option = observeHadithLayoutOption()
+        val option = observeHadithLayout()
 
         return when (option) {
             HadithLayout.HORIZONTAL -> R.string.horizontal
@@ -64,10 +64,16 @@ object ReaderPreferences {
     }
 
     @Composable
-    fun observeHadithLayoutOption(): HadithLayout {
+    fun observeHadithLayout(): HadithLayout {
         return DataStoreManager
             .observe(KEY_HADITH_LAYOUT)
             .let { HadithLayout.fromValue(it) }
+    }
+
+    fun hadithLayoutFlow(): Flow<HadithLayout> {
+        return DataStoreManager
+            .flow(KEY_HADITH_LAYOUT)
+            .map { HadithLayout.fromValue(it) }
     }
 
     suspend fun setHadithLayout(layout: HadithLayout) {
@@ -78,6 +84,10 @@ object ReaderPreferences {
         return DataStoreManager
             .readFirst(KEY_HADITH_TEXT_OPTION)
             .let { HadithTextOption.fromValue(it) }
+    }
+
+    suspend fun setHadithTextOption(option: HadithTextOption) {
+        return DataStoreManager.write(KEY_HADITH_TEXT_OPTION, option.value)
     }
 
     @Composable

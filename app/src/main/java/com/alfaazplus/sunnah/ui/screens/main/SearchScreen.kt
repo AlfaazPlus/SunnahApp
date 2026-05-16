@@ -25,7 +25,7 @@ import com.alfaazplus.sunnah.ui.components.search.BookSearchResults
 import com.alfaazplus.sunnah.ui.components.search.HadithSearchResults
 import com.alfaazplus.sunnah.ui.components.search.ScholarsSearchResults
 import com.alfaazplus.sunnah.ui.components.search.SearchResultTabs
-import com.alfaazplus.sunnah.ui.components.search.SearchTextField
+import com.alfaazplus.sunnah.ui.components.search.GlobalSearchTextField
 import com.alfaazplus.sunnah.ui.models.SearchResultTab
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
@@ -53,7 +53,7 @@ fun SearchScreen(
     val searchQuery = vm.searchQuery.collectAsState().value
 
     Column(modifier = modifier) {
-        SearchTextField(vm)
+        GlobalSearchTextField(vm)
 
         if (searchQuery.isBlank()) {
             Column(

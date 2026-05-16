@@ -61,7 +61,7 @@ fun getTranslationTextStyle(
 fun getArabicTextStyle(
     params: ArabicTextStyleParams,
 ): TextStyle {
-    val baselineFontSize = params.type.bodyLarge.fontSize
+    val baselineFontSize = params.type.bodyLarge.fontSize * 1.2 // slightly size for arabic texts
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
 
     return params.type.headlineSmall.copy(

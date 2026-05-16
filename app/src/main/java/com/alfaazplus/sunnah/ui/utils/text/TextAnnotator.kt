@@ -14,6 +14,18 @@ import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 
 fun buildHadithAnnotatedString(
+    text: String,
+    linkColor: Color,
+    actions: HadithActions,
+): AnnotatedString {
+    return buildHadithAnnotatedString(
+        parts = parseHadithText(text),
+        linkColor = linkColor,
+        actions = actions,
+    )
+}
+
+fun buildHadithAnnotatedString(
     parts: List<HadithRichTextPart>,
     linkColor: Color,
     actions: HadithActions,
@@ -22,11 +34,6 @@ fun buildHadithAnnotatedString(
         style = SpanStyle(
             color = linkColor,
             fontWeight = FontWeight.Medium,
-            textDecoration = TextDecoration.Underline,
-        ),
-        pressedStyle = SpanStyle(
-            color = linkColor.copy(alpha = 0.8f),
-            fontWeight = FontWeight.Bold,
             textDecoration = TextDecoration.Underline,
         ),
     )

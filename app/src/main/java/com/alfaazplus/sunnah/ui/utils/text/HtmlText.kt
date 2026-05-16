@@ -330,6 +330,7 @@ fun Spanned.toAnnotatedString(
         colorSpans.forEach { colorSpan ->
             val start = getSpanStart(colorSpan)
             val end = getSpanEnd(colorSpan)
+
             addStyle(
                 SpanStyle(color = colorMapping.getOrElse(Color(colorSpan.foregroundColor)) { Color(colorSpan.foregroundColor) }),
                 start,

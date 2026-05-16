@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
     alias(libs.plugins.protobuf)
@@ -125,6 +126,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.viewmodel)
     implementation(libs.compose.livedata)
+    implementation(libs.compose.material3.windowSizeClass)
+    implementation(libs.compose.material3.adaptive)
     implementation(libs.activity.compose)
     implementation(libs.ui.graphics)
     implementation(libs.material3)
@@ -170,7 +173,6 @@ dependencies {
     implementation(libs.roomPaging)
 
     implementation(libs.accompanist.permissions)
-    implementation(libs.material3.adaptive)
     implementation(libs.protobuf.java)
 }
 

@@ -41,7 +41,7 @@ private const val TAG_QREF_ATTR_VERSES = "verses"
 private val LINE_BREAK_PATTERN = Regex("(?i)<br\\s*/?>")
 private val TAG_PATTERN = Regex("<[^>]*>")
 
-fun parseHadithBlockText(html: String): List<HadithRichTextPart> {
+fun parseHadithText(html: String): List<HadithRichTextPart> {
     if (html.isBlank()) return emptyList()
 
     val normalized = html

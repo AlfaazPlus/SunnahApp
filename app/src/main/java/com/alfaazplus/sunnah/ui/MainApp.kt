@@ -24,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
-import com.alfaazplus.sunnah.ui.screens.NarratorsChainScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
 import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
@@ -89,7 +88,8 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             NavHost(
                 navController = navController,
-                startDestination = Routes.MAIN,
+//                startDestination = Routes.MAIN,
+                startDestination = Routes.READER.args("bukhari_b1"),
             ) {
                 route(Routes.MAIN) { MainScreen() }
                 route(Routes.SEARCH) { SearchScreenScaffold() }
@@ -124,15 +124,6 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                         bookId = rsEntry.arguments?.getString(Keys.BOOK_ID) ?: "",
                         hadithId = rsEntry.arguments?.getString(Keys.HADITH_ID),
                     )
-                }
-
-                route(
-                    Routes.NARRATOR_CHAIN(),
-                    arguments = listOf(
-                        navArgument(Keys.HADITH_ID) { type = NavType.StringType },
-                    ),
-                ) { bsEntry ->
-                    NarratorsChainScreen(hadithId = bsEntry.arguments?.getString(Keys.HADITH_ID) ?: "")
                 }
                 route(
                     Routes.SCHOLAR_INFO(),

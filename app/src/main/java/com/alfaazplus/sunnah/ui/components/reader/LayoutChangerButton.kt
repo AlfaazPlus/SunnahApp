@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LayoutChangerButton() {
     val coroutineScope = rememberCoroutineScope()
-    val selectedLayoutOption = ReaderPreferences.observeHadithLayoutOption()
+    val selectedLayoutOption = ReaderPreferences.observeHadithLayout()
 
     fun onSelected(option: HadithLayout) {
         if (option == selectedLayoutOption) return

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,7 +36,6 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.ListItem
-import com.alfaazplus.sunnah.ui.components.ListItemIcon
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.common.SwitchItem
 import com.alfaazplus.sunnah.ui.components.settings.DailyReminderSheet
@@ -46,18 +47,19 @@ import com.alfaazplus.sunnah.ui.components.settings.SettingsItem
 import com.alfaazplus.sunnah.ui.components.settings.TextSizeSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 import com.alfaazplus.sunnah.ui.utils.AppUtils
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_IS_SANAD_ENABLED
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_IS_SANAD_ENABLED
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import kotlinx.coroutines.launch
 
 @Composable
 private fun AppVersionFooter() {
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Row(
         modifier = Modifier
@@ -65,7 +67,7 @@ private fun AppVersionFooter() {
             .padding(16.dp)
             .clickable {
                 context.copyToClipboard(BuildConfig.VERSION_NAME)
-                MessageUtils.showClipboardMessage(context, context.getString(R.string.copied_to_clipboard))
+                MessageUtils.showClipboardMessage(context, resources.getString(R.string.copied_to_clipboard))
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -93,7 +95,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val themeMode = ThemeUtils.getThemeMode()
+    val themeMode = ThemeUtils.observeThemeMode()
 
     var showDailyReminderSheet by remember { mutableStateOf(false) }
     var showLayoutOptionSheet by remember { mutableStateOf(false) }
@@ -175,28 +177,45 @@ fun SettingsScreen(
                         Image(
                             painter = painterResource(R.drawable.ic_github),
                             contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 15.dp)
-                                .height(24.dp)
-                                .width(24.dp),
+                            modifier = Modifier.size(24.dp),
                         )
                     },
                 ) { NavigationHelper.openGithubRepo(context) }
                 ListItem(
                     title = R.string.privacy_policy,
-                    leading = { ListItemIcon(R.drawable.ic_shield) },
+                    leading = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_shield),
+                            contentDescription = null,
+                        )
+                    },
                 ) { NavigationHelper.openPrivacyPolicy(context) }
                 ListItem(
                     title = R.string.about_us,
-                    leading = { ListItemIcon(R.drawable.ic_info) },
+                    leading = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_info),
+                            contentDescription = null,
+                        )
+                    },
                 ) { NavigationHelper.openAboutUs(context) }
                 ListItem(
                     title = R.string.rate_app,
-                    leading = { ListItemIcon(R.drawable.ic_star) },
+                    leading = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_star),
+                            contentDescription = null,
+                        )
+                    },
                 ) { NavigationHelper.openPlayStoreListing(context) }
                 ListItem(
                     title = R.string.share_app,
-                    leading = { ListItemIcon(R.drawable.ic_share) },
+                    leading = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_share),
+                            contentDescription = null,
+                        )
+                    },
                 ) {
                     NavigationHelper.shareApp(context)
                 }
@@ -207,10 +226,7 @@ fun SettingsScreen(
                         Image(
                             painter = painterResource(R.drawable.logo_quranapp),
                             contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 15.dp)
-                                .height(24.dp)
-                                .width(24.dp),
+                            modifier = Modifier.size(24.dp),
                         )
                     },
                 ) { NavigationHelper.openQuranAppPlayStoreListing(context) }
@@ -218,7 +234,11 @@ fun SettingsScreen(
                 ListItem(
                     title = R.string.donate,
                     leading = {
-                        ListItemIcon(R.drawable.ic_donate, tint = colorScheme.primary)
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_donate),
+                            contentDescription = null,
+                            tint = colorScheme.primary,
+                        )
                     },
                 ) { NavigationHelper.openDonationPage(context) }
 

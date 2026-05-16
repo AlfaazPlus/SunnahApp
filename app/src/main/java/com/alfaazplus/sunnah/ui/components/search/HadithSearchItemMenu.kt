@@ -1,13 +1,10 @@
 package com.alfaazplus.sunnah.ui.components.search
 
-import android.content.ClipData
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -17,13 +14,12 @@ import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
 import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
-import com.alfaazplus.sunnah.ui.components.reader.ACTION_ADD_TO_BOOKMARK
-import com.alfaazplus.sunnah.ui.components.reader.ACTION_ADD_TO_COLLECTION
-import com.alfaazplus.sunnah.ui.components.reader.ACTION_COPY_HADITH_NUMBER
+import com.alfaazplus.sunnah.ui.components.reader.HadithMenuAction
 import com.alfaazplus.sunnah.ui.controllers.rememberModalController
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
+import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,25 +30,25 @@ import kotlinx.coroutines.withContext
 @Composable
 private fun Items(
     isBookmarked: Boolean,
-    onItemClick: (String) -> Unit,
+    onItemClick: (HadithMenuAction) -> Unit,
 ) {
     BottomSheetMenuItem(
         text = stringResource(R.string.copy_hadith_number),
         icon = R.drawable.ic_clipboard,
     ) {
-        onItemClick(ACTION_COPY_HADITH_NUMBER)
+        onItemClick(HadithMenuAction.COPY_HADITH_NUMBER)
     }
     BottomSheetMenuItem(
         text = if (isBookmarked) stringResource(R.string.added_to_bookmarks) else stringResource(R.string.add_to_bookmarks),
         icon = if (isBookmarked) R.drawable.ic_bookmark_check else R.drawable.ic_bookmark_plus,
     ) {
-        onItemClick(ACTION_ADD_TO_BOOKMARK)
+        onItemClick(HadithMenuAction.ADD_TO_BOOKMARK)
     }
     BottomSheetMenuItem(
         text = stringResource(R.string.add_to_collection),
         icon = R.drawable.ic_library,
     ) {
-        onItemClick(ACTION_ADD_TO_COLLECTION)
+        onItemClick(HadithMenuAction.ADD_TO_COLLECTION)
     }
 }
 
@@ -76,7 +72,6 @@ fun HadithSearchItemMenu(
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
     val copiedMessage = stringResource(R.string.copied_to_clipboard)
 
     AddToCollectionSheet(collectionModalController)
@@ -92,7 +87,7 @@ fun HadithSearchItemMenu(
             isBookmarked,
         ) { actionType ->
             when (actionType) {
-                ACTION_ADD_TO_COLLECTION -> {
+                HadithMenuAction.ADD_TO_COLLECTION -> {
                     collectionModalController.show(
                         AddToCollectionRequest(
                             hadithCollectionId = item.hadith.collectionId,
@@ -102,7 +97,7 @@ fun HadithSearchItemMenu(
                     )
                 }
 
-                ACTION_ADD_TO_BOOKMARK -> {
+                HadithMenuAction.ADD_TO_BOOKMARK -> {
                     scope.launch {
                         if (!isBookmarked) {
                             viewModel.repo.addUserBookmark(
@@ -127,13 +122,16 @@ fun HadithSearchItemMenu(
                     }
                 }
 
-                ACTION_COPY_HADITH_NUMBER -> {
-                    clipboardManager.setClip(ClipEntry(ClipData.newPlainText("", "${item.collectionName}: ${item.hadith.hadithNumber}")))
+                HadithMenuAction.COPY_HADITH_NUMBER -> {
+                    context.copyToClipboard("${item.collectionName}: ${item.hadith.hadithNumber}")
+
                     MessageUtils.showClipboardMessage(
                         context,
                         text = copiedMessage,
                     )
                 }
+
+                else -> {}
             }
 
             onClose()

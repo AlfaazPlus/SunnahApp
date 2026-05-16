@@ -1,85 +1,59 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
-import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
-import com.alfaazplus.sunnah.ui.models.QuranReference
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.components.common.Loader
+import com.alfaazplus.sunnah.ui.viewModels.HadithSetupViewModel
 
-data class HadithActions(
-    val onHadithOption: (hadithId: String) -> Unit,
-    val onNumberReferenceRequest: (hadithId: String) -> Unit,
-    val onQuickReferenceRequest: (hadithId: String) -> Unit,
-    val onQuranReferenceRequest: (chapter: Int, verses: String) -> Unit,
-)
-
-val LocalHadithActions = staticCompositionLocalOf<HadithActions> {
-    error("LocalHadithActions not provided")
-}
 
 @Composable
 fun ReaderProvider(
+    setupVm: HadithSetupViewModel = hiltViewModel(),
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    val isSettingUp by setupVm.isSettingUp.collectAsStateWithLifecycle()
 
-    var showNoQuranAppBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var activeNumberReferenceHadithId by rememberSaveable { mutableStateOf<String?>(null) }
-    var activeHadithMenuId by rememberSaveable { mutableStateOf<String?>(null) }
-
-    CompositionLocalProvider(
-        LocalHadithActions provides HadithActions(
-            onHadithOption = {
-                activeHadithMenuId = it
-            },
-            onNumberReferenceRequest = {
-                activeNumberReferenceHadithId = it
-            },
-            onQuickReferenceRequest = {},
-            onQuranReferenceRequest = { reference ->
-                val parts = reference.split(":")
-                val chapterNo = parts[0].toInt()
-                val versesStr = parts[1]
-
-                val verses = versesStr.split("-")
-                val fromVerse = verses[0].toInt()
-                var toVerse = fromVerse
-
-                if (verses.size > 1) {
-                    toVerse = verses[1].toInt()
-                }
-
-                try {
-                    NavigationHelper.openQuranReference(context, QuranReference(chapterNo, fromVerse, toVerse))
-                } catch (e: Exception) {
-                    Logger.e(e)
-                    showNoQuranAppBottomSheet = true
-                }
-            },
-        )
-    ) {
-        content()
-
-        HadithReferenceSheet(activeNumberReferenceHadithId) {
-            activeNumberReferenceHadithId = null
-        }
-
-        HadithMenu(
-            hadithId = activeHadithMenuId,
-            onClose = {
-                activeHadithMenuId = null
-            },
-        )
+    LaunchedEffect(Unit) {
+        setupVm.initializeHadiths(context)
     }
 
-    NoQuranAppAlert(showNoQuranAppBottomSheet) {
-        showNoQuranAppBottomSheet = false
+    if (isSettingUp) {
+        SettingUpOverlay()
+        return
+    }
+
+    ActionsProvider {
+        content()
+    }
+}
+
+@Composable
+fun SettingUpOverlay() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Loader()
+            Text(stringResource(R.string.setting_up))
+        }
     }
 }

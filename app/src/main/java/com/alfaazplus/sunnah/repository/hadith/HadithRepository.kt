@@ -315,16 +315,4 @@ class HadithRepository(
         return dao.searchQuickBooks(serialNumber.first)
     }
 
-    suspend fun getHotd(urn: String): HadithOfTheDay? {
-        return dao
-            .getHotd(urn, "en")
-            ?.apply {
-                this.collectionName = dao.getCollectionInfoById("en", this.hadith.collectionId).name
-            }
-    }
-
-    suspend fun getNewHotd(): HadithOfTheDay? {
-        val urn = dao.getNewHotdUrn(300, "en") ?: return null
-        return getHotd(urn)
-    }
 }

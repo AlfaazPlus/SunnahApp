@@ -49,10 +49,10 @@ fun SettingsThemeScreen() {
     )
 
     val coroutineScope = rememberCoroutineScope()
-    val isDarkTheme = ThemeUtils.isDarkTheme()
-    val themeMode = ThemeUtils.getThemeMode()
-    val themeColor = ThemeUtils.getThemeColor()
-    val isDynamicColor = ThemeUtils.isDynamicColor()
+    val isDarkTheme = ThemeUtils.observeDarkTheme()
+    val themeMode = ThemeUtils.observeThemeMode()
+    val themeColor = ThemeUtils.observeThemeColor()
+    val isDynamicColor = ThemeUtils.observeIsDynamicColor()
     var showThemeBottomSheet by remember { mutableStateOf(false) }
 
     val span = 2

@@ -20,7 +20,7 @@ class MainActivity : BaseActivity() {
         intentFlow.value = intent
 
         setContent {
-            val isDarkTheme = ThemeUtils.isDarkTheme()
+            val isDarkTheme = ThemeUtils.observeDarkTheme()
             val colorScheme = ThemeUtils.getColorScheme(this, isDarkTheme)
 
             SunnahAppTheme(

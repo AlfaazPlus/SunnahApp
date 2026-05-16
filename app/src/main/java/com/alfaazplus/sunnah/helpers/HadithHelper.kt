@@ -3,16 +3,13 @@ package com.alfaazplus.sunnah.helpers
 import android.content.Context
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
-import androidx.core.text.parseAsHtml
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
 import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeType
-import com.alfaazplus.sunnah.repository.hadith.HADITH_COLLECTIONS
+import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDayHolder
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
@@ -44,14 +41,6 @@ object HadithHelper {
         return INCLUDED_COLLECTIONS.contains(id)
     }
 
-    fun getIncludedCollections(): List<CollectionWithInfo> {
-        return HADITH_COLLECTIONS.map {
-            CollectionWithInfo(
-                collection = DatabaseHelper.toHCollection(it.first), info = DatabaseHelper.toHCollectionInfo(it.second)
-            )
-        }
-    }
-
     fun getHadithGradeText(grade: HadithGradeEntity): HadithGradeText? {
         val gradeType = grade.gradeType
 
@@ -63,6 +52,7 @@ object HadithHelper {
             HadithGradeType.SAHIH_MAUQUF_MARFU -> Triple(
                 "Sahih Mawquf with Marfu' ruling", "Companion narration treated as effectively prophetic", "صحيح موقوف له حكم المرفوع"
             )
+
             HadithGradeType.SAHIH_MUTAWATIR -> Triple("Sahih Mutawatir", "Mass-transmitted authentic hadith", "صحيح متواتر")
             HadithGradeType.HASAN -> Triple("Hasan", "Good and reliable hadith", "حسن")
             HadithGradeType.HASAN_SAHIH -> Triple("Hasan Sahih", "Hadith graded between Hasan and Sahih", "حسن صحيح")
@@ -103,15 +93,6 @@ object HadithHelper {
                 texts.second,
             ).filter { it.isNotEmpty() },
         )
-    }
-
-    fun getHadithGradeColor(gradeType: HadithGradeType): Pair<Color, Color> {
-        return when {
-            gradeType.type.startsWith("sahih") -> Color(76, 175, 80) to Color.White
-            gradeType.type.startsWith("hasan") -> Color(157, 145, 43) to Color.Black
-            gradeType.type.startsWith("daif") -> Color(244, 67, 54) to Color.White
-            else -> Color(158, 11, 0) to Color.White
-        }
     }
 
     suspend fun getHadithOfTheDay(repo: HadithRepository2): HadithOfTheDay? {
@@ -155,16 +136,25 @@ object HadithHelper {
         }
     }
 
-    fun shareHadith(context: Context, translation: HadithTranslation, collectionName: String, hadithNumber: String) {
+    fun shareHadith(context: Context, hwc: HadithWithContents, collectionName: String?, bookName: String?) {
+        val content = hwc.contents.firstOrNull { it.lang == "en" } ?: return
+
         val textToShare = buildString {
-            if (!translation.narratorPrefix.isNullOrBlank()) {
-                appendLine(translation.narratorPrefix.parseAsHtml())
+            content.blocks.forEach {
+                appendLine(it.text)
                 appendLine()
             }
 
-            appendLine(translation.hadithText.parseAsHtml())
-            appendLine()
-            appendLine("— $collectionName: $hadithNumber")
+            appendLine("Reference:")
+            appendLine("Hadith Number: ${hwc.hadith.number ?: ""}")
+
+            if (!collectionName.isNullOrEmpty()) {
+                appendLine(collectionName)
+            }
+
+            if (!bookName.isNullOrEmpty()) {
+                appendLine("Book: $bookName")
+            }
         }
 
         val intent = Intent(Intent.ACTION_SEND).apply {
