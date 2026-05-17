@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.components.reader.dialogs
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -61,23 +59,22 @@ fun BookItemCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(
-                        color = colorScheme.background.copy(alpha = 0.5f), shape = CircleShape
-                    ), contentAlignment = Alignment.Center
+                modifier = Modifier.size(36.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                Image(
-                    painterResource(R.drawable.vector_bg2),
-                    null,
-                    colorFilter = ColorFilter.tint(colorScheme.primary),
-                )
-                Text(
-                    text = bwt.book.number ?: "",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Normal,
-                    color = colorScheme.onPrimary,
-                )
+                if (!bwt.book.number.isNullOrEmpty()) {
+                    Image(
+                        painterResource(R.drawable.vector_bg2),
+                        null,
+                        colorFilter = ColorFilter.tint(colorScheme.primary),
+                    )
+                    Text(
+                        text = bwt.book.number,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = colorScheme.onPrimary,
+                    )
+                }
             }
 
             Column(

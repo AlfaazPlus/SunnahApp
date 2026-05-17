@@ -1,10 +1,15 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,10 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,32 +42,39 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
+import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookInfoSheet
+import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 
 internal data class ReaderAppBarDimensions(
     val barHeight: Dp,
+    val headerHeight: Dp,
+    val dividerHeight: Dp,
+    val dividerCount: Int,
 ) {
     val expandedHeight: Dp
-        get() = barHeight
+        get() = barHeight + headerHeight + (dividerHeight * dividerCount)
 }
 
 @Composable
@@ -68,11 +82,17 @@ internal fun rememberAppBarDimensions(isWideScreen: Boolean): ReaderAppBarDimens
     return remember(isWideScreen) {
         if (isWideScreen) {
             ReaderAppBarDimensions(
-                barHeight = 96.dp,
+                barHeight = 86.dp,
+                headerHeight = 0.dp,
+                dividerHeight = 1.dp,
+                dividerCount = 1,
             )
         } else {
             ReaderAppBarDimensions(
-                barHeight = 96.dp,
+                barHeight = 86.dp,
+                headerHeight = 40.dp,
+                dividerHeight = 1.dp,
+                dividerCount = 2,
             )
         }
     }
@@ -90,6 +110,19 @@ fun rememberCurrentBook(readerVm: ReaderViewModel): BookWithTranslation? {
     }
 }
 
+@Composable
+fun rememberCurrentHadith(readerVm: ReaderViewModel): ReaderLayoutItem.HadithUI? {
+    val currentHadithId by readerVm.activeHadithId.collectAsStateWithLifecycle()
+    val preparedData by readerVm.preparedData.collectAsStateWithLifecycle()
+    val items = preparedData?.items
+
+    return remember(currentHadithId, items) {
+        if (currentHadithId == null || items.isNullOrEmpty()) return@remember null
+
+        items.find { it is ReaderLayoutItem.HadithUI && it.hadithId == currentHadithId } as? ReaderLayoutItem.HadithUI
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderAppBar(
@@ -97,6 +130,7 @@ fun ReaderAppBar(
     isWideScreen: Boolean,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
+    val context = LocalContext.current
     val appBarDims = rememberAppBarDimensions(isWideScreen)
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -135,7 +169,7 @@ fun ReaderAppBar(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier
-                            .clip(MaterialTheme.shapes.medium)
+                            .clip(shapes.medium)
                             .clickable(
                                 enabled = !isWideScreen,
                             ) { showNavigatorSheet = true }
@@ -146,41 +180,36 @@ fun ReaderAppBar(
                                 collectionId = currentBook.book.collectionId,
                                 height = 40.dp,
                             )
-
-                            if (!isWideScreen) {
-                                Row {
-                                    Text(
-                                        modifier = Modifier.widthIn(max = 150.dp),
-                                        text = currentBook.getTitle() ?: "",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Normal,
-                                        lineHeight = 0.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_arrow_drop_down),
-                                        contentDescription = null,
-                                        tint = colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                }
-                            }
                         }
                     }
                 },
                 navigationIcon = {
-                    SimpleTooltip(text = stringResource(R.string.goBack)) {
-                        IconButton(
-                            onClick = {
-                                backPressedDispatcher?.onBackPressed()
-                            }) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_chevron_left),
-                                contentDescription = stringResource(R.string.goBack),
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        SimpleTooltip(text = stringResource(R.string.goBack)) {
+                            IconButton(
+                                onClick = {
+                                    backPressedDispatcher?.onBackPressed()
+                                }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_chevron_left),
+                                    contentDescription = stringResource(R.string.goBack),
+                                )
+                            }
+                        }
+
+                        SimpleTooltip(text = stringResource(R.string.selectTranslation)) {
+                            IconButton(
+                                onClick = {
+                                    MessageUtils.showToast(context, R.string.workInProgress, Toast.LENGTH_LONG)
+                                },
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_translations),
+                                    contentDescription = stringResource(R.string.selectTranslation),
+                                )
+                            }
                         }
                     }
                 },
@@ -188,7 +217,7 @@ fun ReaderAppBar(
                     LayoutChangerButton()
 
                     SimpleTooltip(text = stringResource(R.string.settings)) {
-                        IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(true)) }) {
+                        IconButton(onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_settings),
                                 contentDescription = stringResource(R.string.settings),
@@ -197,6 +226,28 @@ fun ReaderAppBar(
                     }
                 },
             )
+
+            HorizontalDivider(
+                thickness = appBarDims.dividerHeight, color = colorScheme.outlineVariant.alpha(0.5f)
+            )
+
+            if (!isWideScreen) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(appBarDims.headerHeight), contentAlignment = Alignment.Center
+                ) {
+                    Header(readerVm) {
+                        if (!isWideScreen) {
+                            showNavigatorSheet = true
+                        }
+                    }
+                }
+
+                HorizontalDivider(
+                    thickness = appBarDims.dividerHeight, color = colorScheme.outlineVariant.alpha(0.5f)
+                )
+            }
         }
     }
 
@@ -217,5 +268,83 @@ fun ReaderAppBar(
                 isInModal = true,
             ) { showNavigatorSheet = false }
         }
+    }
+}
+
+@Composable
+private fun Header(
+    readerVm: ReaderViewModel,
+    onNavigatorRequest: () -> Unit,
+) {
+    val currentBook = rememberCurrentBook(readerVm) ?: return
+    val currentHadith = rememberCurrentHadith(readerVm)
+
+    val textStyle = typography.labelMedium
+        .copy(
+            color = colorScheme.onSurfaceVariant,
+        )
+        .merge(tightTextStyle)
+
+    var showInfoSheet by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        Modifier.padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            modifier = Modifier
+                .clip(shapes.medium)
+                .clickable { onNavigatorRequest() }
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+        ) {
+            Text(
+                modifier = Modifier.widthIn(max = 150.dp)
+                    .basicMarquee(),
+                text = currentBook.getTitle() ?: "…",
+                style = textStyle,
+                maxLines = 1,
+            )
+
+            Text(
+                text = " : ${currentHadith?.hwc?.hadith?.number ?: "…"}",
+                style = textStyle,
+            )
+
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_down),
+                contentDescription = null,
+                tint = colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        Row(
+            modifier = Modifier
+                .clip(shapes.small)
+                .background(color = colorScheme.surfaceVariant)
+                .clickable { showInfoSheet = true }
+                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .alpha(0.8f), verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_info),
+                contentDescription = null,
+                tint = colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(end = 5.dp)
+                    .size(16.dp)
+            )
+            Text(
+                text = stringResource(R.string.info),
+                style = typography.labelMedium,
+            )
+        }
+    }
+
+    BookInfoSheet(
+        bwt = currentBook.takeIf { showInfoSheet },
+    ) {
+        showInfoSheet = false
     }
 }

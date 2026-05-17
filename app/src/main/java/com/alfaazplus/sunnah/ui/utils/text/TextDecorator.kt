@@ -3,11 +3,14 @@ package com.alfaazplus.sunnah.ui.utils.text
 import android.content.Context
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
@@ -52,7 +55,6 @@ fun getTranslationTextStyle(
         platformStyle = PlatformTextStyle(
             includeFontPadding = true
         ),
-        color = params.colors.onBackground,
         fontSize = resolvedFontSize,
         lineHeight = resolvedFontSize * 1.5f,
     )
@@ -67,7 +69,6 @@ fun getArabicTextStyle(
     return params.type.headlineSmall.copy(
         fontFamily = fontUthmani,
         fontSize = resolvedFontSize,
-        color = params.colors.onBackground,
         textDirection = TextDirection.Rtl,
         lineHeight = resolvedFontSize * 1.8f,
         lineHeightStyle = LineHeightStyle(
@@ -76,4 +77,66 @@ fun getArabicTextStyle(
             mode = LineHeightStyle.Mode.Tight,
         )
     )
+}
+
+fun textStyleForLang(
+    langCode: String,
+    colors: ColorScheme,
+    type: Typography,
+    arabicSizePercent: Int,
+    translationSizePercent: Int,
+    isSerifFontStyle: Boolean,
+): TextStyle {
+    return if (langCode == "ar") {
+        getArabicTextStyle(
+            ArabicTextStyleParams(
+                colors = colors,
+                type = type,
+                sizePercent = arabicSizePercent,
+            ),
+        )
+    } else {
+        getTranslationTextStyle(
+            TranslationTextStyleParams(
+                colors = colors,
+                type = type,
+                sizePercent = translationSizePercent,
+                isSerif = isSerifFontStyle,
+            ),
+        )
+    }
+}
+
+fun buildStyledHadithAnnotatedString(
+    text: String,
+    langCode: String,
+    colors: ColorScheme,
+    type: Typography,
+    arabicSizePercent: Int,
+    translationSizePercent: Int,
+    isSerifFontStyle: Boolean,
+    actions: HadithActions,
+): AnnotatedString {
+    val raw = buildHadithAnnotatedString(
+        text = text,
+        linkColor = colors.primary,
+        actions = actions,
+    )
+
+    val textStyle = textStyleForLang(
+        langCode = langCode,
+        colors = colors,
+        type = type,
+        arabicSizePercent = arabicSizePercent,
+        translationSizePercent = translationSizePercent,
+        isSerifFontStyle = isSerifFontStyle,
+    )
+
+    return buildAnnotatedString {
+        withStyle(textStyle.toParagraphStyle()) {
+            withStyle(textStyle.toSpanStyle()) {
+                append(raw)
+            }
+        }
+    }
 }

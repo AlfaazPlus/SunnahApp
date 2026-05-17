@@ -60,6 +60,15 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    if (showTranslation) {
+                        HadithTextPreview(
+                            translationTextSizePercent,
+                            false,
+                            previewText = "The Prophet (ﷺ) said, \"The signs of a hypocrite are three: 1. Whenever he speaks, he tells a lie. 2. Whenever he promises, he always breaks it (his promise ). 3. If you trust him, he proves to be dishonest. (If you keep something as a trust with him, he will not return it.)\"",
+                            false,
+                        )
+                    }
+
                     if (showArabic) {
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                             HadithTextPreview(
@@ -69,15 +78,6 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                                 false,
                             )
                         }
-                    }
-
-                    if (showTranslation) {
-                        HadithTextPreview(
-                            translationTextSizePercent,
-                            false,
-                            previewText = "The Prophet (ﷺ) said, \"The signs of a hypocrite are three: 1. Whenever he speaks, he tells a lie. 2. Whenever he promises, he always breaks it (his promise ). 3. If you trust him, he proves to be dishonest. (If you keep something as a trust with him, he will not return it.)\"",
-                            false,
-                        )
                     }
                 }
             }

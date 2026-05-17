@@ -7,6 +7,7 @@ object StringUtils {
     const val VERTICAL_BAR: String = "│"
     const val HYPHEN: String = "—"
     const val RTL_MARK: String = "\u200F"
+    const val ELLIPSIS: String = "…"
 
 
     /**

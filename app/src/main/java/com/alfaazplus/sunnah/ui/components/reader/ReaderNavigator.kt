@@ -159,11 +159,12 @@ private fun BookList(
 
     LazyColumn(
         state = bookListState,
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 64.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 64.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item {
+        stickyHeader {
             SearchTextField(
+                modifier = Modifier.padding(top = 16.dp),
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 placeholder = stringResource(R.string.search_book),
@@ -230,11 +231,12 @@ private fun HadithList(
 
     LazyColumn(
         state = hadithListState,
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 64.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 64.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item {
+        stickyHeader {
             SearchTextField(
+                modifier = Modifier.padding(top = 16.dp),
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 placeholder = stringResource(R.string.search_hadith),

@@ -182,6 +182,18 @@
     <string name="optional_note">Optional Note</string>
     <string name="no_note">No note added</string>
     <string name="open_in_reader">Open in Reader</string>
+    <string name="quick_reference_n_hadiths">%1$d hadiths</string>
+    <string name="quick_reference_not_found">Could not load the referenced hadith.</string>
+    <string name="hadith_references">Hadith References</string>
+    <string name="ref_type_sunnahcom">Reference</string>
+    <string name="ref_type_app">App reference</string>
+    <string name="ref_type_in_book">In-book reference</string>
+    <string name="ref_type_english_translation">English reference</string>
+    <string name="ref_type_arabic_english_book">Arabic/English book reference</string>
+    <string name="ref_type_arabic">Arabic reference</string>
+    <string name="ref_type_us_msa">USC-MSA web (English) reference</string>
+    <string name="ref_deprecated">(deprecated)</string>
+    <string name="no_references">No references available.</string>
     <string name="no_bookmarks">No bookmarks yet.</string>
     <string name="reading_history">Reading History</string>
     <string name="no_reading_history">Your reading history appears here.</string>
@@ -207,4 +219,14 @@
     <string name="setting_up">Setting up… This will take a few seconds.</string>
     <string name="selectABook">Select a book first.</string>
     <string name="chapter">Chapter</string>
+    <string name="workInProgress">Work in progress</string>
+    <string name="selectTranslation">Select translation</string>
+    <string name="info">Info</string>
+    <string name="book_info">Book information</string>
+    <string name="book_section_preamble">Preamble</string>
+    <string name="book_section_intro">Introduction</string>
+    <string name="book_section_notes">Notes</string>
+    <string name="book_no_details">No additional information for this book.</string>
+    <string name="lang_arabic">Arabic</string>
+    <string name="lang_english">English</string>
 </resources>

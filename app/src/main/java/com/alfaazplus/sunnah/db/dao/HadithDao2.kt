@@ -82,6 +82,9 @@ interface HadithDao2 {
     @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId AND type = 'sunnahcom_reference' LIMIT 1")
     suspend fun getPrimaryReferenceForHadith(hadithId: String): HadithReferenceEntity?
 
+    @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId")
+    suspend fun getReferencesForHadith(hadithId: String): List<HadithReferenceEntity>
+
     @Query(
         """
             SELECT COUNT(*) from hadith_narrators where hadith_id = :hadithId

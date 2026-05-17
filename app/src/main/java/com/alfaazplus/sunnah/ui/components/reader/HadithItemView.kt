@@ -7,7 +7,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,9 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -31,23 +35,27 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
-import com.alfaazplus.sunnah.ui.components.hadith.HadithText
 import com.alfaazplus.sunnah.ui.models.HadithChapterUi
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
@@ -76,7 +84,8 @@ fun HadithItemView(
                 if (isVertical && hadithUi.showDivider) Modifier.bottomBorder(color = colorScheme.outline.alpha(0.5f))
                 else Modifier
             )
-            .padding(16.dp)
+            .padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (hadithUi.chapterUi != null) {
             ChapterInfo(hadithUi.chapterUi)
@@ -84,18 +93,82 @@ fun HadithItemView(
 
         HadithActionBar(hadithUi)
 
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            HadithText(
-                text = hadithUi.parsedArabicText,
-                modifier = Modifier.padding(bottom = 20.dp),
-            )
+        SelectionContainer {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                if (!hadithUi.parsedTranslationText.isNullOrEmpty()) {
+                    HadithText(
+                        text = hadithUi.parsedTranslationText,
+                        shouldTrim = isVertical,
+                    )
+                }
+
+                if (!hadithUi.parsedArabicText.isNullOrEmpty()) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                        HadithText(
+                            text = hadithUi.parsedArabicText,
+                            shouldTrim = isVertical,
+                            maxLines = 15,
+                        )
+                    }
+                }
+            }
         }
 
-        HadithText(
-            text = hadithUi.parsedTranslationText,
+        HadithGrade(hadithUi)
+    }
+}
+
+@Composable
+private fun HadithText(text: AnnotatedString, shouldTrim: Boolean, maxLines: Int = 20) {
+    val reader = LocalReader.current
+    val interactionSource = remember { MutableInteractionSource() }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(false) }
+    val showFade = !expanded && isOverflowing
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                enabled = shouldTrim,
+                interactionSource = interactionSource,
+                indication = null,
+            ) {
+                expanded = !expanded
+            },
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = if (!shouldTrim || expanded) Int.MAX_VALUE else maxLines,
+            overflow = TextOverflow.Clip,
+            onTextLayout = { isOverflowing = it.hasVisualOverflow },
         )
 
-        HadithGrade(hadithUi)
+        if (showFade) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .drawBehind {
+                        val fadeHeight = size.height * 0.25f
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, reader.containerColor),
+                                startY = size.height - fadeHeight,
+                                endY = size.height,
+                            ),
+                        )
+                    },
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_chevron_down), contentDescription = null, tint = colorScheme.onBackground.alpha(0.5f)
+                )
+            }
+        }
     }
 }
 
@@ -109,18 +182,22 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
         label = "chapter_chevron",
     )
 
+    val containerColor = colorScheme.inverseSurface
+    val contentColor = colorScheme.inverseOnSurface
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp)
+            .padding(horizontal = 8.dp)
             .clip(MaterialTheme.shapes.medium)
-            .background(colorScheme.surfaceContainer)
-            .clickable { expanded = !expanded }
-            .padding(12.dp),
+            .background(containerColor)
+            .clickable { expanded = !expanded },
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -142,6 +219,7 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
                 text = stringResource(R.string.chapter),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
+                color = contentColor,
             )
 
             Spacer(Modifier.weight(1f))
@@ -153,37 +231,60 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
                     .size(18.dp)
                     .rotate(chevronRotation)
                     .alpha(0.7f),
-                tint = colorScheme.onSurface,
+                tint = contentColor,
             )
         }
 
-        chapterUi.titles.forEach { (langCode, text) ->
-            CompositionLocalProvider(
-                LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = text,
-                    maxLines = if (expanded) Int.MAX_VALUE else 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
 
         AnimatedVisibility(
-            visible = expanded && hasIntro,
+            visible = expanded,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
-            Column(
-                modifier = Modifier.padding(top = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                chapterUi.intros.forEach { (langCode, text) ->
-                    CompositionLocalProvider(
-                        LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
+            SelectionContainer {
+                Column {
+                    HorizontalDivider(
+                        color = colorScheme.outline.alpha(0.3f),
+                    )
+
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        HadithText(text = text)
+                        chapterUi.titles.forEach { (langCode, text) ->
+                            CompositionLocalProvider(
+                                LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = text,
+                                    textAlign = TextAlign.Center,
+                                    color = contentColor,
+                                )
+                            }
+                        }
+                    }
+
+                    if (hasIntro) {
+                        HorizontalDivider(color = colorScheme.outline.alpha(0.3f))
+
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+
+                            chapterUi.intros.forEach { (langCode, text) ->
+                                CompositionLocalProvider(
+                                    LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
+                                ) {
+                                    Text(
+                                        text = text,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        color = contentColor.alpha(0.8f),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -201,12 +302,10 @@ private fun HadithActionBar(
     val bgColor = if (isDarkTheme) colorScheme.surfaceContainer else colorScheme.background
     val txtColor = if (isDarkTheme) colorScheme.onSurface else colorScheme.onBackground
 
-    val navController = LocalNavHostController.current
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -300,7 +399,7 @@ private fun HadithGrade(hadithUi: ReaderLayoutItem.HadithUI) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(top = 16.dp)
+            .padding(horizontal = 16.dp)
             .clickable(enabled = hasDescriptions) {
                 actions.showGradeInfo(gradeText)
             }

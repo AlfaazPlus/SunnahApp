@@ -25,6 +25,9 @@ fun CollectionIcon(
             "abudawud" -> R.drawable.book_abudawud
             "tirmidhi" -> R.drawable.book_tirmidhi
             "ibnmajah" -> R.drawable.book_ibnmajah
+            "malik" -> R.drawable.book_malik
+            "riyadussalihin" -> R.drawable.book_riyadussalihin
+            "forty" -> R.drawable.book_forty
             else -> 0
         }
     }

@@ -88,8 +88,8 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             NavHost(
                 navController = navController,
-//                startDestination = Routes.MAIN,
-                startDestination = Routes.READER.args("bukhari_b1"),
+                startDestination = Routes.MAIN,
+//                startDestination = Routes.READER.args("muslim_bintroduction"),
             ) {
                 route(Routes.MAIN) { MainScreen() }
                 route(Routes.SEARCH) { SearchScreenScaffold() }

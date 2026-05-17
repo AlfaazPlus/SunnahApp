@@ -38,13 +38,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
+import com.alfaazplus.sunnah.ui.components.reader.LocalReader
 import com.alfaazplus.sunnah.ui.components.reader.ReaderAppBar
 import com.alfaazplus.sunnah.ui.components.reader.ReaderLayout
 import com.alfaazplus.sunnah.ui.components.reader.ReaderNavigator
 import com.alfaazplus.sunnah.ui.components.reader.ReaderProvider
 import com.alfaazplus.sunnah.ui.components.reader.rememberAppBarDimensions
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
@@ -67,7 +67,6 @@ fun ReaderScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val colors by rememberUpdatedState(colorScheme)
     val type by rememberUpdatedState(MaterialTheme.typography)
-    val isDark = ThemeUtils.observeDarkTheme()
 
     val showTwoPane = currentWindowAdaptiveInfo().windowSizeClass.isAtLeastBreakpoint(
         WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND,
@@ -96,6 +95,7 @@ fun ReaderScreen(
         CompositionLocalProvider(
             LocalReaderScaffoldController provides ReaderScaffoldController()
         ) {
+            val reader = LocalReader.current
             val hadithActions = LocalHadithActions.current
 
             LaunchedEffect(lifecycleOwner, colors, type) {
@@ -126,8 +126,8 @@ fun ReaderScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    containerColor = if (isDark) colors.background
-                    else colors.surface,
+                    containerColor = reader.containerColor,
+                    contentColor = reader.contentColor,
                     topBar = {
                         ReaderAppBar(
                             readerVm = readerVm,

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +64,11 @@ fun VerticalReaderFooter(
         return
     }
 
+    val isDarkTheme = ThemeUtils.observeDarkTheme()
+
+    val containerColor = if (isDarkTheme) colorScheme.surfaceContainer else colorScheme.background
+    val contentColor = if (isDarkTheme) colorScheme.onSurface else colorScheme.onBackground
+
     val scope = rememberCoroutineScope()
 
     val currentBookId by readerVm.activeBookId.collectAsStateWithLifecycle()
@@ -78,6 +84,8 @@ fun VerticalReaderFooter(
         NavigationButton(
             bookNumber = prevBook?.book?.number,
             isPrevious = true,
+            containerColor = containerColor,
+            contentColor = contentColor,
         ) {
             scope.launch {
                 prevBook?.let {
@@ -92,18 +100,18 @@ fun VerticalReaderFooter(
             modifier = Modifier
                 .size(50.dp)
                 .clip(MaterialTheme.shapes.small)
-                .background(colorScheme.surface)
+                .background(containerColor)
                 .clickable { onTopClick() }) {
             Icon(
                 modifier = Modifier.size(18.dp),
                 painter = painterResource(R.drawable.ic_arrow_top),
                 contentDescription = stringResource(R.string.settings),
-                tint = colorScheme.onSurface,
+                tint = contentColor,
             )
             Text(
                 text = stringResource(R.string.top),
                 style = MaterialTheme.typography.labelSmall,
-                color = colorScheme.onSurfaceVariant,
+                color = contentColor,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -111,6 +119,8 @@ fun VerticalReaderFooter(
         NavigationButton(
             bookNumber = nextBook?.book?.number,
             isPrevious = false,
+            containerColor = containerColor,
+            contentColor = contentColor,
         ) {
             scope.launch {
                 nextBook?.let {
@@ -125,13 +135,10 @@ fun VerticalReaderFooter(
 private fun RowScope.NavigationButton(
     bookNumber: String?,
     isPrevious: Boolean,
+    containerColor: Color,
+    contentColor: Color,
     onClick: () -> Unit,
 ) {
-    val isDarkTheme = ThemeUtils.observeDarkTheme()
-
-    val bgColor = if (isDarkTheme) colorScheme.surfaceContainer else colorScheme.background
-    val txtColor = if (isDarkTheme) colorScheme.onSurface else colorScheme.onBackground
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -140,7 +147,7 @@ private fun RowScope.NavigationButton(
             .height(50.dp)
             .padding(horizontal = 10.dp)
             .clip(MaterialTheme.shapes.small)
-            .background(bgColor)
+            .background(containerColor)
             .clickable(
                 enabled = bookNumber != null,
             ) { onClick() }
@@ -152,7 +159,7 @@ private fun RowScope.NavigationButton(
                 text = "Book $bookNumber",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = txtColor,
+                color = contentColor,
             )
         }
 
@@ -170,7 +177,7 @@ private fun RowScope.NavigationButton(
             Text(
                 text = if (isPrevious) stringResource(R.string.previousBook) else stringResource(R.string.nextBook),
                 style = MaterialTheme.typography.labelSmall,
-                color = txtColor,
+                color = contentColor,
                 fontWeight = FontWeight.Normal,
             )
 

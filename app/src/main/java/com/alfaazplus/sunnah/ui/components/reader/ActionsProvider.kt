@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -14,6 +15,8 @@ import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.HadithGradeInfoSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.HadithReferenceSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.NarratorsChainSheet
+import com.alfaazplus.sunnah.ui.components.reader.dialogs.QuickReference
+import com.alfaazplus.sunnah.ui.components.reader.dialogs.QuickReferenceData
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 import com.alfaazplus.sunnah.ui.models.QuranReference
 
@@ -41,6 +44,7 @@ fun ActionsProvider(
     var activeHadithMenuId by rememberSaveable { mutableStateOf<String?>(null) }
     var activeGradeInfo by rememberSaveable { mutableStateOf<HadithGradeText?>(null) }
     var activeNarratorsChainHadithId by rememberSaveable { mutableStateOf<String?>(null) }
+    var activeQuickReference by remember { mutableStateOf<QuickReferenceData?>(null) }
 
     CompositionLocalProvider(
         LocalHadithActions provides HadithActions(
@@ -50,7 +54,9 @@ fun ActionsProvider(
             onNumberReferenceRequest = {
                 activeNumberReferenceHadithId = it
             },
-            onQuickReferenceRequest = {},
+            onQuickReferenceRequest = { id ->
+                activeQuickReference = QuickReferenceData(hadithIds = listOf(id))
+            },
             onQuranReferenceRequest = { chapterNo, verses ->
                 val verses = verses.split("-")
                 val fromVerse = verses[0].toInt()
@@ -95,9 +101,14 @@ fun ActionsProvider(
                 activeHadithMenuId = null
             },
         )
+
     }
 
     NoQuranAppAlert(showNoQuranAppBottomSheet) {
         showNoQuranAppBottomSheet = false
+    }
+
+    QuickReference(activeQuickReference) {
+        activeQuickReference = null
     }
 }
