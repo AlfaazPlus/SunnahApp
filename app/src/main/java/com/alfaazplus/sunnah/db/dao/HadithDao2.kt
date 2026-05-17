@@ -103,14 +103,19 @@ interface HadithDao2 {
 
     // ────────────────────────────────────────────────────────────────────────
 
-    @Transaction
     @Query(
         """
-    SELECT hadith_id FROM hadith_grades
-        WHERE grade_id LIKE 'sahih%'
+        SELECT h.id FROM hadiths AS h
+        WHERE NOT EXISTS (
+            SELECT 1 FROM hadith_grades AS g WHERE g.hadith_id = h.id
+        )
+        OR EXISTS (
+            SELECT 1 FROM hadith_grades AS g
+            WHERE g.hadith_id = h.id AND g.grade_id LIKE 'sahih%'
+        )
         ORDER BY RANDOM()
         LIMIT 1
-    """
+        """
     )
-    suspend fun getRandomHadithId(): String?
+    suspend fun getRandomSahihHadithId(): String?
 }

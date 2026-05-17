@@ -3,6 +3,8 @@ package com.alfaazplus.sunnah.helpers
 import android.content.Context
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
+import androidx.core.text.parseAsHtml
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
@@ -96,44 +98,67 @@ object HadithHelper {
     }
 
     suspend fun getHadithOfTheDay(repo: HadithRepository2): HadithOfTheDay? {
-        val hotdValue = DataStoreManager.read(stringPreferencesKey(Keys.HADITH_OF_THE_DAY), "")
+        val hotdKey = stringPreferencesKey(Keys.HADITH_OF_THE_DAY)
+
+        val hotdValue = DataStoreManager.readFirst(hotdKey, "")
         val hotdHolder = HadithOfTheDayHolder.parse(hotdValue)
 
         if (hotdHolder != null) {
-            val hotd = repo.getHotd(hotdHolder.hadithId)
-            if (hotd != null) {
-                return hotd
-            }
-        }
+            val cached = repo.getHotd(hotdHolder.hadithId)
 
-        val optimalTextLength = 300
-        var count = 0
-
-        while (true) {
-            if (count > 30) return null
-
-            val hwc = repo.getRandomHadith() ?: continue
-
-            // Check if optimal
-            val blocks = hwc.contents.firstOrNull { it.lang == "en" }?.blocks ?: continue
-
-            val text = blocks.firstOrNull {
-                it.type == HadithBlockType.MATN
-            }?.text
-
-            if (!text.isNullOrEmpty() && text.length <= optimalTextLength) {
-                val newHotdHolder = HadithOfTheDayHolder(hwc.hadithId, Date(System.currentTimeMillis()))
-
-                DataStoreManager.write(stringPreferencesKey(Keys.HADITH_OF_THE_DAY), newHotdHolder.toString())
-
-                return HadithOfTheDay(
-                    hwc = hwc,
-                    collectionName = repo.getCollectionName(hwc.hadith.collectionId),
-                )
+            if (cached != null) {
+                return cached
             }
 
-            count++
+            DataStoreManager.write(hotdKey, "")
         }
+
+        val maxPreviewLength = 300
+        var attempts = 0
+
+        while (attempts <= 100) {
+            val hwc = repo.getRandomSahihHadith() ?: break
+
+            val preview = hwc.hotdPreviewText()
+
+            if (preview != null && preview
+                    .parseAsHtml()
+                    .toString().length <= maxPreviewLength
+            ) {
+                return persistHotd(hotdKey, repo, hwc)
+            }
+
+            attempts++
+        }
+
+        return null
+    }
+
+    private fun HadithWithContents.hotdPreviewText(): String? {
+        val blocks = contents.firstOrNull { it.lang == "en" }?.blocks ?: return null
+
+        return buildString {
+            blocks.forEach { block ->
+                if (block.type == HadithBlockType.NARRATOR || block.type == HadithBlockType.MATN) {
+                    block.text?.let { append(it) }
+                }
+            }
+        }.takeIf { it.isNotBlank() }
+    }
+
+    private suspend fun persistHotd(
+        key: Preferences.Key<String>,
+        repo: HadithRepository2,
+        hwc: HadithWithContents,
+    ): HadithOfTheDay {
+        val holder = HadithOfTheDayHolder(hwc.hadithId, Date(System.currentTimeMillis()))
+
+        DataStoreManager.write(key, holder.toString())
+
+        return HadithOfTheDay(
+            hwc = hwc,
+            collectionName = repo.getCollectionName(hwc.hadith.collectionId),
+        )
     }
 
     fun shareHadith(context: Context, hwc: HadithWithContents, collectionName: String?, bookName: String?) {

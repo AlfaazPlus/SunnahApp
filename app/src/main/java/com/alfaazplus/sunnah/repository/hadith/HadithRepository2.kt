@@ -54,8 +54,8 @@ class HadithRepository2(
         )
     }
 
-    suspend fun getRandomHadith(): HadithWithContents? {
-        val hadithId = dao.getRandomHadithId() ?: return null
+    suspend fun getRandomSahihHadith(): HadithWithContents? {
+        val hadithId = dao.getRandomSahihHadithId() ?: return null
         return dao.getHadithById(hadithId)
     }
 
