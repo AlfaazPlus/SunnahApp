@@ -71,7 +71,7 @@ interface HadithDao2 {
     suspend fun getHadithById(id: String): HadithWithContents?
 
     @Transaction
-    @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY number + 0")
+    @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn")
     suspend fun getHadithsForBook(bookId: String): List<HadithWithContents>
 
     @Transaction
