@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
@@ -25,6 +22,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
+    val selectedTranslationId = ReaderPreferences.observeHadithTranslation()
     val selectedHadithTextOption = ReaderPreferences.observeHadithTextOption()
     val arabicTextSizePercent = ReaderPreferences.observeTextSizePercentArabic()
     val translationTextSizePercent = ReaderPreferences.observeTextSizePercentTranslation()
@@ -62,6 +60,7 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                 ) {
                     if (showTranslation) {
                         HadithTextPreview(
+                            selectedTranslationId,
                             translationTextSizePercent,
                             false,
                             previewText = "The Prophet (ﷺ) said, \"The signs of a hypocrite are three: 1. Whenever he speaks, he tells a lie. 2. Whenever he promises, he always breaks it (his promise ). 3. If you trust him, he proves to be dishonest. (If you keep something as a trust with him, he will not return it.)\"",
@@ -70,14 +69,13 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                     }
 
                     if (showArabic) {
-                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                            HadithTextPreview(
-                                arabicTextSizePercent,
-                                true,
-                                previewText = " آيَةُ الْمُنَافِقِ ثَلاَثٌ إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ",
-                                false,
-                            )
-                        }
+                        HadithTextPreview(
+                            selectedTranslationId,
+                            arabicTextSizePercent,
+                            true,
+                            previewText = " آيَةُ الْمُنَافِقِ ثَلاَثٌ إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ",
+                            false,
+                        )
                     }
                 }
             }

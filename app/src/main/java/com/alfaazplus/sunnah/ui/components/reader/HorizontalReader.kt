@@ -65,6 +65,7 @@ fun HorizontalReader(
             .distinctUntilChanged()
             .collect {
                 readerVm.updateLastKnownHadith(it)
+                readerVm.loadMoreItemsIfNeeded(it)
             }
     }
 
@@ -80,6 +81,8 @@ fun HorizontalReader(
         if (idx >= 0) {
             pagerState.scrollToPage(idx)
             readerVm.consumeHadithNavigation()
+        } else if (!preparedData.isComplete) {
+            readerVm.loadPageContainingHadithIfNeeded(hadithId)
         }
     }
 

@@ -34,8 +34,8 @@ object Routes {
     val SETTINGS = SingleArgRoute("settings", Keys.SHOW_READER_SETTINGS_ONLY)
     const val SETTINGS_THEME = "settings_theme"
     const val SETTINGS_LANGUAGE = "settings_language"
+    const val SETTINGS_TRANSLATIONS = "settings_translations"
 
-    //    const val SETTINGS_MANAGE_COLLECTIONS = "settings_manage_collections"
     const val APP_LOGS = "app_logs"
     val BOOKS_INDEX = SingleArgRoute("books_index", Keys.COLLECTION_ID)
     val READER = MultiArgRoute("reader", listOf(Keys.BOOK_ID, Keys.HADITH_ID))

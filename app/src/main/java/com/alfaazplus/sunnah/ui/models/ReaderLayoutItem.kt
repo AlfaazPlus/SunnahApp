@@ -8,8 +8,8 @@ import com.alfaazplus.sunnah.helpers.HadithGradeText
 
 data class HadithChapterUi(
     val chapter: ChapterWithTranslation,
-    val titles: Map<String, AnnotatedString>,
-    val intros: Map<String, AnnotatedString>,
+    val titles: List<AnnotatedString>,
+    val intros: List<AnnotatedString>,
 )
 
 sealed class ReaderLayoutItem {

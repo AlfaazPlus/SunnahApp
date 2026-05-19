@@ -45,6 +45,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
 import com.alfaazplus.sunnah.ui.controllers.rememberModalController
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
@@ -220,20 +222,26 @@ fun BookmarksScreen(
         isOpen = showDeleteAllAlert,
         onClose = { showDeleteAllAlert = false },
         title = stringResource(R.string.delete_all_bookmarks),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            scope.launch {
-                viewModel.repo.clearUserBookmarks()
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    scope.launch {
+                        viewModel.repo.clearUserBookmarks()
 
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.all_bookmarks_deleted, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        },
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.all_bookmarks_deleted, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
         content = {
             Text(
                 text = stringResource(R.string.action_cannot_be_undone),

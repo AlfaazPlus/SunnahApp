@@ -14,6 +14,7 @@ class HadithRepository2(
     private val scholarsDao: ScholarsDao,
 ) {
     val dao get() = database.hadithDao
+    val importDao get() = database.importDao
 
     fun getAllCollectionsFlow(): Flow<List<CollectionWithTranslation>> {
         return dao.getCollectionsFlow()
@@ -67,5 +68,14 @@ class HadithRepository2(
         val byId = scholarsDao.getScholars(ids).associateBy { it.id }
 
         return ids.mapNotNull { byId[it] }
+    }
+
+    suspend fun getDownloadedTranslations(langCodes: List<String>): List<String> {
+        if (langCodes.isEmpty()) return emptyList()
+        return importDao.getDownloadedTranslations(langCodes)
+    }
+
+    suspend fun deleteTranslationData(lang: String) {
+        importDao.deleteTranslationData(lang)
     }
 }

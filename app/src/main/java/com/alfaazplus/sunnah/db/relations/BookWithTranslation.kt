@@ -32,11 +32,11 @@ data class BookWithTranslation(
         return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
     }
 
-    fun getTitlePair(): String {
+    fun getTitlePair(langCode: String = "en"): String {
         val arTitle = getTitle("ar")
-        val enTitle = getTitle("en") ?: return arTitle ?: ""
+        val translatedTitle = getTitle(langCode) ?: return arTitle ?: ""
 
-        return "$enTitle (${arTitle ?: ""})"
+        return "$translatedTitle (${arTitle ?: ""})"
     }
 
     fun getIntro(langCode: String = "en"): String? {

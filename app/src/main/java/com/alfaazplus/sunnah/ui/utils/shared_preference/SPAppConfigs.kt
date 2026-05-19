@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.utils.shared_preference
 
 import android.content.Context
 import androidx.core.content.edit
-import com.alfaazplus.sunnah.api.DownloadSourceUtils.DOWNLOAD_SRC_DEFAULT
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 
 object SPAppConfigs {
@@ -17,6 +16,4 @@ object SPAppConfigs {
     fun setLocale(context: Context, locale: String) {
         sp(context).edit { putString(Keys.LOCALE, locale) }
     }
-
-
 }

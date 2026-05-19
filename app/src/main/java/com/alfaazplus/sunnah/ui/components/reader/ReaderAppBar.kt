@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -45,11 +44,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,7 +60,6 @@ import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
-import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 
@@ -130,7 +126,6 @@ fun ReaderAppBar(
     isWideScreen: Boolean,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    val context = LocalContext.current
     val appBarDims = rememberAppBarDimensions(isWideScreen)
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -202,7 +197,7 @@ fun ReaderAppBar(
                         SimpleTooltip(text = stringResource(R.string.selectTranslation)) {
                             IconButton(
                                 onClick = {
-                                    MessageUtils.showToast(context, R.string.workInProgress, Toast.LENGTH_LONG)
+                                    navController.navigate(Routes.SETTINGS_TRANSLATIONS)
                                 },
                             ) {
                                 Icon(
@@ -298,7 +293,8 @@ private fun Header(
                 .padding(horizontal = 6.dp, vertical = 4.dp),
         ) {
             Text(
-                modifier = Modifier.widthIn(max = 150.dp)
+                modifier = Modifier
+                    .widthIn(max = 150.dp)
                     .basicMarquee(),
                 text = currentBook.getTitle() ?: "…",
                 style = textStyle,

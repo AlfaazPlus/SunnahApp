@@ -12,21 +12,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
+import com.alfaazplus.sunnah.api.ResourceDownloadProxy
 import com.alfaazplus.sunnah.ui.components.common.AlertCard
-import com.alfaazplus.sunnah.ui.components.common.AlertType
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
+import com.alfaazplus.sunnah.ui.utils.preferences.AppPreferences
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun ResourceDownloadSrcSheet(isOpen: Boolean, onDismiss: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-    val currentDownloadSrc = DownloadSourceUtils.observeResourceDownloadSrc()
+    val scope = rememberCoroutineScope()
+
+    val currentDownloadSrc = AppPreferences.observeResourceDownloadProxy()
 
     val items = listOf(
-        Pair(DownloadSourceUtils.DOWNLOAD_SRC_ALFAAZ_PLUS, "AlfaazPlus"),
-        Pair(DownloadSourceUtils.DOWNLOAD_SRC_GITHUB, "GitHub Raw"),
-        Pair(DownloadSourceUtils.DOWNLOAD_SRC_JSDELIVR, "JsDelivr"),
+        Pair(ResourceDownloadProxy.ALFAAZ_PLUS, "AlfaazPlus"),
+        Pair(ResourceDownloadProxy.GITHUB, "GitHub Raw"),
+        Pair(ResourceDownloadProxy.JSDELIVR, "JsDelivr"),
     )
 
     BottomSheet(
@@ -54,10 +57,9 @@ fun ResourceDownloadSrcSheet(isOpen: Boolean, onDismiss: () -> Unit) {
                     subtitleStr = DownloadSourceUtils.getDownloadSourceName(downloadSrc),
                     selected = currentDownloadSrc == downloadSrc,
                     onClick = {
-                        coroutineScope.launch {
-                            DownloadSourceUtils.setResourceDownloadSrc(downloadSrc)
+                        scope.launch {
+                            DownloadSourceUtils.setDownloadSource(downloadSrc)
                         }
-
                         onDismiss()
                     },
                 )

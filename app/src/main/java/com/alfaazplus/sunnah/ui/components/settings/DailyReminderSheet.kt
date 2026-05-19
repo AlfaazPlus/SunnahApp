@@ -22,6 +22,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
@@ -122,18 +124,25 @@ fun DailyReminderSheet(
         isOpen = showPermissionDialog.first,
         onClose = { showPermissionDialog = showPermissionDialog.copy(false) },
         title = stringResource(R.string.notification_permission),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.allow),
-        onConfirm = {
-            permissionState?.let {
-                if (showPermissionDialog.second == true) {
-                    NavigationHelper.openAppSettings(context)
-                } else {
-                    it.launchPermissionRequest()
-                }
-            }
-            showPermissionDialog = showPermissionDialog.copy(false)
-        },
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.allow),
+                style = AlertDialogActionStyle.Primary,
+                onClick = {
+                    permissionState?.let {
+                        if (showPermissionDialog.second == true) {
+                            NavigationHelper.openAppSettings(context)
+                        } else {
+                            it.launchPermissionRequest()
+                        }
+                    }
+                    showPermissionDialog = showPermissionDialog.copy(false)
+                },
+            ),
+        ),
         content = {
             Text(
                 text = stringResource(R.string.notification_permission_desc),

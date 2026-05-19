@@ -16,7 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,15 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,7 +46,6 @@ import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
 import com.alfaazplus.sunnah.ui.components.reader.ReaderProvider
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderChangeManager
@@ -143,6 +136,7 @@ private fun HotdCard(
                             colors = hotdColors,
                             type = typography,
                         ),
+                        translationId = config.selectedTranslationLangCode,
                         hadithActions = hadithActions,
                         arabicSizePercent = config.txtSizePercentArabic,
                         translationSizePercent = config.txtSizePercentTranslation,
@@ -220,7 +214,7 @@ private fun HotdCard(
 
 @Composable
 private fun HotdTexts(hadithUi: ReaderLayoutItem.HadithUI) {
-    val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
+    val translationId = ReaderPreferences.observeHadithTranslation()
 
     Column(
         modifier = Modifier
@@ -229,21 +223,14 @@ private fun HotdTexts(hadithUi: ReaderLayoutItem.HadithUI) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         hadithUi.parsedArabicText?.let { arabicText ->
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                HotdAnnotatedText(
-                    text = arabicText,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontFamily = fontUthmani,
-                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight * 1.5f,
-                )
-            }
+            HotdAnnotatedText(
+                text = arabicText,
+            )
         }
 
         hadithUi.parsedTranslationText?.let { translationText ->
             HotdAnnotatedText(
                 text = translationText,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = if (isSerifFontStyle) FontFamily.Serif else FontFamily.SansSerif,
             )
         }
     }
@@ -252,18 +239,12 @@ private fun HotdTexts(hadithUi: ReaderLayoutItem.HadithUI) {
 @Composable
 private fun HotdAnnotatedText(
     text: AnnotatedString,
-    style: TextStyle,
-    fontFamily: FontFamily? = null,
-    lineHeight: TextUnit = style.lineHeight,
 ) {
     Text(
         modifier = Modifier.fillMaxWidth(),
         text = text,
         color = Color.White,
-        style = style,
-        fontFamily = fontFamily,
         textAlign = TextAlign.Center,
-        lineHeight = lineHeight,
     )
 }
 
@@ -275,6 +256,7 @@ private fun HotdFooter(
 ) {
     val context = LocalContext.current
     val actions = LocalHadithActions.current
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
     val hadithNumber = hotd.hwc.hadith.number.orEmpty()
     val iconTint = Color.LightGray
 
@@ -318,6 +300,7 @@ private fun HotdFooter(
                 hwc = hotd.hwc,
                 collectionName = hotd.collectionName,
                 bookName = null,
+                translationLangCode = translationLangCode,
             )
         }
     }

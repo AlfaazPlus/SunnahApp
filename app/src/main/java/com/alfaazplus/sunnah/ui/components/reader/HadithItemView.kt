@@ -31,8 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,14 +45,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
@@ -60,7 +59,6 @@ import com.alfaazplus.sunnah.ui.models.HadithChapterUi
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
-import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extension.bottomBorder
 
@@ -106,13 +104,11 @@ fun HadithItemView(
                 }
 
                 if (!hadithUi.parsedArabicText.isNullOrEmpty()) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        HadithText(
-                            text = hadithUi.parsedArabicText,
-                            shouldTrim = isVertical,
-                            maxLines = 15,
-                        )
-                    }
+                    HadithText(
+                        text = hadithUi.parsedArabicText,
+                        shouldTrim = isVertical,
+                        maxLines = 15,
+                    )
                 }
             }
         }
@@ -122,30 +118,65 @@ fun HadithItemView(
 }
 
 @Composable
-private fun HadithText(text: AnnotatedString, shouldTrim: Boolean, maxLines: Int = 20) {
+private fun HadithText(text: AnnotatedString, shouldTrim: Boolean, maxLines: Int = 15) {
     val reader = LocalReader.current
     val interactionSource = remember { MutableInteractionSource() }
     var expanded by rememberSaveable { mutableStateOf(false) }
     var isOverflowing by remember { mutableStateOf(false) }
-    val showFade = !expanded && isOverflowing
+    var trimEndOffset by remember(text) { mutableIntStateOf(-1) }
+    val isTrimmed = shouldTrim && !expanded
+
+    val isMeasured = trimEndOffset > 0
+    val showFade = isTrimmed && isOverflowing && isMeasured
+
+    val displayText =
+        if (isTrimmed && isMeasured && trimEndOffset < text.length) {
+            text.subSequence(0, trimEndOffset)
+        } else {
+            text
+        }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .graphicsLayer { clip = false }
             .clickable(
                 enabled = shouldTrim,
                 interactionSource = interactionSource,
                 indication = null,
             ) {
+                val willCollapse = expanded
                 expanded = !expanded
+
+                if (willCollapse) {
+                    trimEndOffset = -1
+                }
             },
     ) {
         Text(
-            text = text,
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = if (!shouldTrim || expanded) Int.MAX_VALUE else maxLines,
-            overflow = TextOverflow.Clip,
-            onTextLayout = { isOverflowing = it.hasVisualOverflow },
+            text = displayText,
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer { clip = false },
+            onTextLayout = { result ->
+                // All these to prevent Urdu glyph clipping
+
+                if (!isTrimmed) {
+                    isOverflowing = false
+                    trimEndOffset = -1
+                    return@Text
+                }
+
+                if (trimEndOffset > 0) return@Text
+
+                if (result.lineCount > maxLines) {
+                    isOverflowing = true
+                    trimEndOffset = result.getLineEnd(maxLines - 1, visibleEnd = true)
+                } else {
+                    isOverflowing = false
+                    trimEndOffset = -1
+                }
+            },
         )
 
         if (showFade) {
@@ -251,17 +282,13 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        chapterUi.titles.forEach { (langCode, text) ->
-                            CompositionLocalProvider(
-                                LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
-                            ) {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = text,
-                                    textAlign = TextAlign.Center,
-                                    color = contentColor,
-                                )
-                            }
+                        chapterUi.titles.forEach { text ->
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = text,
+                                textAlign = TextAlign.Center,
+                                color = contentColor,
+                            )
                         }
                     }
 
@@ -273,16 +300,12 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
 
-                            chapterUi.intros.forEach { (langCode, text) ->
-                                CompositionLocalProvider(
-                                    LocalLayoutDirection provides if (StringUtils.isRtlLanguage(langCode)) LayoutDirection.Rtl else LayoutDirection.Ltr
-                                ) {
-                                    Text(
-                                        text = text,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = contentColor.alpha(0.8f),
-                                    )
-                                }
+                            chapterUi.intros.forEach { text ->
+                                Text(
+                                    text = text,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = contentColor.alpha(0.8f),
+                                )
                             }
                         }
                     }

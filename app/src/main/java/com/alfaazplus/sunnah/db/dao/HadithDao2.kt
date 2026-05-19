@@ -7,6 +7,7 @@ import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceEntity
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
+import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import kotlinx.coroutines.flow.Flow
 
@@ -74,6 +75,45 @@ interface HadithDao2 {
     @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn")
     suspend fun getHadithsForBook(bookId: String): List<HadithWithContents>
 
+    @Query(
+        """
+            SELECT
+                hadiths.id AS hadithId,
+                hadiths.book_id AS bookId,
+                hadiths.number AS number
+            FROM hadiths
+            WHERE hadiths.book_id = :bookId
+            ORDER BY hadiths.urn
+        """
+    )
+    suspend fun getHadithNavigationItemsForBook(bookId: String): List<HadithNavigationItem>
+
+    @Query("SELECT COUNT(*) FROM hadiths WHERE book_id = :bookId")
+    suspend fun getHadithCountForBook(bookId: String): Int
+
+    @Query(
+        """
+            SELECT COUNT(*)
+            FROM hadiths
+            WHERE book_id = :bookId
+                AND urn < (
+                    SELECT urn
+                    FROM hadiths
+                    WHERE id = :hadithId
+                    LIMIT 1
+                )
+        """
+    )
+    suspend fun getHadithOffsetInBook(bookId: String, hadithId: String): Int
+
+    @Transaction
+    @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn LIMIT :limit OFFSET :offset")
+    suspend fun getHadithsForBookPage(
+        bookId: String,
+        limit: Int,
+        offset: Int,
+    ): List<HadithWithContents>
+
     @Transaction
     @Query("SELECT * FROM chapters WHERE book_id = :bookId")
     suspend fun getChaptersForBook(bookId: String): List<ChapterWithTranslation>
@@ -81,6 +121,9 @@ interface HadithDao2 {
     @Transaction
     @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId AND type = 'sunnahcom_reference' LIMIT 1")
     suspend fun getPrimaryReferenceForHadith(hadithId: String): HadithReferenceEntity?
+
+    @Query("SELECT * FROM hadith_references WHERE hadith_id IN (:hadithIds) AND type = 'sunnahcom_reference'")
+    suspend fun getPrimaryReferencesForHadiths(hadithIds: List<String>): List<HadithReferenceEntity>
 
     @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId")
     suspend fun getReferencesForHadith(hadithId: String): List<HadithReferenceEntity>
@@ -91,6 +134,9 @@ interface HadithDao2 {
         """
     )
     suspend fun countNarratorsForHadith(hadithId: String): Int
+
+    @Query("SELECT hadith_id FROM hadith_narrators WHERE hadith_id IN (:hadithIds) GROUP BY hadith_id")
+    suspend fun getHadithIdsWithNarrators(hadithIds: List<String>): List<String>
 
     @Query(
         """

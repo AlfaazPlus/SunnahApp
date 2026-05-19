@@ -41,6 +41,7 @@ import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
@@ -99,6 +100,7 @@ private fun Content(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val d by produceState<HadithMenuData?>(null, hadithId) {
         val hwc = appVm.repo.dao.getHadithById(hadithId) ?: return@produceState
@@ -157,8 +159,9 @@ private fun Content(
                 HadithHelper.shareHadith(
                     context,
                     hwc = data.hwc,
-                    collectionName = data.cwt?.getTitlePair(),
-                    bookName = data.bwt?.getTitlePair(),
+                    collectionName = data.cwt?.getTitlePair(translationLangCode),
+                    bookName = data.bwt?.getTitlePair(translationLangCode),
+                    translationLangCode = translationLangCode,
                 )
             }
 

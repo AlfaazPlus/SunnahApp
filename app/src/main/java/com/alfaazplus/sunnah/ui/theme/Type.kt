@@ -22,16 +22,27 @@ val fontName = GoogleFont("Inter")*/
 val appFontFamilyTitle = FontFamily.Default
 val appFontFamily = FontFamily.Default
 
-val fontUthmani = FontFamily(
-    Font(
-        R.font.kfgqpc_uthman_taha_naskh,
-        weight = FontWeight.Normal,
-    ),
-    Font(
-        R.font.kfgqpc_uthman_taha_naskh_bold,
-        weight = FontWeight.Bold,
-    ),
-)
+val fontUrdu by lazy {
+    FontFamily(
+        Font(
+            R.font.noto_nastaliq_urdu_regular,
+            weight = FontWeight.Normal,
+        ),
+    )
+}
+
+val fontUthmani by lazy {
+    FontFamily(
+        Font(
+            R.font.kfgqpc_uthman_taha_naskh,
+            weight = FontWeight.Normal,
+        ),
+        Font(
+            R.font.kfgqpc_uthman_taha_naskh_bold,
+            weight = FontWeight.Bold,
+        ),
+    )
+}
 
 val tightTextStyle = TextStyle(
     lineHeightStyle = LineHeightStyle.Default.copy(

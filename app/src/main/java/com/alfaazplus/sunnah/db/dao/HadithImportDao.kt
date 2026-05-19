@@ -129,6 +129,33 @@ interface HadithImportDao {
     @Query("DELETE FROM collections WHERE id = :collectionId")
     suspend fun deleteCollection(collectionId: String)
 
+    @Query("SELECT DISTINCT lang FROM hadith_contents WHERE lang IN (:langCodes)")
+    suspend fun getDownloadedTranslations(langCodes: List<String>): List<String>
+
+    @Query("DELETE FROM hadith_contents WHERE lang = :lang")
+    suspend fun deleteHadithContentsForLang(lang: String)
+
+    @Query("DELETE FROM hadith_grades WHERE lang = :lang")
+    suspend fun deleteHadithGradesForLang(lang: String)
+
+    @Query("DELETE FROM chapter_translations WHERE lang = :lang")
+    suspend fun deleteChapterTranslationsForLang(lang: String)
+
+    @Query("DELETE FROM book_translations WHERE lang = :lang")
+    suspend fun deleteBookTranslationsForLang(lang: String)
+
+    @Query("DELETE FROM collection_translations WHERE lang = :lang")
+    suspend fun deleteCollectionTranslationsForLang(lang: String)
+
+    @Transaction
+    suspend fun deleteTranslationData(lang: String) {
+        deleteHadithContentsForLang(lang)
+        deleteHadithGradesForLang(lang)
+        deleteChapterTranslationsForLang(lang)
+        deleteBookTranslationsForLang(lang)
+        deleteCollectionTranslationsForLang(lang)
+    }
+
     @Transaction
     suspend fun deleteCollectionData(collectionId: String) {
         deleteHadithRelatedForCollection(collectionId)

@@ -135,7 +135,9 @@ object HadithHelper {
     }
 
     private fun HadithWithContents.hotdPreviewText(): String? {
-        val blocks = contents.firstOrNull { it.lang == "en" }?.blocks ?: return null
+        val blocks = contents
+            .firstOrNull { it.lang != "ar" }
+            ?.blocks ?: return null
 
         return buildString {
             blocks.forEach { block ->
@@ -161,8 +163,14 @@ object HadithHelper {
         )
     }
 
-    fun shareHadith(context: Context, hwc: HadithWithContents, collectionName: String?, bookName: String?) {
-        val content = hwc.contents.firstOrNull { it.lang == "en" } ?: return
+    fun shareHadith(
+        context: Context,
+        hwc: HadithWithContents,
+        collectionName: String?,
+        bookName: String?,
+        translationLangCode: String = "en",
+    ) {
+        val content = hwc.contents.firstOrNull { it.lang == translationLangCode } ?: return
 
         val textToShare = buildString {
             content.blocks.forEach {

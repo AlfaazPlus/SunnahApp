@@ -52,6 +52,8 @@ import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
@@ -355,22 +357,28 @@ fun SingleUserCollectionScreen(
         isOpen = showDeleteAlert,
         onClose = { showDeleteAlert = false },
         title = stringResource(R.string.delete_collection),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            navController.popBackStack()
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    navController.popBackStack()
 
-            scope.launch {
-                viewModel.repo.deleteUserCollection(userCollectionId)
+                    scope.launch {
+                        viewModel.repo.deleteUserCollection(userCollectionId)
 
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.msg_collection_deleted, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        },
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.msg_collection_deleted, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
         content = {
             Text(
                 text = stringResource(R.string.msg_delete_user_collection),

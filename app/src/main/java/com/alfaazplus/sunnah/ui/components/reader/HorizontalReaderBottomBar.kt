@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.reader
 
-import android.content.res.Resources
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,83 +21,45 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
+import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 
-private fun getPreviousHadith(resources: Resources, currentPage: Int, items: List<ReaderLayoutItem>): Pair<String, String>? {
-    if (items.isEmpty() || currentPage <= 0) {
-        return null
-    }
+private fun getPreviousHadith(currentHadithId: String?, items: List<HadithNavigationItem>): Pair<String, String>? {
+    val currentIndex = items.indexOfFirst { it.hadithId == currentHadithId }
+    if (currentIndex <= 0) return null
 
-    var target = currentPage - 1
-
-    while (target >= 0) {
-        val item = items[target]
-
-        if (item is ReaderLayoutItem.HadithUI) {
-            return Pair(item.hadithId, resources.getString(R.string.hadithNumber, item.hwc.hadith.number))
-        }
-
-        target--
-    }
-
-    return null
+    val item = items[currentIndex - 1]
+    return Pair(item.hadithId, item.visibleNumbering)
 }
 
-private fun getNextHadith(resources: Resources, currentPage: Int, items: List<ReaderLayoutItem>): Pair<String, String>? {
-    if (items.isEmpty() || currentPage >= items.lastIndex) {
-        return null
-    }
+private fun getNextHadith(currentHadithId: String?, items: List<HadithNavigationItem>): Pair<String, String>? {
+    val currentIndex = items.indexOfFirst { it.hadithId == currentHadithId }
+    if (currentIndex == -1 || currentIndex >= items.lastIndex) return null
 
-    var target = currentPage + 1
-
-    while (target < items.size) {
-        val item = items[target]
-
-        if (item is ReaderLayoutItem.HadithUI) {
-            return Pair(
-                item.hadithId, resources.getString(
-                    R.string.hadithNumber, item.hwc.hadith.number
-                )
-            )
-        }
-
-        target++
-    }
-
-    return null
+    val item = items[currentIndex + 1]
+    return Pair(item.hadithId, item.visibleNumbering)
 }
 
 @Composable
 fun HorizontalReaderBottomBar(readerVm: ReaderViewModel, pagerState: PagerState) {
-    val resources = LocalResources.current
-    val currentPage by remember {
-        derivedStateOf {
-            pagerState.currentPage
-        }
-    }
+    val currentHadithId by readerVm.activeHadithId.collectAsStateWithLifecycle()
+    val items by readerVm.hadithNavigationItems.collectAsStateWithLifecycle()
 
-    val preparedData by readerVm.preparedData.collectAsStateWithLifecycle()
-    val items = preparedData?.items ?: emptyList()
-
-    val previousHadith = getPreviousHadith(resources, currentPage, items)
-    val nextHadith = getNextHadith(resources, currentPage, items)
+    val previousHadith = getPreviousHadith(currentHadithId, items)
+    val nextHadith = getNextHadith(currentHadithId, items)
 
     Surface(
         shadowElevation = 12.dp,

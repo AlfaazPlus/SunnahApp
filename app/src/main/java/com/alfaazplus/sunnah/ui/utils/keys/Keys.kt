@@ -8,7 +8,6 @@ object Keys {
     const val HADITH_ID = "hadith_id"
     const val SCHOLAR_ID = "scholar_id"
 
-    const val RESOURCE_DOWNLOAD_SRC = "resource_download_src"
     const val DAILY_REMINDER = "daily_reminder"
 
     const val SHOW_READER_SETTINGS_ONLY = "show_reader_settings_only"

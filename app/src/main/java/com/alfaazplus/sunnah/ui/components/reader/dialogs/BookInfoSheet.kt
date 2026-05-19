@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.components.reader.dialogs
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,21 +24,17 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
@@ -50,7 +44,6 @@ import com.alfaazplus.sunnah.ui.components.reader.ActionsProvider
 import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
-import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.text.buildStyledHadithAnnotatedString
@@ -86,12 +79,14 @@ fun BookInfoSheet(bwt: BookWithTranslation?, onClose: () -> Unit) {
 @Composable
 private fun Content(bwt: BookWithTranslation) {
     val hadithTextOption = ReaderPreferences.observeHadithTextOption()
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
     val arabicSizePercent = ReaderPreferences.observeTextSizePercentArabic()
     val translationSizePercent = ReaderPreferences.observeTextSizePercentTranslation()
     val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
 
     val preambleBlocks = rememberBookContentBlocks(
         bwt,
+        translationLangCode,
         hadithTextOption,
         arabicSizePercent,
         translationSizePercent,
@@ -100,6 +95,7 @@ private fun Content(bwt: BookWithTranslation) {
     )
     val notesBlocks = rememberBookContentBlocks(
         bwt,
+        translationLangCode,
         hadithTextOption,
         arabicSizePercent,
         translationSizePercent,
@@ -108,6 +104,7 @@ private fun Content(bwt: BookWithTranslation) {
     )
     val introBlocks = rememberBookContentBlocks(
         bwt,
+        translationLangCode,
         hadithTextOption,
         arabicSizePercent,
         translationSizePercent,
@@ -143,7 +140,7 @@ private fun Content(bwt: BookWithTranslation) {
             .padding(bottom = 48.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        BookInfoHeader(bwt)
+        BookInfoHeader(bwt, translationLangCode)
 
         if (sections.isEmpty()) {
             Text(
@@ -156,8 +153,10 @@ private fun Content(bwt: BookWithTranslation) {
                     .padding(vertical = 8.dp),
             )
         } else {
-            sections.forEach { section ->
-                BookInfoSectionCard(section)
+            SelectionContainer {
+                sections.forEach { section ->
+                    BookInfoSectionCard(section)
+                }
             }
         }
     }
@@ -165,7 +164,7 @@ private fun Content(bwt: BookWithTranslation) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun BookInfoHeader(bwt: BookWithTranslation) {
+private fun BookInfoHeader(bwt: BookWithTranslation, translationLangCode: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.large,
@@ -180,8 +179,7 @@ private fun BookInfoHeader(bwt: BookWithTranslation) {
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { number ->
                     Box(
-                        modifier = Modifier
-                            .size(44.dp),
+                        modifier = Modifier.size(44.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
@@ -212,7 +210,7 @@ private fun BookInfoHeader(bwt: BookWithTranslation) {
                 }
 
             bwt
-                .getTitle("en")
+                .getTitle(translationLangCode)
                 ?.let { enTitle ->
                     Text(
                         text = enTitle
@@ -282,21 +280,6 @@ private fun BookInfoSectionCard(section: BookInfoSection) {
                 Spacer(Modifier.height(8.dp))
             }
 
-            BookContentBlockView(block)
-        }
-    }
-}
-
-@Composable
-private fun BookContentBlockView(block: BookContentBlock) {
-    SelectionContainer {
-        CompositionLocalProvider(
-            LocalLayoutDirection provides if (StringUtils.isRtlLanguage(block.langCode)) {
-                LayoutDirection.Rtl
-            } else {
-                LayoutDirection.Ltr
-            },
-        ) {
             Text(
                 text = block.text,
                 color = colorScheme.onSurface,
@@ -309,6 +292,7 @@ private fun BookContentBlockView(block: BookContentBlock) {
 @Composable
 private fun rememberBookContentBlocks(
     bwt: BookWithTranslation,
+    translationLangCode: String,
     textOption: HadithTextOption,
     arabicSizePercent: Int,
     translationSizePercent: Int,
@@ -321,6 +305,7 @@ private fun rememberBookContentBlocks(
 
     return remember(
         bwt,
+        translationLangCode,
         textOption,
         colors,
         type,
@@ -331,7 +316,7 @@ private fun rememberBookContentBlocks(
     ) {
         val langCodes = buildList {
             if (textOption != HadithTextOption.ONLY_ARABIC) {
-                add("en")
+                add(translationLangCode)
             }
 
             if (textOption != HadithTextOption.ONLY_TRANSLATION) {

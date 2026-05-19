@@ -30,6 +30,14 @@ import kotlinx.coroutines.withContext
 data class ReaderPreparedData(
     val bookId: String,
     val items: List<ReaderLayoutItem>,
+    val totalHadithCount: Int = items.count { it is ReaderLayoutItem.HadithUI },
+    val isComplete: Boolean = items.count { it is ReaderLayoutItem.HadithUI } >= totalHadithCount,
+)
+
+data class ReaderPreparedPage(
+    val items: List<ReaderLayoutItem>,
+    val totalHadithCount: Int,
+    val nextOffset: Int,
 )
 
 private data class BuilderSessionStyle(
@@ -54,9 +62,10 @@ object ReaderItemsBuilder {
 
         val translationTextStyle = getTranslationTextStyle(
             TranslationTextStyleParams(
+                translationId = params.translationId,
                 colors = params.uiConfig.colors,
                 type = params.uiConfig.type,
-                sizePercent = params.arabicSizePercent,
+                sizePercent = params.translationSizePercent,
                 isSerif = params.isSerifFontStyle
             )
         )
@@ -117,13 +126,89 @@ object ReaderItemsBuilder {
                     hwc = hwc,
                     params = params,
                     chapterUi = buildChapter(chapter, params),
-                    numberingFallback = "${cwt.getTitle()}: ${hwc.hadith.number}",
+                    numberingFallback = "${cwt.getTitleForNumbering()}: ${hwc.hadith.number}",
                     showDivider = true,
                 )
             )
         }
 
         return@withContext ReaderPreparedData(bookId, items = items)
+    }
+
+    suspend fun buildPage(
+        repo: HadithRepository2,
+        bookId: String,
+        params: TextBuilderParams,
+        offset: Int,
+        limit: Int,
+        emittedChapterIds: Set<String>,
+    ): ReaderPreparedPage? = withContext(Dispatchers.IO) {
+        initializeStyles(params)
+
+        val hadithsDeferred = async {
+            repo.dao.getHadithsForBookPage(bookId, limit, offset)
+        }
+
+        val totalDeferred = async {
+            repo.dao.getHadithCountForBook(bookId)
+        }
+
+        val chaptersDeferred = async {
+            repo.dao
+                .getChaptersForBook(bookId)
+                .associateBy { it.chapter.id }
+        }
+
+        val hadiths = hadithsDeferred.await()
+        val totalHadithCount = totalDeferred.await()
+        val chapters = chaptersDeferred.await()
+        val cwt = repo.dao.getCollectionByBookId(bookId) ?: return@withContext null
+
+        if (hadiths.isEmpty()) {
+            return@withContext ReaderPreparedPage(
+                items = emptyList(),
+                totalHadithCount = totalHadithCount,
+                nextOffset = offset,
+            )
+        }
+
+        val hadithIds = hadiths.map { it.hadithId }
+        val hadithIdsWithNarrators = repo.dao
+            .getHadithIdsWithNarrators(hadithIds)
+            .toSet()
+        val primaryReferences = repo.dao
+            .getPrimaryReferencesForHadiths(hadithIds)
+            .associateBy { it.hadithId }
+
+        val items = ArrayList<ReaderLayoutItem>()
+        val pageChapterIds = HashSet(emittedChapterIds)
+
+        hadiths.forEach { hwc ->
+            val chapterId = hwc.hadith.chapterId
+
+            val chapter = if (chapterId != null && pageChapterIds.add(chapterId)) {
+                chapters[chapterId]
+            } else null
+
+            items.add(
+                buildHadithUi(
+                    repo = repo,
+                    hwc = hwc,
+                    params = params,
+                    chapterUi = buildChapter(chapter, params),
+                    numberingFallback = "${cwt.getTitleForNumbering()}: ${hwc.hadith.number}",
+                    showDivider = true,
+                    hasNarratorsChain = hwc.hadithId in hadithIdsWithNarrators,
+                    primaryReferenceValue = primaryReferences[hwc.hadithId]?.value,
+                )
+            )
+        }
+
+        return@withContext ReaderPreparedPage(
+            items = items,
+            totalHadithCount = totalHadithCount,
+            nextOffset = offset + hadiths.size,
+        )
     }
 
     suspend fun buildQuickReferenceItems(
@@ -156,12 +241,14 @@ object ReaderItemsBuilder {
         chapterUi: HadithChapterUi?,
         numberingFallback: String,
         showDivider: Boolean,
+        hasNarratorsChain: Boolean? = null,
+        primaryReferenceValue: String? = null,
     ): ReaderLayoutItem.HadithUI {
-        val narratorsCount = repo.dao.countNarratorsForHadith(hwc.hadithId)
-        val primaryReference = repo.dao.getPrimaryReferenceForHadith(hwc.hadithId)
+        val resolvedHasNarratorsChain = hasNarratorsChain ?: (repo.dao.countNarratorsForHadith(hwc.hadithId) > 0)
+        val resolvedPrimaryReferenceValue = primaryReferenceValue ?: repo.dao.getPrimaryReferenceForHadith(hwc.hadithId)?.value
 
         val gradeText = hwc.grades
-            .firstOrNull { it.lang == "en" }
+            .firstOrNull { it.lang == "en" } // for grades, use English source
             ?.let(HadithHelper::getHadithGradeText) ?: hwc.grades
             .firstOrNull()
             ?.let(HadithHelper::getHadithGradeText)
@@ -171,8 +258,8 @@ object ReaderItemsBuilder {
             chapterUi = chapterUi,
             parsedArabicText = parseArabic(hwc, params),
             parsedTranslationText = parseTranslation(hwc, params),
-            hasNarratorsChain = narratorsCount > 0,
-            visibleNumbering = primaryReference?.value ?: numberingFallback,
+            hasNarratorsChain = resolvedHasNarratorsChain,
+            visibleNumbering = resolvedPrimaryReferenceValue ?: numberingFallback,
             gradeText = gradeText,
             showDivider = showDivider,
             key = "hadith-${hwc.hadith.id}",
@@ -187,7 +274,7 @@ object ReaderItemsBuilder {
 
         val textParts = buildList {
             if (params.hadithTextOption != HadithTextOption.ONLY_ARABIC) {
-                add(Triple("en", styles.trParagraphStyle, styles.trSpanStyle))
+                add(Triple(params.translationId, styles.trParagraphStyle, styles.trSpanStyle))
             }
 
             if (params.hadithTextOption != HadithTextOption.ONLY_TRANSLATION) {
@@ -195,51 +282,47 @@ object ReaderItemsBuilder {
             }
         }
 
-        val titles = textParts
-            .mapNotNull { (langCode, paragraphStyle, spanStyle) ->
-                chapter
-                    .getTitle(langCode)
-                    ?.let {
-                        buildHadithAnnotatedString(
-                            it,
-                            linkColor = colors.primary,
-                            actions = params.hadithActions,
-                        )
-                    }
-                    ?.let { raw ->
-                        langCode to buildAnnotatedString {
-                            paragraph(paragraphStyle) {
-                                span(spanStyle) {
-                                    append(raw)
-                                }
+        val titles = textParts.mapNotNull { (langCode, paragraphStyle, spanStyle) ->
+            chapter
+                .getTitle(langCode)
+                ?.let {
+                    buildHadithAnnotatedString(
+                        it,
+                        linkColor = colors.primary,
+                        actions = params.hadithActions,
+                    )
+                }
+                ?.let { raw ->
+                    buildAnnotatedString {
+                        paragraph(paragraphStyle) {
+                            span(spanStyle) {
+                                append(raw)
                             }
                         }
                     }
-            }
-            .toMap()
+                }
+        }
 
-        val intros = textParts
-            .mapNotNull { (langCode, paragraphStyle, spanStyle) ->
-                chapter
-                    .getIntro(langCode)
-                    ?.let {
-                        buildHadithAnnotatedString(
-                            it,
-                            linkColor = colors.primary,
-                            actions = params.hadithActions,
-                        )
-                    }
-                    ?.let { raw ->
-                        langCode to buildAnnotatedString {
-                            paragraph(paragraphStyle) {
-                                span(spanStyle) {
-                                    append(raw)
-                                }
+        val intros = textParts.mapNotNull { (langCode, paragraphStyle, spanStyle) ->
+            chapter
+                .getIntro(langCode)
+                ?.let {
+                    buildHadithAnnotatedString(
+                        it.trim(),
+                        linkColor = colors.primary,
+                        actions = params.hadithActions,
+                    )
+                }
+                ?.let { raw ->
+                    buildAnnotatedString {
+                        paragraph(paragraphStyle) {
+                            span(spanStyle) {
+                                append(raw)
                             }
                         }
                     }
-            }
-            .toMap()
+                }
+        }
 
         if (titles.isEmpty() && intros.isEmpty()) {
             return null
@@ -285,7 +368,7 @@ object ReaderItemsBuilder {
                         }
 
                         val text = buildHadithAnnotatedString(
-                            parts = parseHadithText(block.text),
+                            parts = parseHadithText(block.text.trim()),
                             linkColor = colors.primary,
                             actions = params.hadithActions,
                         )
@@ -318,7 +401,7 @@ object ReaderItemsBuilder {
     private fun parseTranslation(hwc: HadithWithContents, params: TextBuilderParams): AnnotatedString? {
         if (params.hadithTextOption == HadithTextOption.ONLY_ARABIC) return null
 
-        val content = hwc.contents.firstOrNull { it.lang == "en" } ?: return null
+        val content = hwc.contents.firstOrNull { it.lang == params.translationId } ?: return null
 
         val blocks = content.blocks
 
@@ -328,42 +411,87 @@ object ReaderItemsBuilder {
 
         val styles = sessionStyle!!
 
+        val mutedSpanStyle = styles.trSpanStyle.merge(
+            SpanStyle(color = colors.onBackground.alpha(0.75f))
+        )
+        val lineBreakTypes = setOf(
+            HadithBlockType.COMMENTARY,
+            HadithBlockType.NOTE,
+            HadithBlockType.TRANSLATION,
+            HadithBlockType.UNKNOWN,
+        )
+
         return buildAnnotatedString {
-            blocks.forEachIndexed { index, block ->
-                if (block.text.isNullOrEmpty()) {
-                    return@forEachIndexed
-                }
+            var index = 0
 
-                if (!params.isSanadEnabled && block.type == HadithBlockType.SANAD) {
-                    return@forEachIndexed
-                }
+            while (index < blocks.size) {
+                val block = blocks[index]
+                index++
 
-                paragraph(if (block.type == HadithBlockType.NARRATOR) styles.trTightParagraphStyle else styles.trParagraphStyle) {
-                    val text = buildHadithAnnotatedString(
-                        parts = parseHadithText(block.text),
-                        linkColor = colors.primary,
-                        actions = params.hadithActions,
-                    )
+                if (block.text.isNullOrEmpty()) continue
+                if (!params.isSanadEnabled && block.type == HadithBlockType.SANAD) continue
 
-                    if (block.type == HadithBlockType.NARRATOR) {
-                        span(
-                            styles.trSpanStyle.merge(
-                                SpanStyle(
-                                    fontSize = styles.trSpanStyle.fontSize * 0.85,
-                                    color = colors.onBackground.alpha(0.7f),
-                                )
-                            )
-                        ) {
-                            append(text)
-                        }
-                    } else {
-                        span(styles.trSpanStyle) {
-                            append(text)
+                val text = buildHadithAnnotatedString(
+                    parts = parseHadithText(block.text.trim()),
+                    linkColor = colors.primary,
+                    actions = params.hadithActions,
+                )
+
+                when (block.type) {
+                    HadithBlockType.NARRATOR -> {
+                        paragraph(styles.trTightParagraphStyle) {
+                            span(mutedSpanStyle) { append(text) }
                         }
                     }
 
-                    if (index != blocks.lastIndex) {
-                        append("\n")
+                    in lineBreakTypes -> {
+                        paragraph(styles.trParagraphStyle) {
+                            appendLine()
+                            span(styles.trSpanStyle) { append(text) }
+                            appendLine()
+                        }
+                    }
+
+                    else -> {
+                        paragraph(styles.trParagraphStyle) {
+                            var hasContent = false
+                            var blockIndex = index - 1
+
+                            while (blockIndex < blocks.size) {
+                                val bodyBlock = blocks[blockIndex]
+                                if (bodyBlock.text.isNullOrEmpty()) {
+                                    blockIndex++
+                                    continue
+                                }
+
+                                if (!params.isSanadEnabled && bodyBlock.type == HadithBlockType.SANAD) {
+                                    blockIndex++
+                                    continue
+                                }
+
+                                if (bodyBlock.type == HadithBlockType.NARRATOR || bodyBlock.type in lineBreakTypes) {
+                                    break
+                                }
+
+                                val bodyText = buildHadithAnnotatedString(
+                                    parts = parseHadithText(bodyBlock.text.trim()),
+                                    linkColor = colors.primary,
+                                    actions = params.hadithActions,
+                                )
+
+                                if (hasContent) append(" ")
+
+                                when (bodyBlock.type) {
+                                    HadithBlockType.SANAD -> span(mutedSpanStyle) { append(bodyText) }
+                                    else -> span(styles.trSpanStyle) { append(bodyText) }
+                                }
+
+                                hasContent = true
+                                blockIndex++
+                            }
+
+                            index = blockIndex
+                        }
                     }
                 }
             }
@@ -390,4 +518,3 @@ fun AnnotatedString.Builder.span(style: SpanStyle, enabled: Boolean = true, bloc
         block()
     }
 }
-

@@ -15,14 +15,36 @@ import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.ListItem
 
+
 @Composable
-fun SettingsItemArrow() {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_chevron_right),
-        contentDescription = null,
-        modifier = Modifier.padding(start = 15.dp),
+fun SettingsItem(
+    modifier: Modifier = Modifier,
+    title: Int,
+    subtitle: Int? = null,
+    subtitleStr: String? = null,
+    icon: Int? = null,
+    iconImage: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit,
+) {
+    ListItem(
+        modifier = modifier,
+        leading = {
+            if (icon != null) Icon(
+                painter = painterResource(id = icon),
+                contentDescription = stringResource(title),
+            )
+            else if (iconImage != null) iconImage()
+        },
+        trailing = {
+            SettingsItemArrow()
+        },
+        title = title,
+        subtitle = subtitle,
+        subtitleStr = subtitleStr,
+        onClick = onClick,
     )
 }
+
 
 @Composable
 fun SettingsItemContent(
@@ -55,30 +77,10 @@ fun SettingsItemContent(
 }
 
 @Composable
-fun SettingsItem(
-    modifier: Modifier = Modifier,
-    title: Int,
-    subtitle: Int? = null,
-    subtitleStr: String? = null,
-    icon: Int? = null,
-    iconImage: (@Composable () -> Unit)? = null,
-    onClick: () -> Unit,
-) {
-    ListItem(
-        modifier = modifier,
-        leading = {
-            if (icon != null) Icon(
-                painter = painterResource(id = icon),
-                contentDescription = stringResource(title),
-            )
-            else if (iconImage != null) iconImage()
-        },
-        trailing = {
-            SettingsItemArrow()
-        },
-        title = title,
-        subtitle = subtitle,
-        subtitleStr = subtitleStr,
-        onClick = onClick,
+fun SettingsItemArrow() {
+    Icon(
+        painter = painterResource(id = R.drawable.ic_chevron_right),
+        contentDescription = null,
+        modifier = Modifier.padding(start = 15.dp),
     )
 }

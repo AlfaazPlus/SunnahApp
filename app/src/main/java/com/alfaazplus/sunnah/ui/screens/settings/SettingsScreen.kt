@@ -53,39 +53,11 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_IS_SANAD_ENABLED
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadithTranslation
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import kotlinx.coroutines.launch
 
-@Composable
-private fun AppVersionFooter() {
-    val context = LocalContext.current
-    val resources = LocalResources.current
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clickable {
-                context.copyToClipboard(BuildConfig.VERSION_NAME)
-                MessageUtils.showClipboardMessage(context, resources.getString(R.string.copied_to_clipboard))
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-    ) {
-        Text(
-            text = BuildConfig.VERSION_NAME,
-            style = MaterialTheme.typography.labelMedium,
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_clipboard),
-            contentDescription = null,
-            modifier = Modifier
-                .height(16.dp)
-                .width(16.dp),
-        )
-    }
-}
 
 @Composable
 fun SettingsScreen(
@@ -114,11 +86,20 @@ fun SettingsScreen(
         ) {
             if (!showReaderSettingsOnly) {
                 ListItemCategoryLabel(title = stringResource(R.string.app_settings))
+
+                SettingsItem(
+                    title = R.string.app_langauge,
+                    // fixme
+                    subtitle = ThemeUtils.resolveThemeModeLabel(themeMode),
+                    icon = R.drawable.ic_language,
+                ) { navController.navigate(Routes.SETTINGS_LANGUAGE) }
+
                 SettingsItem(
                     title = R.string.app_theme,
                     subtitle = ThemeUtils.resolveThemeModeLabel(themeMode),
                     icon = R.drawable.ic_theme,
                 ) { navController.navigate(Routes.SETTINGS_THEME) }
+
                 SettingsItem(
                     title = R.string.daily_reminder,
                     subtitle = AppUtils.observeDailyReminderEnabled(),
@@ -127,20 +108,30 @@ fun SettingsScreen(
             }
 
             ListItemCategoryLabel(title = stringResource(R.string.reader_settings))
+
+            SettingsItem(
+                title = R.string.selectTranslation,
+                subtitleStr = TranslationUtils.resolveHadithTranslationLabel(),
+                icon = R.drawable.ic_translations,
+            ) { navController.navigate(Routes.SETTINGS_TRANSLATIONS) }
+
             SettingsItem(
                 title = R.string.hadith_layout,
                 icon = R.drawable.ic_square_menu,
                 subtitle = ReaderPreferences.resolveHadithLayoutLabel(),
             ) { showLayoutOptionSheet = true }
+
             SettingsItem(
                 title = R.string.text_size_and_style,
                 icon = R.drawable.ic_text_size,
             ) { showTextSizesSheet = true }
+
             SettingsItem(
                 title = R.string.hadith_text_option,
                 subtitle = ReaderPreferences.resolveHadithTextOptionLabel(),
                 icon = R.drawable.ic_hadith_text_option,
             ) { showHadithTextOptionsSheet = true }
+
             SwitchItem(
                 title = R.string.show_sanad,
                 subtitle = R.string.show_sanad_description,
@@ -157,7 +148,7 @@ fun SettingsScreen(
                 SettingsItem(
                     title = R.string.resource_download_source,
                     icon = R.drawable.ic_download,
-                    subtitleStr = DownloadSourceUtils.observeCurrentDownloadSourceName(),
+                    subtitleStr = DownloadSourceUtils.observeCurrentSourceName(),
                 ) {
                     showResourceDownloadSrcSheet = true
                 }
@@ -181,6 +172,7 @@ fun SettingsScreen(
                         )
                     },
                 ) { NavigationHelper.openGithubRepo(context) }
+
                 ListItem(
                     title = R.string.privacy_policy,
                     leading = {
@@ -190,6 +182,7 @@ fun SettingsScreen(
                         )
                     },
                 ) { NavigationHelper.openPrivacyPolicy(context) }
+
                 ListItem(
                     title = R.string.about_us,
                     leading = {
@@ -199,6 +192,7 @@ fun SettingsScreen(
                         )
                     },
                 ) { NavigationHelper.openAboutUs(context) }
+
                 ListItem(
                     title = R.string.rate_app,
                     leading = {
@@ -208,6 +202,7 @@ fun SettingsScreen(
                         )
                     },
                 ) { NavigationHelper.openPlayStoreListing(context) }
+
                 ListItem(
                     title = R.string.share_app,
                     leading = {
@@ -219,6 +214,7 @@ fun SettingsScreen(
                 ) {
                     NavigationHelper.shareApp(context)
                 }
+
                 ListItem(
                     title = R.string.install_quranapp,
                     subtitle = R.string.install_quranapp_description,
@@ -251,18 +247,53 @@ fun SettingsScreen(
                     showDailyReminderSheet = false
                 },
             )
+
             LayoutOptionSheet(isOpen = showLayoutOptionSheet) {
                 showLayoutOptionSheet = false
             }
+
             TextSizeSheet(isOpen = showTextSizesSheet) {
                 showTextSizesSheet = false
             }
+
             HadithTextOptionsSheet(isOpen = showHadithTextOptionsSheet) {
                 showHadithTextOptionsSheet = false
             }
+
             ResourceDownloadSrcSheet(isOpen = showResourceDownloadSrcSheet) {
                 showResourceDownloadSrcSheet = false
             }
         }
+    }
+}
+
+@Composable
+private fun AppVersionFooter() {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable {
+                context.copyToClipboard(BuildConfig.VERSION_NAME)
+                MessageUtils.showClipboardMessage(context, resources.getString(R.string.copied_to_clipboard))
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+    ) {
+        Text(
+            text = BuildConfig.VERSION_NAME,
+            style = MaterialTheme.typography.labelMedium,
+        )
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_clipboard),
+            contentDescription = null,
+            modifier = Modifier
+                .height(16.dp)
+                .width(16.dp),
+        )
     }
 }

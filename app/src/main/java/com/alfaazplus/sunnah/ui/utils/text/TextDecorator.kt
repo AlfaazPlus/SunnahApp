@@ -12,7 +12,9 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
+import com.alfaazplus.sunnah.ui.theme.fontUrdu
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 
 data class ComposeUiConfig(
@@ -22,6 +24,7 @@ data class ComposeUiConfig(
 )
 
 data class TextBuilderParams(
+    val translationId: String,
     val uiConfig: ComposeUiConfig,
     val hadithActions: HadithActions,
     val hadithTextOption: HadithTextOption,
@@ -32,6 +35,7 @@ data class TextBuilderParams(
 )
 
 data class TranslationTextStyleParams(
+    val translationId: String,
     val colors: ColorScheme,
     val type: Typography,
     val isSerif: Boolean,
@@ -49,14 +53,19 @@ fun getTranslationTextStyle(
 ): TextStyle {
     val baselineFontSize = params.type.bodyLarge.fontSize
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
+    val isUrdu = params.translationId == "ur"
+    val lineHeightMultiplier = if (isUrdu) 2.5f else 1.5f
 
     return TextStyle(
-        fontFamily = if (params.isSerif) FontFamily.Serif else FontFamily.SansSerif,
+        fontFamily = if (isUrdu) fontUrdu
+        else if (params.isSerif) FontFamily.Serif
+        else FontFamily.SansSerif,
+        textDirection = textDirectionForLang(params.translationId),
         platformStyle = PlatformTextStyle(
             includeFontPadding = true
         ),
         fontSize = resolvedFontSize,
-        lineHeight = resolvedFontSize * 1.5f,
+        lineHeight = resolvedFontSize * lineHeightMultiplier,
     )
 }
 
@@ -75,9 +84,16 @@ fun getArabicTextStyle(
             alignment = LineHeightStyle.Alignment.Center,
             trim = LineHeightStyle.Trim.Both,
             mode = LineHeightStyle.Mode.Tight,
-        )
+        ),
     )
 }
+
+fun textDirectionForLang(
+    langCode: String,
+): TextDirection {
+    return if (StringUtils.isRtlLanguage(langCode)) TextDirection.Rtl else TextDirection.Ltr
+}
+
 
 fun textStyleForLang(
     langCode: String,
@@ -98,6 +114,7 @@ fun textStyleForLang(
     } else {
         getTranslationTextStyle(
             TranslationTextStyleParams(
+                translationId = langCode,
                 colors = colors,
                 type = type,
                 sizePercent = translationSizePercent,

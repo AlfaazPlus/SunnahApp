@@ -125,6 +125,7 @@ private fun QuickReferenceContent(
                             type = type,
                         ),
                         hadithActions = hadithActions,
+                        translationId = config.selectedTranslationLangCode,
                         arabicSizePercent = config.txtSizePercentArabic,
                         translationSizePercent = config.txtSizePercentTranslation,
                         hadithTextOption = config.hadithTextOption,

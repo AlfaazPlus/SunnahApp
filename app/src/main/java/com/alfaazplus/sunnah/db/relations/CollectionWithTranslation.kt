@@ -22,7 +22,7 @@ data class CollectionWithTranslation(
         return translations.firstOrNull { it.lang == langCode }
     }
 
-    fun getTitle(): String? {
+    fun getTitleForNumbering(): String? {
         return sequenceOf("en", "ar").firstNotNullOfOrNull {
             getTranslation(it)?.title?.takeIf { it.isNotEmpty() }
         }
@@ -32,11 +32,11 @@ data class CollectionWithTranslation(
         return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
     }
 
-    fun getTitlePair(): String {
+    fun getTitlePair(langCode: String = "en"): String {
         val arTitle = getTitle("ar")
-        val enTitle = getTitle("en") ?: return arTitle ?: ""
+        val translatedTitle = getTitle(langCode) ?: return arTitle ?: ""
 
-        return "$enTitle (${arTitle ?: ""})"
+        return "$translatedTitle (${arTitle ?: ""})"
     }
 
     fun getIntro(langCode: String = "en"): String? {

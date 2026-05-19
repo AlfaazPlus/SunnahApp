@@ -49,6 +49,7 @@ import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.theme.type
 import com.alfaazplus.sunnah.ui.utils.extension.bottomBorder
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
 
@@ -116,6 +117,7 @@ private fun ScreenContent(
 
     val books = vm.books
     val cwt = vm.cwt
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val totalBooks = books.size
     val totalHadiths = books.sumOf { it.hadithCount ?: 0 }
@@ -166,7 +168,7 @@ private fun ScreenContent(
                         Spacer(Modifier.height(12.dp))
 
                         cwt
-                            ?.getTitle("en")
+                            ?.getTitle(translationLangCode)
                             ?.let {
                                 Text(
                                     text = it,

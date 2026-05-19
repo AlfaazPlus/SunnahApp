@@ -10,14 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.SwitchItem
@@ -36,6 +33,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HadithTextPreview(
+    translationId: String,
     sizePercent: Int,
     isArabic: Boolean,
     previewText: String,
@@ -55,6 +53,7 @@ fun HadithTextPreview(
     } else {
         getTranslationTextStyle(
             params = TranslationTextStyleParams(
+                translationId = translationId,
                 colors = colors,
                 type = typography,
                 sizePercent = sizePercent,
@@ -65,6 +64,7 @@ fun HadithTextPreview(
 
     Text(
         previewText,
+        modifier = Modifier.fillMaxWidth(),
         style = style,
     )
 }
@@ -72,6 +72,7 @@ fun HadithTextPreview(
 @Composable
 private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, isSerif: Boolean = false) {
     val coroutineScope = rememberCoroutineScope()
+    val translationId = ReaderPreferences.observeHadithTranslation()
     val textSizePercent = DataStoreManager.observe(key)
 
     val min = 50f
@@ -97,6 +98,7 @@ private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, i
             text = "${textSizePercent}%", modifier = Modifier.padding(start = 10.dp), style = MaterialTheme.typography.labelSmall
         )
     }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,9 +106,7 @@ private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, i
             .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
-        CompositionLocalProvider(LocalLayoutDirection provides if (key == KEY_TEXT_SIZE_PER_ARABIC) LayoutDirection.Rtl else LayoutDirection.Ltr) {
-            HadithTextPreview(textSizePercent, key == KEY_TEXT_SIZE_PER_ARABIC, previewText, isSerif)
-        }
+        HadithTextPreview(translationId, textSizePercent, key == KEY_TEXT_SIZE_PER_ARABIC, previewText, isSerif)
     }
 }
 

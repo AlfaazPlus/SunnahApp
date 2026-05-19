@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.DEFAULT_TRANSLATION
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.utils.shared_preference.PrefKey
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,7 @@ enum class HadithTextOption(val value: String) {
     }
 }
 
+
 object ReaderPreferences {
     val KEY_HADITH_LAYOUT = PrefKey(stringPreferencesKey("hadith_layout"), HadithLayout.VERTICAL.value)
     val KEY_HADITH_TEXT_OPTION = PrefKey(stringPreferencesKey("hadith_text_option"), HadithTextOption.BOTH.value)
@@ -40,7 +42,7 @@ object ReaderPreferences {
     val KEY_TEXT_SIZE_PER_TRANSLATION = PrefKey(intPreferencesKey("text_size_translation"), 100)
     val KEY_IS_SANAD_ENABLED = PrefKey(booleanPreferencesKey("show_sanad"), true)
     val KEY_IS_SERIF_FONT_STYLE = PrefKey(booleanPreferencesKey("serif_font_style"), false)
-
+    val KEY_HADITH_TRANSLATION = PrefKey(stringPreferencesKey("hadith_translation"), DEFAULT_TRANSLATION.langCode)
 
     @Composable
     fun resolveHadithTextOptionLabel(): Int {
@@ -143,5 +145,25 @@ object ReaderPreferences {
 
     fun isSerifFontStyleFlow(): Flow<Boolean> {
         return DataStoreManager.flow(KEY_IS_SERIF_FONT_STYLE)
+    }
+
+    suspend fun getHadithTranslation(): String {
+        return DataStoreManager.readFirst(KEY_HADITH_TRANSLATION)
+    }
+
+    suspend fun setHadithTranslation(id: String) {
+        return DataStoreManager.write(
+            KEY_HADITH_TRANSLATION,
+            id,
+        )
+    }
+
+    @Composable
+    fun observeHadithTranslation(): String {
+        return DataStoreManager.observe(KEY_HADITH_TRANSLATION)
+    }
+
+    fun hadithTranslationFlow(): Flow<String> {
+        return DataStoreManager.flow(KEY_HADITH_TRANSLATION)
     }
 }

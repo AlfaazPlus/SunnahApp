@@ -9,6 +9,7 @@ import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithLayout
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.ChangeConfig
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderChangeManager
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderPreparedData
@@ -28,6 +29,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
+
+private const val READER_PAGE_SIZE = 40
+private const val READER_PREFETCH_DISTANCE = 8
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
@@ -66,6 +70,21 @@ class ReaderViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
+    val hadithNavigationItems = _activeBookId
+        .map { bookId ->
+            if (bookId != null) {
+                repo.dao.getHadithNavigationItemsForBook(bookId)
+            } else {
+                emptyList()
+            }
+        }
+        .distinctUntilChanged()
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList(),
+        )
+
     private val _preparedData = MutableStateFlow<ReaderPreparedData?>(null)
     val preparedData: StateFlow<ReaderPreparedData?> = _preparedData.asStateFlow()
 
@@ -73,6 +92,12 @@ class ReaderViewModel @Inject constructor(
     val navigateToHadith: StateFlow<String?> = _navigateToHadith.asStateFlow()
 
     private val initReaderMutex = Mutex()
+    private val pageLoadMutex = Mutex()
+
+    private var activeBuildParams: TextBuilderParams? = null
+    private var lastBuiltChangeConfig: ChangeConfig? = null
+    private var nextPageOffset: Int = 0
+    private var isPageLoadComplete: Boolean = false
 
     /**
      * Collects UI-driving prefs and rebuilds reader content. Intended to run only while this
@@ -89,6 +114,7 @@ class ReaderViewModel @Inject constructor(
             Pair(bookId, config)
         }.collectLatest { (bookId, config) ->
             val params = TextBuilderParams(
+                translationId = config.selectedTranslationLangCode,
                 uiConfig = uiConfig,
                 hadithActions = hadithActions,
                 arabicSizePercent = config.txtSizePercentArabic,
@@ -100,31 +126,160 @@ class ReaderViewModel @Inject constructor(
 
             if (bookId == null) return@collectLatest
 
-            buildItems(
+            val currentData = _preparedData.value
+            if (currentData != null && currentData.bookId == bookId && lastBuiltChangeConfig == config) {
+                return@collectLatest
+            }
+
+            rebuildItems(
                 bookId = bookId,
                 params = params,
+                changeConfig = config,
             )
         }
     }
 
     suspend fun initReaderIfNeeded(bookId: String, startHadithId: String? = null) {
         initReaderMutex.withLock {
+            startHadithId?.let { requestHadithNavigation(it) }
+
             if (_activeBookId.value != bookId) {
                 _activeBookId.value = bookId
             }
-
-            startHadithId?.let { requestHadithNavigation(it) }
         }
     }
 
-    private suspend fun buildItems(
+    private suspend fun rebuildItems(
+        bookId: String,
+        params: TextBuilderParams,
+        changeConfig: ChangeConfig,
+    ) {
+        pageLoadMutex.withLock {
+            activeBuildParams = params
+            lastBuiltChangeConfig = changeConfig
+            _preparedData.value = null
+
+            val targetHadithId = _navigateToHadith.value ?: _activeHadithId.value
+            if (targetHadithId != null) {
+                loadPageContainingHadithLocked(
+                    bookId = bookId,
+                    hadithId = targetHadithId,
+                    params = params,
+                )
+            } else {
+                loadPageFromOffsetLocked(
+                    bookId = bookId,
+                    params = params,
+                    offset = 0,
+                    replaceCurrentItems = true,
+                )
+            }
+        }
+    }
+
+    fun loadMoreItemsIfNeeded(lastVisibleIndex: Int) {
+        val data = _preparedData.value ?: return
+        if (data.isComplete || isPageLoadComplete) return
+        if (data.items.lastIndex - lastVisibleIndex > READER_PREFETCH_DISTANCE) return
+
+        val params = activeBuildParams ?: return
+
+        viewModelScope.launch {
+            pageLoadMutex.withLock {
+                val activeBookId = _activeBookId.value ?: return@withLock
+                if (activeBookId != data.bookId) return@withLock
+                if (isPageLoadComplete) return@withLock
+
+                loadNextPageLocked(activeBookId, params)
+            }
+        }
+    }
+
+    fun loadPageContainingHadithIfNeeded(hadithId: String) {
+        val data = _preparedData.value ?: return
+
+        val isAlreadyLoaded = data.items.any { item ->
+            item is ReaderLayoutItem.HadithUI && item.hadithId == hadithId
+        }
+        if (isAlreadyLoaded) return
+
+        val params = activeBuildParams ?: return
+
+        viewModelScope.launch {
+            pageLoadMutex.withLock {
+                val activeBookId = _activeBookId.value ?: return@withLock
+                loadPageContainingHadithLocked(
+                    bookId = activeBookId,
+                    hadithId = hadithId,
+                    params = params,
+                )
+            }
+        }
+    }
+
+    private suspend fun loadNextPageLocked(
         bookId: String,
         params: TextBuilderParams,
     ) {
-        _preparedData.value = ReaderItemsBuilder.build(
-            repo,
-            bookId,
-            params,
+        loadPageFromOffsetLocked(
+            bookId = bookId,
+            params = params,
+            offset = nextPageOffset,
+            replaceCurrentItems = false,
+        )
+    }
+
+    private suspend fun loadPageContainingHadithLocked(
+        bookId: String,
+        hadithId: String,
+        params: TextBuilderParams,
+    ) {
+        val targetOffset = repo.dao.getHadithOffsetInBook(bookId, hadithId)
+        val pageOffset = (targetOffset / READER_PAGE_SIZE) * READER_PAGE_SIZE
+
+        loadPageFromOffsetLocked(
+            bookId = bookId,
+            params = params,
+            offset = pageOffset,
+            replaceCurrentItems = true,
+        )
+    }
+
+    private suspend fun loadPageFromOffsetLocked(
+        bookId: String,
+        params: TextBuilderParams,
+        offset: Int,
+        replaceCurrentItems: Boolean,
+    ) {
+        val currentData = _preparedData.value
+        val currentItems = if (replaceCurrentItems) emptyList() else currentData?.items.orEmpty()
+        val emittedChapterIds = currentItems
+            .filterIsInstance<ReaderLayoutItem.HadithUI>()
+            .mapNotNull { it.chapterUi?.chapter?.chapter?.id }
+            .toSet()
+
+        val page = ReaderItemsBuilder.buildPage(
+            repo = repo,
+            bookId = bookId,
+            params = params,
+            offset = offset,
+            limit = READER_PAGE_SIZE,
+            emittedChapterIds = emittedChapterIds,
+        )
+
+        if (page == null) {
+            isPageLoadComplete = true
+            return
+        }
+
+        nextPageOffset = page.nextOffset
+        isPageLoadComplete = page.nextOffset >= page.totalHadithCount || page.items.isEmpty()
+
+        _preparedData.value = ReaderPreparedData(
+            bookId = bookId,
+            items = currentItems + page.items,
+            totalHadithCount = page.totalHadithCount,
+            isComplete = isPageLoadComplete,
         )
     }
 

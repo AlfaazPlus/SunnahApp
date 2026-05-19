@@ -13,16 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.ui.theme.alpha
 
 
 @Composable
 fun IconButton(
     painter: Painter,
     contentDescription: String? = null,
-    tint: Color = LocalContentColor.current,
+    tint: Color? = LocalContentColor.current,
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = Color.Transparent,
-        contentColor = tint,
+        contentColor = tint ?: LocalContentColor.current,
+        disabledContainerColor = Color.Transparent,
+        disabledContentColor = (tint ?: LocalContentColor.current).alpha(0.5f)
     ),
     shape: RoundedCornerShape = RoundedCornerShape(100),
     enabled: Boolean = true,

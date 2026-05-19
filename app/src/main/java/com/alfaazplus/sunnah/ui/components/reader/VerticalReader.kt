@@ -10,7 +10,10 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -35,8 +38,15 @@ fun VerticalReader(
 
     val readerItems = preparedData.items
 
+    val activeHadithId by readerVm.activeHadithId.collectAsStateWithLifecycle()
+    val navigateToHadith by readerVm.navigateToHadith.collectAsStateWithLifecycle()
+
+    val initialIndex = remember(readerItems, activeHadithId) {
+        resolveReaderItemIndex(readerItems, activeHadithId) ?: 0
+    }
+
     val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = 0
+        initialFirstVisibleItemIndex = initialIndex,
     )
 
     LaunchedEffect(listState) {
@@ -45,13 +55,17 @@ fun VerticalReader(
             .collect { readerVm.updateLastKnownHadith(it) }
     }
 
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }
+            .distinctUntilChanged()
+            .collect { readerVm.loadMoreItemsIfNeeded(it) }
+    }
+
     LaunchedEffect(readerItems) {
         if (readerItems.isNotEmpty()) {
             readerVm.updateLastKnownHadith(listState.firstVisibleItemIndex)
         }
     }
-
-    val navigateToHadith by readerVm.navigateToHadith.collectAsStateWithLifecycle()
 
     LaunchedEffect(navigateToHadith, readerItems) {
         val hadithId = navigateToHadith ?: return@LaunchedEffect
@@ -63,6 +77,8 @@ fun VerticalReader(
         if (idx >= 0) {
             listState.scrollToItem(idx)
             readerVm.consumeHadithNavigation()
+        } else if (!preparedData.isComplete) {
+            readerVm.loadPageContainingHadithIfNeeded(hadithId)
         }
     }
 
@@ -83,15 +99,17 @@ fun VerticalReader(
             }
         }
 
-        item {
-            VerticalReaderFooter(
-                readerVm,
-                onTopClick = {
-                    coroutineScope.launch {
-                        listState.scrollToItem(0)
-                    }
-                },
-            )
+        if (preparedData.isComplete) {
+            item {
+                VerticalReaderFooter(
+                    readerVm,
+                    onTopClick = {
+                        coroutineScope.launch {
+                            listState.scrollToItem(0)
+                        }
+                    },
+                )
+            }
         }
     }
 }

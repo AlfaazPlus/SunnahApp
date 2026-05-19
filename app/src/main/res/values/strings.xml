@@ -18,6 +18,8 @@
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
     <string name="allow">Allow</string>
+    <string name="downloading">Downloading…</string>
+    <string name="downloaded">Downloaded</string>
 
     <string name="hadithNumber">Hadith %s</string>
     <string name="hadithNumberFull">Hadith number %s</string>
@@ -93,7 +95,7 @@
     <string name="theme_yellow">Yellow</string>
     <string name="theme_mono">Mono</string>
     <string name="app_langauge">App Language</string>
-    <string name="app_theme">App Theme</string>
+    <string name="app_theme">Theme</string>
     <string name="theme_colors">Theme Colors</string>
     <string name="theme_mode">Theme Mode</string>
     <string name="light">Light</string>
@@ -227,6 +229,11 @@
     <string name="book_section_intro">Introduction</string>
     <string name="book_section_notes">Notes</string>
     <string name="book_no_details">No additional information for this book.</string>
+    <string name="deleteTranslation">Delete Translation?</string>
     <string name="lang_arabic">Arabic</string>
     <string name="lang_english">English</string>
+    <string name="lang_urdu">Urdu</string>
+    <string name="lang_bengali">Bengali</string>
+    <string name="lang_indonesian">Indonesian</string>
+    <string name="lang_french">French</string>
 </resources>

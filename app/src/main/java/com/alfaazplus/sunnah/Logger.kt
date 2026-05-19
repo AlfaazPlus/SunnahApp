@@ -95,15 +95,13 @@ object Logger {
     }
 
     private fun keepLastNFiles(dir: File, n: Int) {
-        val files = dir.listFiles()
+        val files = dir.listFiles() ?: return
+        if (files.size <= n) return
 
-        if (files != null && files.size > n) {
-            val sortedFiles = files.sortedByDescending { it.lastModified() }
-            val len = sortedFiles.size - n
-            for (i in 0 until len) {
-                sortedFiles[i].delete()
-            }
-        }
+        files
+            .sortedByDescending { it.lastModified() }
+            .drop(n)
+            .forEach { it.delete() }
     }
 
 }

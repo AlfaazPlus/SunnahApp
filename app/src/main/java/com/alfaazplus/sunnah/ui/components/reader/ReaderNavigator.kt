@@ -33,9 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.ui.components.common.SearchTextField
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookItemCard
-import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -72,11 +72,7 @@ fun ReaderNavigator(
 
     fun navigateHadith(bookId: String, hadithId: String) {
         scope.launch {
-            val isInCurrentView = readerVm.preparedData.value?.items?.any { item ->
-                item is ReaderLayoutItem.HadithUI && item.bookId == bookId && item.hadithId == hadithId
-            } ?: false
-
-            if (isInCurrentView) {
+            if (readerVm.activeBookId.value == bookId) {
                 readerVm.requestHadithNavigation(hadithId)
             } else {
                 readerVm.initReaderIfNeeded(bookId, hadithId)
@@ -187,12 +183,11 @@ private fun HadithList(
     readerVm: ReaderViewModel,
     onHadithSelected: (bookId: String, hadithId: String) -> Unit,
 ) {
-    val preparedData by readerVm.preparedData.collectAsStateWithLifecycle()
-    val items = preparedData?.items ?: emptyList()
+    val navigationItems by readerVm.hadithNavigationItems.collectAsStateWithLifecycle()
 
     val currentHadithId by readerVm.activeHadithId.collectAsStateWithLifecycle()
 
-    if (items.isEmpty()) {
+    if (navigationItems.isEmpty()) {
         return Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -205,17 +200,13 @@ private fun HadithList(
 
     var searchQuery by remember { mutableStateOf("") }
 
-    val hadiths = remember(items) {
-        items.filterIsInstance<ReaderLayoutItem.HadithUI>()
-    }
-
-    val filteredHadiths = remember(searchQuery, hadiths) {
-        if (searchQuery.isBlank()) hadiths
+    val filteredItems = remember(searchQuery, navigationItems) {
+        if (searchQuery.isBlank()) navigationItems
         else {
-            hadiths.filter { hadithUi ->
+            navigationItems.filter { item ->
                 val searchString = buildString {
-                    append(hadithUi.visibleNumbering)
-                    hadithUi.hwc.hadith.number?.let { append(it) }
+                    append(item.visibleNumbering)
+                    item.number?.let { append(it) }
                 }
 
                 searchString.contains(searchQuery, ignoreCase = true)
@@ -225,7 +216,7 @@ private fun HadithList(
 
     val hadithListState =
         rememberLazyListState(
-            filteredHadiths
+            filteredItems
                 .indexOfFirst { it.hadithId == currentHadithId }
                 .takeIf { it != -1 } ?: 0)
 
@@ -244,12 +235,12 @@ private fun HadithList(
         }
 
         items(
-            filteredHadiths.size,
+            filteredItems.size,
         ) {
-            val item = filteredHadiths[it]
+            val item = filteredItems[it]
 
             HadithItem(
-                hadithUi = item,
+                item = item,
                 isCurrent = item.hadithId == currentHadithId,
             ) { onHadithSelected(item.bookId, item.hadithId) }
         }
@@ -259,7 +250,7 @@ private fun HadithList(
 
 @Composable
 private fun HadithItem(
-    hadithUi: ReaderLayoutItem.HadithUI,
+    item: HadithNavigationItem,
     isCurrent: Boolean,
     onClick: () -> Unit,
 ) {
@@ -283,7 +274,7 @@ private fun HadithItem(
                 .padding(12.dp),
         ) {
             Text(
-                text = hadithUi.visibleNumbering,
+                text = item.visibleNumbering,
                 style = typography.labelLarge,
                 fontWeight = FontWeight.Bold,
             )

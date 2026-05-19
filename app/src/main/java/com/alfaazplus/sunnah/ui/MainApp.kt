@@ -31,8 +31,10 @@ import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
 import com.alfaazplus.sunnah.ui.screens.main.SearchScreenScaffold
 import com.alfaazplus.sunnah.ui.screens.settings.AppLogsScreen
+import com.alfaazplus.sunnah.ui.screens.settings.SettingsLanguageScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsThemeScreen
+import com.alfaazplus.sunnah.ui.screens.settings.SettingsTranslationsScreen
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import kotlinx.coroutines.flow.StateFlow
@@ -99,7 +101,8 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                     )
                 ) { rsEntry -> SettingsScreen(rsEntry.arguments?.getBoolean(Keys.SHOW_READER_SETTINGS_ONLY) ?: false) }
                 route(Routes.SETTINGS_THEME) { SettingsThemeScreen() }
-                // route(Routes.SETTINGS_MANAGE_COLLECTIONS) { SettingsManageCollectionsScreen() }
+                route(Routes.SETTINGS_LANGUAGE) { SettingsLanguageScreen() }
+                route(Routes.SETTINGS_TRANSLATIONS) { SettingsTranslationsScreen() }
                 route(Routes.APP_LOGS) { AppLogsScreen() }
 
                 route(

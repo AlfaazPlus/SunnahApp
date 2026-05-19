@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,8 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -53,8 +56,8 @@ private fun ItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
         onClick = { onClick(item) },
@@ -121,7 +124,7 @@ private fun Content(
             historyItems.size, key = { historyItems[it].key() }) { index ->
             ItemCard(
                 item = historyItems[index],
-                onClick = { it ->
+                onClick = {
                     navController.navigate(
                         Routes.READER.args(
                             it.item.hadithCollectionId,
@@ -157,7 +160,7 @@ fun ReadingHistoryScreen(
                             },
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = MaterialTheme.colorScheme.error
+                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = colorScheme.error
                             )
                         }
                     }
@@ -175,20 +178,26 @@ fun ReadingHistoryScreen(
         isOpen = showDeleteAllAlert,
         onClose = { showDeleteAllAlert = false },
         title = stringResource(R.string.clear_reading_history),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            scope.launch {
-                viewModel.repo.clearReadHistory()
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    scope.launch {
+                        viewModel.repo.clearReadHistory()
 
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.reading_history_cleared, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        },
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.reading_history_cleared, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
         content = {
             Text(
                 text = stringResource(R.string.action_cannot_be_undone),
