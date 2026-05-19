@@ -3,6 +3,8 @@ package com.alfaazplus.sunnah.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 import com.alfaazplus.sunnah.db.entities.v2.BookTranslationEntity
 import com.alfaazplus.sunnah.db.entities.v2.ChapterEntity
@@ -54,4 +56,92 @@ interface HadithImportDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHadithNarrators(entities: List<HadithNarratorEntity>)
+
+    @Query(
+        """
+        DELETE FROM hadith_related
+        WHERE hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+            OR related_hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteHadithRelatedForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM hadith_contents
+        WHERE hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteHadithContentsForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM hadith_references
+        WHERE hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteHadithReferencesForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM hadith_grades
+        WHERE hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteHadithGradesForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM hadith_narrators
+        WHERE hadith_id IN (SELECT id FROM hadiths WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteHadithNarratorsForCollection(collectionId: String)
+
+    @Query("DELETE FROM hadiths WHERE collection_id = :collectionId")
+    suspend fun deleteHadithsForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM chapter_translations
+        WHERE chapter_id IN (SELECT id FROM chapters WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteChapterTranslationsForCollection(collectionId: String)
+
+    @Query("DELETE FROM chapters WHERE collection_id = :collectionId")
+    suspend fun deleteChaptersForCollection(collectionId: String)
+
+    @Query(
+        """
+        DELETE FROM book_translations
+        WHERE book_id IN (SELECT id FROM books WHERE collection_id = :collectionId)
+        """
+    )
+    suspend fun deleteBookTranslationsForCollection(collectionId: String)
+
+    @Query("DELETE FROM books WHERE collection_id = :collectionId")
+    suspend fun deleteBooksForCollection(collectionId: String)
+
+    @Query("DELETE FROM collection_translations WHERE collection_id = :collectionId")
+    suspend fun deleteCollectionTranslations(collectionId: String)
+
+    @Query("DELETE FROM collections WHERE id = :collectionId")
+    suspend fun deleteCollection(collectionId: String)
+
+    @Transaction
+    suspend fun deleteCollectionData(collectionId: String) {
+        deleteHadithRelatedForCollection(collectionId)
+        deleteHadithContentsForCollection(collectionId)
+        deleteHadithReferencesForCollection(collectionId)
+        deleteHadithGradesForCollection(collectionId)
+        deleteHadithNarratorsForCollection(collectionId)
+        deleteHadithsForCollection(collectionId)
+        deleteChapterTranslationsForCollection(collectionId)
+        deleteChaptersForCollection(collectionId)
+        deleteBookTranslationsForCollection(collectionId)
+        deleteBooksForCollection(collectionId)
+        deleteCollectionTranslations(collectionId)
+        deleteCollection(collectionId)
+    }
 }

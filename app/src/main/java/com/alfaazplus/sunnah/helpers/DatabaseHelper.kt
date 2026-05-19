@@ -81,6 +81,7 @@ object DatabaseHelper {
                 val payload = bundle.toImportPayloadOrNull() ?: continue
 
                 database.withTransaction {
+                    database.importDao.deleteCollectionData(collectionId)
                     database.insertCorpusImportPayload(payload)
                 }
 
