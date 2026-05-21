@@ -58,6 +58,10 @@ object NavigationHelper {
         browseLink(context, "https://play.google.com/store/apps/details?id=com.quranapp.android")
     }
 
+    fun openQuranAppGitHub(context: Context) {
+        browseLink(context, "https://github.com/AlfaazPlus/QuranApp")
+    }
+
     fun openAboutUs(context: Context) {
         browseLink(context, "https://sunnah.alfaazplus.com/about")
     }

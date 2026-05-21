@@ -1,15 +1,18 @@
 package com.alfaazplus.sunnah.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.R
@@ -39,7 +43,8 @@ fun NoQuranAppAlert(isOpen: Boolean, onClose: () -> Unit) {
             modifier = Modifier
                 .padding(20.dp)
                 .padding(bottom = 20.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -50,22 +55,40 @@ fun NoQuranAppAlert(isOpen: Boolean, onClose: () -> Unit) {
                     modifier = Modifier
                         .height(60.dp)
                         .width(60.dp)
-                        .padding(4.dp)
+                        .padding(8.dp)
                 )
             }
+
             Text(
                 text = stringResource(R.string.install_quranapp),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                modifier = Modifier.padding(top = 15.dp)
+                textAlign = TextAlign.Center,
             )
+
             Text(
-                text = stringResource(R.string.install_quranapp_description), modifier = Modifier.padding(bottom = 15.dp)
+                text = stringResource(R.string.install_quranapp_description),
+                textAlign = TextAlign.Center,
             )
-            Button(onClick = {
-                NavigationHelper.openQuranAppPlayStoreListing(context)
-            }) {
-                Text(text = "Install from Google Play")
+
+            Button(
+                onClick = {
+                    NavigationHelper.openQuranAppPlayStoreListing(context)
+                },
+            ) {
+                Text(text = stringResource(R.string.install_from_google_play))
+            }
+
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = colorScheme.primary,
+                ),
+                onClick = {
+                    NavigationHelper.openQuranAppGitHub(context)
+                },
+            ) {
+                Text(text = stringResource(R.string.install_from_github))
             }
         }
     }

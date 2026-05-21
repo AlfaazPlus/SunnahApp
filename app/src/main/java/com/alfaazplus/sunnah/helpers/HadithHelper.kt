@@ -25,7 +25,7 @@ data class HadithGradeText(
 )
 
 object HadithHelper {
-    const val PREBUILT_HADITHS_VERSION = 2
+    const val PREBUILT_HADITHS_VERSION = 3
 
     val INCLUDED_COLLECTIONS: Set<String> = setOf(
         "bukhari",
