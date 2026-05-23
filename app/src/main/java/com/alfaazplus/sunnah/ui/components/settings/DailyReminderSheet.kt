@@ -30,7 +30,7 @@ import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.utils.workers.HadithOfTheDayScheduler
-import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
+import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 fun DailyReminderSheet(
     isOpen: Boolean,
     onClose: () -> Unit,
-    repoViewModel: HadithRepoViewModel = hiltViewModel(),
+    vm: AppViewModel = hiltViewModel(),
 ) {
     val hotdEnabled = DataStoreManager.observe(booleanPreferencesKey(Keys.DAILY_REMINDER), false)
     var showPermissionDialog by remember { mutableStateOf<Pair<Boolean, Boolean>>(Pair(false, false)) }
@@ -66,7 +66,7 @@ fun DailyReminderSheet(
     }
 
     suspend fun validate(newStatus: Boolean): Boolean {
-        if (newStatus == false) {
+        if (!newStatus) {
             return true
         }
 
@@ -77,7 +77,7 @@ fun DailyReminderSheet(
             }
         }
 
-        if (!repoViewModel.repo.isAnyCollectionDownloaded()) {
+        if (!vm.repo.isAnyCollectionDownloaded()) {
             MessageUtils.showToast(context, R.string.download_collection_first, Toast.LENGTH_LONG)
             return false
         }

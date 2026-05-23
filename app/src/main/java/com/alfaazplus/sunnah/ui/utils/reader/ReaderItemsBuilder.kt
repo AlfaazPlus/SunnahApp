@@ -5,13 +5,12 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.HadithChapterUi
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
@@ -78,7 +77,7 @@ object ReaderItemsBuilder {
     }
 
     suspend fun build(
-        repo: HadithRepository2,
+        repo: HadithRepository,
         bookId: String,
         params: TextBuilderParams,
     ): ReaderPreparedData? = withContext(Dispatchers.IO) {
@@ -126,7 +125,7 @@ object ReaderItemsBuilder {
     }
 
     suspend fun buildPage(
-        repo: HadithRepository2,
+        repo: HadithRepository,
         bookId: String,
         params: TextBuilderParams,
         offset: Int,
@@ -202,7 +201,7 @@ object ReaderItemsBuilder {
     }
 
     suspend fun buildQuickReferenceItems(
-        repo: HadithRepository2,
+        repo: HadithRepository,
         hadithIds: List<String>,
         params: TextBuilderParams,
     ): List<ReaderLayoutItem.HadithUI> = withContext(Dispatchers.IO) {
@@ -225,7 +224,7 @@ object ReaderItemsBuilder {
     }
 
     private suspend fun buildHadithUi(
-        repo: HadithRepository2,
+        repo: HadithRepository,
         hwc: HadithWithContents,
         params: TextBuilderParams,
         chapterUi: HadithChapterUi?,

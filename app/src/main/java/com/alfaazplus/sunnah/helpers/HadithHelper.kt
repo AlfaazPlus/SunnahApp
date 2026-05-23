@@ -10,7 +10,7 @@ import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeType
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDayHolder
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
@@ -97,7 +97,7 @@ object HadithHelper {
         )
     }
 
-    suspend fun getHadithOfTheDay(repo: HadithRepository2): HadithOfTheDay? {
+    suspend fun getHadithOfTheDay(repo: HadithRepository): HadithOfTheDay? {
         val hotdKey = stringPreferencesKey(Keys.HADITH_OF_THE_DAY)
 
         val hotdValue = DataStoreManager.readFirst(hotdKey, "")
@@ -150,7 +150,7 @@ object HadithHelper {
 
     private suspend fun persistHotd(
         key: Preferences.Key<String>,
-        repo: HadithRepository2,
+        repo: HadithRepository,
         hwc: HadithWithContents,
     ): HadithOfTheDay {
         val holder = HadithOfTheDayHolder(hwc.hadithId, Date(System.currentTimeMillis()))

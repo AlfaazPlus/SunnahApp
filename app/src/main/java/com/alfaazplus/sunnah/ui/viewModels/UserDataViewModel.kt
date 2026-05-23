@@ -2,9 +2,9 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
@@ -69,20 +69,10 @@ class UserDataViewModel @Inject constructor(
     private val _collectionItems = MutableStateFlow<List<UserCollectionItemNormalized>>(emptyList())
     val collectionItems: StateFlow<List<UserCollectionItemNormalized>> = _collectionItems
 
-    fun isBookmarked(
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
-    ): StateFlow<Boolean> {
-        val key = "$hadithCollectionId-$hadithBookId-$hadithNumber"
-
-        return bookmarkCache.getOrPut(key) {
+    fun isBookmarked(hadithId: String): StateFlow<Boolean> {
+        return bookmarkCache.getOrPut(hadithId) {
             repository
-                .observeUserBookmark(
-                    hadithCollectionId,
-                    hadithBookId,
-                    hadithNumber,
-                )
+                .observeUserBookmark(hadithId)
                 .map { it != null }
                 .stateIn(
                     viewModelScope,
@@ -92,9 +82,7 @@ class UserDataViewModel @Inject constructor(
         }
     }
 
-    fun loadCollectionItems(
-        collectionId: Long,
-    ) {
+    fun loadCollectionItems(collectionId: Long) {
         viewModelScope.launch {
             repository
                 .observeUserCollectionItems(collectionId)

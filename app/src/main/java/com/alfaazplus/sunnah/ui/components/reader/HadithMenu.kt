@@ -13,6 +13,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,7 +44,10 @@ import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 enum class HadithMenuAction {
     ADD_TO_BOOKMARK,
@@ -95,7 +99,9 @@ private fun Content(
         .collectAsState()
         fixme
 */
-    val isBookmarked = false
+    val isBookmarked by viewModel
+        .isBookmarked(hadithId)
+        .collectAsState()
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -122,22 +128,20 @@ private fun Content(
         isBookmarked = isBookmarked
     ) { actionType ->
         when (actionType) {
-            HadithMenuAction.ADD_TO_COLLECTION -> {/*fixme collectionModalController.show(
+            /*HadithMenuAction.ADD_TO_COLLECTION -> {
+                collectionModalController.show(
                     AddToCollectionRequest(
-                        hadithCollectionId = collectionId,
-                        hadithBookId = bookId,
-                        hadithNumber = hadithNumber,
+                        hadithId = hadithId,
                     )
-                )*/
+                )
             }
 
-            HadithMenuAction.ADD_TO_BOOKMARK -> {/*fixme scope.launch {
+            HadithMenuAction.ADD_TO_BOOKMARK -> {
+                scope.launch {
                     if (!isBookmarked) {
                         viewModel.repo.addUserBookmark(
                             UserBookmark(
-                                hadithCollectionId = collectionId,
-                                hadithBookId = bookId,
-                                hadithNumber = hadithNumber,
+                                hadithId = hadithId,
                                 remark = "",
                             )
                         )
@@ -146,14 +150,12 @@ private fun Content(
                     withContext(Dispatchers.Main) {
                         bookmarksModalController.show(
                             AddToBookmarkRequest(
-                                hadithCollectionId = collectionId,
-                                hadithBookId = bookId,
-                                hadithNumber = hadithNumber,
+                                hadithId = hadithId,
                             )
                         )
                     }
-                }*/
-            }
+                }
+            }*/
 
             HadithMenuAction.SHARE_HADITH -> {
                 HadithHelper.shareHadith(

@@ -2,237 +2,335 @@ package com.alfaazplus.sunnah.db.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
-import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.entities.hadith.HadithChapter
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapter
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HChapterInfo
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollection
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollectionInfo
-import com.alfaazplus.sunnah.db.entities.hadith.entities.Hadith
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
+import com.alfaazplus.sunnah.db.entities.migration.HadithIdUrnLookup
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchRow
+import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceEntity
+import com.alfaazplus.sunnah.db.relations.BookWithTranslation
+import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
+import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
+import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
+import com.alfaazplus.sunnah.db.relations.HadithWithContents
+import kotlinx.coroutines.flow.Flow
 
-@Deprecated("v2")
 @Dao
 interface HadithDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCollection(collection: HCollection): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCollectionInfo(collectionInfo: HCollectionInfo): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBooksBulk(book: List<HBook>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBookInfosBulk(bookInfo: List<HBookInfo>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChaptersBulk(chapter: List<HChapter>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChapterInfosBulk(chapterInfo: List<HChapterInfo>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHadithsBulk(hadiths: List<Hadith>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHadithTranslation(hadithTranslation: HadithTranslation): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHadithTranslationsBulk(hadithTranslations: List<HadithTranslation>)
-
-    @Query("SELECT * FROM collection")
-    suspend fun getCollectionList(): List<HCollection>
-
-    @Query("SELECT * FROM collection WHERE collection_id = :collectionId")
-    suspend fun getCollectionById(collectionId: Int): HCollection
-
-    @Query("SELECT * FROM collection_info WHERE collection_id = :collectionId AND language_code = :langCode")
-    suspend fun getCollectionInfoById(langCode: String, collectionId: Int): HCollectionInfo
-
-    @Query("SELECT * FROM book WHERE collection_id = :collectionId AND book_id = :bookId")
-    suspend fun getBookById(collectionId: Int, bookId: Int): HBook
-
-    @Query("SELECT * FROM book WHERE collection_id = :collectionId")
-    suspend fun getBookList(collectionId: Int): List<HBook>
-
-    @Query("SELECT * FROM book_info WHERE collection_id=:collectionId AND book_id = :bookId AND language_code = :langCode")
-    suspend fun getBookInfoById(langCode: String, collectionId: Int, bookId: Int): HBookInfo
+    @Transaction
+    @Query("SELECT * FROM collections ORDER BY sort_order")
+    suspend fun getCollections(): List<CollectionWithTranslation>
 
     @Transaction
-    @RewriteQueriesToDropUnusedColumns
-    @Query("SELECT * FROM chapter INNER JOIN chapter_info ON chapter.chapter_id = chapter_info.chapter_id WHERE chapter.chapter_id = :chapterId")
-    suspend fun getChapterWithInfoById(chapterId: Double): HadithChapter
+    @Query("SELECT * FROM collections ORDER BY sort_order")
+    fun getCollectionsFlow(): Flow<List<CollectionWithTranslation>>
 
-    @Query("SELECT COUNT(*) FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId")
-    suspend fun getHadithCount(collectionId: Int, bookId: Int): Int
-
-    @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId")
-    suspend fun getHadithList(collectionId: Int, bookId: Int): List<Hadith>
-
-    @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND order_in_book = :orderInBook")
-    suspend fun getHadithByOrder(collectionId: Int, bookId: Int, orderInBook: Int): Hadith
-
-    @Query("SELECT * FROM hadith WHERE urn = :urn")
-    suspend fun getHadithByURN(urn: String): Hadith
-
-    @Query("SELECT * FROM hadith_translation WHERE ar_urn = :arURN AND lang_code = :langCode")
-    suspend fun getHadithTranslationByArURN(arURN: String, langCode: String): HadithTranslation
-
+    @Transaction
     @Query(
-        """
-        SELECT * FROM hadith_translation 
-        WHERE ar_urn = (
-            SELECT urn FROM hadith 
-            WHERE collection_id = :collectionId AND book_id = :bookId AND hadith_number = :hadithNumber
-        ) AND lang_code = :langCode
-    """
+        "SELECT * FROM collections WHERE id = :id"
     )
-    suspend fun getHadithTranslationByHadithNumber(
-        collectionId: Int,
-        bookId: Int,
-        hadithNumber: String,
-        langCode: String,
-    ): HadithTranslation
+    suspend fun getCollectionById(id: String): CollectionWithTranslation?
 
-    @Query("SELECT * FROM hadith WHERE collection_id = :collectionId AND book_id = :bookId AND chapter_id = :chapterId")
-    suspend fun getHadithListByChapter(collectionId: Int, bookId: Int, chapterId: Int): List<Hadith>
-
-    @Query("DELETE FROM collection WHERE collection_id = :collectionId")
-    suspend fun deleteCollection(collectionId: Int)
-
-    @Query("SELECT narrators2 from hadith WHERE urn = :urn")
-    suspend fun getNarratorIds(urn: Int): String
-
-    // search hadiths in collectionIds
     @Transaction
-    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-        SELECT
-            hadith.*,
-            hadith_translation.*,
-            collection_info.name
-        FROM hadith
-        INNER JOIN hadith_translation 
-            ON hadith.urn = hadith_translation.ar_urn
-        INNER JOIN collection_info
-            ON hadith.collection_id = collection_info.collection_id
-        WHERE 
-            (hadith_translation.hadith_text LIKE '%' || :query || '%' COLLATE NOCASE)
-            AND (COALESCE(:collectionIds, '') = '' OR hadith.collection_id IN (:collectionIds))
-            AND hadith_translation.lang_code = :langCode
-            AND collection_info.language_code = :langCode
-        """
-    )
-    fun searchHadiths(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, HadithSearchResult>
-
-    // search books in collectionIds
-    @Transaction
-    @RewriteQueriesToDropUnusedColumns
-    @Query(
-        """
-            SELECT 
-                book.*,
-                book_info.*,
-                collection_info.name
-            FROM book
-            INNER JOIN book_info
-                ON book.book_id = book_info.book_id AND book.collection_id = book_info.collection_id
-            INNER JOIN collection_info
-                ON book.collection_id = collection_info.collection_id
-            WHERE (
-                    book_info.title LIKE '%' || :query || '%' COLLATE NOCASE OR
-                    book_info.intro LIKE '%' || :query || '%' COLLATE NOCASE OR
-                    book_info.description LIKE '%' || :query || '%' COLLATE NOCASE
-                )
-                AND book_info.language_code = :langCode
-                AND collection_info.language_code = :langCode
-                AND (COALESCE(:collectionIds, '') = '' OR book.collection_id IN (:collectionIds))
+            SELECT * FROM collections as c
+            INNER JOIN books ON books.collection_id = c.id
+            WHERE books.id = :bookId
             """
     )
-    fun searchBooks(query: String, collectionIds: List<Int>?, langCode: String): PagingSource<Int, BooksSearchResult>
+    suspend fun getCollectionByBookId(bookId: String): CollectionWithTranslation?
 
     @Transaction
-    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+            SELECT books.*, COUNT(hadiths.id) AS hadith_count
+            FROM books
+            LEFT JOIN hadiths
+                ON hadiths.book_id = books.id
+            WHERE books.collection_id = :collectionId
+            GROUP BY books.id
+            ORDER BY books.number + 0
+        """
+    )
+
+    suspend fun getBooksForCollection(collectionId: String): List<BookWithTranslation>
+
+    @Transaction
+    @Query(
+        """
+            SELECT books.*, COUNT(hadiths.id) AS hadith_count
+            FROM books
+            LEFT JOIN hadiths
+                ON hadiths.book_id = books.id
+            WHERE books.id = :bookId
+        """
+    )
+
+    suspend fun getBookById(bookId: String): BookWithTranslation?
+
+    @Transaction
+    @Query(
+        """SELECT * FROM hadiths WHERE hadiths.id = :id """
+    )
+    suspend fun getHadithById(id: String): HadithWithContents?
+
+    @Query("SELECT id FROM hadiths WHERE urn = :urn LIMIT 1")
+    suspend fun getHadithIdByUrn(urn: Long): String?
+
+    @Query("SELECT urn, id FROM hadiths WHERE urn IN (:urns)")
+    suspend fun getHadithIdsByUrns(urns: List<Long>): List<HadithIdUrnLookup>
+
+    @Query("SELECT id FROM hadiths WHERE collection_id = :collectionId")
+    suspend fun getHadithIdsForCollection(collectionId: String): List<String>
+
+    @Transaction
+    @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn")
+    suspend fun getHadithsForBook(bookId: String): List<HadithWithContents>
+
+    @Query(
+        """
+            SELECT
+                hadiths.id AS hadithId,
+                hadiths.book_id AS bookId,
+                hadiths.number AS number
+            FROM hadiths
+            WHERE hadiths.book_id = :bookId
+            ORDER BY hadiths.urn
+        """
+    )
+    suspend fun getHadithNavigationItemsForBook(bookId: String): List<HadithNavigationItem>
+
+    @Query("SELECT COUNT(*) FROM hadiths WHERE book_id = :bookId")
+    suspend fun getHadithCountForBook(bookId: String): Int
+
+    @Query(
+        """
+            SELECT COUNT(*)
+            FROM hadiths
+            WHERE book_id = :bookId
+                AND urn < (
+                    SELECT urn
+                    FROM hadiths
+                    WHERE id = :hadithId
+                    LIMIT 1
+                )
+        """
+    )
+    suspend fun getHadithOffsetInBook(bookId: String, hadithId: String): Int
+
+    @Transaction
+    @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn LIMIT :limit OFFSET :offset")
+    suspend fun getHadithsForBookPage(
+        bookId: String,
+        limit: Int,
+        offset: Int,
+    ): List<HadithWithContents>
+
+    @Transaction
+    @Query("SELECT * FROM chapters WHERE book_id = :bookId")
+    suspend fun getChaptersForBook(bookId: String): List<ChapterWithTranslation>
+
+    @Transaction
+    @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId AND type = 'sunnahcom_reference' LIMIT 1")
+    suspend fun getPrimaryReferenceForHadith(hadithId: String): HadithReferenceEntity?
+
+    @Query("SELECT * FROM hadith_references WHERE hadith_id IN (:hadithIds) AND type = 'sunnahcom_reference'")
+    suspend fun getPrimaryReferencesForHadiths(hadithIds: List<String>): List<HadithReferenceEntity>
+
+    @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId")
+    suspend fun getReferencesForHadith(hadithId: String): List<HadithReferenceEntity>
+
+    @Query(
+        """
+            SELECT COUNT(*) from hadith_narrators where hadith_id = :hadithId
+        """
+    )
+    suspend fun countNarratorsForHadith(hadithId: String): Int
+
+    @Query("SELECT hadith_id FROM hadith_narrators WHERE hadith_id IN (:hadithIds) GROUP BY hadith_id")
+    suspend fun getHadithIdsWithNarrators(hadithIds: List<String>): List<String>
+
+    @Query(
+        """
+            SELECT narrator_id FROM hadith_narrators
+            WHERE hadith_id = :hadithId AND source = :source
+            ORDER BY position DESC
+        """
+    )
+    suspend fun getNarratorIdsForHadith(hadithId: String, source: String = "scholars"): List<Int>
+
+    // ────────────────────────────────────────────────────────────────────────
+
+    @Query(
+        """
+        SELECT h.id FROM hadiths AS h
+        WHERE NOT EXISTS (
+            SELECT 1 FROM hadith_grades AS g WHERE g.hadith_id = h.id
+        )
+        OR EXISTS (
+            SELECT 1 FROM hadith_grades AS g
+            WHERE g.hadith_id = h.id AND g.grade_id LIKE 'sahih%'
+        )
+        ORDER BY RANDOM()
+        LIMIT 1
+        """
+    )
+    suspend fun getRandomSahihHadithId(): String?
+
     @Query(
         """
         SELECT
-            hadith.hadith_number,
-            hadith.collection_id,
-            hadith.book_id,
-            hadith.order_in_book,
-            collection_info.name,
-            book.serial_number,
-            book_info.title
-        FROM hadith
-        INNER JOIN collection_info
-            ON hadith.collection_id = collection_info.collection_id
-        INNER JOIN book
-            ON hadith.collection_id = book.collection_id AND hadith.book_id = book.book_id
-        INNER JOIN book_info
-            ON hadith.collection_id = book_info.collection_id AND hadith.book_id = book_info.book_id
-        WHERE 
-            hadith.hadith_number = :hadithNumber COLLATE NOCASE
+            h.id AS hadith_id,
+            h.book_id AS book_id,
+            h.collection_id AS collection_id,
+            h.number AS hadith_number,
+            ct.title AS collection_name,
+            hc.blocks_json AS blocks_json
+        FROM hadiths AS h
+        INNER JOIN hadith_contents AS hc
+            ON h.id = hc.hadith_id AND hc.lang = :langCode
+        INNER JOIN collection_translations AS ct
+            ON h.collection_id = ct.collection_id AND ct.lang = :langCode
+        WHERE hc.blocks_json LIKE '%' || :query || '%' COLLATE NOCASE
+            AND (
+                COALESCE(:collectionIds, '') = ''
+                OR h.collection_id IN (:collectionIds)
+            )
+        ORDER BY h.urn
         """
     )
-    suspend fun searchQuickHadithsByHadithNumber(hadithNumber: String): List<HadithSearchQuickResult>
+    fun searchHadiths(
+        query: String,
+        collectionIds: List<String>?,
+        langCode: String,
+    ): PagingSource<Int, HadithSearchRow>
 
-    @Transaction
-    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
         SELECT
-            hadith.hadith_number,
-            hadith.collection_id,
-            hadith.book_id,
-            hadith.order_in_book,
-            collection_info.name,
-            book.serial_number,
-            book_info.title
-        FROM book
-        INNER JOIN collection_info
-            ON book.collection_id = collection_info.collection_id
-        INNER JOIN book_info
-            ON book.collection_id = book_info.collection_id AND book.book_id = book_info.book_id
-        INNER JOIN hadith
-            ON book.collection_id = hadith.collection_id AND book.book_id = hadith.book_id
-        WHERE
-            book.serial_number = :bookSerial
-            AND hadith.order_in_book = :orderInBook
+            b.id AS id,
+            b.collection_id AS collection_id,
+            b.number AS number,
+            ct.title AS collection_name,
+            bt_en.title AS title_en,
+            bt_ar.title AS title_ar,
+            (
+                SELECT COUNT(*)
+                FROM hadiths AS h
+                WHERE h.book_id = b.id
+            ) AS hadith_count
+        FROM books AS b
+        INNER JOIN book_translations AS bt_en
+            ON b.id = bt_en.book_id AND bt_en.lang = :langCode
+        INNER JOIN collection_translations AS ct
+            ON b.collection_id = ct.collection_id AND ct.lang = :langCode
+        LEFT JOIN book_translations AS bt_ar
+            ON b.id = bt_ar.book_id AND bt_ar.lang = 'ar'
+        WHERE (
+            bt_en.title LIKE '%' || :query || '%' COLLATE NOCASE
+            OR bt_en.intro LIKE '%' || :query || '%' COLLATE NOCASE
+            OR bt_en.notes LIKE '%' || :query || '%' COLLATE NOCASE
+            OR bt_en.preamble LIKE '%' || :query || '%' COLLATE NOCASE
+        )
+        AND (
+            COALESCE(:collectionIds, '') = ''
+            OR b.collection_id IN (:collectionIds)
+        )
+        ORDER BY ct.title, b.number + 0
         """
     )
-    suspend fun searchQuickHadithsByBook(bookSerial: String, orderInBook: Int): List<HadithSearchQuickResult>
+    fun searchBooks(
+        query: String,
+        collectionIds: List<String>?,
+        langCode: String,
+    ): PagingSource<Int, BooksSearchResult>
 
-    @Transaction
-    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
         SELECT
-            book.book_id,
-            book.collection_id,
-            book.serial_number,
-            collection_info.name,
-            book_info.title
-        FROM book
-        INNER JOIN collection_info
-            ON book.collection_id = collection_info.collection_id
-        INNER JOIN book_info
-            ON book.collection_id = book_info.collection_id AND book.book_id = book_info.book_id
-        WHERE 
-            book.serial_number = :serialNumber
+            h.id AS hadith_id,
+            h.book_id AS book_id,
+            h.collection_id AS collection_id,
+            h.number AS hadith_number,
+            ct.title AS collection_name,
+            b.number AS book_number,
+            bt.title AS book_title,
+            (
+                SELECT COUNT(*)
+                FROM hadiths AS counted
+                WHERE counted.book_id = h.book_id
+                    AND counted.urn <= h.urn
+            ) AS hadith_order
+        FROM hadiths AS h
+        INNER JOIN books AS b ON h.book_id = b.id
+        INNER JOIN book_translations AS bt
+            ON b.id = bt.book_id AND bt.lang = :langCode
+        INNER JOIN collection_translations AS ct
+            ON h.collection_id = ct.collection_id AND ct.lang = :langCode
+        WHERE h.number = :hadithNumber COLLATE NOCASE
+        ORDER BY h.urn
         """
     )
-    suspend fun searchQuickBooks(serialNumber: String): List<BookSearchQuickResult>
+    suspend fun searchQuickHadithsByHadithNumber(
+        hadithNumber: String,
+        langCode: String,
+    ): List<HadithSearchQuickResult>
+
+    @Query(
+        """
+        SELECT
+            h.id AS hadith_id,
+            h.book_id AS book_id,
+            h.collection_id AS collection_id,
+            h.number AS hadith_number,
+            ct.title AS collection_name,
+            b.number AS book_number,
+            bt.title AS book_title,
+            (
+                SELECT COUNT(*)
+                FROM hadiths AS counted
+                WHERE counted.book_id = h.book_id
+                    AND counted.urn <= h.urn
+            ) AS hadith_order
+        FROM hadiths AS h
+        INNER JOIN books AS b ON h.book_id = b.id
+        INNER JOIN book_translations AS bt
+            ON b.id = bt.book_id AND bt.lang = :langCode
+        INNER JOIN collection_translations AS ct
+            ON h.collection_id = ct.collection_id AND ct.lang = :langCode
+        WHERE b.number = :bookNumber
+        ORDER BY h.urn
+        LIMIT 1 OFFSET :offset
+        """
+    )
+    suspend fun searchQuickHadithByBookOrder(
+        bookNumber: String,
+        offset: Int,
+        langCode: String,
+    ): List<HadithSearchQuickResult>
+
+    @Query(
+        """
+        SELECT
+            b.id AS book_id,
+            b.collection_id AS collection_id,
+            b.number AS book_number,
+            ct.title AS collection_name,
+            bt.title AS book_title
+        FROM books AS b
+        INNER JOIN book_translations AS bt
+            ON b.id = bt.book_id AND bt.lang = :langCode
+        INNER JOIN collection_translations AS ct
+            ON b.collection_id = ct.collection_id AND ct.lang = :langCode
+        WHERE b.number = :bookNumber
+        ORDER BY b.number + 0
+        """
+    )
+    suspend fun searchQuickBooks(
+        bookNumber: String,
+        langCode: String,
+    ): List<BookSearchQuickResult>
 }

@@ -51,9 +51,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
+import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Section
 import com.alfaazplus.sunnah.ui.components.common.SectionEmptyMessage
@@ -62,27 +63,41 @@ import com.alfaazplus.sunnah.ui.components.common.SectionHeaderViewAll
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.controllers.rememberModalController
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
-import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
+import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
 @Composable
 private fun ReadHistoryItemCard(
     item: ReadHistory,
-    onClick: () -> Unit,
-    hadithViewModel: HadithRepoViewModel = hiltViewModel(),
+    onNavigate: (bookId: String, hadithId: String) -> Unit,
+    appViewModel: AppViewModel = hiltViewModel(),
 ) {
-    val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getCollection(item.hadithCollectionId) }
+    val hwc = produceState<HadithWithContents?>(initialValue = null, item.hadithId) {
+        value = tryOrNull { appViewModel.repo.dao.getHadithById(item.hadithId) }
     }.value
 
-    val hadithBook = produceState<BookWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getBookById(item.hadithCollectionId, item.hadithBookId) }
+    val collectionName = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getCollectionById(it.collectionId)
+                    ?.getTitle("en")
+            }
+        }
+    }.value
+
+    val bookTitle = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getBookById(it.bookId)
+                    ?.getTitle("en")
+            }
+        }
     }.value
 
     Box(
@@ -92,7 +107,8 @@ private fun ReadHistoryItemCard(
             .clip(MaterialTheme.shapes.small)
             .background(MaterialTheme.colorScheme.surface)
             .clickable {
-                onClick()
+                val bookId = hwc?.bookId ?: return@clickable
+                onNavigate(bookId, item.hadithId)
             }
             .padding(12.dp),
     ) {
@@ -100,12 +116,12 @@ private fun ReadHistoryItemCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "${hadithCollection?.info?.name ?: "?"} : ${item.hadithNumber}",
+                text = "${collectionName ?: "?"} : ${hwc?.hadith?.number ?: item.hadithId}",
                 style = MaterialTheme.typography.titleSmall,
             )
 
             Text(
-                text = "Book: ${hadithBook?.info?.title ?: " ?"}",
+                text = "Book: ${bookTitle ?: " ?"}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                 maxLines = 2,
@@ -143,19 +159,15 @@ private fun SectionReadHistory(
                 contentPadding = PaddingValues(horizontal = 16.dp),
             ) {
                 items(
-                    readHistory.size, key = { readHistory[it].key() }) { index ->
+                    readHistory.size, key = { readHistory[it].hadithId }) { index ->
                     val item = readHistory[index]
 
                     ReadHistoryItemCard(
-                        item,
-                        onClick = {
-                            /*navController.navigate(
-                                Routes.READER.args(
-                                    item.hadithCollectionId,
-                                    item.hadithBookId,
-                                    item.hadithNumber,
-                                )
-                            )fixme*/
+                        item = item,
+                        onNavigate = { bookId, hadithId ->
+                            navController.navigate(
+                                Routes.READER.args(bookId, hadithId),
+                            )
                         },
                     )
                 }
@@ -169,15 +181,30 @@ private fun SectionReadHistory(
 private fun UserBookmarkCard(
     bookmark: UserBookmark,
     onClick: () -> Unit,
-    hadithViewModel: HadithRepoViewModel = hiltViewModel(),
+    appViewModel: AppViewModel = hiltViewModel(),
 ) {
-
-    val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getCollection(bookmark.hadithCollectionId) }
+    val hwc = produceState<HadithWithContents?>(initialValue = null, bookmark.hadithId) {
+        value = tryOrNull { appViewModel.repo.dao.getHadithById(bookmark.hadithId) }
     }.value
 
-    val hadithBook = produceState<BookWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getBookById(bookmark.hadithCollectionId, bookmark.hadithBookId) }
+    val collectionName = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getCollectionById(it.collectionId)
+                    ?.getTitle("en")
+            }
+        }
+    }.value
+
+    val bookTitle = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getBookById(it.bookId)
+                    ?.getTitle("en")
+            }
+        }
     }.value
 
     Box(
@@ -195,7 +222,7 @@ private fun UserBookmarkCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "${hadithCollection?.info?.name ?: "? "}: ${bookmark.hadithNumber}",
+                text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: bookmark.hadithId}",
                 style = MaterialTheme.typography.titleSmall,
             )
 
@@ -231,7 +258,7 @@ private fun UserBookmarkCard(
             } else {
 
                 Text(
-                    text = "Book: ${hadithBook?.info?.title ?: " ?"}",
+                    text = "Book: ${bookTitle ?: " ?"}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                     maxLines = 2,
@@ -282,9 +309,7 @@ private fun SectionBookmarks(
                         onClick = {
                             bookmarksModalController.show(
                                 AddToBookmarkRequest(
-                                    hadithCollectionId = bookmark.hadithCollectionId,
-                                    hadithBookId = bookmark.hadithBookId,
-                                    hadithNumber = bookmark.hadithNumber,
+                                    hadithId = bookmark.hadithId,
                                 )
                             )
                         },

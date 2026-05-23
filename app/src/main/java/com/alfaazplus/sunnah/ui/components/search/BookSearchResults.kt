@@ -64,29 +64,33 @@ private fun BookSearchItem(
                     ),
                 ) {
                     Text(
-                        "${item.collectionName} : ${item.book.serialNumber}",
+                        "${item.collectionName} : ${item.book.number}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }
 
-            Text(
-                text = item.info.title,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 5.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center,
-            )
+            item.titleEn?.let { titleEn ->
+                Text(
+                    text = titleEn,
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 5.dp),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
+                    textAlign = TextAlign.Center,
+                )
+            }
 
-            Text(
-                text = item.book.title,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                fontFamily = fontUthmani,
-            )
+            item.titleAr?.let { titleAr ->
+                Text(
+                    text = titleAr,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontUthmani,
+                )
+            }
 
             Row(
                 modifier = Modifier
@@ -94,8 +98,7 @@ private fun BookSearchItem(
                     .padding(top = 15.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
             ) {
-                BookMetaInfoCard("Range: ${item.book.hadithStart} - ${item.book.hadithEnd}")
-                BookMetaInfoCard("Total Hadith: ${item.book.hadithCount}")
+                BookMetaInfoCard("Total Hadith: ${item.hadithCount}")
             }
         }
     }
@@ -145,7 +148,7 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
         ) { index ->
             val item = quickSearchResults[index]
             QuickHadithSearchResult(
-                title = "${item.serialNumber}. ${item.bookTitle}",
+                title = "${item.bookNumber}. ${item.bookTitle}",
                 description = {
                     Text(
                         text = item.collectionName,
@@ -154,7 +157,7 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
                     )
                 },
             ) {
-                navController.navigate(Routes.READER.args(item.collectionId, item.bookId))
+                navController.navigate(Routes.READER.args(item.bookId))
             }
         }
 
@@ -182,9 +185,7 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
             val item = booksSearchResults[index]
             if (item != null) {
                 BookSearchItem(item) {
-                    navController.navigate(
-                        Routes.READER.args(item.book.collectionId, item.book.id)
-                    )
+                    navController.navigate(Routes.READER.args(item.book.id))
                 }
             }
         }

@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 import com.alfaazplus.sunnah.ui.components.common.TextInput
 import com.alfaazplus.sunnah.ui.controllers.ModalController
 import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
@@ -62,16 +62,9 @@ private fun Content(
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(userCollections) {
-        /**
-         * Load current selected collections for the hadith.
-         */
+    LaunchedEffect(userCollections, request.hadithId) {
         viewModel.repo
-            .loadCollectionsForHadith(
-                hadithCollectionId = request.hadithCollectionId,
-                hadithBookId = request.hadithBookId,
-                hadithNumber = request.hadithNumber,
-            )
+            .loadCollectionsForHadith(request.hadithId)
             .collect { items ->
                 val currentSelectionIds = items
                     .map { it.id }
@@ -178,20 +171,16 @@ private fun Content(
 
                     removedCollectionIds.forEach {
                         viewModel.repo.removeItemFromUserCollection(
-                            hadithCollectionId = request.hadithCollectionId,
-                            hadithBookId = request.hadithBookId,
-                            hadithNumber = request.hadithNumber,
                             userCollectionId = it,
+                            hadithId = request.hadithId,
                         )
                     }
 
-                    addedOrUpdatedCollectionIds.map {
+                    addedOrUpdatedCollectionIds.forEach {
                         viewModel.repo.addUserCollectionItem(
                             UserCollectionItem(
                                 userCollectionId = it,
-                                hadithCollectionId = request.hadithCollectionId,
-                                hadithBookId = request.hadithBookId,
-                                hadithNumber = request.hadithNumber,
+                                hadithId = request.hadithId,
                                 remark = remark,
                             )
                         )

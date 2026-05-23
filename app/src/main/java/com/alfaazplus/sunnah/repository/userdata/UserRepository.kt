@@ -1,12 +1,11 @@
 package com.alfaazplus.sunnah.repository.userdata
 
-import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.UserDataDao
-import com.alfaazplus.sunnah.db.entities.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
@@ -34,7 +33,6 @@ class UserRepository(
 
                 val flows: List<Flow<UserCollection>> = collections.map { collection ->
                     collection.itemsCount = dao.observeUserCollectionItemsCount(collection.id)
-
                     flowOf(collection)
                 }
 
@@ -51,13 +49,12 @@ class UserRepository(
                 if (collection == null) return@flatMapLatest flowOf(null)
 
                 collection.itemsCount = dao.observeUserCollectionItemsCount(collection.id)
-
                 flowOf(collection)
             }
     }
 
-    fun loadCollectionsForHadith(hadithCollectionId: Int, hadithBookId: Int, hadithNumber: String): Flow<List<UserCollection>> {
-        return dao.getUserCollectionsForHadith(hadithCollectionId, hadithBookId, hadithNumber)
+    fun loadCollectionsForHadith(hadithId: String): Flow<List<UserCollection>> {
+        return dao.getUserCollectionsForHadith(hadithId)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,29 +66,7 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<UserCollectionItemNormalized>> = items.map { item ->
-
-                    val collectionName = tryOrNull {
-                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
-                    }
-
-                    val translation = tryOrNull {
-                        hadithDao.getHadithTranslationByHadithNumber(
-                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                        )
-                    }
-
-                    val translationText = translation?.hadithText
-                        ?.parseAsHtml()
-                        ?.toAnnotatedString()
-
-                    flowOf(
-                        UserCollectionItemNormalized(
-                            item = item,
-                            translation = translation,
-                            collectionName = collectionName,
-                            translationText = translationText,
-                        )
-                    )
+                    flowOf(normalizeCollectionItem(item))
                 }
 
                 combine(flows) { it.toList() }
@@ -111,24 +86,22 @@ class UserRepository(
     }
 
     suspend fun addUserCollectionItem(userCollectionItem: UserCollectionItem): UserCollectionItem {
-        val existingItem = userCollectionItem.let {
-            dao.getUserCollectionItem(
-                it.userCollectionId, it.hadithCollectionId, it.hadithBookId, it.hadithNumber
-            )
-        }
+        val existingItem = dao.getUserCollectionItem(
+            userCollectionItem.userCollectionId,
+            userCollectionItem.hadithId,
+        )
 
-        val id = if (existingItem !== null) {
+        if (existingItem != null) {
             dao.updateUserCollectionItem(
                 existingItem.copy(
                     remark = userCollectionItem.remark,
                     updatedAt = Date(),
                 )
             )
-            userCollectionItem.id
-        } else {
-            dao.createUserCollectionItem(userCollectionItem)
+            return dao.getUserCollectionItemById(existingItem.id)
         }
 
+        val id = dao.createUserCollectionItem(userCollectionItem)
         return dao.getUserCollectionItemById(id)
     }
 
@@ -142,13 +115,9 @@ class UserRepository(
 
     suspend fun removeItemFromUserCollection(
         userCollectionId: Long,
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
+        hadithId: String,
     ) {
-        dao.removeItemFromUserCollection(
-            userCollectionId, hadithCollectionId, hadithBookId, hadithNumber
-        )
+        dao.removeItemFromUserCollection(userCollectionId, hadithId)
     }
 
     suspend fun clearUserCollectionItems(collectionId: Long) {
@@ -164,29 +133,7 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<UserBookmarkNormalized>> = items.map { item ->
-                    val collectionName = tryOrNull {
-                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
-                    }
-
-
-                    val translation = tryOrNull {
-                        hadithDao.getHadithTranslationByHadithNumber(
-                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                        )
-                    }
-
-                    val translationText = translation?.hadithText
-                        ?.parseAsHtml()
-                        ?.toAnnotatedString()
-
-                    flowOf(
-                        UserBookmarkNormalized(
-                            item = item,
-                            translation = translation,
-                            collectionName = collectionName,
-                            translationText = translationText,
-                        )
-                    )
+                    flowOf(normalizeBookmark(item))
                 }
 
                 combine(flows) { it.toList() }
@@ -197,12 +144,8 @@ class UserRepository(
         return dao.observeRecentUserBookmarks()
     }
 
-    fun observeUserBookmark(
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
-    ): Flow<UserBookmark?> {
-        return dao.observeUserBookmark(hadithCollectionId, hadithBookId, hadithNumber)
+    fun observeUserBookmark(hadithId: String): Flow<UserBookmark?> {
+        return dao.observeUserBookmark(hadithId)
     }
 
     suspend fun addUserBookmark(userBookmark: UserBookmark): UserBookmark {
@@ -231,29 +174,7 @@ class UserRepository(
                 if (items.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val flows: List<Flow<ReadHistoryNormalized>> = items.map { item ->
-                    val collectionName = tryOrNull {
-                        hadithDao.getCollectionInfoById("en", item.hadithCollectionId).name
-                    }
-
-                    val translation = tryOrNull {
-                        hadithDao.getHadithTranslationByHadithNumber(
-                            item.hadithCollectionId, item.hadithBookId, item.hadithNumber, "en"
-                        )
-                    }
-
-
-                    val translationText = translation?.hadithText
-                        ?.parseAsHtml()
-                        ?.toAnnotatedString()
-
-                    flowOf(
-                        ReadHistoryNormalized(
-                            item = item,
-                            translation = translation,
-                            collectionName = collectionName,
-                            translationText = translationText,
-                        )
-                    )
+                    flowOf(normalizeReadHistory(item))
                 }
 
                 combine(flows) { it.toList() }
@@ -264,26 +185,79 @@ class UserRepository(
         return dao.observeRecentReadHistory()
     }
 
-    suspend fun saveReadHistory(
-        hadithId: String,
-    ) {
-        /*fixme, dao.upsertReadHistory(
+    suspend fun saveReadHistory(hadithId: String) {
+        dao.upsertReadHistory(
             ReadHistory(
-                hadithCollectionId = hadithCollectionId,
-                hadithBookId = hadithBookId,
-                hadithNumber = hadithNumber,
+                hadithId = hadithId,
                 createdAt = Date(),
             )
         )
-
-        dao.deleteOldReadHistory(100)*/
+        dao.deleteOldReadHistory(100)
     }
 
     suspend fun clearReadHistory() {
         dao.clearReadHistory()
     }
 
-    suspend fun clearUserDataForCollection(collectionId: Int) {
-        dao.deleteReadHistoryForCollection(collectionId)
+    suspend fun resolveHadithIdFromUrn(urn: String): String? {
+        val urnValue = urn.toLongOrNull() ?: return null
+        return hadithDao.getHadithIdByUrn(urnValue)
+    }
+
+    suspend fun clearUserDataForCollection(collectionId: String) {
+        val hadithIds = hadithDao.getHadithIdsForCollection(collectionId)
+        if (hadithIds.isEmpty()) return
+
+        for (chunk in hadithIds.chunked(900)) {
+            dao.deleteReadHistoryForHadithIds(chunk)
+        }
+    }
+
+    private suspend fun normalizeCollectionItem(item: UserCollectionItem): UserCollectionItemNormalized {
+        val hwc = tryOrNull { hadithDao.getHadithById(item.hadithId) }
+        val collectionName = hwc?.let {
+            tryOrNull { hadithDao.getCollectionById(it.collectionId)?.getTitle("en") }
+        }
+        val translationText = hwc?.plainTranslationText()?.toAnnotatedString()
+
+        return UserCollectionItemNormalized(
+            item = item,
+            hadith = hwc,
+            collectionName = collectionName,
+            displayNumber = hwc?.displayNumber() ?: item.hadithId,
+            translationText = translationText,
+        )
+    }
+
+    private suspend fun normalizeBookmark(item: UserBookmark): UserBookmarkNormalized {
+        val hwc = tryOrNull { hadithDao.getHadithById(item.hadithId) }
+        val collectionName = hwc?.let {
+            tryOrNull { hadithDao.getCollectionById(it.collectionId)?.getTitle("en") }
+        }
+        val translationText = hwc?.plainTranslationText()?.toAnnotatedString()
+
+        return UserBookmarkNormalized(
+            item = item,
+            hadith = hwc,
+            collectionName = collectionName,
+            displayNumber = hwc?.displayNumber() ?: item.hadithId,
+            translationText = translationText,
+        )
+    }
+
+    private suspend fun normalizeReadHistory(item: ReadHistory): ReadHistoryNormalized {
+        val hwc = tryOrNull { hadithDao.getHadithById(item.hadithId) }
+        val collectionName = hwc?.let {
+            tryOrNull { hadithDao.getCollectionById(it.collectionId)?.getTitle("en") }
+        }
+        val translationText = hwc?.plainTranslationText()?.toAnnotatedString()
+
+        return ReadHistoryNormalized(
+            item = item,
+            hadith = hwc,
+            collectionName = collectionName,
+            displayNumber = hwc?.displayNumber() ?: item.hadithId,
+            translationText = translationText,
+        )
     }
 }

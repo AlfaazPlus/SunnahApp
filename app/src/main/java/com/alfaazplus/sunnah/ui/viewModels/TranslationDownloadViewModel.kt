@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.managers.TranslationDownloadManager
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
@@ -35,7 +35,7 @@ data class TranslationDownloadUiState(
 @HiltViewModel
 class TranslationDownloadViewModel @Inject constructor(
     application: Application,
-    private val repo: HadithRepository2,
+    private val repo: HadithRepository,
 ) : AndroidViewModel(application) {
     private val context get() = application
 

@@ -7,17 +7,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Ignore
-import androidx.room.Relation
-import com.alfaazplus.sunnah.db.contracts.BookContract
-import com.alfaazplus.sunnah.db.contracts.BookInfoContract
-import com.alfaazplus.sunnah.db.contracts.CollectionInfoContract
-import com.alfaazplus.sunnah.db.contracts.HadithContract
-import com.alfaazplus.sunnah.db.contracts.HadithTranslationContract
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo
-import com.alfaazplus.sunnah.db.entities.hadith.entities.Hadith
-import com.alfaazplus.sunnah.db.entities.hadith.entities.HadithTranslation
-import com.alfaazplus.sunnah.db.entities.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 
 enum class SearchResultTab(val type: Int) {
     Hadiths(0),
@@ -32,131 +22,60 @@ enum class SearchResultTab(val type: Int) {
 }
 
 val SearchResultTabSaver: Saver<SearchResultTab, Any> = listSaver(
-    save = {
-        listOf(it.type)
-    },
-    restore = {
-        SearchResultTab.fromType(it[0])
-    },
+    save = { listOf(it.type) },
+    restore = { SearchResultTab.fromType(it[0]) },
+)
+
+/** Room paging projection; mapped to [HadithSearchResult] in the repository. */
+data class HadithSearchRow(
+    @ColumnInfo(name = "hadith_id") val hadithId: String,
+    @ColumnInfo(name = "book_id") val bookId: String,
+    @ColumnInfo(name = "collection_id") val collectionId: String,
+    @ColumnInfo(name = "hadith_number") val hadithNumber: String?,
+    @ColumnInfo(name = "collection_name") val collectionName: String,
+    @ColumnInfo(name = "blocks_json") val blocksJson: String,
 )
 
 data class HadithSearchResult(
-    @Embedded val hadith: Hadith,
-    @Relation(
-        parentColumn = HadithContract.Columns.URN,
-        entityColumn = HadithTranslationContract.Columns.AR_URN,
-    ) val translation: HadithTranslation,
-
-    @ColumnInfo(name = CollectionInfoContract.Columns.NAME) val collectionName: String,
+    val hadithId: String,
+    val bookId: String,
+    val collectionId: String,
+    val hadithNumber: String?,
+    val collectionName: String,
+    val plainText: String,
 ) {
     @Ignore
     var translationText: AnnotatedString = buildAnnotatedString { }
 
+    override fun equals(other: Any?) =
+        this === other || (other is HadithSearchResult && hadithId == other.hadithId)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is HadithSearchResult) return false
-
-        if (hadith.urn != other.hadith.urn) return false
-        if (hadith.collectionId != other.hadith.collectionId) return false
-        if (hadith.bookId != other.hadith.bookId) return false
-        if (translation.langCode != other.translation.langCode) return false
-        if (translationText != other.translationText) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = hadith.hashCode()
-        result = 31 * result + translation.hashCode()
-        result = 31 * result + collectionName.hashCode()
-        result = 31 * result + translationText.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = hadithId.hashCode()
 }
 
 data class BooksSearchResult(
-    @Embedded val book: HBook,
-    @Relation(
-        parentColumn = BookContract.Columns.ID,
-        entityColumn = BookInfoContract.Columns.BOOK_ID,
-    ) val info: HBookInfo,
-
-    @ColumnInfo(name = CollectionInfoContract.Columns.NAME) val collectionName: String,
-) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is BooksSearchResult) return false
-
-        if (info.bookId != other.info.bookId) return false
-        if (info.collectionId != other.info.collectionId) return false
-        if (info.languageCode != other.info.languageCode) return false
-        if (book.id != other.book.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = book.hashCode()
-        result = 31 * result + info.hashCode()
-        result = 31 * result + collectionName.hashCode()
-        return result
-    }
-}
-
-data class ScholarsSearchResult(
-    val scholars: List<Scholar>,
+    @Embedded val book: BookEntity,
+    @ColumnInfo(name = "collection_name") val collectionName: String,
+    @ColumnInfo(name = "title_en") val titleEn: String?,
+    @ColumnInfo(name = "title_ar") val titleAr: String?,
+    @ColumnInfo(name = "hadith_count") val hadithCount: Int,
 )
 
 data class HadithSearchQuickResult(
-    @ColumnInfo(name = CollectionInfoContract.Columns.NAME) val collectionName: String,
-    @ColumnInfo(name = BookInfoContract.Columns.TITLE) val bookTitle: String,
-    @ColumnInfo(name = HadithContract.Columns.HADITH_NUMBER) val hadithNumber: String,
-    @ColumnInfo(name = HadithContract.Columns.ORDER_IN_BOOK) val hadithOrder: Int,
-    @ColumnInfo(name = HadithContract.Columns.COLLECTION_ID) val collectionId: Int,
-    @ColumnInfo(name = HadithContract.Columns.BOOK_ID) val bookId: Int,
-    @ColumnInfo(name = BookContract.Columns.SERIAL_NUMBER) val bookSerial: String,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is HadithSearchQuickResult) return false
-
-        if (hadithNumber != other.hadithNumber) return false
-        if (collectionId != other.collectionId) return false
-        if (bookId != other.bookId) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = hadithNumber.hashCode()
-        result = 31 * result + collectionId
-        result = 31 * result + bookId
-        return result
-    }
-}
+    @ColumnInfo(name = "hadith_id") val hadithId: String,
+    @ColumnInfo(name = "book_id") val bookId: String,
+    @ColumnInfo(name = "collection_id") val collectionId: String,
+    @ColumnInfo(name = "hadith_number") val hadithNumber: String?,
+    @ColumnInfo(name = "collection_name") val collectionName: String,
+    @ColumnInfo(name = "book_number") val bookNumber: String?,
+    @ColumnInfo(name = "book_title") val bookTitle: String?,
+    @ColumnInfo(name = "hadith_order") val hadithOrder: Int,
+)
 
 data class BookSearchQuickResult(
-    @ColumnInfo(name = CollectionInfoContract.Columns.NAME) val collectionName: String,
-    @ColumnInfo(name = BookInfoContract.Columns.TITLE) val bookTitle: String,
-    @ColumnInfo(name = BookContract.Columns.ID) val bookId: Int,
-    @ColumnInfo(name = BookContract.Columns.SERIAL_NUMBER) val serialNumber: Int,
-    @ColumnInfo(name = BookContract.Columns.COLLECTION_ID) val collectionId: Int,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is BookSearchQuickResult) return false
-
-        if (collectionId != other.collectionId) return false
-        if (bookId != other.bookId) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = collectionId
-        result = 31 * result + bookId
-        return result
-    }
-}
+    @ColumnInfo(name = "book_id") val bookId: String,
+    @ColumnInfo(name = "collection_id") val collectionId: String,
+    @ColumnInfo(name = "book_number") val bookNumber: String?,
+    @ColumnInfo(name = "collection_name") val collectionName: String,
+    @ColumnInfo(name = "book_title") val bookTitle: String?,
+)

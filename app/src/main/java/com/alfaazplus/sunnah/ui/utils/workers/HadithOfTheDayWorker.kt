@@ -14,7 +14,7 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.helpers.HadithHelper
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.activities.MainActivity
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
@@ -30,7 +30,7 @@ class HadithOfTheDayWorker @AssistedInject constructor(
     context: Context,
     @Assisted
     params: WorkerParameters,
-    private val repo: HadithRepository2,
+    private val repo: HadithRepository,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {

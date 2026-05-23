@@ -140,7 +140,7 @@ private fun HadithSearchItem(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName}: ${item.hadith.hadithNumber}",
+                        "${item.collectionName}: ${item.hadithNumber}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -235,7 +235,7 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
                             modifier = Modifier.size(14.dp),
                         )
                         Text(
-                            text = "Book ${item.bookSerial}: ${item.bookTitle}",
+                            text = "Book ${item.bookNumber}: ${item.bookTitle}",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
                         )
@@ -257,11 +257,7 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
                     }
                 }) {
                 navController.navigate(
-                    Routes.READER.args(
-                        item.collectionId,
-                        item.bookId,
-                        item.hadithNumber,
-                    )
+                    Routes.READER.args(item.bookId, item.hadithId),
                 )
             }
         }
@@ -280,22 +276,14 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
             hadithSearchResults.itemCount,
             key = { index ->
                 val item = hadithSearchResults[index]
-                if (item != null) {
-                    return@items item.hadith.urn
-                } else {
-                    index
-                }
+                hadithSearchResults[index]?.hadithId ?: index
             },
         ) { index ->
             val item = hadithSearchResults[index]
             if (item != null) {
                 HadithSearchItem(item) {
                     navController.navigate(
-                        Routes.READER.args(
-                            item.hadith.collectionId,
-                            item.hadith.bookId,
-                            item.hadith.hadithNumber,
-                        )
+                        Routes.READER.args(item.bookId, item.hadithId),
                     )
                 }
             }

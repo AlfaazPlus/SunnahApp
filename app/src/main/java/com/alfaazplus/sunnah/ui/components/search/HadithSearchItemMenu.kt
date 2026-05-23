@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.entities.userdata.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
@@ -60,11 +60,7 @@ fun HadithSearchItemMenu(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
     val isBookmarked by viewModel
-        .isBookmarked(
-            item.hadith.collectionId,
-            item.hadith.bookId,
-            item.hadith.hadithNumber,
-        )
+        .isBookmarked(item.hadithId)
         .collectAsState()
 
     val collectionModalController = rememberModalController<AddToCollectionRequest>()
@@ -78,7 +74,7 @@ fun HadithSearchItemMenu(
     AddToBookmarksSheet(bookmarksModalController)
 
     BottomSheetMenu(
-        title = "${item.collectionName}: ${item.hadith.hadithNumber}",
+        title = "${item.collectionName}: ${item.hadithNumber}",
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Start,
@@ -90,9 +86,7 @@ fun HadithSearchItemMenu(
                 HadithMenuAction.ADD_TO_COLLECTION -> {
                     collectionModalController.show(
                         AddToCollectionRequest(
-                            hadithCollectionId = item.hadith.collectionId,
-                            hadithBookId = item.hadith.bookId,
-                            hadithNumber = item.hadith.hadithNumber,
+                            hadithId = item.hadithId,
                         )
                     )
                 }
@@ -102,9 +96,7 @@ fun HadithSearchItemMenu(
                         if (!isBookmarked) {
                             viewModel.repo.addUserBookmark(
                                 UserBookmark(
-                                    hadithCollectionId = item.hadith.collectionId,
-                                    hadithBookId = item.hadith.bookId,
-                                    hadithNumber = item.hadith.hadithNumber,
+                                    hadithId = item.hadithId,
                                     remark = "",
                                 )
                             )
@@ -113,9 +105,7 @@ fun HadithSearchItemMenu(
                         withContext(Dispatchers.Main) {
                             bookmarksModalController.show(
                                 AddToBookmarkRequest(
-                                    hadithCollectionId = item.hadith.collectionId,
-                                    hadithBookId = item.hadith.bookId,
-                                    hadithNumber = item.hadith.hadithNumber,
+                                    hadithId = item.hadithId,
                                 )
                             )
                         }
@@ -123,7 +113,7 @@ fun HadithSearchItemMenu(
                 }
 
                 HadithMenuAction.COPY_HADITH_NUMBER -> {
-                    context.copyToClipboard("${item.collectionName}: ${item.hadith.hadithNumber}")
+                    context.copyToClipboard("${item.collectionName}: ${item.hadithNumber}")
 
                     MessageUtils.showClipboardMessage(
                         context,

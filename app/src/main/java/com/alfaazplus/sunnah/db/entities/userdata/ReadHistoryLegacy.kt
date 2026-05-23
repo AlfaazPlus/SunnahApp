@@ -14,7 +14,8 @@ import java.util.Date
         Columns.HADITH_NUMBER,
     ]
 )
-data class ReadHistory(
+@Deprecated("")
+data class ReadHistoryLegacy(
     @ColumnInfo(name = Columns.HADITH_COLLECTION_ID) val hadithCollectionId: Int,
     @ColumnInfo(name = Columns.HADITH_BOOK_ID) val hadithBookId: Int,
     @ColumnInfo(name = Columns.HADITH_NUMBER) val hadithNumber: String,

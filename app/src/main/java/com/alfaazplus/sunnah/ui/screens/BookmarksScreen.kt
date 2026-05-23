@@ -81,7 +81,7 @@ private fun BookmarkItemCard(
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(
-                            "${bookmark.collectionName ?: "? "}: ${bookmark.item.hadithNumber}",
+                            "${bookmark.collectionName ?: "? "}: ${bookmark.displayNumber}",
                             modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                             style = MaterialTheme.typography.labelMedium,
                         )
@@ -171,9 +171,7 @@ private fun Content(
                 onClick = { it ->
                     bookmarksModalController.show(
                         AddToBookmarkRequest(
-                            hadithCollectionId = it.item.hadithCollectionId,
-                            hadithBookId = it.item.hadithBookId,
-                            hadithNumber = it.item.hadithNumber,
+                            hadithId = it.item.hadithId,
                         )
                     )
                 },

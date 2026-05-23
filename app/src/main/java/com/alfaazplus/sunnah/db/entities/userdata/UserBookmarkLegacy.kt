@@ -10,7 +10,8 @@ import java.util.Date
 @Entity(
     tableName = UserBookmarkContract.TABLE_NAME,
 )
-data class UserBookmark(
+@Deprecated("")
+data class UserBookmarkLegacy(
     @ColumnInfo(name = Columns.ID) @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = Columns.HADITH_COLLECTION_ID) val hadithCollectionId: Int,
     @ColumnInfo(name = Columns.HADITH_BOOK_ID) val hadithBookId: Int,

@@ -29,18 +29,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.common.TextButton
 import com.alfaazplus.sunnah.ui.components.common.TextIconButton
 import com.alfaazplus.sunnah.ui.components.common.TextInput
 import com.alfaazplus.sunnah.ui.controllers.ModalController
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.models.CollectionWithInfo
 import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
-import com.alfaazplus.sunnah.ui.viewModels.HadithRepoViewModel
+import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,22 +51,34 @@ private fun Content(
     request: AddToBookmarkRequest,
     closeSheet: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
-    hadithViewModel: HadithRepoViewModel = hiltViewModel(),
+    appViewModel: AppViewModel = hiltViewModel(),
 ) {
-    val hadithCollection = produceState<CollectionWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getCollection(request.hadithCollectionId) }
+    val hwc = produceState<HadithWithContents?>(initialValue = null, request.hadithId) {
+        value = tryOrNull { appViewModel.repo.dao.getHadithById(request.hadithId) }
     }.value
 
-    val hadithBook = produceState<BookWithInfo?>(null) {
-        value = tryOrNull { hadithViewModel.repo.getBookById(request.hadithCollectionId, request.hadithBookId) }
+    val collectionName = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getCollectionById(it.collectionId)
+                    ?.getTitle("en")
+            }
+        }
+    }.value
+
+    val bookTitle = produceState<String?>(initialValue = null, hwc) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo.dao
+                    .getBookById(it.bookId)
+                    ?.getTitle("en")
+            }
+        }
     }.value
 
     val oBookmark by viewModel.repo
-        .observeUserBookmark(
-            request.hadithCollectionId,
-            request.hadithBookId,
-            request.hadithNumber,
-        )
+        .observeUserBookmark(request.hadithId)
         .collectAsState(initial = null)
 
     var isEditing by remember { mutableStateOf(request.editMode) }
@@ -157,11 +168,11 @@ private fun Content(
                 ) {
 
                     Text(
-                        text = "${hadithCollection?.info?.name ?: "? "} : ${request.hadithNumber}",
+                        text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: request.hadithId}",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "Book: ${hadithBook?.info?.title ?: "? "}",
+                        text = "Book: ${bookTitle ?: "? "}",
                     )
                 }
             }
@@ -212,13 +223,10 @@ private fun Content(
                 fullWidth = true,
                 modifier = Modifier.padding(16.dp),
             ) {
-                /*fixme navController.navigate(
-                    Routes.READER.args(
-                        request.hadithCollectionId,
-                        request.hadithBookId,
-                        request.hadithNumber,
-                    )
-                )*/
+                val bookId = hwc?.bookId ?: return@TextButton
+                navController.navigate(
+                    Routes.READER.args(bookId, request.hadithId),
+                )
             }
         }
     }

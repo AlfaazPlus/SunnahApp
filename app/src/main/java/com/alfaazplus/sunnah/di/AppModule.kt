@@ -2,12 +2,12 @@ package com.alfaazplus.sunnah.di
 
 import android.app.Application
 import androidx.room.Room
-import com.alfaazplus.sunnah.db.databases.AppDatabase
+import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.ScholarsDatabase
+import com.alfaazplus.sunnah.db.databases.UserDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.UserDatabase
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -23,19 +23,18 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideAppDatabase(app: Application): AppDatabase {
+    fun provideAppDatabaseLegacy(app: Application): HadithDatabaseLegacy {
         return Room
-            .databaseBuilder(app, AppDatabase::class.java, "sunnah_app_db")
+            .databaseBuilder(app, HadithDatabaseLegacy::class.java, "sunnah_app_db")
             .fallbackToDestructiveMigration(false)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideHadithDatabase(app: Application): HadithDatabase {
+    fun provideUserDatabaseLegacy(app: Application): UserDatabaseLegacy {
         return Room
-            .databaseBuilder(app, HadithDatabase::class.java, "sunnahapp_db")
-            .fallbackToDestructiveMigration(false)
+            .databaseBuilder(app, UserDatabaseLegacy::class.java, "user_db")
             .build()
     }
 
@@ -69,27 +68,30 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserDatabase(app: Application): UserDatabase {
+    fun provideUserDatabase2(app: Application): UserDatabase {
         return Room
-            .databaseBuilder(app, UserDatabase::class.java, "user_db")
+            .databaseBuilder(app, UserDatabase::class.java, "user_db_2")
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideHadithRepository(hadithDb: AppDatabase, scholarsDb: ScholarsDatabase): HadithRepository {
-        return HadithRepository(hadithDb.hadithDao, scholarsDb.scholarsDao)
+    fun provideHadithDatabase(app: Application): HadithDatabase {
+        return Room
+            .databaseBuilder(app, HadithDatabase::class.java, "sunnahapp_db")
+            .fallbackToDestructiveMigration(false)
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideHadithRepository2(hadithDb: HadithDatabase, scholarsDb: ScholarsDatabase): HadithRepository2 {
-        return HadithRepository2(hadithDb, scholarsDb.scholarsDao)
+    fun provideHadithRepository2(hadithDb: HadithDatabase, scholarsDb: ScholarsDatabase): HadithRepository {
+        return HadithRepository(hadithDb, scholarsDb.scholarsDao)
     }
 
     @Provides
     @Singleton
-    fun provideUserRepository(hadithDb: AppDatabase, userDb: UserDatabase): UserRepository {
+    fun provideUserRepository(hadithDb: HadithDatabase, userDb: UserDatabase): UserRepository {
         return UserRepository(hadithDb.hadithDao, userDb.dao)
     }
 }

@@ -2,8 +2,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
-import com.alfaazplus.sunnah.repository.userdata.UserRepository
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -11,10 +10,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CollectionListViewModel @Inject constructor(
-    private val repo: HadithRepository2,
-    private val userRepo: UserRepository,
+    repo: HadithRepository,
 ) : ViewModel() {
-
     val collections = repo
         .getAllCollectionsFlow()
         .stateIn(

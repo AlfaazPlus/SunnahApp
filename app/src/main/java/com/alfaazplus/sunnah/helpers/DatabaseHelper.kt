@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import androidx.room.withTransaction
 import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.db.databases.AppDatabase
+import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.deliverable.v1.CorpusBundle
 import com.alfaazplus.sunnah.ui.utils.preferences.AppPreferences
@@ -34,13 +34,7 @@ private fun AssetManager.readCorpusAssetBytes(collectionId: String): Pair<String
 }
 
 object DatabaseHelper {
-    suspend fun populateHadithDataFromAssets(context: Context, database: HadithDatabase, legacy: AppDatabase) {
-
-        // delete legacy database
-        for (id in getLegacyIncludedCollectionIds()) {
-            legacy.hadithDao.deleteCollection(id)
-        }
-
+    suspend fun populateHadithDataFromAssets(context: Context, database: HadithDatabase) {
         val startTime = System.currentTimeMillis()
         Logger.d("Hadith v2 corpus import started")
 
@@ -96,9 +90,20 @@ object DatabaseHelper {
             Logger.d("Hadith v2 corpus import skipped (no corpus assets loaded)")
         }
     }
+
+    suspend fun cleanupLegacyHadithData(legacy: HadithDatabaseLegacy) {
+        for (id in getLegacyIncludedCollectionIds()) {
+            legacy.hadithDao.deleteCollection(id)
+        }
+        Logger.d("DatabaseHelper: legacy hadith collections deleted")
+    }
 }
 
 fun getLegacyIncludedCollectionIds(): List<Int> {
-    // There were 6 legacy collections with integer Ids.
+    /**
+     * There were 6 legacy collections with integer Ids.
+     * Mapped in order:
+     * bukhari, muslim, nasai, abudawud, tirmidhi, ibnmajah
+     */
     return (1..6).toList()
 }

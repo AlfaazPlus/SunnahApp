@@ -3,7 +3,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository2
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
@@ -35,7 +35,7 @@ private const val READER_PREFETCH_DISTANCE = 8
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val repo: HadithRepository2,
+    private val repo: HadithRepository,
     private val userRepo: UserRepository,
 ) : ViewModel() {
 

@@ -47,7 +47,7 @@ open class SearchViewModel @Inject constructor(
             .distinctUntilChanged(),
     ) { collectionIds, query -> Pair(collectionIds, query) }
         .flatMapLatest { (collectionIds, query) ->
-            repo.searchHadiths(query, /*fixme collectionIds*/ emptyList(), primaryColor)
+            repo.searchHadiths(query, collectionIds?.takeIf { it.isNotEmpty() }, primaryColor)
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -64,7 +64,7 @@ open class SearchViewModel @Inject constructor(
             .distinctUntilChanged(),
     ) { collectionIds, query -> Pair(collectionIds, query) }
         .flatMapLatest { (collectionIds, query) ->
-            repo.searchBooks(query, /*fixme collectionIds*/ emptyList())
+            repo.searchBooks(query, collectionIds?.takeIf { it.isNotEmpty() })
         }
         .cachedIn(viewModelScope)
         .stateIn(

@@ -48,7 +48,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.entities.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
@@ -75,7 +75,7 @@ private fun CollectionItemMenu(
     val scope = rememberCoroutineScope()
 
     BottomSheetMenu(
-        title = "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
+        title = "${item.collectionName ?: "? "}: ${item.displayNumber}",
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Center,
@@ -86,10 +86,8 @@ private fun CollectionItemMenu(
         ) {
             scope.launch {
                 viewModel.repo.removeItemFromUserCollection(
-                    item.item.id,
-                    item.item.hadithCollectionId,
-                    item.item.hadithBookId,
-                    item.item.hadithNumber,
+                    userCollectionId = item.item.userCollectionId,
+                    hadithId = item.item.hadithId,
                 )
             }
         }
@@ -121,7 +119,7 @@ private fun CollectionItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName  ?: "? "}: ${item.item.hadithNumber}",
+                        "${item.collectionName  ?: "? "}: ${item.displayNumber}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -178,11 +176,11 @@ private fun CollectionItems(
         item { header() }
         items(collectionItems.size) { index ->
             CollectionItemCard(collectionItems[index]) { item ->
+                val bookId = item.hadith?.bookId ?: return@CollectionItemCard
                 navController.navigate(
                     Routes.READER.args(
-                        item.item.hadithCollectionId,
-                        item.item.hadithBookId,
-                        item.item.hadithNumber,
+                        bookId,
+                        item.item.hadithId,
                     )
                 )
             }

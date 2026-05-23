@@ -71,7 +71,7 @@ private fun ItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
+                        "${item.collectionName ?: "? "}: ${item.displayNumber}",
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -125,11 +125,11 @@ private fun Content(
             ItemCard(
                 item = historyItems[index],
                 onClick = {
+                    val bookId = it.hadith?.bookId ?: return@ItemCard
                     navController.navigate(
                         Routes.READER.args(
-                            it.item.hadithCollectionId,
-                            it.item.hadithBookId,
-                            it.item.hadithNumber,
+                            bookId,
+                            it.item.hadithId,
                         )
                     )
                 },
