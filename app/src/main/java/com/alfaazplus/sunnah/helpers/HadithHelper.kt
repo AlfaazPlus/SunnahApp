@@ -113,6 +113,7 @@ object HadithHelper {
             DataStoreManager.write(hotdKey, "")
         }
 
+        val minPreviewLength = 50
         val maxPreviewLength = 300
         var attempts = 0
 
@@ -120,11 +121,11 @@ object HadithHelper {
             val hwc = repo.getRandomSahihHadith() ?: break
 
             val preview = hwc.hotdPreviewText()
+            val length = preview
+                ?.parseAsHtml()
+                ?.toString()?.length ?: 0
 
-            if (preview != null && preview
-                    .parseAsHtml()
-                    .toString().length <= maxPreviewLength
-            ) {
+            if (length in minPreviewLength..maxPreviewLength) {
                 return persistHotd(hotdKey, repo, hwc)
             }
 
@@ -135,9 +136,7 @@ object HadithHelper {
     }
 
     private fun HadithWithContents.hotdPreviewText(): String? {
-        val blocks = contents
-            .firstOrNull { it.lang != "ar" }
-            ?.blocks ?: return null
+        val blocks = contents.firstOrNull { it.lang != "ar" }?.blocks ?: return null
 
         return buildString {
             blocks.forEach { block ->

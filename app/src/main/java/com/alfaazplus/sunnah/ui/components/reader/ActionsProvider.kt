@@ -12,6 +12,9 @@ import androidx.compose.ui.platform.LocalContext
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.helpers.HadithGradeText
 import com.alfaazplus.sunnah.ui.components.NoQuranAppAlert
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
+import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.HadithGradeInfoSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.HadithReferenceSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.NarratorsChainSheet
@@ -22,6 +25,8 @@ import com.alfaazplus.sunnah.ui.models.QuranReference
 
 data class HadithActions(
     val onHadithOption: (hadithId: String) -> Unit,
+    val onAddToCollectionRequest: (hadithId: String) -> Unit,
+    val onBookmarkViewerRequest: (BookmarkViewerData) -> Unit,
     val onNumberReferenceRequest: (hadithId: String) -> Unit,
     val onQuickReferenceRequest: (hadithId: String) -> Unit,
     val onQuranReferenceRequest: (chapterNo: Int, verses: String) -> Unit,
@@ -45,11 +50,19 @@ fun ActionsProvider(
     var activeGradeInfo by rememberSaveable { mutableStateOf<HadithGradeText?>(null) }
     var activeNarratorsChainHadithId by rememberSaveable { mutableStateOf<String?>(null) }
     var activeQuickReference by remember { mutableStateOf<QuickReferenceData?>(null) }
+    var addToCollectionRequest by remember { mutableStateOf<String?>(null) }
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
 
     CompositionLocalProvider(
         LocalHadithActions provides HadithActions(
             onHadithOption = {
                 activeHadithMenuId = it
+            },
+            onAddToCollectionRequest = {
+                addToCollectionRequest = it
+            },
+            onBookmarkViewerRequest = {
+                bookmarkViewerData = it
             },
             onNumberReferenceRequest = {
                 activeNumberReferenceHadithId = it
@@ -110,5 +123,13 @@ fun ActionsProvider(
 
     QuickReference(activeQuickReference) {
         activeQuickReference = null
+    }
+
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
+
+    AddToCollectionSheet(addToCollectionRequest) {
+        addToCollectionRequest = null
     }
 }

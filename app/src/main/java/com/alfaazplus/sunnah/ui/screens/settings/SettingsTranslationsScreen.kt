@@ -37,6 +37,7 @@ import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
+import com.alfaazplus.sunnah.ui.utils.LocalAppLocale
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.viewModels.TranslationDownloadUiState
@@ -116,8 +117,7 @@ private fun ItemRow(
     isAnyDownloading: Boolean,
     onDeleteRequest: () -> Unit,
 ) {
-//    val appLocale = LocalAppLocale.current.platformLocale
-    val platformLocale = Locale.current.platformLocale
+    val platformLocale = LocalAppLocale.current.platformLocale
     val isDownloaded = row.isDownloaded
     val isSelected = row.id == uiState.selectedTranslation
 

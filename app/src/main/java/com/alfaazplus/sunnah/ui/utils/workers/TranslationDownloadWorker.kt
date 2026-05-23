@@ -86,7 +86,6 @@ class TranslationDownloadWorker @AssistedInject constructor(
             val payload = bundle.toImportPayloadOrNull() ?: error("")
 
             database.withTransaction {
-                // fixme delete old data for the language first
                 database.importDao.deleteTranslationData(translationId)
                 database.insertCorpusImportPayload(payload)
             }

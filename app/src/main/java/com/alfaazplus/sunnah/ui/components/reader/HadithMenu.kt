@@ -28,25 +28,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
-import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
-import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
-import com.alfaazplus.sunnah.ui.controllers.rememberModalController
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
-import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
-import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 enum class HadithMenuAction {
@@ -68,13 +65,6 @@ fun HadithMenu(
     hadithId: String?,
     onClose: () -> Unit,
 ) {
-    // fixme move to ReaderProvider
-    val collectionModalController = rememberModalController<AddToCollectionRequest>()
-    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
-
-    AddToCollectionSheet(collectionModalController)
-    AddToBookmarksSheet(bookmarksModalController)
-
     BottomSheetMenu(
         isOpen = hadithId != null,
         title = stringResource(R.string.hadith_options),
@@ -90,15 +80,7 @@ private fun Content(
     onClose: () -> Unit,
     appVm: AppViewModel = hiltViewModel(),
     viewModel: UserDataViewModel = hiltViewModel(),
-) {/*
-    val collectionId = cwi.collection.id
-    val hadithNumber = hadith.hadith.hadithNumber
-
-    val isBookmarked by viewModel
-        .isBookmarked(collectionId, bookId, hadithNumber)
-        .collectAsState()
-        fixme
-*/
+) {
     val isBookmarked by viewModel
         .isBookmarked(hadithId)
         .collectAsState()
@@ -106,6 +88,7 @@ private fun Content(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
+    val actions = LocalHadithActions.current
     val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val d by produceState<HadithMenuData?>(null, hadithId) {
@@ -128,12 +111,8 @@ private fun Content(
         isBookmarked = isBookmarked
     ) { actionType ->
         when (actionType) {
-            /*HadithMenuAction.ADD_TO_COLLECTION -> {
-                collectionModalController.show(
-                    AddToCollectionRequest(
-                        hadithId = hadithId,
-                    )
-                )
+            HadithMenuAction.ADD_TO_COLLECTION -> {
+                actions.onAddToCollectionRequest(hadithId)
             }
 
             HadithMenuAction.ADD_TO_BOOKMARK -> {
@@ -148,14 +127,16 @@ private fun Content(
                     }
 
                     withContext(Dispatchers.Main) {
-                        bookmarksModalController.show(
-                            AddToBookmarkRequest(
-                                hadithId = hadithId,
+                        actions.onBookmarkViewerRequest(
+                            BookmarkViewerData(
+                                hadithId,
+                                editMode = false,
+                                openInReader = false,
                             )
                         )
                     }
                 }
-            }*/
+            }
 
             HadithMenuAction.SHARE_HADITH -> {
                 HadithHelper.shareHadith(

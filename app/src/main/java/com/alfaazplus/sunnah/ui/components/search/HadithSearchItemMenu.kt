@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -12,13 +15,11 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
-import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
 import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.components.reader.HadithMenuAction
-import com.alfaazplus.sunnah.ui.controllers.rememberModalController
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
-import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -63,15 +64,20 @@ fun HadithSearchItemMenu(
         .isBookmarked(item.hadithId)
         .collectAsState()
 
-    val collectionModalController = rememberModalController<AddToCollectionRequest>()
-    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
+    var addToCollectionRequest by remember { mutableStateOf<String?>(null) }
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val copiedMessage = stringResource(R.string.copied_to_clipboard)
 
-    AddToCollectionSheet(collectionModalController)
-    AddToBookmarksSheet(bookmarksModalController)
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
+
+    AddToCollectionSheet(addToCollectionRequest) {
+        addToCollectionRequest = null
+    }
 
     BottomSheetMenu(
         title = "${item.collectionName}: ${item.hadithNumber}",
@@ -84,11 +90,7 @@ fun HadithSearchItemMenu(
         ) { actionType ->
             when (actionType) {
                 HadithMenuAction.ADD_TO_COLLECTION -> {
-                    collectionModalController.show(
-                        AddToCollectionRequest(
-                            hadithId = item.hadithId,
-                        )
-                    )
+                    addToCollectionRequest = item.hadithId
                 }
 
                 HadithMenuAction.ADD_TO_BOOKMARK -> {
@@ -103,10 +105,9 @@ fun HadithSearchItemMenu(
                         }
 
                         withContext(Dispatchers.Main) {
-                            bookmarksModalController.show(
-                                AddToBookmarkRequest(
-                                    hadithId = item.hadithId,
-                                )
+                            bookmarkViewerData = BookmarkViewerData(
+                                hadithId = item.hadithId,
+                                openInReader = true,
                             )
                         }
                     }

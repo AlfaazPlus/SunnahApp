@@ -10,6 +10,7 @@ import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItemsCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,7 +19,15 @@ interface UserDataDao {
     fun observeUserCollections(): Flow<List<UserCollection>>
 
     @Query("SELECT COUNT(id) FROM user_collection_items WHERE collection_id = :collectionId")
-    fun observeUserCollectionItemsCount(collectionId: Long): Flow<Int>
+    suspend  fun getUserCollectionItemsCount(collectionId: Long): Int
+
+    @Query("""
+        SELECT collection_id AS id, COUNT(id) AS count
+        FROM user_collection_items
+        WHERE collection_id IN (:collectionIds)
+        GROUP BY collection_id
+    """)
+    suspend fun getUserCollectionItemCounts(collectionIds: List<Long>): List<UserCollectionItemsCount>
 
     @Query("SELECT * FROM user_collections WHERE id = :id")
     fun observeUserCollectionById(id: Long): Flow<UserCollection?>

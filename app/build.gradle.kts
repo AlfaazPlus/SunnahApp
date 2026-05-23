@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "com.alfaazplus.sunnah"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = 19
         versionName = "0.1.4"

@@ -53,9 +53,9 @@ import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.KEY_IS_SANAD_ENABLED
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadithTranslation
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import com.alfaazplus.sunnah.ui.utils.shared_preference.SPAppConfigs
 import kotlinx.coroutines.launch
 
 
@@ -75,6 +75,18 @@ fun SettingsScreen(
     var showHadithTextOptionsSheet by remember { mutableStateOf(false) }
     var showResourceDownloadSrcSheet by remember { mutableStateOf(false) }
 
+    val availableLocales = availableAppLocales()
+
+    val selectedLanguage = remember(context, availableLocales) {
+        val selectedLocale = SPAppConfigs
+            .getLocale(context)
+            .let { languageCode ->
+                availableLocales.firstOrNull { it.first == languageCode }
+            }
+
+        selectedLocale?.second ?: ""
+    }
+
     Scaffold(topBar = { AppBar(title = stringResource(R.string.settings)) }) { paddingValues ->
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -89,8 +101,7 @@ fun SettingsScreen(
 
                 SettingsItem(
                     title = R.string.app_langauge,
-                    // fixme
-                    subtitle = ThemeUtils.resolveThemeModeLabel(themeMode),
+                    subtitleStr = selectedLanguage,
                     icon = R.drawable.ic_language,
                 ) { navController.navigate(Routes.SETTINGS_LANGUAGE) }
 
@@ -217,7 +228,7 @@ fun SettingsScreen(
 
                 ListItem(
                     title = R.string.install_quranapp,
-                    subtitle = R.string.install_quranapp_description,
+                    subtitle = R.string.install_quranapp_description_short,
                     leading = {
                         Image(
                             painter = painterResource(R.drawable.logo_quranapp),

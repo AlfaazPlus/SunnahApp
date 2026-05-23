@@ -35,8 +35,6 @@ import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.common.TextButton
 import com.alfaazplus.sunnah.ui.components.common.TextIconButton
 import com.alfaazplus.sunnah.ui.components.common.TextInput
-import com.alfaazplus.sunnah.ui.controllers.ModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
 import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
@@ -46,15 +44,55 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
 
+
+data class BookmarkViewerData(
+    val hadithId: String,
+    val openInReader: Boolean,
+    val editMode: Boolean = false,
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BookmarkViewerSheet(
+    data: BookmarkViewerData?,
+    onClose: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
+
+    if (data == null) {
+        return
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            onClose()
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = {},
+    ) {
+        Content(
+            data = data,
+            onClose = onClose,
+        )
+    }
+}
+
+
 @Composable
 private fun Content(
-    request: AddToBookmarkRequest,
-    closeSheet: () -> Unit,
+    data: BookmarkViewerData,
+    onClose: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
     appViewModel: AppViewModel = hiltViewModel(),
 ) {
-    val hwc = produceState<HadithWithContents?>(initialValue = null, request.hadithId) {
-        value = tryOrNull { appViewModel.repo.dao.getHadithById(request.hadithId) }
+    val hadithId = data.hadithId
+
+    val hwc = produceState<HadithWithContents?>(initialValue = null, hadithId) {
+        value = tryOrNull { appViewModel.repo.dao.getHadithById(hadithId) }
     }.value
 
     val collectionName = produceState<String?>(initialValue = null, hwc) {
@@ -78,10 +116,10 @@ private fun Content(
     }.value
 
     val oBookmark by viewModel.repo
-        .observeUserBookmark(request.hadithId)
+        .observeUserBookmark(hadithId)
         .collectAsState(initial = null)
 
-    var isEditing by remember { mutableStateOf(request.editMode) }
+    var isEditing by remember { mutableStateOf(data.editMode) }
     var remark by remember { mutableStateOf(oBookmark?.remark ?: "") }
 
     val scope = rememberCoroutineScope()
@@ -134,7 +172,7 @@ private fun Content(
                         viewModel.repo.deleteUserBookmark(bookmark.id)
 
                         withContext(Dispatchers.Main) {
-                            closeSheet()
+                            onClose()
                         }
                     }
                 }
@@ -168,7 +206,7 @@ private fun Content(
                 ) {
 
                     Text(
-                        text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: request.hadithId}",
+                        text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: hadithId}",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
@@ -217,7 +255,7 @@ private fun Content(
             }
         }
 
-        if (!isEditing && request.openInReader) {
+        if (!isEditing && data.openInReader) {
             TextButton(
                 text = stringResource(R.string.open_in_reader),
                 fullWidth = true,
@@ -225,40 +263,9 @@ private fun Content(
             ) {
                 val bookId = hwc?.bookId ?: return@TextButton
                 navController.navigate(
-                    Routes.READER.args(bookId, request.hadithId),
+                    Routes.READER.args(bookId, hadithId),
                 )
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddToBookmarksSheet(
-    controller: ModalController<AddToBookmarkRequest>,
-) {
-    val request = controller.data
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
-
-    if (!controller.isVisible) {
-        return
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            controller.hide()
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        dragHandle = {},
-    ) {
-        if (request != null) {
-            Content(request = request, closeSheet = {
-                controller.hide()
-            })
         }
     }
 }

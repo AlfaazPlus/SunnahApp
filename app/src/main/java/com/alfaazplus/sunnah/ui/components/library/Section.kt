@@ -1,12 +1,9 @@
-package com.alfaazplus.sunnah.ui.components.common
+package com.alfaazplus.sunnah.ui.components.library
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,70 +16,21 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.theme.alpha
 
 @Composable
-fun Section(
-    icon: Int? = null,
-    title: String,
-    headerRightContent: @Composable (() -> Unit)? = null,
-    headerModifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium) //            .background(
-            //                color = MaterialTheme.colorScheme.surface,
-            //            )
-            .padding(vertical = 8.dp)
-            .padding(bottom = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Row(
-            modifier = headerModifier.padding(
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 12.dp,
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            if (icon != null) {
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = title,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f),
-            )
-
-            headerRightContent?.let {
-                it()
-            }
-        }
-
-        content()
-    }
-}
-
-@Composable
 fun SectionEmptyMessage(
     message: String,
+    horizontalPadding: Dp = 16.dp,
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = horizontalPadding)
             .border(1.dp, MaterialTheme.colorScheme.outlineVariant.alpha(0.6f), MaterialTheme.shapes.medium)
             .padding(20.dp)
             .fillMaxWidth(),

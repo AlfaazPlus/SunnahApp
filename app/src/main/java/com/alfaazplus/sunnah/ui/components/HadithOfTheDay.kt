@@ -18,10 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -39,24 +38,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.helpers.HadithHelper
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.IconButton
-import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
 import com.alfaazplus.sunnah.ui.components.reader.ReaderProvider
-import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
-import com.alfaazplus.sunnah.ui.utils.reader.ReaderChangeManager
-import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
-import com.alfaazplus.sunnah.ui.utils.text.TextBuilderParams
-import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.HotdViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.withContext
 
 private data class HotdPalette(
     val gradient: List<Color>,
@@ -98,19 +89,14 @@ private fun ColorScheme.forHotdCard(linkColor: Color) = copy(
 fun HadithOfTheDay(
     vm: HotdViewModel = hiltViewModel(),
 ) {
-    val hotd by vm.hotdFlow.collectAsStateWithLifecycle()
-
-    val hotdData = hotd ?: return
-
     ReaderProvider {
-        HotdCard(hotd = hotdData)
+        HotdCard(vm = vm)
     }
 }
 
 @Composable
 private fun HotdCard(
-    hotd: HadithOfTheDay,
-    appVm: AppViewModel = hiltViewModel(),
+    vm: HotdViewModel,
 ) {
     val context = LocalContext.current
     val hadithActions = LocalHadithActions.current
@@ -118,47 +104,22 @@ private fun HotdCard(
     val typography by rememberUpdatedState(MaterialTheme.typography)
     val palette = rememberHotdPalette()
 
-    var hUi by remember(hotd.hwc.hadithId) { mutableStateOf<ReaderLayoutItem.HadithUI?>(null) }
-    var isLoading by remember(hotd.hwc.hadithId) { mutableStateOf(true) }
+    LaunchedEffect(hadithActions, colors, typography, palette.link) {
+        val hotdColors = colors.forHotdCard(palette.link)
+        val uiConfig = ComposeUiConfig(
+            context = context,
+            colors = hotdColors,
+            type = typography,
+        )
 
-    LaunchedEffect(hotd.hwc.hadithId, hadithActions, colors, typography, palette.link) {
-        ReaderChangeManager
-            .changeFlow()
-            .collectLatest { config ->
-                isLoading = true
-
-                withContext(Dispatchers.IO) {
-                    val hotdColors = colors.forHotdCard(palette.link)
-
-                    val params = TextBuilderParams(
-                        uiConfig = ComposeUiConfig(
-                            context = context,
-                            colors = hotdColors,
-                            type = typography,
-                        ),
-                        translationId = config.selectedTranslationLangCode,
-                        hadithActions = hadithActions,
-                        arabicSizePercent = config.txtSizePercentArabic,
-                        translationSizePercent = config.txtSizePercentTranslation,
-                        hadithTextOption = config.hadithTextOption,
-                        isSanadEnabled = false,
-                        isSerifFontStyle = config.isSerifFontStyle,
-                    )
-
-                    hUi = ReaderItemsBuilder
-                        .buildQuickReferenceItems(
-                            repo = appVm.repo,
-                            hadithIds = listOf(hotd.hwc.hadithId),
-                            params = params,
-                        )
-                        .firstOrNull()
-                }
-
-                isLoading = false
-            }
+        vm.observeHadithUi(
+            uiConfig = uiConfig,
+            hadithActions = hadithActions,
+        )
     }
 
-    val hadithUi = hUi
+    val hUi by vm.hadithUi.collectAsStateWithLifecycle()
+    val hadithUi = hUi ?: return
 
     Box(
         modifier = Modifier
@@ -184,38 +145,19 @@ private fun HotdCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 HotdTitle(palette)
-                ReadButton(hotd, palette)
+                ReadButton(hadithUi, palette)
             }
 
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Loader()
-                    }
-                }
-
-                hadithUi != null -> {
-                    HotdTexts(hadithUi)
-                    HotdFooter(
-                        hotd = hotd,
-                        palette = palette,
-                        hasNarratorsChain = hadithUi.hasNarratorsChain,
-                    )
-                }
-            }
+            HotdTexts(hadithUi)
+            HotdFooter(
+                hadithUi = hadithUi, palette = palette, repo = vm.repo
+            )
         }
     }
 }
 
 @Composable
 private fun HotdTexts(hadithUi: ReaderLayoutItem.HadithUI) {
-    val translationId = ReaderPreferences.observeHadithTranslation()
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -250,14 +192,19 @@ private fun HotdAnnotatedText(
 
 @Composable
 private fun HotdFooter(
-    hotd: HadithOfTheDay,
+    hadithUi: ReaderLayoutItem.HadithUI,
     palette: HotdPalette,
-    hasNarratorsChain: Boolean,
+    repo: HadithRepository,
 ) {
     val context = LocalContext.current
     val actions = LocalHadithActions.current
     val translationLangCode = ReaderPreferences.observeHadithTranslation()
-    val hadithNumber = hotd.hwc.hadith.number.orEmpty()
+
+    val hadithNumber = hadithUi.hwc.hadith.number.orEmpty()
+    val collectionName by produceState("", hadithUi.collectionId) {
+        value = repo.getCollectionName(hadithUi.collectionId)
+    }
+
     val iconTint = Color.LightGray
 
     HorizontalDivider(
@@ -274,19 +221,19 @@ private fun HotdFooter(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "${hotd.collectionName}: $hadithNumber",
+            text = "${collectionName}: $hadithNumber",
             style = MaterialTheme.typography.labelMedium,
             color = iconTint,
         )
 
-        if (hasNarratorsChain) {
+        if (hadithUi.hasNarratorsChain) {
             IconButton(
                 painter = painterResource(id = R.drawable.ic_users),
                 contentDescription = stringResource(R.string.desc_narrators_chain),
                 tint = iconTint,
                 small = true,
             ) {
-                actions.showNarratorsChain(hotd.hwc.hadithId)
+                actions.showNarratorsChain(hadithUi.hadithId)
             }
         }
 
@@ -297,8 +244,8 @@ private fun HotdFooter(
         ) {
             HadithHelper.shareHadith(
                 context,
-                hwc = hotd.hwc,
-                collectionName = hotd.collectionName,
+                hwc = hadithUi.hwc,
+                collectionName = collectionName,
                 bookName = null,
                 translationLangCode = translationLangCode,
             )
@@ -338,7 +285,7 @@ private fun HotdTitle(palette: HotdPalette) {
 
 @Composable
 private fun ReadButton(
-    hotd: HadithOfTheDay,
+    hadithUi: ReaderLayoutItem.HadithUI,
     palette: HotdPalette,
 ) {
     val navController = LocalNavHostController.current
@@ -351,7 +298,7 @@ private fun ReadButton(
         shape = MaterialTheme.shapes.small,
         onClick = {
             navController.navigate(
-                Routes.READER.args(hotd.hwc.bookId, hotd.hwc.hadithId)
+                Routes.READER.args(hadithUi.bookId, hadithUi.hadithId)
             )
         },
     ) {

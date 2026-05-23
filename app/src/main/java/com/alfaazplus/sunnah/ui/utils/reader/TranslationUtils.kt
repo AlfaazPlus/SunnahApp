@@ -47,4 +47,9 @@ object TranslationUtils {
     fun resolveHadithTranslationLabel(): String {
         return stringResource(getHadithTranslationLabelRes(observeHadithTranslation()))
     }
+
+    fun langCodeFromId(translationId: String): String {
+        // Currently the id is itself the language code
+        return translationId
+    }
 }

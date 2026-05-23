@@ -71,16 +71,16 @@ private fun ItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName ?: "? "}: ${item.displayNumber}",
+                        item.ui.visibleNumbering,
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }
 
-            if (!item.translationText.isNullOrEmpty()) {
+            if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
-                    text = item.translationText!!,
+                    text = item.ui.translationText!!,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
@@ -121,11 +121,11 @@ private fun Content(
             .padding(16.dp),
     ) {
         items(
-            historyItems.size, key = { historyItems[it].key() }) { index ->
+            historyItems.size, key = { historyItems[it].item.hadithId }) { index ->
             ItemCard(
                 item = historyItems[index],
                 onClick = {
-                    val bookId = it.hadith?.bookId ?: return@ItemCard
+                    val bookId = it.ui.hwc?.bookId ?: return@ItemCard
                     navController.navigate(
                         Routes.READER.args(
                             bookId,

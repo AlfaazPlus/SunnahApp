@@ -27,5 +27,12 @@ data class UserCollection(
     val updatedAt: Date = Date(),
 ) {
     @Ignore
-    var itemsCount: Flow<Int> = MutableStateFlow(0)
+    var itemsCount: Int = 0
 }
+
+data class UserCollectionItemsCount(
+    @ColumnInfo(name = "id")
+    val collectionId: Long,
+    @ColumnInfo(name = "count")
+    val itemsCount: Int
+)

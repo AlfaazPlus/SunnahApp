@@ -5,16 +5,16 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.alfaazplus.sunnah.db.entities.migration.HadithIdUrnLookup
-import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchRow
 import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceEntity
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
+import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
+import com.alfaazplus.sunnah.ui.models.BooksSearchResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
+import com.alfaazplus.sunnah.ui.models.HadithSearchRow
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -32,6 +32,12 @@ interface HadithDao {
         "SELECT * FROM collections WHERE id = :id"
     )
     suspend fun getCollectionById(id: String): CollectionWithTranslation?
+
+    @Transaction
+    @Query(
+        "SELECT * FROM collections WHERE id IN (:collectionIds)"
+    )
+    suspend fun getCollectionsByIds(collectionIds: List<String>): List<CollectionWithTranslation>
 
     @Transaction
     @Query(
@@ -73,12 +79,32 @@ interface HadithDao {
 
     @Transaction
     @Query(
+        """
+            SELECT books.*, COUNT(hadiths.id) AS hadith_count
+            FROM books
+            LEFT JOIN hadiths
+                ON hadiths.book_id = books.id
+            WHERE books.id IN (:bookIds)
+            GROUP BY books.id
+        """
+    )
+
+    suspend fun getBooksByIds(bookIds: List<String>): List<BookWithTranslation>
+
+    @Transaction
+    @Query(
         """SELECT * FROM hadiths WHERE hadiths.id = :id """
     )
     suspend fun getHadithById(id: String): HadithWithContents?
 
     @Query("SELECT id FROM hadiths WHERE urn = :urn LIMIT 1")
     suspend fun getHadithIdByUrn(urn: Long): String?
+
+    @Transaction
+    @Query(
+        """SELECT * FROM hadiths WHERE hadiths.id IN (:ids) """
+    )
+    suspend fun getHadithsByIds(ids: List<String>): List<HadithWithContents>
 
     @Query("SELECT urn, id FROM hadiths WHERE urn IN (:urns)")
     suspend fun getHadithIdsByUrns(urns: List<Long>): List<HadithIdUrnLookup>

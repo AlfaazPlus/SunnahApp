@@ -96,7 +96,7 @@ object ThemeUtils {
     }
 
     @Composable
-    fun getColorScheme(context: Context, isDarkTheme: Boolean = observeDarkTheme()): ColorScheme {
+    fun observeColorScheme(context: Context, isDarkTheme: Boolean = observeDarkTheme()): ColorScheme {
         val themeColor = observeThemeColor()
         val isDynamicColor = observeIsDynamicColor()
 

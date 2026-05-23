@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.InlineTextContent
@@ -47,9 +46,8 @@ import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
-import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
-import com.alfaazplus.sunnah.ui.controllers.rememberModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
@@ -81,16 +79,16 @@ private fun BookmarkItemCard(
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(
-                            "${bookmark.collectionName ?: "? "}: ${bookmark.displayNumber}",
+                            bookmark.ui.visibleNumbering,
                             modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 }
 
-                if (!bookmark.translationText.isNullOrEmpty()) {
+                if (!bookmark.ui.translationText.isNullOrEmpty()) {
                     Text(
-                        text = bookmark.translationText!!,
+                        text = bookmark.ui.translationText!!,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = if (bookmark.item.remark.isNotBlank()) 5 else 8,
                         overflow = TextOverflow.Ellipsis,
@@ -139,8 +137,11 @@ private fun Content(
     paddingValues: PaddingValues,
     userBookmarks: List<UserBookmarkNormalized>,
 ) {
-    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
-    AddToBookmarksSheet(bookmarksModalController)
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
+
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
 
     if (userBookmarks.isEmpty()) {
         Box(
@@ -157,7 +158,7 @@ private fun Content(
         return
     }
 
-    LazyVerticalGrid (
+    LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 300.dp),
         contentPadding = paddingValues,
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -168,11 +169,10 @@ private fun Content(
         items(userBookmarks.size) { index ->
             BookmarkItemCard(
                 bookmark = userBookmarks[index],
-                onClick = { it ->
-                    bookmarksModalController.show(
-                        AddToBookmarkRequest(
-                            hadithId = it.item.hadithId,
-                        )
+                onClick = {
+                    bookmarkViewerData = BookmarkViewerData(
+                        hadithId = it.item.hadithId,
+                        openInReader = true,
                     )
                 },
             )

@@ -39,18 +39,68 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 import com.alfaazplus.sunnah.ui.components.common.TextInput
-import com.alfaazplus.sunnah.ui.controllers.ModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
 import com.alfaazplus.sunnah.ui.screens.main.UserCollectionCard
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddToCollectionSheet(
+    hadithId: String?,
+    onClose: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(true) { sheetValue ->
+        when (sheetValue) {
+            SheetValue.Hidden -> false
+            SheetValue.Expanded,
+            SheetValue.PartiallyExpanded,
+                -> true
+        }
+    }
+
+    if (hadithId == null) {
+        return
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            onClose()
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        properties = ModalBottomSheetProperties(
+            shouldDismissOnBackPress = false,
+        ),
+        dragHandle = {},
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.add_to_collection),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+        }
+
+        Content(
+            hadithId = hadithId,
+            onClose = onClose,
+        )
+    }
+}
+
+
 @Composable
 private fun Content(
-    request: AddToCollectionRequest,
-    onCancel: () -> Unit,
-    onCreate: () -> Unit,
+    hadithId: String,
+    onClose: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
     val userCollections by viewModel.userCollections.collectAsState()
@@ -62,9 +112,9 @@ private fun Content(
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(userCollections, request.hadithId) {
+    LaunchedEffect(userCollections, hadithId) {
         viewModel.repo
-            .loadCollectionsForHadith(request.hadithId)
+            .loadCollectionsForHadith(hadithId)
             .collect { items ->
                 val currentSelectionIds = items
                     .map { it.id }
@@ -153,7 +203,7 @@ private fun Content(
     ) {
         Button(
             modifier = Modifier.weight(1f),
-            onClick = onCancel,
+            onClick = onClose,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -172,7 +222,7 @@ private fun Content(
                     removedCollectionIds.forEach {
                         viewModel.repo.removeItemFromUserCollection(
                             userCollectionId = it,
-                            hadithId = request.hadithId,
+                            hadithId = hadithId,
                         )
                     }
 
@@ -180,13 +230,13 @@ private fun Content(
                         viewModel.repo.addUserCollectionItem(
                             UserCollectionItem(
                                 userCollectionId = it,
-                                hadithId = request.hadithId,
+                                hadithId = hadithId,
                                 remark = remark,
                             )
                         )
                     }
 
-                    onCreate()
+                    onClose()
                 }
             },
             enabled = isDeleting || selectedCollectionIds.isNotEmpty(),
@@ -208,65 +258,6 @@ private fun Content(
                 if (isDeleting) stringResource(R.string.remove)
                 else if (initialCollectionIds.isEmpty()) stringResource(R.string.add_to_collection)
                 else stringResource(R.string.update)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddToCollectionSheet(
-    controller: ModalController<AddToCollectionRequest>,
-) {
-    val request = controller.data
-    val sheetState = rememberModalBottomSheetState(true) { sheetValue ->
-        when (sheetValue) {
-            SheetValue.Hidden -> false
-            SheetValue.Expanded,
-            SheetValue.PartiallyExpanded,
-                -> true
-        }
-    }
-
-    if (!controller.isVisible) {
-        return
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            controller.hide()
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        properties = ModalBottomSheetProperties(
-            shouldDismissOnBackPress = false,
-        ),
-        dragHandle = {},
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(R.string.add_to_collection),
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-        }
-
-        if (request != null) {
-            Content(
-                request = request,
-                onCancel = {
-                    controller.hide()
-                },
-                onCreate = {
-                    controller.hide()
-                },
             )
         }
     }

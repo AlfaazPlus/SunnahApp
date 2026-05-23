@@ -75,7 +75,7 @@ private fun CollectionItemMenu(
     val scope = rememberCoroutineScope()
 
     BottomSheetMenu(
-        title = "${item.collectionName ?: "? "}: ${item.displayNumber}",
+        title = item.ui.visibleNumbering,
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Center,
@@ -119,7 +119,7 @@ private fun CollectionItemCard(
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(
-                        "${item.collectionName  ?: "? "}: ${item.displayNumber}",
+                        item.ui.visibleNumbering,
                         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -141,9 +141,9 @@ private fun CollectionItemCard(
                 }
             }
 
-            if (!item.translationText.isNullOrEmpty()) {
+            if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
-                    text = item.translationText!!,
+                    text = item.ui.translationText!!,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
@@ -176,7 +176,7 @@ private fun CollectionItems(
         item { header() }
         items(collectionItems.size) { index ->
             CollectionItemCard(collectionItems[index]) { item ->
-                val bookId = item.hadith?.bookId ?: return@CollectionItemCard
+                val bookId = item.ui.hwc?.bookId ?: return@CollectionItemCard
                 navController.navigate(
                     Routes.READER.args(
                         bookId,

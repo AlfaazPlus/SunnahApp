@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.db.entities.v2
 
+import androidx.core.text.parseAsHtml
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -110,5 +111,15 @@ data class HadithContentEntity(
     @get:Ignore
     val blocks: List<HadithBlock> by lazy {
         JsonHelper.json.decodeFromString(blocksJson)
+    }
+
+    fun toPlainText(): String {
+        return buildString {
+            blocks.forEach {
+                if (!it.text.isNullOrEmpty()) {
+                    appendLine(it.text.parseAsHtml())
+                }
+            }
+        }
     }
 }

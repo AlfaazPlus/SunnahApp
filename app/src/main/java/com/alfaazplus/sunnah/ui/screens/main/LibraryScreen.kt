@@ -8,20 +8,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,84 +49,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
-import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
-import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.LocalNavHostController
-import com.alfaazplus.sunnah.ui.components.common.Section
-import com.alfaazplus.sunnah.ui.components.common.SectionEmptyMessage
-import com.alfaazplus.sunnah.ui.components.common.SectionHeaderActionButton
-import com.alfaazplus.sunnah.ui.components.common.SectionHeaderViewAll
-import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
-import com.alfaazplus.sunnah.ui.controllers.rememberModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.components.library.SectionEmptyMessage
+import com.alfaazplus.sunnah.ui.components.library.SectionHeaderActionButton
+import com.alfaazplus.sunnah.ui.components.library.SectionHeaderViewAll
+import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
+import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
-import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
 @Composable
-private fun ReadHistoryItemCard(
-    item: ReadHistory,
-    onNavigate: (bookId: String, hadithId: String) -> Unit,
-    appViewModel: AppViewModel = hiltViewModel(),
+fun LibraryScreen(
+    viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val hwc = produceState<HadithWithContents?>(initialValue = null, item.hadithId) {
-        value = tryOrNull { appViewModel.repo.dao.getHadithById(item.hadithId) }
-    }.value
+    val userCollections by viewModel.userCollections.collectAsState()
+    var showCreateCollectionSheet by remember { mutableStateOf(false) }
+    val navController = LocalNavHostController.current
 
-    val collectionName = produceState<String?>(initialValue = null, hwc) {
-        value = hwc?.let {
-            tryOrNull {
-                appViewModel.repo.dao
-                    .getCollectionById(it.collectionId)
-                    ?.getTitle("en")
-            }
-        }
-    }.value
+    CreateUpdateCollectionSheet(
+        showCreateCollectionSheet,
+        onClose = { showCreateCollectionSheet = false },
+    )
 
-    val bookTitle = produceState<String?>(initialValue = null, hwc) {
-        value = hwc?.let {
-            tryOrNull {
-                appViewModel.repo.dao
-                    .getBookById(it.bookId)
-                    ?.getTitle("en")
-            }
-        }
-    }.value
-
-    Box(
-        modifier = Modifier
-            .width(250.dp)
-            .height(70.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable {
-                val bookId = hwc?.bookId ?: return@clickable
-                onNavigate(bookId, item.hadithId)
-            }
-            .padding(12.dp),
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(160.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 20.dp,
+            bottom = 150.dp,
+        ),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = "${collectionName ?: "?"} : ${hwc?.hadith?.number ?: item.hadithId}",
-                style = MaterialTheme.typography.titleSmall,
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SectionTitle(
+                iconRes = R.drawable.ic_history,
+                title = stringResource(R.string.reading_history),
+                headerRightContent = {
+                    SectionHeaderViewAll {
+                        navController.navigate(Routes.READING_HISTORY)
+                    }
+                },
             )
+        }
 
-            Text(
-                text = "Book: ${bookTitle ?: " ?"}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(end = 6.dp)
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SectionReadHistory()
+        }
+
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SectionTitle(
+                modifier = Modifier.padding(top = 16.dp),
+                iconRes = R.drawable.ic_bookmark,
+                title = stringResource(R.string.bookmarks),
+                headerRightContent = {
+                    SectionHeaderViewAll {
+                        navController.navigate(Routes.BOOKMARKS)
+                    }
+                },
             )
+        }
+
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SectionBookmarks()
+        }
+
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SectionTitle(
+                modifier = Modifier.padding(top = 16.dp),
+                iconRes = R.drawable.ic_library,
+                title = stringResource(R.string.collections),
+                headerRightContent = {
+                    if (userCollections.isEmpty()) {
+                        SectionHeaderActionButton(
+                            icon = R.drawable.ic_add,
+                            text = stringResource(R.string.label_new),
+                        ) { showCreateCollectionSheet = true }
+                    }
+                },
+            )
+        }
+
+        if (userCollections.isEmpty()) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CollectionsEmptyState(
+                    onCreateCollection = { showCreateCollectionSheet = true },
+                )
+            }
+        } else {
+            items(
+                items = userCollections,
+                key = { it.id },
+            ) { collection ->
+                UserCollectionCard(collection) {
+                    navController.navigate(
+                        Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
+                    )
+                }
+            }
         }
     }
 }
@@ -139,74 +167,116 @@ private fun SectionReadHistory(
     val readHistory by viewModel.recentReadHistory.collectAsState()
     val navController = LocalNavHostController.current
 
-    Section(
-        icon = R.drawable.ic_history,
-        title = stringResource(R.string.reading_history),
-        headerRightContent = {
-            SectionHeaderViewAll {
-                navController.navigate(Routes.READING_HISTORY)
-            }
-        },
-    ) {
-        if (readHistory.isEmpty()) {
-            SectionEmptyMessage(
-                stringResource(R.string.no_reading_history),
-            )
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-            ) {
-                items(
-                    readHistory.size, key = { readHistory[it].hadithId }) { index ->
-                    val item = readHistory[index]
+    if (readHistory.isEmpty()) {
+        SectionEmptyMessage(
+            message = stringResource(R.string.no_reading_history),
+            horizontalPadding = 0.dp,
+        )
+    } else {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(
+                readHistory.size, key = { readHistory[it].item.hadithId }) { index ->
+                val item = readHistory[index]
 
-                    ReadHistoryItemCard(
-                        item = item,
-                        onNavigate = { bookId, hadithId ->
-                            navController.navigate(
-                                Routes.READER.args(bookId, hadithId),
-                            )
-                        },
-                    )
-                }
+                ReadHistoryItemCard(
+                    history = item,
+                    onNavigate = { bookId, hadithId ->
+                        navController.navigate(
+                            Routes.READER.args(bookId, hadithId),
+                        )
+                    },
+                )
             }
         }
     }
 }
 
+@Composable
+private fun ReadHistoryItemCard(
+    history: ReadHistoryNormalized,
+    onNavigate: (bookId: String, hadithId: String) -> Unit,
+) {
+    val hadithId = history.item.hadithId
+
+    Box(
+        modifier = Modifier
+            .width(250.dp)
+            .height(70.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable {
+                val bookId = history.ui.hwc?.bookId ?: return@clickable
+                onNavigate(bookId, hadithId)
+            }
+            .padding(12.dp),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = history.ui.visibleNumbering,
+                style = MaterialTheme.typography.titleSmall,
+            )
+
+            Text(
+                text = history.ui.bookTitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(end = 6.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionBookmarks(
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    val userBookmarks by viewModel.recentUserBookmarks.collectAsState()
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
+
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
+
+    if (userBookmarks.isEmpty()) {
+        SectionEmptyMessage(
+            message = stringResource(R.string.no_bookmarks),
+            horizontalPadding = 0.dp,
+        )
+    } else {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(userBookmarks.size) { index ->
+                val bookmark = userBookmarks[index]
+
+                UserBookmarkCard(
+                    bookmark,
+                    onClick = {
+                        bookmarkViewerData = BookmarkViewerData(
+                            hadithId = bookmark.item.hadithId,
+                            openInReader = true,
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun UserBookmarkCard(
-    bookmark: UserBookmark,
+    bookmark: UserBookmarkNormalized,
     onClick: () -> Unit,
-    appViewModel: AppViewModel = hiltViewModel(),
 ) {
-    val hwc = produceState<HadithWithContents?>(initialValue = null, bookmark.hadithId) {
-        value = tryOrNull { appViewModel.repo.dao.getHadithById(bookmark.hadithId) }
-    }.value
-
-    val collectionName = produceState<String?>(initialValue = null, hwc) {
-        value = hwc?.let {
-            tryOrNull {
-                appViewModel.repo.dao
-                    .getCollectionById(it.collectionId)
-                    ?.getTitle("en")
-            }
-        }
-    }.value
-
-    val bookTitle = produceState<String?>(initialValue = null, hwc) {
-        value = hwc?.let {
-            tryOrNull {
-                appViewModel.repo.dao
-                    .getBookById(it.bookId)
-                    ?.getTitle("en")
-            }
-        }
-    }.value
-
+    Logger.d(bookmark)
     Box(
         modifier = Modifier
             .width(250.dp)
@@ -222,16 +292,16 @@ private fun UserBookmarkCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: bookmark.hadithId}",
+                text = bookmark.ui.visibleNumbering,
                 style = MaterialTheme.typography.titleSmall,
             )
 
-            if (bookmark.remark.isNotEmpty()) {
+            if (bookmark.item.remark.isNotEmpty()) {
                 Text(
                     text = buildAnnotatedString {
                         appendInlineContent("user_note", "[icon]")
                         append(" ")
-                        append(bookmark.remark)
+                        append(bookmark.item.remark)
                     },
                     inlineContent = mapOf(
                         "user_note" to InlineTextContent(
@@ -256,9 +326,8 @@ private fun UserBookmarkCard(
                     modifier = Modifier.padding(end = 6.dp),
                 )
             } else {
-
                 Text(
-                    text = "Book: ${bookTitle ?: " ?"}",
+                    text = bookmark.ui.bookTitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                     maxLines = 2,
@@ -271,59 +340,10 @@ private fun UserBookmarkCard(
     }
 }
 
-@Composable
-private fun SectionBookmarks(
-    viewModel: UserDataViewModel = hiltViewModel(),
-) {
-    val userBookmarks by viewModel.recentUserBookmarks.collectAsState()
-    val navController = LocalNavHostController.current
-
-    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
-
-    AddToBookmarksSheet(bookmarksModalController)
-
-    Section(
-        icon = R.drawable.ic_bookmark,
-        title = stringResource(R.string.bookmarks),
-        headerRightContent = {
-            SectionHeaderViewAll {
-                navController.navigate(Routes.BOOKMARKS)
-            }
-        },
-    ) {
-        if (userBookmarks.isEmpty()) {
-            SectionEmptyMessage(
-                stringResource(R.string.no_bookmarks)
-            )
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-            ) {
-                items(userBookmarks.size) { index ->
-                    val bookmark = userBookmarks[index]
-
-                    UserBookmarkCard(
-                        bookmark,
-                        onClick = {
-                            bookmarksModalController.show(
-                                AddToBookmarkRequest(
-                                    hadithId = bookmark.hadithId,
-                                )
-                            )
-                        },
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> Unit) {
     val userColor = collection.color?.let { Color(it.toColorInt()) } ?: Color.Gray
-    val itemsCount = collection.itemsCount.collectAsState(0).value
 
     val gradientColors = listOf(
         Color.Transparent,
@@ -371,7 +391,7 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
             )
 
             Text(
-                text = "$itemsCount items",
+                text = "${collection.itemsCount} items",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
                 textAlign = TextAlign.Center,
@@ -382,96 +402,65 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
 }
 
 @Composable
-private fun SectionCollections(
-    viewModel: UserDataViewModel = hiltViewModel(),
+private fun CollectionsEmptyState(
+    onCreateCollection: () -> Unit,
 ) {
-    var showCreateCollectionSheet by remember { mutableStateOf(false) }
-    val userCollections by viewModel.userCollections.collectAsState()
-    val navController = LocalNavHostController.current
-
-    Section(
-        icon = R.drawable.ic_library,
-        title = stringResource(R.string.collections),
-        headerRightContent = {
-            if (userCollections.isNotEmpty()) {
-                SectionHeaderActionButton(
-                    icon = R.drawable.ic_add,
-                    text = stringResource(R.string.label_new),
-                ) {
-                    showCreateCollectionSheet = true
-                }
-            }
-        },
+    Column(
+        modifier = Modifier
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.alpha(0.6f), MaterialTheme.shapes.medium)
+            .padding(20.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (userCollections.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant.alpha(0.6f), MaterialTheme.shapes.medium)
-                    .padding(20.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    stringResource(R.string.no_collections),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
+        Text(
+            stringResource(R.string.no_collections),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
 
-                OutlinedButton(
-                    onClick = {
-                        showCreateCollectionSheet = true
-                    },
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(R.string.create_collection),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-            }
-        } else {
-            LazyVerticalGrid(
-                userScrollEnabled = false,
-                columns = GridCells.Adaptive(160.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 150.dp),
-                modifier = Modifier.heightIn(max = 1000.dp)
-            ) {
-                items(userCollections.size) {
-                    UserCollectionCard(userCollections[it]) { collection ->
-                        navController.navigate(Routes.SINGLE_COLLECTION.args(collection.id, collection.name))
-                    }
-                }
-            }
+        OutlinedButton(
+            onClick = onCreateCollection,
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.primary,
+            ),
+        ) {
+            Text(
+                text = stringResource(R.string.create_collection),
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
     }
-
-    CreateUpdateCollectionSheet(
-        showCreateCollectionSheet,
-        onClose = {
-            showCreateCollectionSheet = false
-        },
-    )
 }
 
 @Composable
-fun LibraryScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+private fun SectionTitle(
+    modifier: Modifier = Modifier,
+    iconRes: Int,
+    title: String,
+    headerRightContent: (@Composable () -> Unit)?,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        SectionReadHistory()
-        SectionBookmarks()
-        SectionCollections()
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = title,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f),
+        )
+
+        headerRightContent?.let {
+            it()
+        }
     }
 }

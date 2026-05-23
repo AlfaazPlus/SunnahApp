@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">SunnahApp</string>
-    <string name="app_name_generated">SunnahApp</string>
-    <string name="app_description">SunnahApp</string>
+    <string name="app_name" translatable="false">SunnahApp</string>
+    <string name="app_name_generated" translatable="false">SunnahApp</string>
+    <string name="app_description" translatable="false">SunnahApp</string>
 
     <string name="next">Next</string>
     <string name="previous">Previous</string>
@@ -50,7 +50,7 @@
     <string name="search_result_menu">Search result menu</string>
     <string name="clear_search">Clear search</string>
 
-    <string name="lorem_ipsum">
+    <string name="lorem_ipsum" translatable="false">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum
         ullamcorper, risus dolor egestas lectus, sit amet mattis purus dui nec risus. Maecenas non sodales nisi, vel dictum dolor.
         Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend diam,
@@ -114,6 +114,7 @@
     <string name="share_app_msg">SunnahApp is a free and open-source app to read and explore the Sunnah of the Prophet ﷺ. This app has a nice and clean interface with features like translation, advanced search, reminder and many more. \n\nDOWNLOAD NOW:\n%s</string>
     <string name="install_quranapp">Install QuranApp</string>
     <string name="install_quranapp_description">Read this Quran reference with translations, word-by-word meaning, recitation, and more. QuranApp is Free, secure &amp; open source</string>
+    <string name="install_quranapp_description_short">Free, secure &amp; open source</string>
     <string name="install_from_google_play">Install from Google Play</string>
     <string name="install_from_github">Install from GitHub</string>
     <string name="donate">Donate</string>
