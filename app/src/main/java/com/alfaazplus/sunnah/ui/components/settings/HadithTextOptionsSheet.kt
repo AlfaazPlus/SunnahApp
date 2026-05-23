@@ -62,8 +62,7 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                         HadithTextPreview(
                             selectedTranslationId,
                             translationTextSizePercent,
-                            false,
-                            previewText = "The Prophet (ﷺ) said, \"The signs of a hypocrite are three: 1. Whenever he speaks, he tells a lie. 2. Whenever he promises, he always breaks it (his promise ). 3. If you trust him, he proves to be dishonest. (If you keep something as a trust with him, he will not return it.)\"",
+                            isArabic = false,
                             false,
                         )
                     }
@@ -72,8 +71,7 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                         HadithTextPreview(
                             selectedTranslationId,
                             arabicTextSizePercent,
-                            true,
-                            previewText = " آيَةُ الْمُنَافِقِ ثَلاَثٌ إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ",
+                            isArabic = true,
                             false,
                         )
                     }

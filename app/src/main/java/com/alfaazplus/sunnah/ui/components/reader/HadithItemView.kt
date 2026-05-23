@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -51,8 +50,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.models.HadithChapterUi
@@ -129,12 +128,11 @@ private fun HadithText(text: AnnotatedString, shouldTrim: Boolean, maxLines: Int
     val isMeasured = trimEndOffset > 0
     val showFade = isTrimmed && isOverflowing && isMeasured
 
-    val displayText =
-        if (isTrimmed && isMeasured && trimEndOffset < text.length) {
-            text.subSequence(0, trimEndOffset)
-        } else {
-            text
-        }
+    val displayText = if (isTrimmed && isMeasured && trimEndOffset < text.length) {
+        text.subSequence(0, trimEndOffset)
+    } else {
+        text
+    }
 
     Box(
         modifier = Modifier
@@ -232,20 +230,6 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            chapterUi.chapter.chapter.number
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { number ->
-                    Text(
-                        text = number,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(colorScheme.background)
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
-                    )
-                }
-
             Text(
                 text = stringResource(R.string.chapter),
                 style = MaterialTheme.typography.labelMedium,

@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.text.Editable
 import android.text.Spanned
 import android.text.style.StyleSpan
+import android.text.style.SuperscriptSpan
 import android.text.style.UnderlineSpan
 import androidx.core.text.HtmlCompat
 import androidx.core.text.getSpans
@@ -18,6 +19,7 @@ sealed interface HadithRichTextPart {
         val bold: Boolean,
         val italic: Boolean,
         val underline: Boolean,
+        val superscript: Boolean,
     ) : HadithRichTextPart
 
     data class HadithRef(
@@ -46,8 +48,6 @@ fun parseHadithText(html: String): List<HadithRichTextPart> {
 
     val normalized = html
         .replace("\u0000", "")
-        .replace("\r\n", "\n")
-        .replace("\r", "\n")
         .replace(LINE_BREAK_PATTERN, "<br/>")
         .replace("&nbsp;", " ")
 
@@ -72,6 +72,7 @@ fun parseHadithText(html: String): List<HadithRichTextPart> {
                 bold = false,
                 italic = false,
                 underline = false,
+                superscript = false,
             )
         )
     }
@@ -162,6 +163,10 @@ private fun Spanned.toHadithRichTextParts(): List<HadithRichTextPart> {
         boundaries.add(getSpanStart(span))
         boundaries.add(getSpanEnd(span))
     }
+    getSpans<SuperscriptSpan>().forEach { span ->
+        boundaries.add(getSpanStart(span))
+        boundaries.add(getSpanEnd(span))
+    }
     getSpans<RefSpan>().forEach { span ->
         boundaries.add(getSpanStart(span))
         boundaries.add(getSpanEnd(span))
@@ -221,6 +226,7 @@ private fun Spanned.toHadithRichTextParts(): List<HadithRichTextPart> {
         }
 
         val underline = getSpans(mid, mid, UnderlineSpan::class.java).isNotEmpty()
+        val superscript = getSpans(mid, mid, SuperscriptSpan::class.java).isNotEmpty()
 
         appendPart(
             parts,
@@ -229,6 +235,7 @@ private fun Spanned.toHadithRichTextParts(): List<HadithRichTextPart> {
                 bold = bold,
                 italic = italic,
                 underline = underline,
+                superscript = superscript,
             ),
         )
     }
@@ -238,7 +245,7 @@ private fun Spanned.toHadithRichTextParts(): List<HadithRichTextPart> {
 
 private fun appendPart(parts: MutableList<HadithRichTextPart>, next: HadithRichTextPart) {
     when (val previous = parts.lastOrNull()) {
-        is HadithRichTextPart.Plain if next is HadithRichTextPart.Plain && previous.bold == next.bold && previous.italic == next.italic && previous.underline == next.underline -> {
+        is HadithRichTextPart.Plain if next is HadithRichTextPart.Plain && previous.bold == next.bold && previous.italic == next.italic && previous.underline == next.underline && previous.superscript == next.superscript -> {
             parts[parts.lastIndex] = previous.copy(text = previous.text + next.text)
         }
 

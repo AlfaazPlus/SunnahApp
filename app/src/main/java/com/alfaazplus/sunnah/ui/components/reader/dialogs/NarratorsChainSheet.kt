@@ -101,7 +101,7 @@ private fun NarratorsList(narrators: List<Scholar>) {
     ) {
         items(
             count = narrators.size,
-            key = { narrators[it].id },
+            key = { "${narrators[it].id}_idx_$it" },
         ) { i ->
             NarratorCard(narrators[i])
 

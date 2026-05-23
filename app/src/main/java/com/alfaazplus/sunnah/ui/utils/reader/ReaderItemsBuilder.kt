@@ -44,7 +44,6 @@ private data class BuilderSessionStyle(
     val arParagraphStyle: ParagraphStyle,
     val arSpanStyle: SpanStyle,
     val trParagraphStyle: ParagraphStyle,
-    val trTightParagraphStyle: ParagraphStyle,
     val trSpanStyle: SpanStyle,
 )
 
@@ -74,15 +73,6 @@ object ReaderItemsBuilder {
             arParagraphStyle = arabicTextStyle.toParagraphStyle(),
             arSpanStyle = arabicTextStyle.toSpanStyle(),
             trParagraphStyle = translationTextStyle.toParagraphStyle(),
-            trTightParagraphStyle = translationTextStyle
-                .copy(
-                    lineHeight = translationTextStyle.fontSize,
-                    lineHeightStyle = LineHeightStyle.Default.copy(
-                        mode = LineHeightStyle.Mode.Tight,
-                        alignment = LineHeightStyle.Alignment.Center,
-                    ),
-                )
-                .toParagraphStyle(),
             trSpanStyle = translationTextStyle.toSpanStyle(),
         )
     }
@@ -439,7 +429,7 @@ object ReaderItemsBuilder {
 
                 when (block.type) {
                     HadithBlockType.NARRATOR -> {
-                        paragraph(styles.trTightParagraphStyle) {
+                        paragraph(styles.trParagraphStyle) {
                             span(mutedSpanStyle) { append(text) }
                         }
                     }

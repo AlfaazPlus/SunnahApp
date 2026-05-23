@@ -36,11 +36,23 @@ fun HadithTextPreview(
     translationId: String,
     sizePercent: Int,
     isArabic: Boolean,
-    previewText: String,
     isSerif: Boolean,
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+
+    // hadith id = nasai_urn_1122120
+    val previewText = when {
+        isArabic -> "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
+        else -> when (translationId) {
+            "en" -> "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins."
+            "bn" -> ""
+            "fr" -> ""
+            "in" -> ""
+            "ur" -> "جس نے رمضان میں ایمان کے ساتھ ثواب کی نیت سے روزہ رکھا تو اس کے پچھلے گناہ بخش دئیے جائیں گے"
+            else -> ""
+        }
+    } // fixme
 
     val style = if (isArabic) {
         getArabicTextStyle(
@@ -70,17 +82,16 @@ fun HadithTextPreview(
 }
 
 @Composable
-private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, isSerif: Boolean = false) {
+private fun TextSizeSlider(key: PrefKey<Int>, title: Int, translationId: String, isSerif: Boolean = false) {
     val coroutineScope = rememberCoroutineScope()
-    val translationId = ReaderPreferences.observeHadithTranslation()
     val textSizePercent = DataStoreManager.observe(key)
 
     val min = 50f
     val max = 200f
     val steps = max.toInt() - min.toInt()
 
-
     ListItemCategoryLabel(stringResource(title))
+
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -94,8 +105,11 @@ private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, i
             },
             valueRange = min..max, steps = steps,
         )
+
         Text(
-            text = "${textSizePercent}%", modifier = Modifier.padding(start = 10.dp), style = MaterialTheme.typography.labelSmall
+            text = "${textSizePercent}%",
+            modifier = Modifier.padding(start = 10.dp),
+            style = MaterialTheme.typography.labelSmall,
         )
     }
 
@@ -106,13 +120,20 @@ private fun TextSizeSlider(key: PrefKey<Int>, title: Int, previewText: String, i
             .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
-        HadithTextPreview(translationId, textSizePercent, key == KEY_TEXT_SIZE_PER_ARABIC, previewText, isSerif)
+        HadithTextPreview(
+            translationId,
+            textSizePercent,
+            key == KEY_TEXT_SIZE_PER_ARABIC,
+            isSerif,
+        )
     }
 }
 
 @Composable
 fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
+
+    val translationId = ReaderPreferences.observeHadithTranslation()
     val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
 
     BottomSheet(
@@ -129,21 +150,24 @@ fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
             TextSizeSlider(
                 KEY_TEXT_SIZE_PER_ARABIC,
                 R.string.arabic_text_size,
-                previewText = " مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
+                translationId,
             )
             TextSizeSlider(
                 KEY_TEXT_SIZE_PER_TRANSLATION,
                 R.string.translation_text_size,
-                previewText = "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins.",
-                isSerifFontStyle
+                translationId,
+                isSerifFontStyle,
             )
-            SwitchItem(
-                modifier = Modifier.padding(top = 16.dp),
-                title = R.string.serif_font_style,
-                checked = isSerifFontStyle,
-            ) {
-                coroutineScope.launch {
-                    DataStoreManager.write(KEY_IS_SERIF_FONT_STYLE, it)
+
+            if (translationId == "en") {
+                SwitchItem(
+                    modifier = Modifier.padding(top = 16.dp),
+                    title = R.string.serif_font_style,
+                    checked = isSerifFontStyle,
+                ) {
+                    coroutineScope.launch {
+                        DataStoreManager.write(KEY_IS_SERIF_FONT_STYLE, it)
+                    }
                 }
             }
         }

@@ -10,6 +10,7 @@ import com.alfaazplus.sunnah.ui.utils.managers.TranslationDownloadManager
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.AVAILABLE_TRANSLATIONS
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.DEFAULT_TRANSLATION
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -143,6 +144,7 @@ class TranslationDownloadViewModel @Inject constructor(
 
         viewModelScope.launch {
             repo.deleteTranslationData(id)
+            ReaderPreferences.setHadithTranslation(DEFAULT_TRANSLATION.langCode)
             refreshRows()
         }
     }
