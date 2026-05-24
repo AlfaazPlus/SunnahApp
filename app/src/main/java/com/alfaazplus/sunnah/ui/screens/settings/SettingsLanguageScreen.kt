@@ -52,7 +52,7 @@ data class LanguageModel(
 @Composable
 fun availableAppLocales(): Set<Pair<String, String>> {
     return setOf(
-        "default" to stringResource(R.string.system_default),
+        SPAppConfigs.LOCALE_DEFAULT to stringResource(R.string.system_default),
         "en" to "English",
         "ur" to "اردو",
     )
@@ -66,7 +66,7 @@ fun SettingsLanguageScreen() {
 
     val languages = remember(platformLocale) {
         availableLocales.map { (rawLanguageTag, nativeName) ->
-            val locale = if (rawLanguageTag == "default") {
+            val locale = if (rawLanguageTag == SPAppConfigs.LOCALE_DEFAULT) {
                 null
             } else {
                 Locale.forLanguageTag(rawLanguageTag.normalizedLanguageTag())
@@ -142,8 +142,7 @@ fun SettingsLanguageScreen() {
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(
-                top = 16.dp,
-                bottom = 96.dp
+                top = 16.dp, bottom = 96.dp
             ),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {

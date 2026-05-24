@@ -4,19 +4,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -27,12 +28,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
+import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
 fun GlobalSearchTextField(vm: SearchViewModel) {
-    var showSearchFilterSheet by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -42,13 +42,11 @@ fun GlobalSearchTextField(vm: SearchViewModel) {
 
     val searchQuery = vm.searchQuery.collectAsState().value
 
-    val bgColor = MaterialTheme.colorScheme.background
-
-    TextField(
+    OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.surface,
+                color = colorScheme.surfaceContainer,
             )
             .padding(start = 16.dp, end = 16.dp, bottom = if (searchQuery.isNotBlank()) 0.dp else 16.dp)
             .focusRequester(focusRequester)
@@ -58,19 +56,24 @@ fun GlobalSearchTextField(vm: SearchViewModel) {
                     keyboardController?.show()
                 }
             },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = bgColor,
-            focusedContainerColor = bgColor,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = colorScheme.background,
+            unfocusedContainerColor = colorScheme.background,
+            focusedBorderColor = colorScheme.primary,
+            unfocusedBorderColor = colorScheme.outline.alpha(0.3f),
         ),
         trailingIcon = {
-            SimpleTooltip(stringResource(R.string.search_filter)) {
-                IconButton(onClick = {
-                    showSearchFilterSheet = true
-                }) {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(
+                    onClick = {
+                        vm.onSearchQueryChanged("")
+                    },
+                    modifier = Modifier.size(20.dp),
+                ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_filter), contentDescription = stringResource(R.string.search_filter)
+                        painterResource(R.drawable.ic_x),
+                        contentDescription = stringResource(R.string.clear),
+                        tint = colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -81,11 +84,5 @@ fun GlobalSearchTextField(vm: SearchViewModel) {
         textStyle = MaterialTheme.typography.titleSmall,
         shape = MaterialTheme.shapes.medium,
         singleLine = true,
-    )
-
-    SearchFilterSheet(
-        isOpen = showSearchFilterSheet,
-        onClose = { showSearchFilterSheet = false },
-        searchVm = vm,
     )
 }

@@ -38,11 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
-import com.alfaazplus.sunnah.ui.components.common.TextInput
+import com.alfaazplus.sunnah.ui.screens.main.CollectionsEmptyState
 import com.alfaazplus.sunnah.ui.screens.main.UserCollectionCard
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,9 +104,14 @@ private fun Content(
     onClose: () -> Unit,
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val userCollections by viewModel.userCollections.collectAsState()
+    var showCreateCollectionSheet by remember { mutableStateOf(false) }
 
-    var remark by remember { mutableStateOf("") }
+    CreateUpdateCollectionSheet(
+        showCreateCollectionSheet,
+        onClose = { showCreateCollectionSheet = false },
+    )
+
+    val userCollections by viewModel.userCollections.collectAsState()
 
     var initialCollectionIds by remember { mutableStateOf(setOf<Long>()) }
     var selectedCollectionIds by remember { mutableStateOf(setOf<Long>()) }
@@ -133,60 +139,55 @@ private fun Content(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        TextInput(
-            value = remark,
-            onValueChange = {
-                remark = it
-            },
-            maxLines = 4,
-            minLines = 2,
-            label = stringResource(R.string.note),
-            placeholder = stringResource(R.string.optional_note),
-            bgColor = MaterialTheme.colorScheme.background,
-        )
-
         Text(
             stringResource(R.string.select_collections),
             modifier = Modifier.padding(vertical = 8.dp),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
         )
-        LazyVerticalGrid(
-            userScrollEnabled = false,
-            columns = GridCells.Adaptive(160.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.heightIn(max = 1000.dp)
-        ) {
-            items(userCollections.size) {
-                Box {
-                    UserCollectionCard(userCollections[it]) { collection ->
-                        val collectionId = collection.id
 
-                        selectedCollectionIds = if (selectedCollectionIds.contains(collectionId)) {
-                            selectedCollectionIds - collectionId
-                        } else {
-                            selectedCollectionIds + collectionId
+        if (userCollections.isEmpty()) {
+            CollectionsEmptyState(
+                onCreateCollection = { showCreateCollectionSheet = true },
+            )
+        } else {
+            LazyVerticalGrid(
+                userScrollEnabled = false,
+                columns = GridCells.Adaptive(160.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.heightIn(max = 1000.dp)
+            ) {
+                items(userCollections.size) {
+                    Box {
+                        UserCollectionCard(userCollections[it]) { collection ->
+                            val collectionId = collection.id
+
+                            selectedCollectionIds = if (selectedCollectionIds.contains(collectionId)) {
+                                selectedCollectionIds - collectionId
+                            } else {
+                                selectedCollectionIds + collectionId
+                            }
                         }
-                    }
 
-                    if (selectedCollectionIds.contains(userCollections[it].id)) {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(24.dp)
-                                .align(Alignment.TopEnd)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary.alpha(0.5f),
-                                    shape = RoundedCornerShape(100),
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(15.dp),
-                                painter = painterResource(R.drawable.check),
-                                contentDescription = null,
-                            )
+                        if (selectedCollectionIds.contains(userCollections[it].id)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .size(24.dp)
+                                    .align(Alignment.TopEnd)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary.alpha(0.5f),
+                                        shape = RoundedCornerShape(100),
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(15.dp),
+                                    painter = painterResource(R.drawable.check),
+                                    contentDescription = null,
+                                )
+                            }
                         }
                     }
                 }
@@ -219,20 +220,27 @@ private fun Content(
                     val removedCollectionIds = initialCollectionIds - selectedCollectionIds
                     val addedOrUpdatedCollectionIds = selectedCollectionIds
 
-                    removedCollectionIds.forEach {
-                        viewModel.repo.removeItemFromUserCollection(
-                            userCollectionId = it,
-                            hadithId = hadithId,
-                        )
-                    }
+                    viewModel.repo.removeItemFromUserCollections(
+                        userCollectionIds = removedCollectionIds.toList(),
+                        hadithId = hadithId,
+                    )
 
                     addedOrUpdatedCollectionIds.forEach {
                         viewModel.repo.addUserCollectionItem(
                             UserCollectionItem(
                                 userCollectionId = it,
                                 hadithId = hadithId,
-                                remark = remark,
+                                remark = "",
                             )
+                        )
+                    }
+
+                    val updateIds = (removedCollectionIds + addedOrUpdatedCollectionIds).distinct()
+
+                    if (updateIds.isNotEmpty()) {
+                        viewModel.repo.dao.updateUserCollectionsTimestamp(
+                            ids = updateIds,
+                            updatedAt = Date(),
                         )
                     }
 

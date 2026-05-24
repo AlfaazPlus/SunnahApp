@@ -1,13 +1,9 @@
 package com.alfaazplus.sunnah.ui.screens.main
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -15,9 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.LastCrashReportDialog
-import com.alfaazplus.sunnah.ui.components.appbars.MainAppBar
 import com.alfaazplus.sunnah.ui.components.appbars.MainBottomNavigationBar
 import com.alfaazplus.sunnah.ui.components.reader.SettingUpOverlay
 import com.alfaazplus.sunnah.ui.enterTransition
@@ -30,32 +24,12 @@ import com.alfaazplus.sunnah.ui.viewModels.HadithSetupViewModel
 @Composable
 private fun Content() {
     val navController = rememberNavController()
-    var titleRes by remember { mutableStateOf<Int?>(R.string.app_name) }
-    var showAppbarActions by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            titleRes = when (destination.route) {
-                Routes.LIBRARY -> R.string.library
-                Routes.SEARCH -> R.string.global_search
-                else -> null
-            }
-
-            showAppbarActions = when (destination.route) {
-                Routes.SEARCH -> false
-                else -> true
-            }
-        }
-    }
-
-    Scaffold(
-        topBar = { MainAppBar(titleRes, showAppbarActions) },
-        bottomBar = { MainBottomNavigationBar(navController) },
-    ) { innerPadding ->
+    Column {
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.weight(1f),
             enterTransition = { enterTransition },
             exitTransition = { exitTransition },
             popEnterTransition = { popEnterTransition },
@@ -63,8 +37,10 @@ private fun Content() {
         ) {
             composable(Routes.HOME) { HomeScreen() }
             composable(Routes.LIBRARY) { LibraryScreen() }
-            composable(Routes.SEARCH) { SearchScreen() }
+            composable(Routes.SEARCH) { SearchScreen(withBackButton = false) }
         }
+
+        MainBottomNavigationBar(navController)
     }
 }
 

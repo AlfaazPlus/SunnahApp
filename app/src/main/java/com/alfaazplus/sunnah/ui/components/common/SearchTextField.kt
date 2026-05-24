@@ -80,7 +80,8 @@ fun SearchTextField(
                         width = 1.dp, color = if (isFocused) colorScheme.primary else colorScheme.outlineVariant, shape = shape
                     )
                     .background(if (isFocused) colorScheme.background else colorScheme.surfaceContainerLow)
-                    .padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
 
                 if (leadingIcon != null) {
@@ -89,13 +90,18 @@ fun SearchTextField(
                 }
 
                 Box(
-                    modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart,
                 ) {
                     if (value.isEmpty()) {
                         Text(
-                            text = placeholder, style = typography.bodyMedium.copy(
-                                color = colorScheme.onSurfaceVariant, lineHeight = 20.sp
-                            ), maxLines = 1, overflow = TextOverflow.Ellipsis
+                            text = placeholder,
+                            style = typography.bodyMedium.copy(
+                                color = colorScheme.onSurfaceVariant,
+                                lineHeight = 20.sp,
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
 
@@ -106,13 +112,17 @@ fun SearchTextField(
                     Spacer(Modifier.width(8.dp))
 
                     IconButton(
-                        onClick = { onClearClick?.invoke() ?: onValueChange("") }, modifier = Modifier.size(20.dp)
+                        onClick = { onClearClick?.invoke() ?: onValueChange("") },
+                        modifier = Modifier.size(20.dp),
                     ) {
                         Icon(
-                            painterResource(R.drawable.ic_x), contentDescription = stringResource(R.string.clear), tint = colorScheme.onSurfaceVariant
+                            painterResource(R.drawable.ic_x),
+                            contentDescription = stringResource(R.string.clear),
+                            tint = colorScheme.onSurfaceVariant,
                         )
                     }
                 }
             }
-        })
+        },
+    )
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -24,7 +25,11 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,10 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
@@ -78,82 +83,93 @@ fun LibraryScreen(
         onClose = { showCreateCollectionSheet = false },
     )
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(160.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            end = 16.dp,
-            top = 20.dp,
-            bottom = 150.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = stringResource(R.string.library),
+                showNavigationIcon = false,
+            )
+        },
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionTitle(
-                iconRes = R.drawable.ic_history,
-                title = stringResource(R.string.reading_history),
-                headerRightContent = {
-                    SectionHeaderViewAll {
-                        navController.navigate(Routes.READING_HISTORY)
-                    }
-                },
-            )
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionReadHistory()
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionTitle(
-                modifier = Modifier.padding(top = 16.dp),
-                iconRes = R.drawable.ic_bookmark,
-                title = stringResource(R.string.bookmarks),
-                headerRightContent = {
-                    SectionHeaderViewAll {
-                        navController.navigate(Routes.BOOKMARKS)
-                    }
-                },
-            )
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionBookmarks()
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionTitle(
-                modifier = Modifier.padding(top = 16.dp),
-                iconRes = R.drawable.ic_library,
-                title = stringResource(R.string.collections),
-                headerRightContent = {
-                    if (userCollections.isEmpty()) {
-                        SectionHeaderActionButton(
-                            icon = R.drawable.ic_add,
-                            text = stringResource(R.string.label_new),
-                        ) { showCreateCollectionSheet = true }
-                    }
-                },
-            )
-        }
-
-        if (userCollections.isEmpty()) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(160.dp),
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 20.dp,
+                bottom = 150.dp,
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                CollectionsEmptyState(
-                    onCreateCollection = { showCreateCollectionSheet = true },
+                SectionTitle(
+                    iconRes = R.drawable.ic_history,
+                    title = stringResource(R.string.reading_history),
+                    headerRightContent = {
+                        SectionHeaderViewAll {
+                            navController.navigate(Routes.READING_HISTORY)
+                        }
+                    },
                 )
             }
-        } else {
-            items(
-                items = userCollections,
-                key = { it.id },
-            ) { collection ->
-                UserCollectionCard(collection) {
-                    navController.navigate(
-                        Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionReadHistory()
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle(
+                    modifier = Modifier.padding(top = 16.dp),
+                    iconRes = R.drawable.ic_bookmark,
+                    title = stringResource(R.string.bookmarks),
+                    headerRightContent = {
+                        SectionHeaderViewAll {
+                            navController.navigate(Routes.BOOKMARKS)
+                        }
+                    },
+                )
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionBookmarks()
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle(
+                    modifier = Modifier.padding(top = 16.dp),
+                    iconRes = R.drawable.ic_library,
+                    title = stringResource(R.string.collections),
+                    headerRightContent = {
+                        if (userCollections.isNotEmpty()) {
+                            SectionHeaderActionButton(
+                                icon = R.drawable.ic_add,
+                                text = stringResource(R.string.label_new),
+                            ) { showCreateCollectionSheet = true }
+                        }
+                    },
+                )
+            }
+
+            if (userCollections.isEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    CollectionsEmptyState(
+                        onCreateCollection = { showCreateCollectionSheet = true },
                     )
+                }
+            } else {
+                items(
+                    items = userCollections,
+                    key = { it.id },
+                ) { collection ->
+                    UserCollectionCard(collection) {
+                        navController.navigate(
+                            Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
+                        )
+                    }
                 }
             }
         }
@@ -201,19 +217,20 @@ private fun ReadHistoryItemCard(
 ) {
     val hadithId = history.item.hadithId
 
-    Box(
-        modifier = Modifier
-            .width(250.dp)
-            .height(70.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable {
-                val bookId = history.ui.hwc?.bookId ?: return@clickable
-                onNavigate(bookId, hadithId)
-            }
-            .padding(12.dp),
-    ) {
+    Surface(
+        shape = shapes.medium,
+        color = colorScheme.surfaceContainer,
+        onClick = {
+            val bookId = history.ui.hwc?.bookId ?: return@Surface
+            onNavigate(bookId, hadithId)
+        },
+
+        ) {
         Column(
+            modifier = Modifier
+                .width(250.dp)
+                .height(70.dp)
+                .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
@@ -224,7 +241,7 @@ private fun ReadHistoryItemCard(
             Text(
                 text = history.ui.bookTitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                color = colorScheme.onSurfaceVariant.alpha(0.8f),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(end = 6.dp)
@@ -276,19 +293,16 @@ private fun UserBookmarkCard(
     bookmark: UserBookmarkNormalized,
     onClick: () -> Unit,
 ) {
-    Logger.d(bookmark)
-    Box(
-        modifier = Modifier
-            .width(250.dp)
-            .height(90.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable {
-                onClick()
-            }
-            .padding(12.dp),
+    Surface(
+        shape = shapes.medium,
+        color = colorScheme.surfaceContainer,
+        onClick = onClick,
     ) {
         Column(
+            modifier = Modifier
+                .width(250.dp)
+                .height(90.dp)
+                .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
@@ -320,7 +334,7 @@ private fun UserBookmarkCard(
                         },
                     ),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                    color = colorScheme.onSurfaceVariant.alpha(0.8f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = 6.dp),
@@ -329,7 +343,7 @@ private fun UserBookmarkCard(
                 Text(
                     text = bookmark.ui.bookTitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                    color = colorScheme.onSurfaceVariant.alpha(0.8f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = 6.dp)
@@ -353,9 +367,9 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
+            .clip(shapes.medium)
             .background(
-                color = MaterialTheme.colorScheme.surface,
+                color = colorScheme.surface,
             )
             .background(
                 brush = Brush.linearGradient(
@@ -363,12 +377,12 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f),
                 ),
-                shape = MaterialTheme.shapes.medium,
+                shape = shapes.medium,
             )
             .border(
                 width = 1.dp,
                 color = userColor.alpha(0.1f),
-                shape = MaterialTheme.shapes.medium,
+                shape = shapes.medium,
             )
             .clickable { onClick(collection) },
     ) {
@@ -393,7 +407,7 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
             Text(
                 text = "${collection.itemsCount} items",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.8f),
+                color = colorScheme.onSurfaceVariant.alpha(0.8f),
                 textAlign = TextAlign.Center,
             )
         }
@@ -402,12 +416,12 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
 }
 
 @Composable
-private fun CollectionsEmptyState(
+fun CollectionsEmptyState(
     onCreateCollection: () -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.alpha(0.6f), MaterialTheme.shapes.medium)
+            .border(1.dp, colorScheme.outlineVariant.alpha(0.6f), shapes.medium)
             .padding(20.dp)
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -416,7 +430,7 @@ private fun CollectionsEmptyState(
         Text(
             stringResource(R.string.no_collections),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
 
@@ -424,7 +438,7 @@ private fun CollectionsEmptyState(
             onClick = onCreateCollection,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
+                color = colorScheme.primary,
             ),
         ) {
             Text(
@@ -450,12 +464,13 @@ private fun SectionTitle(
         Icon(
             painter = painterResource(iconRes),
             contentDescription = title,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = colorScheme.primary,
+            modifier = Modifier.size(20.dp),
         )
 
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.weight(1f),
         )
 

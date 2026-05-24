@@ -33,6 +33,7 @@ import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.components.reader.ActionsProvider
 import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.text.buildHadithAnnotatedString
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +41,7 @@ import com.alfaazplus.sunnah.ui.utils.text.buildHadithAnnotatedString
 fun AboutCollectionSheet(cwt: CollectionWithTranslation) {
     var showSheet by remember { mutableStateOf(false) }
     val colors by rememberUpdatedState(colorScheme)
-
+    val translationId = ReaderPreferences.observeHadithTranslation()
 
     ActionsProvider {
         val actions = LocalHadithActions.current
@@ -58,7 +59,7 @@ fun AboutCollectionSheet(cwt: CollectionWithTranslation) {
         }
         val infoEn = remember {
             cwt
-                .getIntro("en")
+                .getIntro(translationId)
                 ?.let {
                     buildHadithAnnotatedString(
                         it,
@@ -74,12 +75,12 @@ fun AboutCollectionSheet(cwt: CollectionWithTranslation) {
 
         Row(
             modifier = Modifier
-            .padding(top = 20.dp)
-            .clip(shapes.small)
-            .background(color = colorScheme.surfaceVariant)
-            .clickable { showSheet = true }
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-            .alpha(0.8f), verticalAlignment = Alignment.CenterVertically) {
+                .padding(top = 20.dp)
+                .clip(shapes.small)
+                .background(color = colorScheme.surfaceVariant)
+                .clickable { showSheet = true }
+                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .alpha(0.8f), verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_info),
                 contentDescription = null,

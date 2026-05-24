@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,13 +34,13 @@ fun SectionEmptyMessage(
     Box(
         modifier = Modifier
             .padding(horizontal = horizontalPadding)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.alpha(0.6f), MaterialTheme.shapes.medium)
+            .border(1.dp, colorScheme.outlineVariant.alpha(0.6f), shapes.medium)
             .padding(20.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center
+            message, style = MaterialTheme.typography.bodyMedium, color = colorScheme.onSurfaceVariant, textAlign = TextAlign.Center
         )
     }
 }
@@ -51,9 +54,13 @@ fun SectionHeaderActionButton(
     TextButton(
         onClick = onClick,
         colors = ButtonDefaults.textButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            contentColor = colorScheme.onBackground.alpha(0.85f),
         ),
-        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(
+            width = 1.dp,
+            color = colorScheme.outline.alpha(0.25f),
+        ),
+        shape = shapes.small,
         modifier = Modifier.height(28.dp),
         contentPadding = PaddingValues(
             start = if (icon != null) 6.dp else 10.dp,
@@ -66,7 +73,6 @@ fun SectionHeaderActionButton(
             Icon(
                 painter = painterResource(icon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .size(16.dp),
@@ -75,8 +81,7 @@ fun SectionHeaderActionButton(
 
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }
@@ -87,11 +92,14 @@ fun SectionHeaderViewAll(
 ) {
     TextButton(
         onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = colorScheme.onBackground.alpha(0.85f),
+        ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.alpha(0.3f),
+            color = colorScheme.outline.alpha(0.25f),
         ),
-        shape = MaterialTheme.shapes.small,
+        shape = shapes.small,
         modifier = Modifier.height(28.dp),
         contentPadding = PaddingValues(
             start = 10.dp,
@@ -101,18 +109,14 @@ fun SectionHeaderViewAll(
         ),
     ) {
         Text(
-            text = "View all",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+            text = stringResource(R.string.viewAll),
+            style = MaterialTheme.typography.labelMedium,
         )
 
         Icon(
             painter = painterResource(R.drawable.ic_chevron_right),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .size(16.dp),
+            modifier = Modifier.size(16.dp),
         )
     }
 }

@@ -12,6 +12,7 @@ import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItemsCount
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface UserDataDao {
@@ -37,6 +38,13 @@ interface UserDataDao {
 
     @Update
     suspend fun updateUserCollection(userCollection: UserCollection)
+
+    @Query(
+        """
+            UPDATE user_collections SET updated_at = :updatedAt  WHERE id in (:ids)
+        """
+    )
+    suspend fun updateUserCollectionsTimestamp(ids: List<Long>, updatedAt: Date)
 
     @Query("DELETE FROM user_collections WHERE id = :id")
     suspend fun deleteUserCollection(id: Long)
@@ -85,11 +93,11 @@ interface UserDataDao {
     @Query(
         """
         DELETE FROM user_collection_items
-        WHERE collection_id = :userCollectionId AND hadith_id = :hadithId
+        WHERE collection_id IN (:userCollectionIds) AND hadith_id = :hadithId
         """
     )
-    suspend fun removeItemFromUserCollection(
-        userCollectionId: Long,
+    suspend fun removeItemFromUserCollections(
+        userCollectionIds: List<Long>,
         hadithId: String,
     )
 

@@ -8,7 +8,6 @@ import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -75,11 +74,15 @@ class UserRepository(
         dao.deleteUserCollectionItem(id)
     }
 
-    suspend fun removeItemFromUserCollection(
-        userCollectionId: Long,
+    suspend fun removeItemFromUserCollections(
+        userCollectionIds: List<Long>,
         hadithId: String,
     ) {
-        dao.removeItemFromUserCollection(userCollectionId, hadithId)
+        val uCollectionIds = userCollectionIds
+            .distinct()
+            .takeIf { it.isNotEmpty() } ?: return
+
+        dao.removeItemFromUserCollections(uCollectionIds, hadithId)
     }
 
     suspend fun clearUserCollectionItems(collectionId: Long) {

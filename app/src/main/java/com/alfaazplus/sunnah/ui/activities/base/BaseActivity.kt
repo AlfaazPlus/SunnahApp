@@ -1,5 +1,5 @@
 package com.alfaazplus.sunnah.ui.activities.base
 
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 
-abstract class BaseActivity : ComponentActivity()
+abstract class BaseActivity : AppCompatActivity()

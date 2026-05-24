@@ -113,6 +113,7 @@ private fun Content(
         when (actionType) {
             HadithMenuAction.ADD_TO_COLLECTION -> {
                 actions.onAddToCollectionRequest(hadithId)
+                onClose()
             }
 
             HadithMenuAction.ADD_TO_BOOKMARK -> {
@@ -134,6 +135,8 @@ private fun Content(
                                 openInReader = false,
                             )
                         )
+
+                        onClose()
                     }
                 }
             }
@@ -146,20 +149,23 @@ private fun Content(
                     bookName = data.bwt?.getTitlePair(translationLangCode),
                     translationLangCode = translationLangCode,
                 )
+
+
+                onClose()
             }
 
             HadithMenuAction.REPORT_ISSUE -> {
                 context.copyToClipboard(data.hwc.hadithId)
                 MessageUtils.showClipboardMessage(context, resources.getString(R.string.paste_reference_github_issue))
                 NavigationHelper.openGithubIssuesHadithReport(context)
+
+                onClose()
             }
 
             else -> {
-                // noop
+                onClose()
             }
         }
-
-        onClose()
     }
 }
 
@@ -228,7 +234,7 @@ private fun Item(
         modifier = Modifier
             .clip(MaterialTheme.shapes.large)
             .background(
-                color = MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.surfaceContainer,
             )
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 20.dp),

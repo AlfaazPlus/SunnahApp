@@ -1,4 +1,288 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="next">اگلا</string>
+    <string name="previous">پچھلا</string>
+    <string name="top">اوپر</string>
+    <string name="cancel">منسوخ کریں</string>
+    <string name="close">بند کریں</string>
+    <string name="clear">صاف کریں</string>
+    <string name="delete">حذف کریں</string>
+    <string name="create">بنائیں</string>
+    <string name="goBack">واپس جائیں</string>
+    <string name="copy">کاپی کریں</string>
+    <string name="enable">فعال کریں</string>
+    <string name="disable">غیرفعال کریں</string>
+    <string name="enabled">فعال</string>
+    <string name="disabled">غیرفعال</string>
+    <string name="allow">اجازت دیں</string>
+    <string name="downloading">ڈاؤن لوڈ ہو رہا ہے…</string>
+    <string name="downloaded">ڈاؤن لوڈ مکمل</string>
+    <string name="viewAll">سب دیکھیں</string>
+
+    <string name="hadithNumber">حدیث %s</string>
+    <string name="hadithNumberFull">حدیث نمبر %s</string>
+
+    <string name="books">کتابیں</string>
+    <string name="hadiths">احادیث</string>
+    <string name="hadithRangeValue" formatted="false">%d سے %d</string>
+    <string name="totalBooks" formatted="false">کل کتابیں: %d</string>
+    <string name="totalHadiths" formatted="false">کل احادیث: %d</string>
+    <string name="previousHadith">پچھلی حدیث</string>
+    <string name="nextHadith">اگلی حدیث</string>
+    <string name="previousBook">پچھلی کتاب</string>
+    <string name="nextBook">اگلی کتاب</string>
+
+    <string name="search">تلاش</string>
+    <string name="global_search">مکمل تلاش</string>
+    <string name="search_placeholder">تلاش کا لفظ درج کریں…</string>
+    <string name="search_book">کتاب میں تلاش کریں…</string>
+    <string name="search_hadith">حدیث میں تلاش کریں…</string>
+    <string name="search_filter">تلاش فلٹر</string>
+    <string name="search_in">میں تلاش کریں…</string>
+    <string name="search_for">تلاش کریں…</string>
+    <string name="search_hint">تلاش کریں…</string>
+    <string name="apply_filter">فلٹر لاگو کریں</string>
+    <string name="no_results_found">کوئی نتیجہ نہیں ملا</string>
+    <string name="one_result_found">1 نتیجہ ملا</string>
+    <string name="n_results_found" formatted="false">%d نتائج ملے</string>
+    <string name="search_result_menu">تلاش نتائج مینو</string>
+    <string name="clear_search">تلاش صاف کریں</string>
+
+    <string name="settings">ترتیبات</string>
+    <string name="app_settings">ایپ ترتیبات</string>
+    <string name="reader_settings">ریڈر ترتیبات</string>
+    <string name="other_settings">دیگر</string>
+
+    <string name="home">ہوم</string>
+    <string name="history">تاریخچہ</string>
+    <string name="library">لائبریری</string>
+    <string name="theme_default">ڈیفالٹ</string>
+    <string name="theme_blue">نیلا</string>
+    <string name="theme_red">سرخ</string>
+    <string name="theme_purple">جامنی</string>
+    <string name="theme_violet">بنفشی</string>
+    <string name="theme_yellow">پیلا</string>
+    <string name="theme_mono">مونو</string>
+    <string name="app_langauge">ایپ زبان</string>
+    <string name="app_theme">تھیم</string>
+    <string name="theme_colors">تھیم رنگ</string>
+    <string name="theme_mode">تھیم موڈ</string>
+    <string name="light">لائٹ</string>
+    <string name="dark">ڈارک</string>
+    <string name="system_default">سسٹم کے مطابق</string>
+    <string name="theme_dark_description">ڈارک تھیم آنکھوں کے لیے آرام دہ ہے اور بیٹری کم استعمال کرتی ہے</string>
+    <string name="theme_default_description">سسٹم سیٹنگ کے مطابق خودکار تبدیلی</string>
+    <string name="dynamic_color">ڈائنامک کلر</string>
+    <string name="dynamic_color_description">وال پیپر کے مطابق تھیم رنگ تبدیل کریں</string>
+    <string name="github">گٹ ہب</string>
+    <string name="github_description">مسائل رپورٹ کرنے یا تعاون کے لیے ایپ کی GitHub ریپوزٹری دیکھیں</string>
+    <string name="privacy_policy">پرائیویسی پالیسی</string>
+    <string name="about_us">ہمارے بارے میں</string>
+    <string name="rate_app">ایپ کو ریٹ کریں</string>
+    <string name="share_app">ایپ شیئر کریں</string>
+
+    <string name="share_app_msg">SunnahApp ایک مفت اور اوپن سورس ایپ ہے جس کے ذریعے آپ نبی ﷺ کی سنت پڑھ اور دریافت کر سکتے ہیں۔ اس میں خوبصورت اور آسان انٹرفیس کے ساتھ ترجمہ، ایڈوانس سرچ، یاد دہانی اور بہت سے مفید فیچرز شامل ہیں۔ \n\nابھی ڈاؤن لوڈ کریں:\n%s</string>
+
+    <string name="install_quranapp">QuranApp انسٹال کریں</string>
+    <string name="install_quranapp_description">ترجمہ، لفظی معنی، تلاوت اور مزید خصوصیات کے ساتھ قرآن پڑھیں۔ QuranApp مفت، محفوظ اور اوپن سورس ہے</string>
+    <string name="install_quranapp_description_short">مفت، محفوظ اور اوپن سورس</string>
+
+    <string name="install_from_google_play">Google Play سے انسٹال کریں</string>
+    <string name="install_from_github">GitHub سے انسٹال کریں</string>
+
+    <string name="donate">تعاون کریں</string>
+
+    <string name="hadith_layout">حدیث لے آؤٹ</string>
+    <string name="hadith_layout_description">افقی — احادیث دائیں اور بائیں اسکرول ہوں گی۔\nعمودی — احادیث اوپر اور نیچے اسکرول ہوں گی۔</string>
+
+    <string name="horizontal">افقی</string>
+    <string name="vertical">عمودی</string>
+
+    <string name="add">شامل کریں</string>
+    <string name="label_new">نیا</string>
+    <string name="remove">ہٹائیں</string>
+    <string name="update">اپ ڈیٹ کریں</string>
+    <string name="edit">ترمیم کریں</string>
+    <string name="done">مکمل</string>
+    <string name="reset">ری سیٹ کریں</string>
+
+    <string name="select_color">رنگ منتخب کریں</string>
+
+    <string name="change_to_horizontal_layout">افقی لے آؤٹ پر تبدیل کریں</string>
+    <string name="change_to_vertical_layout">عمودی لے آؤٹ پر تبدیل کریں</string>
+
+    <string name="text_size_and_style">ٹیکسٹ سائز اور اسٹائل</string>
+    <string name="serif_font_style">سیرف فونٹ اسٹائل</string>
+    <string name="arabic_text_size">عربی متن کا سائز</string>
+    <string name="translation_text_size">ترجمے کے متن کا سائز</string>
+
+    <string name="hadith_text_option">حدیث متن آپشن</string>
+    <string name="show_arabic_and_translation">عربی اور ترجمہ دونوں دکھائیں</string>
+    <string name="show_only_arabic">صرف عربی دکھائیں</string>
+    <string name="show_only_translation">صرف ترجمہ دکھائیں</string>
+
+    <string name="show_sanad">سند دکھائیں</string>
+    <string name="show_sanad_description">حدیث میں راویوں کی مکمل سند دکھائیں</string>
+
+    <string name="show_chapter">باب دکھائیں</string>
+
+    <string name="manage_collections">کلیکشنز مینیج کریں</string>
+    <string name="about_collection">اس کلیکشن کے بارے میں</string>
+    <string name="delete_collection">کلیکشن حذف کریں؟</string>
+
+    <string name="collection_name">کلیکشن کا نام</string>
+    <string name="collection_name_hint">کلیکشن کا نام درج کریں</string>
+
+    <string name="description">تفصیل</string>
+    <string name="collection_description_hint">کلیکشن کی تفصیل درج کریں</string>
+
+    <string name="msg_delete_collection">کیا آپ واقعی یہ کلیکشن حذف کرنا چاہتے ہیں؟</string>
+    <string name="msg_collection_deleted">کلیکشن کامیابی سے حذف کر دیا گیا۔</string>
+
+    <string name="desc_hadith_options">حدیث آپشنز</string>
+
+    <string name="narrators_chain">سلسلۂ رواۃ</string>
+    <string name="desc_narrators_chain">راویوں کی مکمل سند دیکھیں</string>
+
+    <string name="scholar_info">محدث کی معلومات</string>
+    <string name="scholars">علماء</string>
+
+    <string name="copy_hadith_number">حدیث نمبر کاپی کریں</string>
+
+    <string name="add_to_bookmarks">بک مارکس میں شامل کریں</string>
+    <string name="added_to_bookmarks">بک مارکس میں شامل کر دیا گیا</string>
+    <string name="remove_from_bookmarks">بک مارکس سے ہٹائیں</string>
+
+    <string name="add_to_collection">کلیکشن میں شامل کریں</string>
+    <string name="remove_from_collection">کلیکشن سے ہٹائیں</string>
+
+    <string name="select_collections">کلیکشن منتخب کریں</string>
+
+    <string name="bookmarks">بک مارکس</string>
+
+    <string name="delete_all_bookmarks">تمام بک مارکس حذف کریں؟</string>
+    <string name="all_bookmarks_deleted">تمام بک مارکس حذف کر دیے گئے۔</string>
+
+    <string name="collections">کلیکشنز</string>
+
+    <string name="no_collections">ابھی تک کوئی کلیکشن نہیں بنایا گیا۔</string>
+
+    <string name="no_collection_items">
+اس کلیکشن میں کوئی حدیث موجود نہیں۔ آپ اپنی پسندیدہ احادیث کو آسان رسائی کے لیے کلیکشنز میں محفوظ کر سکتے ہیں۔
+</string>
+
+    <string name="create_collection">کلیکشن بنائیں</string>
+    <string name="update_collection">کلیکشن اپ ڈیٹ کریں</string>
+
+    <string name="msg_delete_user_collection">کیا آپ واقعی یہ کلیکشن حذف کرنا چاہتے ہیں؟ اس کلیکشن میں محفوظ تمام احادیث بھی حذف ہو جائیں گی۔</string>
+
+    <string name="copied_to_clipboard">کلپ بورڈ میں کاپی کر دیا گیا</string>
+
+    <string name="paste_log_github_issue">لاگ کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم اسے GitHub issue میں پیسٹ کریں۔</string>
+
+    <string name="paste_reference_github_issue">حدیث ریفرنس کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم اسے GitHub issue میں پیسٹ کریں۔</string>
+
+    <string name="hadith_of_the_day">آج کی حدیث</string>
+
+    <string name="hadith_options">حدیث آپشنز</string>
+
+    <string name="share_this_hadith">یہ حدیث شیئر کریں</string>
+
+    <string name="copy_hadith_text">حدیث متن کاپی کریں</string>
+
+    <string name="report_issue">مسئلہ رپورٹ کریں</string>
+
+    <string name="note">نوٹ</string>
+    <string name="optional_note">اختیاری نوٹ</string>
+    <string name="no_note">کوئی نوٹ شامل نہیں کیا گیا</string>
+
+    <string name="open_in_reader">ریڈر میں کھولیں</string>
+
+    <string name="quick_reference_n_hadiths">%1$d احادیث</string>
+
+    <string name="quick_reference_not_found">دی گئی حدیث لوڈ نہیں ہو سکی۔</string>
+
+    <string name="hadith_references">حدیث حوالہ جات</string>
+
+    <string name="ref_type_sunnahcom">حوالہ</string>
+    <string name="ref_type_app">ایپ حوالہ</string>
+    <string name="ref_type_in_book">کتاب کا حوالہ</string>
+    <string name="ref_type_english_translation">انگریزی حوالہ</string>
+    <string name="ref_type_arabic_english_book">عربی/انگریزی کتاب حوالہ</string>
+    <string name="ref_type_arabic">عربی حوالہ</string>
+    <string name="ref_type_us_msa">USC-MSA ویب حوالہ (انگریزی)</string>
+    <string name="ref_deprecated">(متروک)</string>
+
+    <string name="no_references">کوئی حوالہ موجود نہیں۔</string>
+
+    <string name="no_bookmarks">ابھی تک کوئی بک مارک نہیں۔</string>
+
+    <string name="reading_history">مطالعے کی تاریخ</string>
+
+    <string name="no_reading_history">آپ کی مطالعے کی تاریخ یہاں نظر آئے گی۔</string>
+
+    <string name="clear_reading_history">مطالعے کی تاریخ صاف کریں؟</string>
+
+    <string name="reading_history_cleared">مطالعے کی تاریخ صاف کر دی گئی۔</string>
+
+    <string name="action_cannot_be_undone">یہ عمل واپس نہیں کیا جا سکتا۔</string>
+
+    <string name="last_crash_log">آخری کریش لاگ</string>
+
+    <string name="app_logs">ایپ لاگز</string>
+    <string name="app_logs_desc">کریش لاگز، دبائے گئے لاگز</string>
+
+    <string name="crash_logs">کریش لاگز</string>
+    <string name="suppressed_logs">دبائے گئے لاگز</string>
+
+    <string name="log_removed">لاگ حذف کر دیا گیا</string>
+
+    <string name="create_issue">Issue بنائیں</string>
+
+    <string name="no_logs_found">کوئی لاگ نہیں ملا</string>
+
+    <string name="resource_download_source">ریسورس ڈاؤن لوڈ سورس</string>
+
+    <string name="resource_download_source_desc">اگر ایک سورس کام نہ کرے تو حدیث ریسورس کسی دوسرے سورس سے ڈاؤن لوڈ کریں۔</string>
+
+    <string name="open_github_issues">GitHub issues کھولیں</string>
+
+    <string name="daily_reminder">روزانہ یاد دہانی</string>
+
+    <string name="daily_reminder_desc">روزانہ حدیث کی یاد دہانی حاصل کریں۔</string>
+
+    <string name="notification_permission">نوٹیفکیشن اجازت</string>
+
+    <string name="notification_permission_desc">روزانہ حدیث یاد دہانی حاصل کرنے کے لیے نوٹیفکیشن کی اجازت دیں۔</string>
+
+    <string name="download_collection_first">اس فیچر کے استعمال کے لیے پہلے کم از کم ایک حدیث کلیکشن ڈاؤن لوڈ کریں۔</string>
+
+    <string name="setting_up">سیٹ اپ ہو رہا ہے… اس میں چند سیکنڈ لگ سکتے ہیں۔</string>
+
+    <string name="selectABook">پہلے ایک کتاب منتخب کریں۔</string>
+
+    <string name="chapter">باب</string>
+
+    <string name="workInProgress">کام جاری ہے</string>
+
+    <string name="selectTranslation">ترجمہ منتخب کریں</string>
+
+    <string name="info">معلومات</string>
+
+    <string name="book_info">کتاب کی معلومات</string>
+
+    <string name="book_section_preamble">ابتدائیہ</string>
+    <string name="book_section_intro">تعارف</string>
+    <string name="book_section_notes">نوٹس</string>
+
+    <string name="book_no_details">اس کتاب کے لیے مزید معلومات موجود نہیں۔</string>
+
+    <string name="deleteTranslation">ترجمہ حذف کریں؟</string>
+
+    <string name="lang_arabic">عربی</string>
+    <string name="lang_english">انگریزی</string>
+    <string name="lang_urdu">اردو</string>
+    <string name="lang_bengali">بنگالی</string>
+    <string name="lang_indonesian">انڈونیشین</string>
+    <string name="lang_french">فرانسیسی</string>
 </resources>

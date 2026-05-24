@@ -29,7 +29,7 @@ import com.alfaazplus.sunnah.ui.screens.ReadingHistoryScreen
 import com.alfaazplus.sunnah.ui.screens.ScholarInfoScreen
 import com.alfaazplus.sunnah.ui.screens.SingleUserCollectionScreen
 import com.alfaazplus.sunnah.ui.screens.main.MainScreen
-import com.alfaazplus.sunnah.ui.screens.main.SearchScreenScaffold
+import com.alfaazplus.sunnah.ui.screens.main.SearchScreen
 import com.alfaazplus.sunnah.ui.screens.settings.AppLogsScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsLanguageScreen
 import com.alfaazplus.sunnah.ui.screens.settings.SettingsScreen
@@ -94,7 +94,7 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
 //                startDestination = Routes.READER.args("muslim_bintroduction"),
             ) {
                 route(Routes.MAIN) { MainScreen() }
-                route(Routes.SEARCH) { SearchScreenScaffold() }
+                route(Routes.SEARCH) { SearchScreen() }
                 route(
                     Routes.SETTINGS(), arguments = listOf(
                         navArgument(Keys.SHOW_READER_SETTINGS_ONLY) { type = NavType.BoolType },

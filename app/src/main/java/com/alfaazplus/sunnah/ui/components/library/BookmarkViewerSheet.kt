@@ -238,7 +238,6 @@ private fun Content(
                     },
                     minLines = 4,
                     placeholder = stringResource(R.string.optional_note),
-                    bgColor = MaterialTheme.colorScheme.background,
                 )
             } else if (bookmark.remark.isNotBlank()) {
                 Text(
