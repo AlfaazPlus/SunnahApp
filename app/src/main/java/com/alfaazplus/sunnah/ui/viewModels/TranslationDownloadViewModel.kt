@@ -97,7 +97,7 @@ class TranslationDownloadViewModel @Inject constructor(
 
             TranslationUiModel(
                 id = translation.langCode,
-                title = application.getString(translation.labelRes),
+                title = translation.label,
                 isDownloaded = isDownloaded,
             )
         }

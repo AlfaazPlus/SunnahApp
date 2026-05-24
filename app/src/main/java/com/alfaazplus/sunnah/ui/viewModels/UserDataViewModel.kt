@@ -1,18 +1,26 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.core.text.parseAsHtml
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
+import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserDataUserItem
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
+import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -28,8 +36,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserDataViewModel @Inject constructor(
+    application: Application,
     val repo: UserRepository,
-) : ViewModel() {
+    private val hadithRepo: HadithRepository,
+) : AndroidViewModel(application) {
+    private val ctx get() = application.applicationContext
     private val bookmarkCache = mutableMapOf<String, StateFlow<Boolean>>()
 
     val allReadHistory: StateFlow<List<ReadHistoryNormalized>> = repo.dao
@@ -119,24 +130,22 @@ class UserDataViewModel @Inject constructor(
         }
     }
 
-    private suspend fun normalizeCollections(items: List<UserCollection>): List<UserCollection> =
-        withContext(Dispatchers.IO) {
-            if (items.isEmpty()) return@withContext emptyList()
+    private suspend fun normalizeCollections(items: List<UserCollection>): List<UserCollection> = withContext(Dispatchers.IO) {
+        if (items.isEmpty()) return@withContext emptyList()
 
-            val itemCounts = repo.dao
-                .getUserCollectionItemCounts(
-                    items
-                        .map { it.id }
-                        .distinct()
-                )
-                .associateBy { it.collectionId }
+        val itemCounts = repo.dao
+            .getUserCollectionItemCounts(
+                items
+                    .map { it.id }
+                    .distinct())
+            .associateBy { it.collectionId }
 
-            items.map {
-                it.apply {
-                    itemsCount = itemCounts[it.id]?.itemsCount ?: 0
-                }
+        items.map {
+            it.apply {
+                itemsCount = itemCounts[it.id]?.itemsCount ?: 0
             }
         }
+    }
 
     private suspend fun normalizeReadHistory(items: List<ReadHistory>, withText: Boolean): List<ReadHistoryNormalized> {
         return normalizeItems(
@@ -177,33 +186,37 @@ class UserDataViewModel @Inject constructor(
         }
     }
 
-    private suspend fun <R : Any> normalizeItems(
+    private suspend fun <RESULT : Any> normalizeItems(
         hadithIds: List<String>,
         withText: Boolean,
-        transform: (Int, UserDataUserItem) -> R,
-    ): List<R> = withContext(Dispatchers.IO) {
+        transform: (Int, UserDataUserItem) -> RESULT,
+    ): List<RESULT> = withContext(Dispatchers.IO) {
         if (hadithIds.isEmpty()) return@withContext emptyList()
 
-        val translationId = ReaderPreferences.getHadithTranslation()
-        val langCode = TranslationUtils.langCodeFromId(translationId)
+        val textOption = ReaderPreferences.getHadithTextOption()
+        val langCode = if (textOption == HadithTextOption.ONLY_ARABIC) "ar" else ReaderPreferences.getHadithTranslation()
+        val serifFontStyle = ReaderPreferences.getIsSerifFontStyle()
 
-        val hadiths = repo.hadithDao.getHadithsByIds(
+        val hadiths = hadithRepo.getHadithsByIds(
             hadithIds,
+            langCode,
         )
 
         val collectionsDeferred = async {
-            repo.hadithDao.getCollectionsByIds(
+            hadithRepo.getCollectionsByIds(
                 hadiths
                     .map { it.collectionId }
                     .distinct(),
+                langCode,
             )
         }
 
         val booksDeferred = async {
-            repo.hadithDao.getBooksByIds(
+            hadithRepo.getBooksByIds(
                 hadiths
                     .map { it.bookId }
                     .distinct(),
+                langCode,
             )
         }
 
@@ -211,22 +224,27 @@ class UserDataViewModel @Inject constructor(
 
         val collectionNamesMap = collectionsDeferred
             .await()
-            .associate { it.collection.id to it.getTitle(langCode) }
+            .associate { it.collection.id to (it.getTitle(langCode) ?: it.getTitle("ar")) }
 
         val bookNamesMap = booksDeferred
             .await()
-            .associate { it.book.id to it.getTitle(langCode) }
+            .associate { it.book.id to (it.getTitle(langCode) ?: it.getTitle("ar")) }
 
-        val primaryReferences = repo.hadithDao
-            .getPrimaryReferencesForHadiths(hadithIds)
-            .associateBy { it.hadithId }
+
+        val trTextStyle = textStyleForLang(
+            langCode,
+            isSerifFontStyle =  serifFontStyle,
+        )
+        val trParagraphStyle = trTextStyle.toParagraphStyle();
+        val trSpanStyle = trTextStyle.toSpanStyle();
 
         return@withContext hadithIds.mapIndexed { index, hadithId ->
             val hwc = hadithsMap[hadithId] ?: return@mapIndexed transform(
                 index, UserDataUserItem(
                     hwc = null,
-                    visibleNumbering = "?",
+                    numbering = "?",
                     bookTitle = "?",
+                    langCode = langCode,
                     translationText = null,
                 )
             )
@@ -234,15 +252,35 @@ class UserDataViewModel @Inject constructor(
             val collectionName = collectionNamesMap[hwc.collectionId]
 
             val hadithText = if (withText) {
-                val content = hwc.contents.firstOrNull { content -> content.lang == translationId }
-                content?.toPlainText()
+                val content = hwc.contents.firstOrNull { content -> content.lang == langCode }
+
+                content?.let { content ->
+                    buildAnnotatedString {
+                        withStyle(trParagraphStyle) {
+                            withStyle(trSpanStyle) {
+                                val blocks = content.blocks
+
+                                blocks.forEachIndexed { index, block ->
+                                    if (!block.text.isNullOrEmpty()) {
+                                        append(block.text.parseAsHtml())
+
+                                        if (index < blocks.lastIndex) {
+                                            append(" ")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } ?: TranslationUtils.getNoTranslationMessage(ctx, langCode)
             } else null
 
             transform(
                 index, UserDataUserItem(
                     hwc = hwc,
-                    visibleNumbering = primaryReferences[hwc.hadithId]?.value ?: "${collectionName}: ${hwc.hadith.number}",
+                    numbering = "${collectionName}: ${hwc.hadith.number}",
                     bookTitle = bookNamesMap[hwc.bookId] ?: "?",
+                    langCode = langCode,
                     translationText = hadithText,
                 )
             )

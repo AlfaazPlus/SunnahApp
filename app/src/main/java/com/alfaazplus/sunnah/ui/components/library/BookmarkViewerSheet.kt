@@ -37,6 +37,7 @@ import com.alfaazplus.sunnah.ui.components.common.TextIconButton
 import com.alfaazplus.sunnah.ui.components.common.TextInput
 import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
@@ -90,27 +91,28 @@ private fun Content(
     appViewModel: AppViewModel = hiltViewModel(),
 ) {
     val hadithId = data.hadithId
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
-    val hwc = produceState<HadithWithContents?>(initialValue = null, hadithId) {
-        value = tryOrNull { appViewModel.repo.dao.getHadithById(hadithId) }
+    val hwc = produceState<HadithWithContents?>(initialValue = null, hadithId, translationLangCode) {
+        value = tryOrNull { appViewModel.repo.getHadithById(hadithId, translationLangCode) }
     }.value
 
-    val collectionName = produceState<String?>(initialValue = null, hwc) {
+    val collectionName = produceState<String?>(initialValue = null, hwc, translationLangCode) {
         value = hwc?.let {
             tryOrNull {
-                appViewModel.repo.dao
-                    .getCollectionById(it.collectionId)
-                    ?.getTitle("en")
+                appViewModel.repo
+                    .getCollectionById(it.collectionId, translationLangCode)
+                    ?.getTitle(translationLangCode)
             }
         }
     }.value
 
-    val bookTitle = produceState<String?>(initialValue = null, hwc) {
+    val bookTitle = produceState<String?>(initialValue = null, hwc, translationLangCode) {
         value = hwc?.let {
             tryOrNull {
-                appViewModel.repo.dao
-                    .getBookById(it.bookId)
-                    ?.getTitle("en")
+                appViewModel.repo
+                    .getBookById(it.bookId, translationLangCode)
+                    ?.getTitle(translationLangCode)
             }
         }
     }.value

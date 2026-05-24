@@ -56,7 +56,7 @@ private fun ItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface,
+            containerColor = colorScheme.surfaceContainer,
             contentColor = colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
@@ -67,20 +67,15 @@ private fun ItemCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        item.ui.visibleNumbering,
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
+                NumberingCard(
+                    numbering = item.ui.numbering,
+                    translationId = item.ui.langCode,
+                )
             }
 
             if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
-                    text = item.ui.translationText!!,
+                    text = item.ui.translationText,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,

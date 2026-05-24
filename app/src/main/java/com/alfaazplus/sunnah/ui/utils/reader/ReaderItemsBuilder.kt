@@ -22,6 +22,7 @@ import com.alfaazplus.sunnah.ui.utils.text.buildHadithAnnotatedString
 import com.alfaazplus.sunnah.ui.utils.text.getArabicTextStyle
 import com.alfaazplus.sunnah.ui.utils.text.getTranslationTextStyle
 import com.alfaazplus.sunnah.ui.utils.text.parseHadithText
+import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -52,19 +53,13 @@ object ReaderItemsBuilder {
     fun initializeStyles(params: TextBuilderParams) {
         val arabicTextStyle = getArabicTextStyle(
             ArabicTextStyleParams(
-                colors = params.uiConfig.colors,
-                type = params.uiConfig.type,
                 sizePercent = params.arabicSizePercent,
             )
         )
 
         val translationTextStyle = getTranslationTextStyle(
             TranslationTextStyleParams(
-                translationId = params.translationId,
-                colors = params.uiConfig.colors,
-                type = params.uiConfig.type,
-                sizePercent = params.translationSizePercent,
-                isSerif = params.isSerifFontStyle
+                translationId = params.translationId, sizePercent = params.translationSizePercent, isSerif = params.isSerifFontStyle
             )
         )
 
@@ -74,54 +69,6 @@ object ReaderItemsBuilder {
             trParagraphStyle = translationTextStyle.toParagraphStyle(),
             trSpanStyle = translationTextStyle.toSpanStyle(),
         )
-    }
-
-    suspend fun build(
-        repo: HadithRepository,
-        bookId: String,
-        params: TextBuilderParams,
-    ): ReaderPreparedData? = withContext(Dispatchers.IO) {
-        initializeStyles(params)
-
-        val hadithsDeferred = async {
-            repo.dao.getHadithsForBook(bookId)
-        }
-
-        val chaptersDeferred = async {
-            repo.dao
-                .getChaptersForBook(bookId)
-                .associateBy { it.chapter.id }
-        }
-
-        val hadiths = hadithsDeferred.await()
-        val chapters = chaptersDeferred.await()
-        val cwt = repo.dao.getCollectionByBookId(bookId) ?: return@withContext null
-
-        if (hadiths.isEmpty()) return@withContext null
-
-        val items = ArrayList<ReaderLayoutItem>()
-        val emittedChapterIds = HashSet<String>()
-
-        hadiths.forEach { hwc ->
-            val chapterId = hwc.hadith.chapterId
-
-            val chapter = if (chapterId != null && emittedChapterIds.add(chapterId)) {
-                chapters[chapterId]
-            } else null
-
-            items.add(
-                buildHadithUi(
-                    repo = repo,
-                    hwc = hwc,
-                    params = params,
-                    chapterUi = buildChapter(chapter, params),
-                    numberingFallback = "${cwt.getTitleForNumbering()}: ${hwc.hadith.number}",
-                    showDivider = true,
-                )
-            )
-        }
-
-        return@withContext ReaderPreparedData(bookId, items = items)
     }
 
     suspend fun buildPage(
@@ -135,7 +82,7 @@ object ReaderItemsBuilder {
         initializeStyles(params)
 
         val hadithsDeferred = async {
-            repo.dao.getHadithsForBookPage(bookId, limit, offset)
+            repo.getHadithsForBookPage(bookId, limit, offset, params.translationId)
         }
 
         val totalDeferred = async {
@@ -143,15 +90,15 @@ object ReaderItemsBuilder {
         }
 
         val chaptersDeferred = async {
-            repo.dao
-                .getChaptersForBook(bookId)
+            repo
+                .getChaptersForBook(bookId, params.translationId)
                 .associateBy { it.chapter.id }
         }
 
         val hadiths = hadithsDeferred.await()
         val totalHadithCount = totalDeferred.await()
         val chapters = chaptersDeferred.await()
-        val cwt = repo.dao.getCollectionByBookId(bookId) ?: return@withContext null
+        val cwt = repo.getCollectionByBookId(bookId, params.translationId) ?: return@withContext null
 
         if (hadiths.isEmpty()) {
             return@withContext ReaderPreparedPage(
@@ -165,12 +112,10 @@ object ReaderItemsBuilder {
         val hadithIdsWithNarrators = repo.dao
             .getHadithIdsWithNarrators(hadithIds)
             .toSet()
-        val primaryReferences = repo.dao
-            .getPrimaryReferencesForHadiths(hadithIds)
-            .associateBy { it.hadithId }
 
         val items = ArrayList<ReaderLayoutItem>()
         val pageChapterIds = HashSet(emittedChapterIds)
+        val collectionName = cwt.getTitle(params.translationId)
 
         hadiths.forEach { hwc ->
             val chapterId = hwc.hadith.chapterId
@@ -185,10 +130,9 @@ object ReaderItemsBuilder {
                     hwc = hwc,
                     params = params,
                     chapterUi = buildChapter(chapter, params),
-                    numberingFallback = "${cwt.getTitleForNumbering()}: ${hwc.hadith.number}",
+                    numbering = "$collectionName: ${hwc.hadith.number}",
                     showDivider = true,
                     hasNarratorsChain = hwc.hadithId in hadithIdsWithNarrators,
-                    primaryReferenceValue = primaryReferences[hwc.hadithId]?.value,
                 )
             )
         }
@@ -207,17 +151,33 @@ object ReaderItemsBuilder {
     ): List<ReaderLayoutItem.HadithUI> = withContext(Dispatchers.IO) {
         initializeStyles(params)
 
-        hadithIds
+        val ids = hadithIds.distinct()
+        val hadiths = repo.getHadithsByIds(ids, params.translationId)
+
+        val hadithMap = hadiths.associateBy { it.hadithId }
+
+        val collectionsIds = hadiths
+            .map { it.collectionId }
+            .distinct()
+
+        val collectionNameMap = repo
+            .getCollectionsByIds(collectionsIds, params.translationId)
+            .associateBy {
+                it.collection.id
+            }
+
+        ids
             .distinct()
             .mapNotNull { id ->
-                val hwc = repo.dao.getHadithById(id) ?: return@mapNotNull null
+                val hwc = hadithMap[id] ?: return@mapNotNull null
+                val collectionName = collectionNameMap[hwc.collectionId]?.getTitle(params.translationId) ?: ""
 
                 buildHadithUi(
                     repo = repo,
                     hwc = hwc,
                     params = params,
                     chapterUi = null,
-                    numberingFallback = hwc.hadith.number ?: id,
+                    numbering = "$collectionName: ${hwc.hadith.number}",
                     showDivider = true,
                 )
             }
@@ -228,13 +188,11 @@ object ReaderItemsBuilder {
         hwc: HadithWithContents,
         params: TextBuilderParams,
         chapterUi: HadithChapterUi?,
-        numberingFallback: String,
+        numbering: String,
         showDivider: Boolean,
         hasNarratorsChain: Boolean? = null,
-        primaryReferenceValue: String? = null,
     ): ReaderLayoutItem.HadithUI {
         val resolvedHasNarratorsChain = hasNarratorsChain ?: (repo.dao.countNarratorsForHadith(hwc.hadithId) > 0)
-        val resolvedPrimaryReferenceValue = primaryReferenceValue ?: repo.dao.getPrimaryReferenceForHadith(hwc.hadithId)?.value
 
         val gradeText = hwc.grades
             .firstOrNull { it.lang == "en" } // for grades, use English source
@@ -248,7 +206,7 @@ object ReaderItemsBuilder {
             parsedArabicText = parseArabic(hwc, params),
             parsedTranslationText = parseTranslation(hwc, params),
             hasNarratorsChain = resolvedHasNarratorsChain,
-            visibleNumbering = resolvedPrimaryReferenceValue ?: numberingFallback,
+            visibleNumbering = numbering,
             gradeText = gradeText,
             showDivider = showDivider,
             key = "hadith-${hwc.hadith.id}",
@@ -390,7 +348,8 @@ object ReaderItemsBuilder {
     private fun parseTranslation(hwc: HadithWithContents, params: TextBuilderParams): AnnotatedString? {
         if (params.hadithTextOption == HadithTextOption.ONLY_ARABIC) return null
 
-        val content = hwc.contents.firstOrNull { it.lang == params.translationId } ?: return null
+        val content = hwc.contents.firstOrNull { it.lang == params.translationId } ?: return TranslationUtils
+            .getNoTranslationMessage(params.uiConfig.context, params.translationId)
 
         val blocks = content.blocks
 

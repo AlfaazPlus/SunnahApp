@@ -7,6 +7,7 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderChangeManager
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
@@ -60,7 +61,7 @@ class HotdViewModel @Inject constructor(
                     hadithActions = hadithActions,
                     arabicSizePercent = config.txtSizePercentArabic,
                     translationSizePercent = config.txtSizePercentTranslation,
-                    hadithTextOption = config.hadithTextOption,
+                    hadithTextOption = if (config.hadithTextOption == HadithTextOption.ONLY_ARABIC) config.hadithTextOption else HadithTextOption.ONLY_TRANSLATION,
                     isSanadEnabled = false,
                     isSerifFontStyle = config.isSerifFontStyle,
                 )

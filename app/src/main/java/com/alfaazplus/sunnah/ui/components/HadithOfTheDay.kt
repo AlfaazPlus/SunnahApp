@@ -44,6 +44,7 @@ import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
 import com.alfaazplus.sunnah.ui.components.reader.ReaderProvider
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
@@ -101,15 +102,13 @@ private fun HotdCard(
     val context = LocalContext.current
     val hadithActions = LocalHadithActions.current
     val colors by rememberUpdatedState(MaterialTheme.colorScheme)
-    val typography by rememberUpdatedState(MaterialTheme.typography)
     val palette = rememberHotdPalette()
 
-    LaunchedEffect(hadithActions, colors, typography, palette.link) {
+    LaunchedEffect(hadithActions, colors, palette.link) {
         val hotdColors = colors.forHotdCard(palette.link)
         val uiConfig = ComposeUiConfig(
             context = context,
             colors = hotdColors,
-            type = typography,
         )
 
         vm.observeHadithUi(
@@ -150,7 +149,9 @@ private fun HotdCard(
 
             HotdTexts(hadithUi)
             HotdFooter(
-                hadithUi = hadithUi, palette = palette, repo = vm.repo
+                hadithUi = hadithUi,
+                palette = palette,
+                repo = vm.repo,
             )
         }
     }
@@ -201,8 +202,8 @@ private fun HotdFooter(
     val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val hadithNumber = hadithUi.hwc.hadith.number.orEmpty()
-    val collectionName by produceState("", hadithUi.collectionId) {
-        value = repo.getCollectionName(hadithUi.collectionId)
+    val collectionName by produceState("", hadithUi.collectionId, translationLangCode) {
+        value = repo.getCollectionName(hadithUi.collectionId, translationLangCode)
     }
 
     val iconTint = Color.LightGray
@@ -222,7 +223,7 @@ private fun HotdFooter(
         Text(
             modifier = Modifier.weight(1f),
             text = "${collectionName}: $hadithNumber",
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelMedium.merge(tightTextStyle),
             color = iconTint,
         )
 

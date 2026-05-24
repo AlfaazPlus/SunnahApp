@@ -279,10 +279,11 @@
 
     <string name="deleteTranslation">ترجمہ حذف کریں؟</string>
 
-    <string name="lang_arabic">عربی</string>
-    <string name="lang_english">انگریزی</string>
-    <string name="lang_urdu">اردو</string>
-    <string name="lang_bengali">بنگالی</string>
-    <string name="lang_indonesian">انڈونیشین</string>
-    <string name="lang_french">فرانسیسی</string>
+    <string name="primaryCollections">بنیادی مجموعے</string>
+    <string name="selection">منتخب مجموعے</string>
+
+    <string name="noUrduTranslation">اس حدیث کا اردو ترجمہ ابھی دستیاب نہیں ہے۔</string>
+    <string name="noBanglaTranslation">اس حدیث کا بنگالی ترجمہ ابھی دستیاب نہیں ہے۔</string>
+    <string name="noFrenchTranslation">اس حدیث کا فرانسیسی ترجمہ ابھی دستیاب نہیں ہے۔</string>
+    <string name="noIndonesianTranslation">اس حدیث کا انڈونیشیائی ترجمہ ابھی دستیاب نہیں ہے۔</string>
 </resources>

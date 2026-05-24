@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -20,7 +21,8 @@ class BookListViewModel @Inject constructor(
     suspend fun setCollectionId(collectionId: String) {
         if (cwt?.collection?.id == collectionId) return
 
-        cwt = repo.dao.getCollectionById(collectionId)
-        books = repo.loadBooks(collectionId)
+        val langCode = ReaderPreferences.getHadithTranslation()
+        cwt = repo.getCollectionById(collectionId, langCode)
+        books = repo.loadBooks(collectionId, langCode)
     }
 }

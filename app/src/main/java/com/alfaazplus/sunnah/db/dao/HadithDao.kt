@@ -3,14 +3,18 @@ package com.alfaazplus.sunnah.db.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
-import androidx.room.Transaction
 import com.alfaazplus.sunnah.db.entities.migration.HadithIdUrnLookup
+import com.alfaazplus.sunnah.db.entities.v2.BookTranslationEntity
+import com.alfaazplus.sunnah.db.entities.v2.ChapterEntity
+import com.alfaazplus.sunnah.db.entities.v2.ChapterTranslationEntity
+import com.alfaazplus.sunnah.db.entities.v2.CollectionEntity
+import com.alfaazplus.sunnah.db.entities.v2.CollectionTranslationEntity
+import com.alfaazplus.sunnah.db.entities.v2.HadithContentEntity
+import com.alfaazplus.sunnah.db.entities.v2.HadithEntity
+import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceEntity
-import com.alfaazplus.sunnah.db.relations.BookWithTranslation
-import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
-import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
+import com.alfaazplus.sunnah.db.relations.BookWithHadithCount
 import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
-import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
@@ -19,37 +23,40 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HadithDao {
-    @Transaction
     @Query("SELECT * FROM collections ORDER BY sort_order")
-    suspend fun getCollections(): List<CollectionWithTranslation>
+    suspend fun getCollections(): List<CollectionEntity>
 
-    @Transaction
     @Query("SELECT * FROM collections ORDER BY sort_order")
-    fun getCollectionsFlow(): Flow<List<CollectionWithTranslation>>
+    fun getCollectionsFlow(): Flow<List<CollectionEntity>>
 
-    @Transaction
     @Query(
         "SELECT * FROM collections WHERE id = :id"
     )
-    suspend fun getCollectionById(id: String): CollectionWithTranslation?
+    suspend fun getCollectionById(id: String): CollectionEntity?
 
-    @Transaction
     @Query(
         "SELECT * FROM collections WHERE id IN (:collectionIds)"
     )
-    suspend fun getCollectionsByIds(collectionIds: List<String>): List<CollectionWithTranslation>
+    suspend fun getCollectionsByIds(collectionIds: List<String>): List<CollectionEntity>
 
-    @Transaction
     @Query(
         """
-            SELECT * FROM collections as c
+            SELECT c.* FROM collections as c
             INNER JOIN books ON books.collection_id = c.id
             WHERE books.id = :bookId
             """
     )
-    suspend fun getCollectionByBookId(bookId: String): CollectionWithTranslation?
+    suspend fun getCollectionByBookId(bookId: String): CollectionEntity?
 
-    @Transaction
+    @Query("SELECT * FROM collection_translations WHERE collection_id IN (:collectionIds) AND lang IN (:langCodes)")
+    suspend fun getCollectionTranslations(
+        collectionIds: List<String>,
+        langCodes: List<String>,
+    ): List<CollectionTranslationEntity>
+
+    @Query("SELECT * FROM collection_translations WHERE lang IN (:langCodes)")
+    fun getCollectionTranslationsFlow(langCodes: List<String>): Flow<List<CollectionTranslationEntity>>
+
     @Query(
         """
             SELECT books.*, COUNT(hadiths.id) AS hadith_count
@@ -61,10 +68,8 @@ interface HadithDao {
             ORDER BY books.number + 0
         """
     )
+    suspend fun getBooksForCollection(collectionId: String): List<BookWithHadithCount>
 
-    suspend fun getBooksForCollection(collectionId: String): List<BookWithTranslation>
-
-    @Transaction
     @Query(
         """
             SELECT books.*, COUNT(hadiths.id) AS hadith_count
@@ -74,10 +79,8 @@ interface HadithDao {
             WHERE books.id = :bookId
         """
     )
+    suspend fun getBookById(bookId: String): BookWithHadithCount?
 
-    suspend fun getBookById(bookId: String): BookWithTranslation?
-
-    @Transaction
     @Query(
         """
             SELECT books.*, COUNT(hadiths.id) AS hadith_count
@@ -88,23 +91,38 @@ interface HadithDao {
             GROUP BY books.id
         """
     )
+    suspend fun getBooksByIds(bookIds: List<String>): List<BookWithHadithCount>
 
-    suspend fun getBooksByIds(bookIds: List<String>): List<BookWithTranslation>
+    @Query("SELECT * FROM book_translations WHERE book_id IN (:bookIds) AND lang IN (:langCodes)")
+    suspend fun getBookTranslations(
+        bookIds: List<String>,
+        langCodes: List<String>,
+    ): List<BookTranslationEntity>
 
-    @Transaction
     @Query(
         """SELECT * FROM hadiths WHERE hadiths.id = :id """
     )
-    suspend fun getHadithById(id: String): HadithWithContents?
+    suspend fun getHadithById(id: String): HadithEntity?
 
     @Query("SELECT id FROM hadiths WHERE urn = :urn LIMIT 1")
     suspend fun getHadithIdByUrn(urn: Long): String?
 
-    @Transaction
     @Query(
         """SELECT * FROM hadiths WHERE hadiths.id IN (:ids) """
     )
-    suspend fun getHadithsByIds(ids: List<String>): List<HadithWithContents>
+    suspend fun getHadithsByIds(ids: List<String>): List<HadithEntity>
+
+    @Query("SELECT * FROM hadith_contents WHERE hadith_id IN (:hadithIds) AND lang IN (:langCodes)")
+    suspend fun getHadithContents(
+        hadithIds: List<String>,
+        langCodes: List<String>,
+    ): List<HadithContentEntity>
+
+    @Query("SELECT * FROM hadith_grades WHERE hadith_id IN (:hadithIds) AND lang IN (:langCodes)")
+    suspend fun getHadithGrades(
+        hadithIds: List<String>,
+        langCodes: List<String>,
+    ): List<HadithGradeEntity>
 
     @Query("SELECT urn, id FROM hadiths WHERE urn IN (:urns)")
     suspend fun getHadithIdsByUrns(urns: List<Long>): List<HadithIdUrnLookup>
@@ -112,9 +130,8 @@ interface HadithDao {
     @Query("SELECT id FROM hadiths WHERE collection_id = :collectionId")
     suspend fun getHadithIdsForCollection(collectionId: String): List<String>
 
-    @Transaction
     @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn")
-    suspend fun getHadithsForBook(bookId: String): List<HadithWithContents>
+    suspend fun getHadithsForBook(bookId: String): List<HadithEntity>
 
     @Query(
         """
@@ -147,21 +164,21 @@ interface HadithDao {
     )
     suspend fun getHadithOffsetInBook(bookId: String, hadithId: String): Int
 
-    @Transaction
     @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn LIMIT :limit OFFSET :offset")
     suspend fun getHadithsForBookPage(
         bookId: String,
         limit: Int,
         offset: Int,
-    ): List<HadithWithContents>
+    ): List<HadithEntity>
 
-    @Transaction
     @Query("SELECT * FROM chapters WHERE book_id = :bookId")
-    suspend fun getChaptersForBook(bookId: String): List<ChapterWithTranslation>
+    suspend fun getChaptersForBook(bookId: String): List<ChapterEntity>
 
-    @Transaction
-    @Query("SELECT * FROM hadith_references WHERE hadith_id = :hadithId AND type = 'sunnahcom_reference' LIMIT 1")
-    suspend fun getPrimaryReferenceForHadith(hadithId: String): HadithReferenceEntity?
+    @Query("SELECT * FROM chapter_translations WHERE chapter_id IN (:chapterIds) AND lang IN (:langCodes)")
+    suspend fun getChapterTranslations(
+        chapterIds: List<String>,
+        langCodes: List<String>,
+    ): List<ChapterTranslationEntity>
 
     @Query("SELECT * FROM hadith_references WHERE hadith_id IN (:hadithIds) AND type = 'sunnahcom_reference'")
     suspend fun getPrimaryReferencesForHadiths(hadithIds: List<String>): List<HadithReferenceEntity>

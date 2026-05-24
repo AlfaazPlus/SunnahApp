@@ -38,9 +38,6 @@ fun HadithTextPreview(
     isArabic: Boolean,
     isSerif: Boolean,
 ) {
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-
     // hadith id = nasai_urn_1122120
     val previewText = when {
         isArabic -> "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
@@ -57,8 +54,6 @@ fun HadithTextPreview(
     val style = if (isArabic) {
         getArabicTextStyle(
             params = ArabicTextStyleParams(
-                colors = colors,
-                type = typography,
                 sizePercent = sizePercent,
             )
         )
@@ -66,8 +61,6 @@ fun HadithTextPreview(
         getTranslationTextStyle(
             params = TranslationTextStyleParams(
                 translationId = translationId,
-                colors = colors,
-                type = typography,
                 sizePercent = sizePercent,
                 isSerif = isSerif,
             )

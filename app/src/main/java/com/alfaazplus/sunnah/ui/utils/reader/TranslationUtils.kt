@@ -2,19 +2,24 @@ package com.alfaazplus.sunnah.ui.utils.reader
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.ui.utils.appLocale
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadithTranslation
 import kotlinx.coroutines.runBlocking
 
 
-enum class HadithTranslation(val langCode: String, val labelRes: Int) {
-    ENGLISH("en", R.string.lang_english),
-    URDU("ur", R.string.lang_urdu),
-    BENGALI("bn", R.string.lang_bengali),
-    INDONESIAN("id", R.string.lang_indonesian),
-    FRENCH("fr", R.string.lang_french);
+enum class HadithTranslation(val langCode: String, val label: String) {
+    ENGLISH("en", "English"),
+    URDU("ur", "اردو");
+//    BENGALI("bn", "বাংলা"),
+//    INDONESIAN("id", "Bahasa Indonesia"),
+//    FRENCH("fr", "française");
 
     companion object {
         fun fromLangCode(langCode: String): HadithTranslation {
@@ -25,31 +30,66 @@ enum class HadithTranslation(val langCode: String, val labelRes: Int) {
 
 
 object TranslationUtils {
+    const val ARABIC_LANG = "ar"
+    const val ENGLISH_LANG = "en"
+
     val DEFAULT_TRANSLATION = HadithTranslation.ENGLISH
 
     val AVAILABLE_TRANSLATIONS = HadithTranslation.entries
 
     fun isBuiltInTranslation(id: String): Boolean {
-        return id == "en"
+        return id == ENGLISH_LANG
     }
 
-    private fun getHadithTranslationLabelRes(langCode: String): Int {
-        return HadithTranslation.fromLangCode(langCode).labelRes
+    private fun getHadithTranslation(langCode: String): HadithTranslation {
+        return HadithTranslation.fromLangCode(langCode)
     }
 
-    fun getHadithTranslationLabel(context: Context): String {
+    fun getHadithTranslationLabel(): String {
         return runBlocking {
-            context.getString(getHadithTranslationLabelRes(ReaderPreferences.getHadithTranslation()))
+            getHadithTranslation(ReaderPreferences.getHadithTranslation()).label
         }
     }
 
     @Composable
     fun resolveHadithTranslationLabel(): String {
-        return stringResource(getHadithTranslationLabelRes(observeHadithTranslation()))
+        return getHadithTranslation(observeHadithTranslation()).label
+    }
+
+    fun getNoTranslationMessage(context: Context, langCode: String): AnnotatedString {
+        val message = when (langCode) {
+            "bn" -> context.getString(R.string.noBanglaTranslation)
+            "fr" -> context.getString(R.string.noFrenchTranslation)
+            "in" -> context.getString(R.string.noIndonesianTranslation)
+            "ur" -> context.getString(R.string.noUrduTranslation)
+            else -> ""
+        }
+
+        return buildAnnotatedString {
+            withStyle(
+                SpanStyle(
+                    fontStyle = FontStyle.Italic,
+                )
+            ) {
+                append(message)
+            }
+        }
     }
 
     fun langCodeFromId(translationId: String): String {
         // Currently the id is itself the language code
         return translationId
+    }
+
+    fun contentLangCodes(preferredId: String): List<String> {
+        return listOf(ARABIC_LANG, langCodeFromId(preferredId)).distinct()
+    }
+
+    fun metadataLangCodes(preferredLangCode: String): List<String> {
+        return listOf(ARABIC_LANG, preferredLangCode).distinct()
+    }
+
+    fun gradeLangCodes(preferredLangCode: String): List<String> {
+        return listOf(ENGLISH_LANG, langCodeFromId(preferredLangCode)).distinct()
     }
 }

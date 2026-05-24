@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.models.userdata
 
+import androidx.compose.ui.text.AnnotatedString
 import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
@@ -7,12 +8,13 @@ import com.alfaazplus.sunnah.db.relations.HadithWithContents
 
 data class UserDataUserItem(
     val hwc: HadithWithContents?,
-    val visibleNumbering: String,
+    val numbering: String,
     val bookTitle: String,
-    var translationText: String?,
+    val langCode: String,
+    val translationText: AnnotatedString?,
 ) {
     override fun toString(): String {
-        return "visibleNumbering=${visibleNumbering}, bookTitle=${bookTitle}"
+        return "numbering=${numbering}, bookTitle=${bookTitle}"
     }
 }
 

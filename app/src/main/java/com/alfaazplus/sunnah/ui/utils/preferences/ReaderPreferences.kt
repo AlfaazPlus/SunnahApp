@@ -147,6 +147,10 @@ object ReaderPreferences {
         return DataStoreManager.flow(KEY_IS_SERIF_FONT_STYLE)
     }
 
+    suspend fun getIsSerifFontStyle(): Boolean {
+        return DataStoreManager.readFirst(KEY_IS_SERIF_FONT_STYLE)
+    }
+
     suspend fun getHadithTranslation(): String {
         return DataStoreManager.readFirst(KEY_HADITH_TRANSLATION)
     }

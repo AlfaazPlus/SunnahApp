@@ -67,6 +67,7 @@ import com.alfaazplus.sunnah.ui.components.library.SectionHeaderViewAll
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.theme.alpha
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
@@ -219,7 +220,8 @@ private fun ReadHistoryItemCard(
 
     Surface(
         shape = shapes.medium,
-        color = colorScheme.surfaceContainer,
+        color = colorScheme.surfaceContainerLow,
+        border = BorderStroke(1.dp, colorScheme.outline.alpha(0.15f)),
         onClick = {
             val bookId = history.ui.hwc?.bookId ?: return@Surface
             onNavigate(bookId, hadithId)
@@ -234,13 +236,13 @@ private fun ReadHistoryItemCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = history.ui.visibleNumbering,
-                style = MaterialTheme.typography.titleSmall,
+                text = history.ui.numbering,
+                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle),
             )
 
             Text(
                 text = history.ui.bookTitle,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.merge(tightTextStyle),
                 color = colorScheme.onSurfaceVariant.alpha(0.8f),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -295,7 +297,8 @@ private fun UserBookmarkCard(
 ) {
     Surface(
         shape = shapes.medium,
-        color = colorScheme.surfaceContainer,
+        color = colorScheme.surfaceContainerLow,
+        border = BorderStroke(1.dp, colorScheme.outline.alpha(0.15f)),
         onClick = onClick,
     ) {
         Column(
@@ -306,8 +309,8 @@ private fun UserBookmarkCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = bookmark.ui.visibleNumbering,
-                style = MaterialTheme.typography.titleSmall,
+                text = bookmark.ui.numbering,
+                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle),
             )
 
             if (bookmark.item.remark.isNotEmpty()) {
@@ -333,7 +336,7 @@ private fun UserBookmarkCard(
                             )
                         },
                     ),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.merge(tightTextStyle),
                     color = colorScheme.onSurfaceVariant.alpha(0.8f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -369,7 +372,7 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
             .fillMaxWidth()
             .clip(shapes.medium)
             .background(
-                color = colorScheme.surface,
+                color = colorScheme.surfaceContainerLow,
             )
             .background(
                 brush = Brush.linearGradient(
@@ -400,13 +403,13 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
 
             Text(
                 text = collection.name,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle),
                 textAlign = TextAlign.Center,
             )
 
             Text(
                 text = "${collection.itemsCount} items",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.merge(tightTextStyle),
                 color = colorScheme.onSurfaceVariant.alpha(0.8f),
                 textAlign = TextAlign.Center,
             )

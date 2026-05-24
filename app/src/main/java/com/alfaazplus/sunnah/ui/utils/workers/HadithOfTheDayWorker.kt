@@ -18,6 +18,7 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.activities.MainActivity
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.CHANNEL_ID_HOTD
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -35,16 +36,17 @@ class HadithOfTheDayWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val hotd = HadithHelper.getHadithOfTheDay(repo) ?: return@withContext Result.failure()
+        val translationLangCode = ReaderPreferences.getHadithTranslation()
 
-        sendNotification(hotd)
+        sendNotification(hotd, translationLangCode)
 
         return@withContext Result.success()
     }
 
-    private fun sendNotification(hotd: HadithOfTheDay) {
+    private fun sendNotification(hotd: HadithOfTheDay, translationLangCode: String) {
         val notificationId = 10
         val context = applicationContext
-        val blocks = hotd.hwc.contents.firstOrNull { it.lang == "en" }?.blocks ?: return
+        val blocks = hotd.hwc.contents.firstOrNull { it.lang == translationLangCode }?.blocks ?: return
 
         val manager = ContextCompat.getSystemService(
             context, NotificationManager::class.java

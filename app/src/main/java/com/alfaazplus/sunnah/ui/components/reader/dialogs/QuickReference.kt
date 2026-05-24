@@ -106,12 +106,11 @@ private fun QuickReferenceContent(
     val hadithActions = LocalHadithActions.current
 
     val colors by rememberUpdatedState(colorScheme)
-    val type by rememberUpdatedState(typography)
 
     var items by remember { mutableStateOf<List<ReaderLayoutItem.HadithUI>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(data.hadithIds, hadithActions, colors, type) {
+    LaunchedEffect(data.hadithIds, hadithActions, colors) {
         ReaderChangeManager
             .changeFlow()
             .collectLatest { config ->
@@ -122,7 +121,6 @@ private fun QuickReferenceContent(
                         uiConfig = ComposeUiConfig(
                             context = context,
                             colors = colors,
-                            type = type,
                         ),
                         hadithActions = hadithActions,
                         translationId = config.selectedTranslationLangCode,

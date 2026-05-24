@@ -63,7 +63,7 @@ private fun BookmarkItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
@@ -75,20 +75,15 @@ private fun BookmarkItemCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Row {
-                    Card(
-                        shape = MaterialTheme.shapes.extraSmall
-                    ) {
-                        Text(
-                            bookmark.ui.visibleNumbering,
-                            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
+                    NumberingCard(
+                        numbering = bookmark.ui.numbering,
+                        translationId = bookmark.ui.langCode,
+                    )
                 }
 
                 if (!bookmark.ui.translationText.isNullOrEmpty()) {
                     Text(
-                        text = bookmark.ui.translationText!!,
+                        text = bookmark.ui.translationText,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = if (bookmark.item.remark.isNotBlank()) 5 else 8,
                         overflow = TextOverflow.Ellipsis,

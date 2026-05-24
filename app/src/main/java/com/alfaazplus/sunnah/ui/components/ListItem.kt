@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 
 @Composable
 fun ListItemContent(
@@ -38,13 +39,13 @@ fun ListItemContent(
         if (titleText != null) {
             Text(
                 text = titleText,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle)
             )
         }
         if (subtitleText != null) {
             Text(
                 text = subtitleText,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.merge(tightTextStyle),
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier
                     .padding(top = 3.dp)

@@ -43,7 +43,7 @@ class ThemeMonoColors : BaseColors() {
             onSurfaceVariant = Color(0xFF3D3D3D),
 
             surfaceContainerLow = Color(0xFFFFFFFF),
-            surfaceContainer = Color(0xFFF5F5F5),
+            surfaceContainer = Color(0xFFFFFFFF),
 
             inverseOnSurface = Color(0xFFF5F5F5),
             inverseSurface = Color(0xFF303030),

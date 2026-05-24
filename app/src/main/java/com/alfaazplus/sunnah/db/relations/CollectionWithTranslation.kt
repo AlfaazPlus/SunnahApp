@@ -22,28 +22,23 @@ data class CollectionWithTranslation(
         return translations.firstOrNull { it.lang == langCode }
     }
 
-    fun getTitleForNumbering(): String? {
-        return sequenceOf("en", "ar").firstNotNullOfOrNull {
-            getTranslation(it)?.title?.takeIf { it.isNotEmpty() }
-        }
-    }
 
-    fun getTitle(langCode: String = "en"): String? {
+    fun getTitle(langCode: String): String? {
         return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
     }
 
-    fun getTitlePair(langCode: String = "en"): String {
+    fun getTitlePair(langCode: String): String {
+        val translatedTitle = getTitle(langCode) ?: return ""
         val arTitle = getTitle("ar")
-        val translatedTitle = getTitle(langCode) ?: return arTitle ?: ""
 
-        return "$translatedTitle (${arTitle ?: ""})"
+        return if (arTitle != null) "$translatedTitle ($arTitle)" else translatedTitle
     }
 
-    fun getIntro(langCode: String = "en"): String? {
+    fun getIntro(langCode: String): String? {
         return getTranslation(langCode)?.intro?.takeIf { it.isNotEmpty() }
     }
 
-    fun getDescription(langCode: String = "en"): String? {
+    fun getDescription(langCode: String): String? {
         return getTranslation(langCode)?.description?.takeIf { it.isNotEmpty() }
     }
 }

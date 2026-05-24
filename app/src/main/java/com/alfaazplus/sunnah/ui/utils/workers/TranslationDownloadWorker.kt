@@ -133,7 +133,7 @@ class TranslationDownloadWorker @AssistedInject constructor(
                 setShowWhen(false)
                 setSmallIcon(R.drawable.logo_icon)
                 setContentTitle(ctx.getString(R.string.downloading))
-                setContentText(TranslationUtils.getHadithTranslationLabel(ctx))
+                setContentText(TranslationUtils.getHadithTranslationLabel())
                 setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 setProgress(100, progress ?: 0, progress == null)
             }

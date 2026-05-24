@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
+import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 
 
@@ -39,11 +42,13 @@ fun BookItemCard(
     isCurrent: Boolean = false,
     onClick: () -> Unit,
 ) {
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface
+            containerColor = colorScheme.surfaceContainerLow
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         border = BorderStroke(
@@ -54,7 +59,7 @@ fun BookItemCard(
         onClick = onClick,
     ) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -70,7 +75,7 @@ fun BookItemCard(
                     )
                     Text(
                         text = bwt.book.number,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = typography.labelMedium,
                         fontWeight = FontWeight.Normal,
                         color = colorScheme.onPrimary,
                     )
@@ -82,25 +87,23 @@ fun BookItemCard(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = bwt.getTitle("ar") ?: "",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = fontUthmani
-                    ),
-                    color = colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                )
-
-                val meaning = bwt.getTitle("en")
-
-                if (!meaning.isNullOrEmpty()) {
-                    Text(
-                        text = meaning
-                            .parseAsHtml()
-                            .toAnnotatedString(),
-                        style = MaterialTheme.typography.labelLarge,
-                        textAlign = TextAlign.Center,
-                    )
+                metadataLangCodes(translationLangCode).forEach { langCode ->
+                    bwt
+                        .getTitle(langCode)
+                        ?.let {
+                            Text(
+                                text = it
+                                    .parseAsHtml()
+                                    .toAnnotatedString(),
+                                style = textStyleForLang(langCode)
+                                    .merge(tightTextStyle)
+                                    .copy(
+                                        fontSize = typography.titleSmall.fontSize,
+                                        fontWeight = FontWeight.SemiBold,
+                                    ),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                 }
             }
 

@@ -211,8 +211,8 @@ private fun ChapterInfo(chapterUi: HadithChapterUi) {
         label = "chapter_chevron",
     )
 
-    val containerColor = colorScheme.inverseSurface
-    val contentColor = colorScheme.inverseOnSurface
+    val containerColor = colorScheme.surfaceContainerHigh
+    val contentColor = colorScheme.onSurface
 
     Column(
         modifier = Modifier

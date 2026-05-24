@@ -91,10 +91,10 @@ private fun Content(
     val actions = LocalHadithActions.current
     val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
-    val d by produceState<HadithMenuData?>(null, hadithId) {
-        val hwc = appVm.repo.dao.getHadithById(hadithId) ?: return@produceState
-        val cwt = appVm.repo.dao.getCollectionById(hwc.collectionId)
-        val bwt = appVm.repo.dao.getBookById(hwc.bookId)
+    val d by produceState<HadithMenuData?>(null, hadithId, translationLangCode) {
+        val hwc = appVm.repo.getHadithById(hadithId, translationLangCode) ?: return@produceState
+        val cwt = appVm.repo.getCollectionById(hwc.collectionId, translationLangCode)
+        val bwt = appVm.repo.getBookById(hwc.bookId, translationLangCode)
 
         value = HadithMenuData(
             hwc, cwt, bwt

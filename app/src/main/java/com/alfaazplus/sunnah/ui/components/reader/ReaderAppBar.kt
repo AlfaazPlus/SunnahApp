@@ -60,6 +60,7 @@ import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 
@@ -273,6 +274,7 @@ private fun Header(
 ) {
     val currentBook = rememberCurrentBook(readerVm) ?: return
     val currentHadith = rememberCurrentHadith(readerVm)
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val textStyle = typography.labelMedium
         .copy(
@@ -296,7 +298,7 @@ private fun Header(
                 modifier = Modifier
                     .widthIn(max = 150.dp)
                     .basicMarquee(),
-                text = currentBook.getTitle() ?: "…",
+                text = currentBook.getTitle(translationLangCode) ?: "…",
                 style = textStyle,
                 maxLines = 1,
             )

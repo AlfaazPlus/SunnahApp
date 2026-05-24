@@ -42,7 +42,7 @@ class ThemeVioletColors : BaseColors() {
             onSurfaceVariant = Color(0xFF52485B),
 
             surfaceContainerLow = Color(0xFFFFFFFF),
-            surfaceContainer = Color(0xFFF5EEFF),
+            surfaceContainer = Color(0xFFFFFFFF),
 
             inverseOnSurface = Color(0xFFF8EEFF),
             inverseSurface = Color(0xFF35263F),

@@ -112,14 +112,4 @@ data class HadithContentEntity(
     val blocks: List<HadithBlock> by lazy {
         JsonHelper.json.decodeFromString(blocksJson)
     }
-
-    fun toPlainText(): String {
-        return buildString {
-            blocks.forEach {
-                if (!it.text.isNullOrEmpty()) {
-                    appendLine(it.text.parseAsHtml())
-                }
-            }
-        }
-    }
 }

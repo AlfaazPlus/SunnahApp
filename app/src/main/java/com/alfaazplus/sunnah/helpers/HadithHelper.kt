@@ -14,6 +14,7 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDayHolder
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import java.util.Date
 
@@ -25,7 +26,7 @@ data class HadithGradeText(
 )
 
 object HadithHelper {
-    const val PREBUILT_HADITHS_VERSION = 6
+    const val PREBUILT_HADITHS_VERSION = 7
 
     val INCLUDED_COLLECTIONS: Set<String> = setOf(
         "bukhari",
@@ -104,7 +105,8 @@ object HadithHelper {
         val hotdHolder = HadithOfTheDayHolder.parse(hotdValue)
 
         if (hotdHolder != null) {
-            val cached = repo.getHotd(hotdHolder.hadithId)
+            val langCode = ReaderPreferences.getHadithTranslation()
+            val cached = repo.getHotd(hotdHolder.hadithId, langCode)
 
             if (cached != null) {
                 return cached
@@ -156,9 +158,11 @@ object HadithHelper {
 
         DataStoreManager.write(key, holder.toString())
 
+        val langCode = ReaderPreferences.getHadithTranslation()
+
         return HadithOfTheDay(
             hwc = hwc,
-            collectionName = repo.getCollectionName(hwc.hadith.collectionId),
+            collectionName = repo.getCollectionName(hwc.hadith.collectionId, langCode),
         )
     }
 
@@ -167,7 +171,7 @@ object HadithHelper {
         hwc: HadithWithContents,
         collectionName: String?,
         bookName: String?,
-        translationLangCode: String = "en",
+        translationLangCode: String,
     ) {
         val content = hwc.contents.firstOrNull { it.lang == translationLangCode } ?: return
 

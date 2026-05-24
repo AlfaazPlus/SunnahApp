@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -19,14 +20,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.v2.CollectionType
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
+import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
 
 
@@ -59,8 +65,8 @@ fun HadithCollectionList(
 
                 Text(
                     when (type) {
-                        CollectionType.COLLECTION -> "Primary Collections (لمصدر الأصلي)"
-                        CollectionType.SELECTION -> "Selection (المصادر الثانوية)"
+                        CollectionType.COLLECTION -> stringResource(R.string.primaryCollections)
+                        CollectionType.SELECTION -> stringResource(R.string.selection)
                     },
                     style = typography.titleSmall,
                     color = colorScheme.primary,
@@ -74,9 +80,11 @@ fun HadithCollectionList(
             }
 
             items
-                .chunked(1)
+                .chunked(2)
                 .forEach {
-                    Row {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
                         it.forEach { cwt ->
                             HadithCollectionItem(cwt) {
                                 onCollectionClick(cwt.collection.id)
@@ -90,45 +98,40 @@ fun HadithCollectionList(
 }
 
 @Composable
-private fun HadithCollectionItem(
+private fun RowScope.HadithCollectionItem(
     cwt: CollectionWithTranslation,
     onClick: () -> Unit,
 ) {
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
+
     Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = colorScheme.surfaceContainer,
+        modifier = Modifier.weight(1f),
+        color = colorScheme.surfaceContainerLow,
         shape = shapes.medium,
         border = BorderStroke(1.dp, colorScheme.outline.alpha(0.15f)),
         onClick = onClick,
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            cwt
-                .getTitle("en")
-                ?.let {
-                    Text(
-                        text = it,
-                        style = typography.titleSmall,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-
-            cwt
-                .getTitle("ar")
-                ?.let {
-                    Text(
-                        text = it,
-                        style = typography.titleMedium
-                            .merge(tightTextStyle)
-                            .copy(
-                                fontFamily = fontUthmani,
-                            ),
-                        textAlign = TextAlign.Center,
-                    )
-                }
+            metadataLangCodes(translationLangCode).forEach { langCode ->
+                cwt
+                    .getTitle(langCode)
+                    ?.let {
+                        Text(
+                            text = it,
+                            style = textStyleForLang(langCode)
+                                .merge(tightTextStyle)
+                                .copy(
+                                    fontSize = typography.titleSmall.fontSize,
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+            }
         }
     }
 }

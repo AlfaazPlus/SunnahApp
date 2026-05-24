@@ -2,7 +2,6 @@ package com.alfaazplus.sunnah.ui.utils.text
 
 import android.content.Context
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -11,16 +10,18 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.theme.fontUrdu
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.StringUtils
+import com.alfaazplus.sunnah.ui.utils.isUrduLanguageCode
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 
 data class ComposeUiConfig(
     val context: Context,
     val colors: ColorScheme,
-    val type: Typography,
 )
 
 data class TextBuilderParams(
@@ -36,31 +37,28 @@ data class TextBuilderParams(
 
 data class TranslationTextStyleParams(
     val translationId: String,
-    val colors: ColorScheme,
-    val type: Typography,
     val isSerif: Boolean,
     val sizePercent: Int,
 )
 
 data class ArabicTextStyleParams(
-    val colors: ColorScheme,
-    val type: Typography,
     val sizePercent: Int,
 )
 
 fun getTranslationTextStyle(
     params: TranslationTextStyleParams,
 ): TextStyle {
-    val baselineFontSize = params.type.bodyLarge.fontSize
+    val baselineFontSize = 16.sp
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
-    val isUrdu = params.translationId == "ur"
+    val langCode = TranslationUtils.langCodeFromId(params.translationId)
+    val isUrdu = langCode.isUrduLanguageCode()
     val lineHeightMultiplier = if (isUrdu) 2.5f else 1.5f
 
     return TextStyle(
         fontFamily = if (isUrdu) fontUrdu
         else if (params.isSerif) FontFamily.Serif
         else FontFamily.SansSerif,
-        textDirection = textDirectionForLang(params.translationId),
+        textDirection = textDirectionForLang(langCode),
         platformStyle = PlatformTextStyle(
             includeFontPadding = true
         ),
@@ -72,10 +70,10 @@ fun getTranslationTextStyle(
 fun getArabicTextStyle(
     params: ArabicTextStyleParams,
 ): TextStyle {
-    val baselineFontSize = params.type.bodyLarge.fontSize * 1.2 // slightly size for arabic texts
+    val baselineFontSize = 20.sp
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
 
-    return params.type.headlineSmall.copy(
+    return TextStyle(
         fontFamily = fontUthmani,
         fontSize = resolvedFontSize,
         textDirection = TextDirection.Rtl,
@@ -97,27 +95,20 @@ fun textDirectionForLang(
 
 fun textStyleForLang(
     langCode: String,
-    colors: ColorScheme,
-    type: Typography,
-    arabicSizePercent: Int,
-    translationSizePercent: Int,
-    isSerifFontStyle: Boolean,
+    sizePercent: Int = 100,
+    isSerifFontStyle: Boolean = false,
 ): TextStyle {
     return if (langCode == "ar") {
         getArabicTextStyle(
             ArabicTextStyleParams(
-                colors = colors,
-                type = type,
-                sizePercent = arabicSizePercent,
+                sizePercent = sizePercent,
             ),
         )
     } else {
         getTranslationTextStyle(
             TranslationTextStyleParams(
                 translationId = langCode,
-                colors = colors,
-                type = type,
-                sizePercent = translationSizePercent,
+                sizePercent = sizePercent,
                 isSerif = isSerifFontStyle,
             ),
         )
@@ -128,9 +119,7 @@ fun buildStyledHadithAnnotatedString(
     text: String,
     langCode: String,
     colors: ColorScheme,
-    type: Typography,
-    arabicSizePercent: Int,
-    translationSizePercent: Int,
+    sizePercent: Int,
     isSerifFontStyle: Boolean,
     actions: HadithActions,
 ): AnnotatedString {
@@ -142,10 +131,7 @@ fun buildStyledHadithAnnotatedString(
 
     val textStyle = textStyleForLang(
         langCode = langCode,
-        colors = colors,
-        type = type,
-        arabicSizePercent = arabicSizePercent,
-        translationSizePercent = translationSizePercent,
+        sizePercent = sizePercent,
         isSerifFontStyle = isSerifFontStyle,
     )
 

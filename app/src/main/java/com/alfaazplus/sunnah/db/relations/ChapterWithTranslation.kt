@@ -18,17 +18,11 @@ data class ChapterWithTranslation(
         return translations.firstOrNull { it.lang == langCode }
     }
 
-    fun getTitle(): String? {
-        return sequenceOf("en", "ar").firstNotNullOfOrNull {
-            getTranslation(it)?.title?.takeIf { it.isNotEmpty() }
-        }
-    }
-
-    fun getTitle(langCode: String = "en"): String? {
+    fun getTitle(langCode: String): String? {
         return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
     }
 
-    fun getIntro(langCode: String = "en"): String? {
+    fun getIntro(langCode: String): String? {
         return getTranslation(langCode)?.intro?.takeIf { it.isNotEmpty() }
     }
 }

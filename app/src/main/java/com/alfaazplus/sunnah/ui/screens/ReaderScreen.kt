@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -66,7 +65,6 @@ fun ReaderScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val colors by rememberUpdatedState(colorScheme)
-    val type by rememberUpdatedState(MaterialTheme.typography)
 
     val showTwoPane = currentWindowAdaptiveInfo().windowSizeClass.isAtLeastBreakpoint(
         WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND,
@@ -98,13 +96,12 @@ fun ReaderScreen(
             val reader = LocalReader.current
             val hadithActions = LocalHadithActions.current
 
-            LaunchedEffect(lifecycleOwner, colors, type) {
+            LaunchedEffect(lifecycleOwner, colors) {
                 lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     readerVm.observeChanges(
                         uiConfig = ComposeUiConfig(
                             context = context,
                             colors = colors,
-                            type = type,
                         ),
                         hadithActions,
                     )

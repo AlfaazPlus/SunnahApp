@@ -42,7 +42,7 @@ class ThemePurpleColors : BaseColors() {
             onSurfaceVariant = Color(0xFF5A4A54),
 
             surfaceContainerLow = Color(0xFFFFFFFF),
-            surfaceContainer = Color(0xFFFFF0F7),
+            surfaceContainer = Color(0xFFFFFFFF),
 
             inverseOnSurface = Color(0xFFFFF1F6),
             inverseSurface = Color(0xFF382B34),

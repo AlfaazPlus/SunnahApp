@@ -56,9 +56,9 @@ class ReaderViewModel @Inject constructor(
     val activeHadithId: StateFlow<String?> = _activeHadithId.asStateFlow()
 
     val books = _activeBookId
-        .map {
-            if (it != null) {
-                repo.loadSisterBooksFromBookId(it)
+        .combine(ReaderPreferences.hadithTranslationFlow()) { bookId, langCode ->
+            if (bookId != null) {
+                repo.loadSisterBooksFromBookId(bookId, langCode)
             } else {
                 emptyList()
             }

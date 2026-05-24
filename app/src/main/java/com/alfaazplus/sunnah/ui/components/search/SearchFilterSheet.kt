@@ -21,6 +21,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.CheckboxItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
@@ -34,6 +35,7 @@ fun SearchFilterSheet(
 ) {
     val selectedCollections = remember { mutableStateMapOf<String, Boolean>() }
     val collections by vm.collections.collectAsState()
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     fun applyFilters() {
         searchVm.applyFilters(
@@ -86,7 +88,7 @@ fun SearchFilterSheet(
                 collections.forEach { c ->
                     CheckboxItem(
                         modifier = Modifier.padding(horizontal = 10.dp),
-                        title = "${c.getTitle("en") ?: ""} (${c.getTitle("ar") ?: ""})",
+                        title = "${c.getTitle(translationLangCode) ?: ""} (${c.getTitle("ar") ?: ""})",
                         enabled = c.isDownloaded,
                         checked = if (c.isDownloaded) selectedCollections.getOrElse(c.collection.id) { false } else false,
                         onCheckedChange = {

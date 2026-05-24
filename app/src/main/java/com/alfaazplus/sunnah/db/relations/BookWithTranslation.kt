@@ -22,32 +22,26 @@ data class BookWithTranslation(
         return translations.firstOrNull { it.lang == langCode }
     }
 
-    fun getTitle(): String? {
-        return sequenceOf("en", "ar").firstNotNullOfOrNull {
-            getTranslation(it)?.title?.takeIf { it.isNotEmpty() }
-        }
-    }
-
-    fun getTitle(langCode: String = "en"): String? {
+    fun getTitle(langCode: String): String? {
         return getTranslation(langCode)?.title?.takeIf { it.isNotEmpty() }
     }
 
-    fun getTitlePair(langCode: String = "en"): String {
+    fun getTitlePair(langCode: String): String {
+        val translatedTitle = getTitle(langCode) ?: return ""
         val arTitle = getTitle("ar")
-        val translatedTitle = getTitle(langCode) ?: return arTitle ?: ""
 
-        return "$translatedTitle (${arTitle ?: ""})"
+        return if (arTitle != null) "$translatedTitle ($arTitle)" else translatedTitle
     }
 
-    fun getIntro(langCode: String = "en"): String? {
+    fun getIntro(langCode: String): String? {
         return getTranslation(langCode)?.intro?.takeIf { it.isNotEmpty() }
     }
 
-    fun getNotes(langCode: String = "en"): String? {
+    fun getNotes(langCode: String): String? {
         return getTranslation(langCode)?.notes?.takeIf { it.isNotEmpty() }
     }
 
-    fun getPreamble(langCode: String = "en"): String? {
+    fun getPreamble(langCode: String): String? {
         return getTranslation(langCode)?.preamble?.takeIf { it.isNotEmpty() }
     }
 }

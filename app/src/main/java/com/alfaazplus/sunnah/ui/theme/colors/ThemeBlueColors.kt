@@ -42,7 +42,7 @@ class ThemeBlueColors : BaseColors() {
             onSurfaceVariant = Color(0xFF44464F),
 
             surfaceContainerLow = Color(0xFFFFFFFF),
-            surfaceContainer = Color(0xFFF5F6FA),
+            surfaceContainer = Color(0xFFFFFFFF),
 
             inverseOnSurface = Color(0xFFF2F0F4),
             inverseSurface = Color(0xFF303034),

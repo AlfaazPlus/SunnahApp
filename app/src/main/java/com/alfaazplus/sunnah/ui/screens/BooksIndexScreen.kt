@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -50,6 +51,8 @@ import com.alfaazplus.sunnah.ui.theme.type
 import com.alfaazplus.sunnah.ui.utils.extension.bottomBorder
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
+import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
 
@@ -167,29 +170,22 @@ private fun ScreenContent(
 
                         Spacer(Modifier.height(12.dp))
 
-                        cwt
-                            ?.getTitle(translationLangCode)
-                            ?.let {
-                                Text(
-                                    text = it,
-                                    style = typography.titleSmall,
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
-
-                        cwt
-                            ?.getTitle("ar")
-                            ?.let {
-                                Text(
-                                    text = it,
-                                    style = typography.titleMedium
-                                        .merge(tightTextStyle)
-                                        .copy(
-                                            fontFamily = fontUthmani,
-                                        ),
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
+                        metadataLangCodes(translationLangCode).forEach { langCode ->
+                            cwt
+                                ?.getTitle(langCode)
+                                ?.let {
+                                    Text(
+                                        text = it,
+                                        style = textStyleForLang(langCode)
+                                            .merge(tightTextStyle)
+                                            .copy(
+                                                fontSize = typography.titleMedium.fontSize,
+                                                fontWeight = FontWeight.SemiBold,
+                                            ),
+                                        textAlign = TextAlign.Center,
+                                    )
+                                }
+                        }
 
                         Spacer(Modifier.height(12.dp))
 

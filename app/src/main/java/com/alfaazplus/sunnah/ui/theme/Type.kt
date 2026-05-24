@@ -48,6 +48,10 @@ val tightTextStyle = TextStyle(
     lineHeightStyle = LineHeightStyle.Default.copy(
         mode = LineHeightStyle.Mode.Tight,
         alignment = LineHeightStyle.Alignment.Center,
+        trim = LineHeightStyle.Trim.Both,
+    ),
+    platformStyle = PlatformTextStyle(
+        includeFontPadding = false,
     )
 )
 

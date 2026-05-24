@@ -15,19 +15,30 @@ import com.alfaazplus.sunnah.api.JsonHelper
 import com.alfaazplus.sunnah.db.dao.ScholarsDao
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.entities.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.v2.ChapterEntity
+import com.alfaazplus.sunnah.db.entities.v2.CollectionEntity
+import com.alfaazplus.sunnah.db.entities.v2.CollectionTranslationEntity
+import com.alfaazplus.sunnah.db.entities.v2.HadithBlock
+import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
+import com.alfaazplus.sunnah.db.entities.v2.HadithEntity
+import com.alfaazplus.sunnah.db.relations.BookWithHadithCount
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
+import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
 import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
-import com.alfaazplus.sunnah.db.entities.v2.HadithBlock
-import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchRow
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class HadithRepository(
@@ -37,55 +48,121 @@ class HadithRepository(
     val dao get() = database.hadithDao
     val importDao get() = database.importDao
 
-
     suspend fun isAnyCollectionDownloaded(): Boolean {
         return dao
             .getCollections()
             .isNotEmpty()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getAllCollectionsFlow(): Flow<List<CollectionWithTranslation>> {
-        return dao.getCollectionsFlow()
-    }
-
-    suspend fun getCollectionName(collectionId: String): String {
-        val collectionTranslations = dao.getCollectionById(collectionId)?.translations ?: emptyList()
-
-        val theC = sequenceOf("en", "ar").firstNotNullOfOrNull { langCode ->
-            collectionTranslations.firstOrNull { it.lang == langCode }
-        }
-
-        return theC?.title ?: ""
-    }
-
-    suspend fun loadBooks(collectionId: String): List<BookWithTranslation> {
-        val books = dao.getBooksForCollection(collectionId)
-
-        return books.map {
-            it.apply {
-
+        return ReaderPreferences
+            .hadithTranslationFlow()
+            .flatMapLatest { langCode ->
+                combine(
+                    dao.getCollectionsFlow(),
+                    dao.getCollectionTranslationsFlow(TranslationUtils.metadataLangCodes(langCode)),
+                ) { collections, translations ->
+                    collections.withCollectionTranslations(translations.groupBy { it.collectionId })
+                }
             }
-        }
     }
 
-    suspend fun loadSisterBooksFromBookId(bookId: String): List<BookWithTranslation> {
-        val collectionId = dao.getCollectionByBookId(bookId)?.collection?.id ?: return emptyList()
-        return dao.getBooksForCollection(collectionId)
+    suspend fun getCollectionName(collectionId: String, langCode: String): String {
+        return getCollectionById(collectionId, langCode)
+            ?.getTitle(langCode)
+            .orEmpty()
+    }
+
+    suspend fun getCollectionById(id: String, langCode: String): CollectionWithTranslation? {
+        return dao
+            .getCollectionById(id)
+            ?.withCollectionTranslations(langCode)
+    }
+
+    suspend fun getCollectionsByIds(collectionIds: List<String>, langCode: String): List<CollectionWithTranslation> {
+        if (collectionIds.isEmpty()) return emptyList()
+
+        return dao
+            .getCollectionsByIds(collectionIds)
+            .withCollectionTranslations(langCode)
+    }
+
+    suspend fun getCollectionByBookId(bookId: String, langCode: String): CollectionWithTranslation? {
+        return dao
+            .getCollectionByBookId(bookId)
+            ?.withCollectionTranslations(langCode)
+    }
+
+    suspend fun loadBooks(collectionId: String, langCode: String): List<BookWithTranslation> {
+        return dao
+            .getBooksForCollection(collectionId)
+            .withBookTranslations(langCode)
+    }
+
+    suspend fun getBookById(bookId: String, langCode: String): BookWithTranslation? {
+        return dao
+            .getBookById(bookId)
+            ?.withBookTranslations(langCode)
+    }
+
+    suspend fun getBooksByIds(bookIds: List<String>, langCode: String): List<BookWithTranslation> {
+        if (bookIds.isEmpty()) return emptyList()
+        return dao
+            .getBooksByIds(bookIds)
+            .withBookTranslations(langCode)
+    }
+
+    suspend fun loadSisterBooksFromBookId(bookId: String, langCode: String): List<BookWithTranslation> {
+        val collectionId = dao.getCollectionByBookId(bookId)?.id ?: return emptyList()
+        return loadBooks(collectionId, langCode)
     }
 
     // ─────────────────────────────────────────────────────────────────────────
 
-    suspend fun getHotd(id: String): HadithOfTheDay? {
-        val hwc = dao.getHadithById(id) ?: return null
+    suspend fun getHotd(id: String, langCode: String): HadithOfTheDay? {
+        val hwc = getHadithById(id, langCode) ?: return null
         return HadithOfTheDay(
             hwc = hwc,
-            collectionName = getCollectionName(hwc.hadith.collectionId),
+            collectionName = getCollectionName(hwc.hadith.collectionId, langCode),
         )
     }
 
     suspend fun getRandomSahihHadith(): HadithWithContents? {
         val hadithId = dao.getRandomSahihHadithId() ?: return null
-        return dao.getHadithById(hadithId)
+        val langCode = ReaderPreferences.getHadithTranslation()
+        return getHadithById(hadithId, langCode)
+    }
+
+    suspend fun getHadithById(id: String, langCode: String): HadithWithContents? {
+        return dao
+            .getHadithById(id)
+            ?.withContents(langCode)
+    }
+
+    suspend fun getHadithsByIds(ids: List<String>, langCode: String): List<HadithWithContents> {
+        if (ids.isEmpty()) return emptyList()
+
+        return dao
+            .getHadithsByIds(ids)
+            .withContents(langCode)
+    }
+
+    suspend fun getHadithsForBookPage(
+        bookId: String,
+        limit: Int,
+        offset: Int,
+        langCode: String,
+    ): List<HadithWithContents> {
+        return dao
+            .getHadithsForBookPage(bookId, limit, offset)
+            .withContents(langCode)
+    }
+
+    suspend fun getChaptersForBook(bookId: String, langCode: String): List<ChapterWithTranslation> {
+        return dao
+            .getChaptersForBook(bookId)
+            .withChapterTranslations(langCode)
     }
 
     suspend fun getNarratorsOfHadith(hadithId: String): List<Scholar> {
@@ -93,7 +170,9 @@ class HadithRepository(
 
         if (ids.isEmpty()) return emptyList()
 
-        val byId = scholarsDao.getScholars(ids).associateBy { it.id }
+        val byId = scholarsDao
+            .getScholars(ids)
+            .associateBy { it.id }
 
         return ids.mapNotNull { byId[it] }
     }
@@ -111,7 +190,7 @@ class HadithRepository(
         query: String,
         collectionIds: List<String>?,
         color: Color,
-        langCode: String = "en",
+        langCode: String,
     ): Flow<PagingData<HadithSearchResult>> {
         Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 
@@ -137,7 +216,7 @@ class HadithRepository(
     fun searchBooks(
         query: String,
         collectionIds: List<String>?,
-        langCode: String = "en",
+        langCode: String,
     ): Flow<PagingData<BooksSearchResult>> {
         Logger.d("Searching for books with query: $query", "CollectionIds: $collectionIds")
 
@@ -180,7 +259,7 @@ class HadithRepository(
 
     suspend fun getQuickHadithSearchResults(
         query: String,
-        langCode: String = "en",
+        langCode: String,
     ): List<HadithSearchQuickResult> {
         val parts = query.split(":")
 
@@ -198,7 +277,7 @@ class HadithRepository(
 
     suspend fun getQuickBookSearchResults(
         query: String,
-        langCode: String = "en",
+        langCode: String,
     ): List<BookSearchQuickResult> {
         val bookNumber = parseSearchNumber(query)?.first ?: return emptyList()
         return dao.searchQuickBooks(bookNumber, langCode)
@@ -271,9 +350,7 @@ class HadithRepository(
             .decodeFromString<List<HadithBlock>>(this)
             .asSequence()
             .filter {
-                it.type == HadithBlockType.MATN ||
-                    it.type == HadithBlockType.TRANSLATION ||
-                    it.type == HadithBlockType.NARRATOR
+                it.type == HadithBlockType.MATN || it.type == HadithBlockType.TRANSLATION || it.type == HadithBlockType.NARRATOR
             }
             .mapNotNull { it.text?.trim() }
             .filter { it.isNotEmpty() }
@@ -311,13 +388,123 @@ class HadithRepository(
             if (postContextEnd < length) append("…")
         }
     }
+
+    private suspend fun CollectionEntity.withCollectionTranslations(langCode: String): CollectionWithTranslation {
+        return listOf(this)
+            .withCollectionTranslations(langCode)
+            .first()
+    }
+
+    private suspend fun List<CollectionEntity>.withCollectionTranslations(langCode: String): List<CollectionWithTranslation> {
+        if (isEmpty()) return emptyList()
+
+        val translations = dao
+            .getCollectionTranslations(
+                collectionIds = map { it.id }.distinct(),
+                langCodes = TranslationUtils.metadataLangCodes(langCode),
+            )
+            .groupBy { it.collectionId }
+
+        return withCollectionTranslations(translations)
+    }
+
+    private fun List<CollectionEntity>.withCollectionTranslations(
+        translationsByCollectionId: Map<String, List<CollectionTranslationEntity>>,
+    ): List<CollectionWithTranslation> {
+        return map { collection ->
+            CollectionWithTranslation(
+                collection = collection,
+                translations = translationsByCollectionId[collection.id].orEmpty(),
+            )
+        }
+    }
+
+    private suspend fun BookWithHadithCount.withBookTranslations(langCode: String): BookWithTranslation {
+        return listOf(this)
+            .withBookTranslations(langCode)
+            .first()
+    }
+
+    private suspend fun List<BookWithHadithCount>.withBookTranslations(langCode: String): List<BookWithTranslation> {
+        if (isEmpty()) return emptyList()
+
+        val translations = dao
+            .getBookTranslations(
+                bookIds = map { it.book.id }.distinct(),
+                langCodes = TranslationUtils.metadataLangCodes(langCode),
+            )
+            .groupBy { it.bookId }
+
+        return map { item ->
+            BookWithTranslation(
+                book = item.book,
+                translations = translations[item.book.id].orEmpty(),
+                hadithCount = item.hadithCount,
+            )
+        }
+    }
+
+    private suspend fun HadithEntity.withContents(langCode: String): HadithWithContents {
+        return listOf(this)
+            .withContents(langCode)
+            .first()
+    }
+
+    private suspend fun List<HadithEntity>.withContents(langCode: String): List<HadithWithContents> {
+        if (isEmpty()) return emptyList()
+
+        val hadithIds = map { it.id }.distinct()
+        val contents = dao
+            .getHadithContents(
+                hadithIds = hadithIds,
+                langCodes = TranslationUtils.contentLangCodes(langCode),
+            )
+            .groupBy { it.hadithId }
+
+        val grades = dao
+            .getHadithGrades(
+                hadithIds = hadithIds,
+                langCodes = TranslationUtils.gradeLangCodes(langCode),
+            )
+            .groupBy { it.hadithId }
+
+        return map { hadith ->
+            HadithWithContents(
+                hadith = hadith,
+                contents = contents[hadith.id].orEmpty(),
+                grades = grades[hadith.id].orEmpty(),
+            )
+        }
+    }
+
+    private suspend fun List<ChapterEntity>.withChapterTranslations(langCode: String): List<ChapterWithTranslation> {
+        if (isEmpty()) return emptyList()
+
+        val translations = dao
+            .getChapterTranslations(
+                chapterIds = map { it.id }.distinct(),
+                langCodes = TranslationUtils.metadataLangCodes(langCode),
+            )
+            .groupBy { it.chapterId }
+
+        return map { chapter ->
+            ChapterWithTranslation(
+                chapter = chapter,
+                translations = translations[chapter.id].orEmpty(),
+            )
+        }
+    }
 }
 
 private fun parseSearchNumber(query: String): Pair<String, Int>? {
-    val cleaned = query.lowercase().replace("\\s+".toRegex(), "")
+    val cleaned = query
+        .lowercase()
+        .replace("\\s+".toRegex(), "")
     val match = Regex("(\\d+)([a-zA-Z]?)").find(cleaned) ?: return null
     val number = match.groupValues[1]
-    val suffix = match.groupValues.getOrNull(2)?.firstOrNull()
+    val suffix = match.groupValues
+        .getOrNull(2)
+        ?.firstOrNull()
     val numString = if (suffix != null) "$number$suffix" else number
     val numInt = number.toIntOrNull() ?: return null
     return numString to numInt

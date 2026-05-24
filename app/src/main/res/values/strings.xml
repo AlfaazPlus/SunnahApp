@@ -233,10 +233,12 @@
     <string name="book_section_notes">Notes</string>
     <string name="book_no_details">No additional information for this book.</string>
     <string name="deleteTranslation">Delete Translation?</string>
-    <string name="lang_arabic">Arabic</string>
-    <string name="lang_english">English</string>
-    <string name="lang_urdu">Urdu</string>
-    <string name="lang_bengali">Bengali</string>
-    <string name="lang_indonesian">Indonesian</string>
-    <string name="lang_french">French</string>
+
+    <string name="primaryCollections">Primary Collections</string>
+    <string name="selection">Selection</string>
+
+    <string name="noUrduTranslation">Urdu translation is not available for this item.</string>
+    <string name="noBanglaTranslation">Bengali translation is not available for this item.</string>
+    <string name="noFrenchTranslation">French translation is not available for this item.</string>
+    <string name="noIndonesianTranslation">Indonesian translation is not available for this item.</string>
 </resources>

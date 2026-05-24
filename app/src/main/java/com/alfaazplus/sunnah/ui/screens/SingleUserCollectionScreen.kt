@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +20,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -58,6 +62,7 @@ import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.formatDateTimeShort
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -113,7 +118,7 @@ fun SingleUserCollectionScreen(
                         Icon(
                             painter = painterResource(R.drawable.ic_delete),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
+                            tint = colorScheme.error,
                         )
                     }
 
@@ -195,7 +200,7 @@ private fun Content(
     val gradientColors = listOf(
         bgColor,
         bgColor,
-        MaterialTheme.colorScheme.background,
+        colorScheme.background,
     )
 
     Box(
@@ -218,8 +223,8 @@ private fun Content(
                     .fillMaxWidth()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = colorScheme.surface,
+                    contentColor = colorScheme.onSurface,
                 ),
             ) {
                 Icon(
@@ -253,7 +258,7 @@ private fun Content(
                     Text(
                         formatDateTimeShort(userCollection.updatedAt),
                         color = textColor,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = typography.labelMedium,
                         modifier = Modifier.alpha(0.8f),
                         fontStyle = FontStyle.Italic,
                     )
@@ -304,8 +309,8 @@ private fun CollectionItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
         onClick = { onClick(item) },
@@ -315,16 +320,13 @@ private fun CollectionItemCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        item.ui.visibleNumbering,
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-                Box(modifier = Modifier.weight(1f)) {}
+                NumberingCard(
+                    numbering = item.ui.numbering,
+                    translationId = item.ui.langCode,
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
                 IconButton(
                     modifier = Modifier
                         .padding(0.dp)
@@ -344,7 +346,7 @@ private fun CollectionItemCard(
             if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
                     text = item.ui.translationText!!,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = typography.bodyMedium,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -360,6 +362,23 @@ private fun CollectionItemCard(
 }
 
 @Composable
+fun NumberingCard(
+    numbering: String,
+    translationId: String,
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = colorScheme.background,
+    ) {
+        Text(
+            numbering,
+            modifier = Modifier.padding(10.dp),
+            style = typography.labelMedium.merge(tightTextStyle),
+        )
+    }
+}
+
+@Composable
 private fun CollectionItemMenu(
     item: UserCollectionItemNormalized,
     isOpen: Boolean,
@@ -369,7 +388,7 @@ private fun CollectionItemMenu(
     val scope = rememberCoroutineScope()
 
     BottomSheetMenu(
-        title = item.ui.visibleNumbering,
+        title = item.ui.numbering,
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Center,

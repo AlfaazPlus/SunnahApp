@@ -300,7 +300,6 @@ private fun rememberBookContentBlocks(
     getter: (String) -> String?,
 ): List<BookContentBlock> {
     val colors by rememberUpdatedState(colorScheme)
-    val type by rememberUpdatedState(typography)
     val actions = LocalHadithActions.current
 
     return remember(
@@ -308,7 +307,6 @@ private fun rememberBookContentBlocks(
         translationLangCode,
         textOption,
         colors,
-        type,
         actions,
         arabicSizePercent,
         translationSizePercent,
@@ -332,9 +330,7 @@ private fun rememberBookContentBlocks(
                         text = raw,
                         langCode = lang,
                         colors = colors,
-                        type = type,
-                        arabicSizePercent = arabicSizePercent,
-                        translationSizePercent = translationSizePercent,
+                        sizePercent = if (lang == "ar") arabicSizePercent else translationSizePercent,
                         isSerifFontStyle = isSerifFontStyle,
                         actions = actions,
                     ),

@@ -43,7 +43,7 @@ class ThemeRedColors : BaseColors() {
             onSurfaceVariant = Color(0xFF5A4745),
 
             surfaceContainerLow = Color(0xFFFFFFFF),
-            surfaceContainer = Color(0xFFFFF1EE),
+            surfaceContainer = Color(0xFFFFFFFF),
 
             inverseOnSurface = Color(0xFFFFF1EF),
             inverseSurface = Color(0xFF382E2C),

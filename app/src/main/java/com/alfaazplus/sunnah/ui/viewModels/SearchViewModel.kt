@@ -11,6 +11,7 @@ import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -45,9 +46,15 @@ open class SearchViewModel @Inject constructor(
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
-    ) { collectionIds, query -> Pair(collectionIds, query) }
-        .flatMapLatest { (collectionIds, query) ->
-            repo.searchHadiths(query, collectionIds?.takeIf { it.isNotEmpty() }, primaryColor)
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { collectionIds, query, langCode -> Triple(collectionIds, query, langCode) }
+        .flatMapLatest { (collectionIds, query, langCode) ->
+            repo.searchHadiths(
+                query,
+                collectionIds?.takeIf { it.isNotEmpty() },
+                primaryColor,
+                langCode,
+            )
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -62,9 +69,10 @@ open class SearchViewModel @Inject constructor(
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
-    ) { collectionIds, query -> Pair(collectionIds, query) }
-        .flatMapLatest { (collectionIds, query) ->
-            repo.searchBooks(query, collectionIds?.takeIf { it.isNotEmpty() })
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { collectionIds, query, langCode -> Triple(collectionIds, query, langCode) }
+        .flatMapLatest { (collectionIds, query, langCode) ->
+            repo.searchBooks(query, collectionIds?.takeIf { it.isNotEmpty() }, langCode)
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -86,11 +94,14 @@ open class SearchViewModel @Inject constructor(
             initialValue = PagingData.empty(),
         )
 
-    val quickHadithResults: StateFlow<List<HadithSearchQuickResult>> = _searchQuery
-        .debounce(300)
-        .distinctUntilChanged()
-        .mapLatest { query ->
-            repo.getQuickHadithSearchResults(query)
+    val quickHadithResults: StateFlow<List<HadithSearchQuickResult>> = combine(
+        _searchQuery
+            .debounce(300)
+            .distinctUntilChanged(),
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { query, langCode -> query to langCode }
+        .mapLatest { (query, langCode) ->
+            repo.getQuickHadithSearchResults(query, langCode)
         }
         .stateIn(
             viewModelScope,
@@ -98,11 +109,14 @@ open class SearchViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    val quickBookResults: StateFlow<List<BookSearchQuickResult>> = _searchQuery
-        .debounce(300)
-        .distinctUntilChanged()
-        .mapLatest { query ->
-            repo.getQuickBookSearchResults(query)
+    val quickBookResults: StateFlow<List<BookSearchQuickResult>> = combine(
+        _searchQuery
+            .debounce(300)
+            .distinctUntilChanged(),
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { query, langCode -> query to langCode }
+        .mapLatest { (query, langCode) ->
+            repo.getQuickBookSearchResults(query, langCode)
         }
         .stateIn(
             viewModelScope,
