@@ -102,17 +102,18 @@ message HadithNarratorRow {
 message CorpusBundle {
     int32 schema_version = 1;
     string corpus_id = 2;
-    repeated CollectionRow collections = 3;
-    repeated CollectionTranslationRow collection_translations = 4;
-    repeated BookRow books = 5;
-    repeated BookTranslationRow book_translations = 6;
-    repeated ChapterRow chapters = 7;
-    repeated ChapterTranslationRow chapter_translations = 8;
-    repeated HadithRow hadiths = 9;
-    repeated HadithContentRow hadith_contents = 10;
-    repeated HadithReferenceRow hadith_references = 11;
+    int32 content_version = 3;
+    repeated CollectionRow collections = 4;
+    repeated CollectionTranslationRow collection_translations = 5;
+    repeated BookRow books = 6;
+    repeated BookTranslationRow book_translations = 7;
+    repeated ChapterRow chapters = 8;
+    repeated ChapterTranslationRow chapter_translations = 9;
+    repeated HadithRow hadiths = 10;
+    repeated HadithContentRow hadith_contents = 11;
+    repeated HadithReferenceRow hadith_references = 12;
     // Edges may point out of this bundle; see `HadithRelatedRow`.
-    repeated HadithRelatedRow hadith_related = 12;
-    repeated HadithGradeRow hadith_grades = 13;
-    repeated HadithNarratorRow hadith_narrators = 14;
+    repeated HadithRelatedRow hadith_related = 13;
+    repeated HadithGradeRow hadith_grades = 14;
+    repeated HadithNarratorRow hadith_narrators = 15;
 }

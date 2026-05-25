@@ -9,7 +9,7 @@ import com.alfaazplus.sunnah.api.DownloadSourceUtils
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extended.ExceptionHandler
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
-import com.alfaazplus.sunnah.ui.utils.refreshAppLocale
+import com.alfaazplus.sunnah.ui.utils.app.refreshAppLocale
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File

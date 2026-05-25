@@ -8,7 +8,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.utils.appLocale
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadithTranslation
 import kotlinx.coroutines.runBlocking

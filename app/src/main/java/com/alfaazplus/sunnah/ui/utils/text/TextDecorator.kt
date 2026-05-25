@@ -15,7 +15,7 @@ import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.theme.fontUrdu
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.StringUtils
-import com.alfaazplus.sunnah.ui.utils.isUrduLanguageCode
+import com.alfaazplus.sunnah.ui.utils.app.isUrduLanguageCode
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 

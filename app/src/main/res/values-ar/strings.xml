@@ -278,6 +278,8 @@
     <string name="book_no_details">لا توجد معلومات إضافية لهذا الكتاب.</string>
 
     <string name="deleteTranslation">حذف الترجمة؟</string>
+    <string name="updateAvailable">تحديث متاح</string>
+    <string name="msgTranslationUpdateAvailable">يتوفر إصدار أحدث من ترجمتك.</string>
 
     <string name="primaryCollections">المجموعات الأساسية</string>
     <string name="selection">مجموعات مختارة</string>
@@ -366,4 +368,11 @@
 
     <string name="hadith_grade_shadh_maqtu">شاذ مقطوع</string>
     <string name="hadith_grade_shadh_maqtu_desc">أثر شاذ عن تابعي</string>
+
+    <string name="msgUpdateAvailable">تحديث متاح! يرجى تحديث التطبيق للحصول على أحدث الميزات.</string>
+    <string name="msgUpdateAvailable4Dialog">تحديث متاح!
+\nيرجى تحديث التطبيق.</string>
+    <string name="msgUpdateAvailable2Continue">مطلوب التحديث!
+\nيرجى تحديث التطبيق للإستمرار.</string>
+
 </resources>

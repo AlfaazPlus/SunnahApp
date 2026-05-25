@@ -290,6 +290,8 @@
     <string name="book_no_details">اس کتاب کے لیے مزید معلومات موجود نہیں۔</string>
 
     <string name="deleteTranslation">ترجمہ حذف کریں؟</string>
+    <string name="updateAvailable">اپ ڈیٹ دستیاب ہے</string>
+    <string name="msgTranslationUpdateAvailable">آپ کے ترجمے کا نیا ورژن دستیاب ہے۔</string>
 
     <string name="primaryCollections">بنیادی مجموعے</string>
     <string name="selection">منتخب مجموعے</string>
@@ -378,4 +380,10 @@
 
     <string name="hadith_grade_shadh_maqtu">شاذ مقطوع</string>
     <string name="hadith_grade_shadh_maqtu_desc">تابعی سے مروی شاذ اثر</string>
+
+    <string name="msgUpdateAvailable">اپ ڈیٹ دستیاب ہے! تازہ ترین خصوصیات حاصل کرنے کے لیے براہ کرم ایپ کو اپ ڈیٹ کریں۔</string>
+    <string name="msgUpdateAvailable4Dialog">اپ ڈیٹ دستیاب ہے!
+\nبراہ کرم ایپ کو اپ ڈیٹ کریں۔</string>
+    <string name="msgUpdateAvailable2Continue">اپ ڈیٹ کی ضرورت ہے!
+\nجاری رکھنے کے لیے براہ کرم ایپ کو اپ ڈیٹ کریں۔</string>
 </resources>

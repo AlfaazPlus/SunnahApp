@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.utils.LocalAppLocale
-import com.alfaazplus.sunnah.ui.utils.NumeralSystem
-import com.alfaazplus.sunnah.ui.utils.appLocaleForLanguageChange
-import com.alfaazplus.sunnah.ui.utils.normalizedLanguageTag
-import com.alfaazplus.sunnah.ui.utils.setAppLocale
+import com.alfaazplus.sunnah.ui.utils.app.LocalAppLocale
+import com.alfaazplus.sunnah.ui.utils.app.NumeralSystem
+import com.alfaazplus.sunnah.ui.utils.app.appLocaleForLanguageChange
+import com.alfaazplus.sunnah.ui.utils.app.normalizedLanguageTag
+import com.alfaazplus.sunnah.ui.utils.app.setAppLocale
 import com.alfaazplus.sunnah.ui.utils.shared_preference.SPAppConfigs
 import java.util.Locale
 

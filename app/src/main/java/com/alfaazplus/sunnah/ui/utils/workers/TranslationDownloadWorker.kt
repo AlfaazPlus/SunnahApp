@@ -20,11 +20,12 @@ import com.alfaazplus.sunnah.deliverable.v1.CorpusBundle
 import com.alfaazplus.sunnah.helpers.insertCorpusImportPayload
 import com.alfaazplus.sunnah.helpers.toImportPayloadOrNull
 import com.alfaazplus.sunnah.ui.activities.MainActivity
-import com.alfaazplus.sunnah.ui.utils.extension.isGzip
+import com.alfaazplus.sunnah.ui.utils.isGzip
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.createForegroundInfoFallback
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationManager
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -68,7 +69,7 @@ class TranslationDownloadWorker @AssistedInject constructor(
     private suspend fun downloadAndStore(
         translationId: String,
     ) = withContext(Dispatchers.IO) {
-        val tmpFile = File(ctx.filesDir, "translation_$translationId.tmp")
+        val tmpFile = TranslationManager.getTempDownloadFile(ctx, translationId)
         val url = "ghraw://AlfaazPlus/SunnahAppInventory/master/translations/$translationId.pb.gz"
 
         try {
@@ -89,6 +90,12 @@ class TranslationDownloadWorker @AssistedInject constructor(
                 database.importDao.deleteTranslationData(translationId)
                 database.insertCorpusImportPayload(payload)
             }
+
+            TranslationManager.saveResourceVersion(
+                context = ctx,
+                id = translationId,
+                version = bundle.contentVersion
+            )
         } finally {
             if (tmpFile.exists()) {
                 tmpFile.delete()

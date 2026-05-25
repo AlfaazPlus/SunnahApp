@@ -2,8 +2,8 @@
 
 package com.alfaazplus.sunnah.ui.utils.reader
 
-import com.alfaazplus.sunnah.ui.utils.AppLocale
-import com.alfaazplus.sunnah.ui.utils.appLocaleFlow
+import com.alfaazplus.sunnah.ui.utils.app.AppLocale
+import com.alfaazplus.sunnah.ui.utils.app.appLocaleFlow
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import kotlinx.coroutines.flow.Flow

@@ -5,9 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.ui.utils.app.ResourceUpdateManager
+import com.alfaazplus.sunnah.ui.utils.app.ResourceUpdateState
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.managers.TranslationDownloadManager
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationManager
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.AVAILABLE_TRANSLATIONS
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.DEFAULT_TRANSLATION
@@ -22,6 +25,7 @@ data class TranslationUiModel(
     val id: String,
     val title: String,
     val isDownloaded: Boolean,
+    val hasUpdate: Boolean,
 )
 
 
@@ -46,8 +50,18 @@ class TranslationDownloadViewModel @Inject constructor(
         TranslationDownloadManager.initialize(context)
         observeSelection()
         observeDownloads()
+
         viewModelScope.launch {
             refreshRows()
+            ResourceUpdateManager.checkAndPerformUpdates()
+        }
+
+        viewModelScope.launch {
+            ResourceUpdateManager.updateState.collect { state ->
+                if (state == ResourceUpdateState.COMPLETED || state == ResourceUpdateState.IDLE) {
+                    refreshRows()
+                }
+            }
         }
     }
 
@@ -92,13 +106,21 @@ class TranslationDownloadViewModel @Inject constructor(
             .getDownloadedTranslations(languages.map { it.langCode })
             .toSet()
 
+        val resourceVersions = ResourceUpdateManager.getLocalVersions()
+
         val items = languages.map { translation ->
-            val isDownloaded = downloadedCodes.contains(translation.langCode)
+            val id = translation.langCode
+            val isDownloaded = downloadedCodes.contains(id)
+            val hasUpdate =
+                isDownloaded && !TranslationUtils.isBuiltInTranslation(id) && resourceVersions != null && TranslationManager.isUpdateAvailable(
+                    context, id, resourceVersions
+                )
 
             TranslationUiModel(
-                id = translation.langCode,
+                id = id,
                 title = translation.label,
                 isDownloaded = isDownloaded,
+                hasUpdate = hasUpdate,
             )
         }
 

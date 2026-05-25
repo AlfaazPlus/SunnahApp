@@ -27,6 +27,8 @@ import com.alfaazplus.sunnah.ui.components.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.HadithCollectionList
+import com.alfaazplus.sunnah.ui.components.homepage.AppUpdateBanner
+import com.alfaazplus.sunnah.ui.components.homepage.TranslationUpdateBanner
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 
 @Composable
@@ -70,13 +72,16 @@ fun HomeScreen() {
                     }
                 },
             )
-        }) {
+        },
+    ) {
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(it)
                 .verticalScroll(rememberScrollState())
         ) {
+            AppUpdateBanner()
+            TranslationUpdateBanner()
             HadithOfTheDay()
             HadithCollectionList(
                 onCollectionClick = { collectionId ->

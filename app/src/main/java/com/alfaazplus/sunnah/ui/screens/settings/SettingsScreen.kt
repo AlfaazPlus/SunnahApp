@@ -46,7 +46,7 @@ import com.alfaazplus.sunnah.ui.components.settings.ResourceDownloadSrcSheet
 import com.alfaazplus.sunnah.ui.components.settings.SettingsItem
 import com.alfaazplus.sunnah.ui.components.settings.TextSizeSheet
 import com.alfaazplus.sunnah.ui.helpers.NavigationHelper
-import com.alfaazplus.sunnah.ui.utils.AppUtils
+import com.alfaazplus.sunnah.ui.utils.app.AppUtils
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.keys.Routes

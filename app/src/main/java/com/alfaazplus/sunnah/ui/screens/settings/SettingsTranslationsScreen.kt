@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,7 +36,7 @@ import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
-import com.alfaazplus.sunnah.ui.utils.LocalAppLocale
+import com.alfaazplus.sunnah.ui.utils.app.LocalAppLocale
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.viewModels.TranslationDownloadUiState
@@ -73,10 +72,9 @@ fun SettingsTranslationsScreen(
                 val status = downloadStates[row.id] ?: ResourceDownloadStatus.Idle
 
                 ItemRow(
-                    row, status, downloadVm, uiState, isAnyDownloading
-                ) {
-                    deleteDialogData = row
-                }
+                    row, status, downloadVm, uiState, isAnyDownloading,
+                    onDeleteRequest = { deleteDialogData = row },
+                )
             }
         }
     }
@@ -172,6 +170,7 @@ private fun ItemRow(
                     )
 
                     downloadStatus is ResourceDownloadStatus.Started -> stringResource(R.string.downloading)
+                    row.hasUpdate -> stringResource(R.string.updateAvailable)
                     isDownloaded -> stringResource(R.string.downloaded)
                     else -> null
                 }
@@ -181,8 +180,11 @@ private fun ItemRow(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (downloadStatus is ResourceDownloadStatus.Failed) colorScheme.error
-                    else colorScheme.onSurfaceVariant,
+                    color = when {
+                        downloadStatus is ResourceDownloadStatus.Failed -> colorScheme.error
+                        row.hasUpdate -> colorScheme.primary
+                        else -> colorScheme.onSurfaceVariant
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -229,13 +231,24 @@ private fun ItemRow(
                         enabled = !isAnyDownloading,
                         onClick = onDownloadOrUpdate,
                     )
-                } else if (!TranslationUtils.isBuiltInTranslation(row.id)) {
-                    AppIconButton(
-                        painter = painterResource(R.drawable.ic_delete),
-                        enabled = !isAnyDownloading,
-                        tint = colorScheme.error,
-                        onClick = onDeleteRequest
-                    )
+                } else {
+                    if (row.hasUpdate) {
+                        AppIconButton(
+                            painter = painterResource(R.drawable.ic_download),
+                            enabled = !isAnyDownloading,
+                            contentDescription = stringResource(R.string.update),
+                            onClick = onDownloadOrUpdate,
+                        )
+                    }
+
+                    if (!TranslationUtils.isBuiltInTranslation(row.id)) {
+                        AppIconButton(
+                            painter = painterResource(R.drawable.ic_delete),
+                            enabled = !isAnyDownloading,
+                            tint = colorScheme.error,
+                            onClick = onDeleteRequest
+                        )
+                    }
                 }
             }
         }

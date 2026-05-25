@@ -233,6 +233,8 @@
     <string name="book_section_notes">Notes</string>
     <string name="book_no_details">No additional information for this book.</string>
     <string name="deleteTranslation">Delete Translation?</string>
+    <string name="updateAvailable">Update available</string>
+    <string name="msgTranslationUpdateAvailable">A newer version of your translation is available.</string>
 
     <string name="primaryCollections">Primary Collections</string>
     <string name="selection">Selection</string>
@@ -321,4 +323,8 @@
 
     <string name="hadith_grade_shadh_maqtu">Shadh Maqtu\'</string>
     <string name="hadith_grade_shadh_maqtu_desc">Irregular narration from a Tabi‘i</string>
+
+    <string name="msgUpdateAvailable">UPDATE AVAILABLE! Please update the app to get the latest features.</string>
+    <string name="msgUpdateAvailable4Dialog">UPDATE AVAILABLE!\nPlease update the app.</string>
+    <string name="msgUpdateAvailable2Continue">UPDATE REQUIRED!\nPlease update the app to continue.</string>
 </resources>
