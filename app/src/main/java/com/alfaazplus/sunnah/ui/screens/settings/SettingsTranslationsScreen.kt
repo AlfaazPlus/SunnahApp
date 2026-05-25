@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -116,8 +119,10 @@ private fun ItemRow(
     onDeleteRequest: () -> Unit,
 ) {
     val platformLocale = LocalAppLocale.current.platformLocale
+    val isComingSoon = row.isComingSoon
     val isDownloaded = row.isDownloaded
     val isSelected = row.id == uiState.selectedTranslation
+    val isEnabled = !isComingSoon && isDownloaded
 
     val onSelect = {
         downloadVm.selectLanguage(row.id)
@@ -130,8 +135,9 @@ private fun ItemRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(isDownloaded) {
-                if (isDownloaded) onSelect()
+            .alpha(if (isComingSoon) 0.6f else 1f)
+            .clickable(isEnabled) {
+                if (isEnabled) onSelect()
             }
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -139,9 +145,9 @@ private fun ItemRow(
         RadioButton(
             selected = isSelected,
             onClick = {
-                if (isDownloaded) onSelect()
+                if (isEnabled) onSelect()
             },
-            enabled = isDownloaded,
+            enabled = isEnabled,
             colors = RadioButtonDefaults.colors(
                 selectedColor = colorScheme.primary
             ),
@@ -163,8 +169,9 @@ private fun ItemRow(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            val subtitle = if (!TranslationUtils.isBuiltInTranslation(row.id)) {
-                when {
+            val subtitle = when {
+                isComingSoon -> null
+                !TranslationUtils.isBuiltInTranslation(row.id) -> when {
                     downloadStatus is ResourceDownloadStatus.InProgress -> String.format(
                         platformLocale, $$"%1$s %2$d%%", stringResource(R.string.downloading), downloadStatus.progress
                     )
@@ -174,24 +181,24 @@ private fun ItemRow(
                     isDownloaded -> stringResource(R.string.downloaded)
                     else -> null
                 }
-            } else null
+
+                else -> null
+            }
 
             if (subtitle != null) {
                 Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = when {
+                    text = subtitle, style = MaterialTheme.typography.bodySmall, color = when {
                         downloadStatus is ResourceDownloadStatus.Failed -> colorScheme.error
                         row.hasUpdate -> colorScheme.primary
                         else -> colorScheme.onSurfaceVariant
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    }, maxLines = 1, overflow = TextOverflow.Ellipsis
                 )
             }
         }
 
-        when (downloadStatus) {
+        if (isComingSoon) {
+            ComingSoonBadge()
+        } else if (!TranslationUtils.isBuiltInTranslation(row.id)) when (downloadStatus) {
             is ResourceDownloadStatus.InProgress -> {
                 Box(
                     modifier = Modifier.size(48.dp),
@@ -241,16 +248,29 @@ private fun ItemRow(
                         )
                     }
 
-                    if (!TranslationUtils.isBuiltInTranslation(row.id)) {
-                        AppIconButton(
-                            painter = painterResource(R.drawable.ic_delete),
-                            enabled = !isAnyDownloading,
-                            tint = colorScheme.error,
-                            onClick = onDeleteRequest
-                        )
-                    }
+                    AppIconButton(
+                        painter = painterResource(R.drawable.ic_delete),
+                        enabled = !isAnyDownloading,
+                        tint = colorScheme.error,
+                        onClick = onDeleteRequest
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ComingSoonBadge() {
+    Surface(
+        shape = shapes.small,
+        color = colorScheme.secondaryContainer,
+    ) {
+        Text(
+            text = stringResource(R.string.comingSoon),
+            style = MaterialTheme.typography.labelSmall,
+            color = colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+        )
     }
 }

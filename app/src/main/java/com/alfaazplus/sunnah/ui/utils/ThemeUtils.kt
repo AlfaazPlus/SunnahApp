@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.utils
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,15 +20,19 @@ import com.alfaazplus.sunnah.ui.theme.colors.ThemePurpleColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeRedColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeVioletColors
 import com.alfaazplus.sunnah.ui.theme.colors.ThemeYellowColors
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils.observeDarkTheme
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import com.alfaazplus.sunnah.ui.utils.shared_preference.PrefKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 object ThemeUtils {
-    const val THEME_DEFAULT = "default"
-    const val THEME_LIGHT = "light"
-    const val THEME_DARK = "dark"
+    const val THEME_MODE_DEFAULT = "default"
+    const val THEME_MODE_LIGHT = "light"
+    const val THEME_MODE_DARK = "dark"
 
-    private val KEY_THEME_MODE = PrefKey(stringPreferencesKey("theme_mode"), THEME_DEFAULT)
+    private val KEY_THEME_MODE = PrefKey(stringPreferencesKey("theme_mode"), THEME_MODE_DEFAULT)
     private val KEY_THEME_COLOR = PrefKey(stringPreferencesKey("theme_color"), THEME_COLOR_DEFAULT)
     private val KEY_THEME_DYNAMIC_COLOR = PrefKey(booleanPreferencesKey("theme_dynamic_color"), DEFAULT_DYNAMIC_COLOR)
 
@@ -47,8 +52,8 @@ object ThemeUtils {
 
     fun resolveThemeModeLabel(themeMode: String): Int {
         return when (themeMode) {
-            THEME_LIGHT -> R.string.light
-            THEME_DARK -> R.string.dark
+            THEME_MODE_LIGHT -> R.string.light
+            THEME_MODE_DARK -> R.string.dark
             else -> R.string.system_default
         }
     }
@@ -58,8 +63,8 @@ object ThemeUtils {
         val themeMode = observeThemeMode()
 
         return when (themeMode) {
-            THEME_LIGHT -> false
-            THEME_DARK -> true
+            THEME_MODE_LIGHT -> false
+            THEME_MODE_DARK -> true
             else -> isSystemInDarkTheme()
         }
     }
@@ -99,10 +104,39 @@ object ThemeUtils {
     fun observeColorScheme(context: Context, isDarkTheme: Boolean = observeDarkTheme()): ColorScheme {
         val themeColor = observeThemeColor()
         val isDynamicColor = observeIsDynamicColor()
+        return buildColorScheme(context, isDarkTheme, themeColor, isDynamicColor)
+    }
 
+    fun colorSchemeFromPreferences(context: Context, isDark: Boolean? = null): ColorScheme {
+        return buildColorScheme(
+            context,
+            isDark ?: isDarkTheme(context),
+            DataStoreManager.read(KEY_THEME_COLOR),
+            DataStoreManager.read(KEY_THEME_DYNAMIC_COLOR),
+        )
+    }
+
+    fun widgetAppearancePreferencesFlow(): Flow<Triple<String, String, Boolean>> {
+        return combine(
+            DataStoreManager.flow(KEY_THEME_MODE),
+            DataStoreManager.flow(KEY_THEME_COLOR),
+            DataStoreManager.flow(KEY_THEME_DYNAMIC_COLOR),
+        ) { mode, color, dynamicColor ->
+            Triple(mode, color, dynamicColor)
+        }.distinctUntilChanged()
+    }
+
+    private fun buildColorScheme(
+        context: Context,
+        isDarkTheme: Boolean,
+        themeColor: String,
+        isDynamicColor: Boolean,
+    ): ColorScheme {
         // Dynamic color is available on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isDynamicColor) {
-            return if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            return if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                context,
+            )
         }
 
         val preferredColor: BaseColors = when (themeColor) {
@@ -118,11 +152,25 @@ object ThemeUtils {
         return if (isDarkTheme) preferredColor.darkColors() else preferredColor.lightColors()
     }
 
+    /**
+     * Dark/light resolution aligned with [observeDarkTheme] (theme mode + system night).
+     */
+    fun isDarkTheme(context: Context): Boolean {
+        return when (getThemeMode()) {
+            THEME_MODE_LIGHT -> false
+            THEME_MODE_DARK -> true
+            else -> {
+                val uiMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                uiMode == Configuration.UI_MODE_NIGHT_YES
+            }
+        }
+    }
+
 
     fun resolveThemeModeForDelegate(themeMode: String? = null): Int {
         return when (themeMode ?: getThemeMode()) {
-            THEME_DARK -> AppCompatDelegate.MODE_NIGHT_YES
-            THEME_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+            THEME_MODE_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            THEME_MODE_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
     }

@@ -31,12 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
@@ -145,7 +145,7 @@ fun ReadingHistoryScreen(
             AppBar(
                 title = stringResource(R.string.reading_history),
                 actions = {
-                    if (readHistory.isNotEmpty()) {
+                    if (!readHistory.isNullOrEmpty()) {
                         IconButton(
                             onClick = {
                                 showDeleteAllAlert = true
@@ -160,10 +160,19 @@ fun ReadingHistoryScreen(
             )
         },
     ) { paddingValues ->
-        Content(
-            paddingValues = paddingValues,
-            readHistory,
-        )
+        if (readHistory == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else {
+            Content(
+                paddingValues = paddingValues,
+                readHistory!!,
+            )
+        }
     }
 
     AlertDialog(

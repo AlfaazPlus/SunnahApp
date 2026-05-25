@@ -58,6 +58,7 @@ import com.alfaazplus.sunnah.ui.models.AppLogModel
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.browseLink
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
+import com.alfaazplus.sunnah.ui.utils.readFileText
 import com.alfaazplus.sunnah.ui.utils.formatted
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.toDate
@@ -185,7 +186,7 @@ private fun SuppressedLogs() {
                 .map { logFile ->
                     val (datetimeStr, location) = logFile.nameWithoutExtension.split("@")
 
-                    val logText = logFile.readText()
+                    val logText = logFile.readFileText()
                     val logShort = if (logText.length > 200) logText.substring(0, 200) + "... ${logText.length - 200} more chars"
                     else logText
 
@@ -267,7 +268,7 @@ private fun CrashLogs() {
             logs = files
                 .sortedByDescending { it.lastModified() }
                 .map { logFile ->
-                    val logText = logFile.readText()
+                    val logText = logFile.readFileText()
                     val logShort = if (logText.length > 200) logText.substring(0, 200) + "... ${logText.length - 200} more chars"
                     else logText
 

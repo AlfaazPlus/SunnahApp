@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -58,6 +59,7 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
@@ -76,7 +78,8 @@ import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 fun LibraryScreen(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val userCollections by viewModel.userCollections.collectAsState()
+    val uCollections by viewModel.userCollections.collectAsState()
+    val userCollections = uCollections
     var showCreateCollectionSheet by remember { mutableStateOf(false) }
     val navController = LocalNavHostController.current
 
@@ -92,21 +95,27 @@ fun LibraryScreen(
                 showNavigationIcon = false,
             )
         },
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(160.dp),
+    ) { paddingValues ->
+        BoxWithConstraints(
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 20.dp,
-                bottom = 150.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            val collectionColumnCount = maxOf(
+                1,
+                ((maxWidth + 16.dp) / (160.dp + 16.dp)).toInt(),
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(160.dp),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = 20.dp,
+                    bottom = 150.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 SectionTitle(
                     iconRes = R.drawable.ic_history,
@@ -146,7 +155,7 @@ fun LibraryScreen(
                     iconRes = R.drawable.ic_library,
                     title = stringResource(R.string.collections),
                     headerRightContent = {
-                        if (userCollections.isNotEmpty()) {
+                        if (!userCollections.isNullOrEmpty()) {
                             SectionHeaderActionButton(
                                 icon = R.drawable.ic_add,
                                 text = stringResource(R.string.label_new),
@@ -156,23 +165,43 @@ fun LibraryScreen(
                 )
             }
 
-            if (userCollections.isEmpty()) {
+            if (userCollections == null) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        modifier = Modifier.padding(36.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Loader()
+                    }
+                }
+            } else if (userCollections.isEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     CollectionsEmptyState(
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         onCreateCollection = { showCreateCollectionSheet = true },
                     )
                 }
             } else {
-                items(
+                itemsIndexed(
                     items = userCollections,
-                    key = { it.id },
-                ) { collection ->
-                    UserCollectionCard(collection) {
-                        navController.navigate(
-                            Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
-                        )
+                    key = { _, collection -> collection.id },
+                ) { index, collection ->
+                    val column = index % collectionColumnCount
+
+                    Box(
+                        modifier = Modifier.padding(
+                            start = if (column == 0) 16.dp else 0.dp,
+                            end = if (column == collectionColumnCount - 1) 16.dp else 0.dp,
+                        ),
+                    ) {
+                        UserCollectionCard(collection) {
+                            navController.navigate(
+                                Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
+                            )
+                        }
                     }
                 }
+            }
             }
         }
     }
@@ -182,18 +211,27 @@ fun LibraryScreen(
 private fun SectionReadHistory(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val readHistory by viewModel.recentReadHistory.collectAsState()
     val navController = LocalNavHostController.current
 
-    if (readHistory.isEmpty()) {
+    val _readHistory by viewModel.recentReadHistory.collectAsState()
+    val readHistory = _readHistory
+
+    if (readHistory == null) {
+        Box(
+            modifier = Modifier.padding(36.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Loader()
+        }
+    } else if (readHistory.isEmpty()) {
         SectionEmptyMessage(
             message = stringResource(R.string.no_reading_history),
-            horizontalPadding = 0.dp,
         )
     } else {
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
             items(
                 readHistory.size, key = { readHistory[it].item.hadithId }) { index ->
@@ -261,22 +299,31 @@ private fun ReadHistoryItemCard(
 private fun SectionBookmarks(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val userBookmarks by viewModel.recentUserBookmarks.collectAsState()
+    val _userBookmarks by viewModel.recentUserBookmarks.collectAsState()
     var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
 
     BookmarkViewerSheet(bookmarkViewerData) {
         bookmarkViewerData = null
     }
 
-    if (userBookmarks.isEmpty()) {
+    val userBookmarks = _userBookmarks
+
+    if (userBookmarks == null) {
+        Box(
+            modifier = Modifier.padding(36.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Loader()
+        }
+    } else if (userBookmarks.isEmpty()) {
         SectionEmptyMessage(
             message = stringResource(R.string.no_bookmarks),
-            horizontalPadding = 0.dp,
         )
     } else {
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
             items(userBookmarks.size) { index ->
                 val bookmark = userBookmarks[index]
@@ -429,10 +476,11 @@ fun UserCollectionCard(collection: UserCollection, onClick: (UserCollection) -> 
 
 @Composable
 fun CollectionsEmptyState(
+    modifier: Modifier = Modifier,
     onCreateCollection: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .border(1.dp, colorScheme.outlineVariant.alpha(0.6f), shapes.medium)
             .padding(20.dp)
             .fillMaxWidth(),
@@ -469,7 +517,7 @@ private fun SectionTitle(
     headerRightContent: (@Composable () -> Unit)?,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {

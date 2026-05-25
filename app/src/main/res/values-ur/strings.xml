@@ -291,6 +291,7 @@
 
     <string name="deleteTranslation">ترجمہ حذف کریں؟</string>
     <string name="updateAvailable">اپ ڈیٹ دستیاب ہے</string>
+    <string name="comingSoon">جلد آرہا ہے</string>
     <string name="msgTranslationUpdateAvailable">آپ کے ترجمے کا نیا ورژن دستیاب ہے۔</string>
 
     <string name="primaryCollections">بنیادی مجموعے</string>

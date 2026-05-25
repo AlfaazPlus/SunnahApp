@@ -20,6 +20,7 @@ import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
+import com.alfaazplus.sunnah.ui.utils.readFileText
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.utils.shared_preference.SPLog
 import com.alfaazplus.sunnah.ui.utils.shared_preference.SPLog.getLastCrashLogFilename
@@ -45,7 +46,7 @@ fun LastCrashReportDialog() {
         }
 
         try {
-            val logText = withContext(Dispatchers.IO) { logFile.readText() }
+            val logText = withContext(Dispatchers.IO) { logFile.readFileText() }
 
             if (logText.isNotBlank()) {
                 crashLog = logText

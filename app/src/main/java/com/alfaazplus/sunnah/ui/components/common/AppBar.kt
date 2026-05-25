@@ -34,8 +34,8 @@ import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 fun AppBar(
     title: String? = null,
     titleContent: (@Composable () -> Unit)? = null,
-    bgColor: Color = colorScheme.surfaceContainer,
-    color: Color = colorScheme.onSurface,
+    containerColor: Color = colorScheme.surfaceContainer,
+    contentColor: Color = colorScheme.onSurface,
     searchQuery: String = "",
     onSearchQueryChange: ((String) -> Unit)? = null,
     searchPlaceholder: String? = null,
@@ -64,11 +64,11 @@ fun AppBar(
     TopAppBar(
         modifier = Modifier.shadow(shadowElevation),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = bgColor,
-            scrolledContainerColor = bgColor,
-            navigationIconContentColor = color,
-            titleContentColor = color,
-            actionIconContentColor = color,
+            containerColor = containerColor,
+            scrolledContainerColor = containerColor,
+            navigationIconContentColor = contentColor,
+            titleContentColor = contentColor,
+            actionIconContentColor = contentColor,
         ),
         title = {
             if (searchEnabled && searchExpanded) {

@@ -16,6 +16,8 @@ import com.alfaazplus.sunnah.api.RetrofitInstance
 import com.alfaazplus.sunnah.api.models.AppUpdate
 import com.alfaazplus.sunnah.ui.utils.createFile
 import com.alfaazplus.sunnah.ui.utils.getOtherDirectory
+import com.alfaazplus.sunnah.ui.utils.readFileText
+import com.alfaazplus.sunnah.ui.utils.writeFileText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +72,7 @@ class UpdateManager private constructor(private val ctx: Context) {
                 val updatesFile = getAppUpdatesFile()
 
                 if (updatesFile.createFile()) {
-                    updatesFile.writeText(updatesString)
+                    updatesFile.writeFileText(updatesString)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -107,7 +109,7 @@ class UpdateManager private constructor(private val ctx: Context) {
             val file = getAppUpdatesFile()
 
             if (file.exists()) {
-                JsonHelper.json.decodeFromString(file.readText())
+                JsonHelper.json.decodeFromString(file.readFileText())
             } else {
                 emptyList()
             }

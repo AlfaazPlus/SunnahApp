@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
@@ -64,6 +65,7 @@ import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.formatDateTimeShort
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
@@ -82,7 +84,6 @@ fun SingleUserCollectionScreen(
     var showUpdateCollectionSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val view = LocalView.current
     val navController = LocalNavHostController.current
 
     val scope = rememberCoroutineScope()
@@ -91,30 +92,38 @@ fun SingleUserCollectionScreen(
         .observeUserCollectionById(userCollectionId)
         .collectAsState(null)
 
-    val userCollection = uCollection ?: return
+    val bgColor = remember(uCollection?.color) {
+        uCollection?.color?.let { Color(it.toColorInt()) } ?: Color.DarkGray
+    }
 
-    val bgColor = userCollection.color?.let { Color(it.toColorInt()) } ?: Color.DarkGray
-    val textColor = if (bgColor.luminance() < 0.6f) Color.White else Color.Black
+    val isDarkHeader = bgColor.luminance() < 0.5f
+    val textColor = if (isDarkHeader) Color.White else Color.Black
+    val isDarkTheme = ThemeUtils.observeDarkTheme()
 
-    DisposableEffect(textColor) {
-        val isDarkBg = textColor == Color.White
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        DisposableEffect(isDarkTheme, isDarkHeader) {
+            val window = (view.context as Activity).window
+            val controller = WindowCompat.getInsetsController(window, view)
 
-        val insetsController = WindowCompat.getInsetsController((view.context as Activity).window, view)
-        val orgLightStatusBar = insetsController.isAppearanceLightStatusBars
+            controller.isAppearanceLightNavigationBars = !isDarkHeader
+            controller.isAppearanceLightStatusBars = !isDarkHeader
 
-        insetsController.isAppearanceLightStatusBars = !isDarkBg
-
-        onDispose {
-            insetsController.isAppearanceLightStatusBars = orgLightStatusBar
+            onDispose {
+                controller.isAppearanceLightNavigationBars = isDarkTheme
+                controller.isAppearanceLightStatusBars = isDarkTheme
+            }
         }
     }
+
+    val userCollection = uCollection ?: return
 
     Scaffold(
         topBar = {
             AppBar(
                 title = userCollection.name,
-                bgColor = bgColor,
-                color = textColor,
+                containerColor = bgColor,
+                contentColor = textColor,
                 actions = {
                     IconButton(onClick = { showDeleteAlert = true }) {
                         Icon(

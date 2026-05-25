@@ -46,7 +46,7 @@ class UserDataViewModel @Inject constructor(
     private val ctx get() = application.applicationContext
     private val bookmarkCache = mutableMapOf<String, StateFlow<Boolean>>()
 
-    val allReadHistory: StateFlow<List<ReadHistoryNormalized>> = repo.dao
+    val allReadHistory: StateFlow<List<ReadHistoryNormalized>?> = repo.dao
         .observeReadHistory()
         .distinctUntilChanged()
         .map {
@@ -55,10 +55,10 @@ class UserDataViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = null,
         )
 
-    val recentReadHistory: StateFlow<List<ReadHistoryNormalized>> = repo.dao
+    val recentReadHistory: StateFlow<List<ReadHistoryNormalized>?> = repo.dao
         .observeRecentReadHistory()
         .distinctUntilChanged()
         .map {
@@ -67,10 +67,10 @@ class UserDataViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = null,
         )
 
-    val userCollections: StateFlow<List<UserCollection>> = repo.dao
+    val userCollections: StateFlow<List<UserCollection>?> = repo.dao
         .observeUserCollections()
         .distinctUntilChanged()
         .map {
@@ -79,10 +79,10 @@ class UserDataViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = null,
         )
 
-    val allUserBookmarks: StateFlow<List<UserBookmarkNormalized>> = repo.dao
+    val allUserBookmarks: StateFlow<List<UserBookmarkNormalized>?> = repo.dao
         .observeUserBookmarks()
         .distinctUntilChanged()
         .map {
@@ -91,10 +91,10 @@ class UserDataViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = null,
         )
 
-    val recentUserBookmarks: StateFlow<List<UserBookmarkNormalized>> = repo.dao
+    val recentUserBookmarks: StateFlow<List<UserBookmarkNormalized>?> = repo.dao
         .observeRecentUserBookmarks()
         .distinctUntilChanged()
         .map {
@@ -103,7 +103,7 @@ class UserDataViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = null,
         )
 
     private val _collectionItems = MutableStateFlow<List<UserCollectionItemNormalized>>(emptyList())

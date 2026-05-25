@@ -3,13 +3,14 @@ package com.alfaazplus.sunnah.ui.utils
 import com.alfaazplus.sunnah.SunnahApp
 import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
 import java.util.StringJoiner
-import kotlin.io.path.Path
+import kotlin.text.Charsets
 
 
-val APP_DOWNLOADED_DATA_DIR: String = Path("downloaded", "saved_data").toString()
+val APP_DOWNLOADED_DATA_DIR: String = createPath("downloaded", "saved_data")
 const val APP_LOG_DATA_DIR = "logs"
-val APP_OTHER_DIR: String = Path(APP_DOWNLOADED_DATA_DIR, "other").toString()
+val APP_OTHER_DIR: String = createPath(APP_DOWNLOADED_DATA_DIR, "other")
 
 fun createPath(vararg subPaths: String): String {
     val joiner = StringJoiner(File.separator)
@@ -35,6 +36,13 @@ fun makeAndGetAppResourceDir(dirName: String): File? {
 
 fun getOtherDirectory(): File? {
     return makeAndGetAppResourceDir(APP_OTHER_DIR)
+}
+
+fun File.readFileText(charset: Charset = Charsets.UTF_8): String =
+    inputStream().bufferedReader(charset).use { it.readText() }
+
+fun File.writeFileText(text: String, charset: Charset = Charsets.UTF_8) {
+    outputStream().bufferedWriter(charset).use { it.write(text) }
 }
 
 fun File.createFile(): Boolean {

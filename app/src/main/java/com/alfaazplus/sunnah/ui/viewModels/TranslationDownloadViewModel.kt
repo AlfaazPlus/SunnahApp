@@ -26,6 +26,7 @@ data class TranslationUiModel(
     val title: String,
     val isDownloaded: Boolean,
     val hasUpdate: Boolean,
+    val isComingSoon: Boolean = false,
 )
 
 
@@ -121,6 +122,7 @@ class TranslationDownloadViewModel @Inject constructor(
                 title = translation.label,
                 isDownloaded = isDownloaded,
                 hasUpdate = hasUpdate,
+                isComingSoon = translation.isComingSoon,
             )
         }
 
@@ -134,7 +136,7 @@ class TranslationDownloadViewModel @Inject constructor(
 
     fun selectLanguage(id: String) {
         val selectedRow = _uiState.value.rows.firstOrNull { it.id == id } ?: return
-        if (!selectedRow.isDownloaded) return
+        if (selectedRow.isComingSoon || !selectedRow.isDownloaded) return
 
         viewModelScope.launch {
             ReaderPreferences.setHadithTranslation(id)
@@ -142,7 +144,9 @@ class TranslationDownloadViewModel @Inject constructor(
     }
 
     fun startDownload(id: String) {
-        val id = _uiState.value.rows.firstOrNull { it.id == id }?.id ?: return
+        val row = _uiState.value.rows.firstOrNull { it.id == id } ?: return
+        if (row.isComingSoon) return
+        val id = row.id
 
         TranslationDownloadManager.startDownload(context, id)
 

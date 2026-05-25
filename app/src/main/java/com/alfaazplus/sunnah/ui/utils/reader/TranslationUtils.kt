@@ -13,12 +13,12 @@ import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadit
 import kotlinx.coroutines.runBlocking
 
 
-enum class HadithTranslation(val langCode: String, val label: String) {
+enum class HadithTranslation(val langCode: String, val label: String, val isComingSoon: Boolean = false) {
     ENGLISH("en", "English"),
-    URDU("ur", "اردو");
-//    BENGALI("bn", "বাংলা"),
-//    INDONESIAN("id", "Bahasa Indonesia"),
-//    FRENCH("fr", "française");
+    URDU("ur", "اردو"),
+    BENGALI("bn", "বাংলা", true),
+    INDONESIAN("id", "Bahasa Indonesia", true),
+    FRENCH("fr", "Française", true);
 
     companion object {
         fun fromLangCode(langCode: String): HadithTranslation {

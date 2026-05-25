@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.screens.main.CollectionsEmptyState
 import com.alfaazplus.sunnah.ui.screens.main.UserCollectionCard
 import com.alfaazplus.sunnah.ui.theme.alpha
@@ -111,7 +112,8 @@ private fun Content(
         onClose = { showCreateCollectionSheet = false },
     )
 
-    val userCollections by viewModel.userCollections.collectAsState()
+    val _userCollections by viewModel.userCollections.collectAsState()
+    val userCollections = _userCollections
 
     var initialCollectionIds by remember { mutableStateOf(setOf<Long>()) }
     var selectedCollectionIds by remember { mutableStateOf(setOf<Long>()) }
@@ -146,7 +148,14 @@ private fun Content(
             color = MaterialTheme.colorScheme.primary,
         )
 
-        if (userCollections.isEmpty()) {
+        if (userCollections == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else if (userCollections.isEmpty()) {
             CollectionsEmptyState(
                 onCreateCollection = { showCreateCollectionSheet = true },
             )

@@ -279,6 +279,7 @@
 
     <string name="deleteTranslation">حذف الترجمة؟</string>
     <string name="updateAvailable">تحديث متاح</string>
+    <string name="comingSoon">قريبًا</string>
     <string name="msgTranslationUpdateAvailable">يتوفر إصدار أحدث من ترجمتك.</string>
 
     <string name="primaryCollections">المجموعات الأساسية</string>

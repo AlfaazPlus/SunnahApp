@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
@@ -70,7 +71,7 @@ fun BookmarksScreen(
             AppBar(
                 title = stringResource(R.string.bookmarks),
                 actions = {
-                    if (userBookmarks.isNotEmpty()) {
+                    if (!userBookmarks.isNullOrEmpty()) {
                         IconButton(
                             onClick = {
                                 showDeleteAllAlert = true
@@ -85,10 +86,19 @@ fun BookmarksScreen(
             )
         },
     ) { paddingValues ->
-        Content(
-            paddingValues = paddingValues,
-            userBookmarks,
-        )
+        if (userBookmarks == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else {
+            Content(
+                paddingValues = paddingValues,
+                userBookmarks!!,
+            )
+        }
     }
 
     AlertDialog(

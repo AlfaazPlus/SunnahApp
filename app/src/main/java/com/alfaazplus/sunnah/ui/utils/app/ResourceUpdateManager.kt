@@ -6,6 +6,8 @@ import com.alfaazplus.sunnah.api.RetrofitInstance
 import com.alfaazplus.sunnah.api.models.ResourcesVersions
 import com.alfaazplus.sunnah.ui.utils.createFile
 import com.alfaazplus.sunnah.ui.utils.getOtherDirectory
+import com.alfaazplus.sunnah.ui.utils.readFileText
+import com.alfaazplus.sunnah.ui.utils.writeFileText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +32,7 @@ object ResourceUpdateManager {
         if (!file.exists() || file.length() == 0L) return null
 
         return try {
-            JsonHelper.json.decodeFromString<ResourcesVersions>(file.readText())
+            JsonHelper.json.decodeFromString<ResourcesVersions>(file.readFileText())
         } catch (e: Exception) {
             Logger.saveError(e, "ResourceUpdateManager.getLocalVersions")
             null
@@ -91,7 +93,7 @@ object ResourceUpdateManager {
             val file = getResourcesVersionsFile()
 
             if (file.createFile()) {
-                file.writeText(JsonHelper.json.encodeToString(versions))
+                file.writeFileText(JsonHelper.json.encodeToString(versions))
             }
         } catch (e: Exception) {
             Logger.saveError(e, "ResourceUpdateManager.saveLocalVersions")

@@ -1,11 +1,13 @@
 package com.alfaazplus.sunnah.ui.components.hadith
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -20,6 +22,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,18 +54,25 @@ fun HadithCollectionList(
         }
     }
 
+    val decorationTint = colorScheme.primary
+
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 150.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         grouped.forEach { (type, items) ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                HorizontalDivider(
-                    Modifier.weight(1f),
+                Image(
+                    painterResource(R.drawable.vector_1),
+                    contentDescription = null,
+                    modifier = Modifier.height(24.dp),
+                    colorFilter = ColorFilter.tint(decorationTint)
                 )
 
                 Text(
@@ -70,12 +82,17 @@ fun HadithCollectionList(
                     },
                     style = typography.titleSmall,
                     color = colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 16.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    textAlign = TextAlign.Center
                 )
 
-                HorizontalDivider(
-                    Modifier.weight(1f),
+                Image(
+                    painterResource(R.drawable.vector_1),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(24.dp)
+                        .scale(-1f, 1f),
+                    colorFilter = ColorFilter.tint(decorationTint)
                 )
             }
 
@@ -108,7 +125,7 @@ private fun RowScope.HadithCollectionItem(
         modifier = Modifier.weight(1f),
         color = colorScheme.surfaceContainerLow,
         shape = shapes.medium,
-        border = BorderStroke(1.dp, colorScheme.outline.alpha(0.15f)),
+        border = BorderStroke(1.dp, colorScheme.primary.alpha(0.15f)),
         onClick = onClick,
     ) {
         Column(

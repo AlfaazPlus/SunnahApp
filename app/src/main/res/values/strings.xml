@@ -234,6 +234,7 @@
     <string name="book_no_details">No additional information for this book.</string>
     <string name="deleteTranslation">Delete Translation?</string>
     <string name="updateAvailable">Update available</string>
+    <string name="comingSoon">Coming soon</string>
     <string name="msgTranslationUpdateAvailable">A newer version of your translation is available.</string>
 
     <string name="primaryCollections">Primary Collections</string>

@@ -129,7 +129,7 @@ dependencies {
     implementation(libs.compose.livedata)
     implementation(libs.compose.material3.windowSizeClass)
     implementation(libs.compose.material3.adaptive)
-    implementation(libs.activity.compose)
+    implementation(libs.androidx.activityCompose)
     implementation(libs.ui.graphics)
     implementation(libs.material3)
     implementation(libs.google.fonts)
@@ -161,7 +161,6 @@ dependencies {
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
-    implementation(libs.commons.compress)
     implementation(libs.workManager)
     implementation(libs.dataStore)
     implementation(libs.hiltWork)
