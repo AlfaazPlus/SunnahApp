@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -143,10 +144,10 @@ private fun QuickReferenceContent(
     }
 
     val resolvedTitle = when {
-        !data.title.isNullOrEmpty() -> data.title
+        !data.title.isNullOrEmpty() -> AnnotatedString(data.title)
         items.size == 1 -> items.first().visibleNumbering
-        items.size > 1 -> stringResource(R.string.quick_reference_n_hadiths, items.size)
-        else -> ""
+        items.size > 1 -> AnnotatedString(stringResource(R.string.quick_reference_n_hadiths, items.size))
+        else -> AnnotatedString("")
     }
 
     Column(
@@ -223,7 +224,7 @@ private fun QuickReferenceContent(
 
 @Composable
 private fun QuickReferenceHeader(
-    title: String,
+    title: AnnotatedString,
     showOpen: Boolean,
     onOpen: () -> Unit,
     onClose: () -> Unit,

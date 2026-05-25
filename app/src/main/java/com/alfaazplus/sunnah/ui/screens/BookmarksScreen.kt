@@ -56,126 +56,6 @@ import kotlinx.coroutines.withContext
 
 
 @Composable
-private fun BookmarkItemCard(
-    bookmark: UserBookmarkNormalized,
-    onClick: (UserBookmarkNormalized) -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-        border = CardDefaults.outlinedCardBorder(),
-        onClick = { onClick(bookmark) },
-    ) {
-        Column {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Row {
-                    NumberingCard(
-                        numbering = bookmark.ui.numbering,
-                        translationId = bookmark.ui.langCode,
-                    )
-                }
-
-                if (!bookmark.ui.translationText.isNullOrEmpty()) {
-                    Text(
-                        text = bookmark.ui.translationText,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = if (bookmark.item.remark.isNotBlank()) 5 else 8,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-
-            }
-
-            if (bookmark.item.remark.isNotBlank()) {
-                HorizontalDivider()
-
-                Text(
-                    text = buildAnnotatedString {
-                        appendInlineContent("user_note", "[icon]")
-                        append(" ")
-                        append(bookmark.item.remark)
-                    },
-                    inlineContent = mapOf(
-                        "user_note" to InlineTextContent(
-                            Placeholder(
-                                width = 16.sp,
-                                height = 16.sp,
-                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
-                            )
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.pencil_line),
-                                contentDescription = null,
-                                tint = Color.Gray,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        },
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun Content(
-    paddingValues: PaddingValues,
-    userBookmarks: List<UserBookmarkNormalized>,
-) {
-    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
-
-    BookmarkViewerSheet(bookmarkViewerData) {
-        bookmarkViewerData = null
-    }
-
-    if (userBookmarks.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(R.string.no_bookmarks),
-            )
-        }
-
-        return
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 300.dp),
-        contentPadding = paddingValues,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        items(userBookmarks.size) { index ->
-            BookmarkItemCard(
-                bookmark = userBookmarks[index],
-                onClick = {
-                    bookmarkViewerData = BookmarkViewerData(
-                        hadithId = it.item.hadithId,
-                        openInReader = true,
-                    )
-                },
-            )
-        }
-    }
-}
-
-@Composable
 fun BookmarksScreen(
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
@@ -241,4 +121,121 @@ fun BookmarksScreen(
             )
         },
     )
+}
+
+@Composable
+private fun Content(
+    paddingValues: PaddingValues,
+    userBookmarks: List<UserBookmarkNormalized>,
+) {
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
+
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
+
+    if (userBookmarks.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.no_bookmarks),
+            )
+        }
+
+        return
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 300.dp),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+    ) {
+        items(userBookmarks.size) { index ->
+            BookmarkItemCard(
+                bookmark = userBookmarks[index],
+                onClick = {
+                    bookmarkViewerData = BookmarkViewerData(
+                        hadithId = it.item.hadithId,
+                        openInReader = true,
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun BookmarkItemCard(
+    bookmark: UserBookmarkNormalized,
+    onClick: (UserBookmarkNormalized) -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        border = CardDefaults.outlinedCardBorder(),
+        onClick = { onClick(bookmark) },
+    ) {
+        Column {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    NumberingCard(
+                        numbering = bookmark.ui.numbering,
+                    )
+                }
+
+                if (!bookmark.ui.translationText.isNullOrEmpty()) {
+                    Text(
+                        text = bookmark.ui.translationText,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+
+            }
+
+            if (bookmark.item.remark.isNotBlank()) {
+                HorizontalDivider()
+
+                Text(
+                    text = buildAnnotatedString {
+                        appendInlineContent("user_note", "[icon]")
+                        append(" ")
+                        append(bookmark.item.remark)
+                    },
+                    inlineContent = mapOf(
+                        "user_note" to InlineTextContent(
+                            Placeholder(
+                                width = 16.sp,
+                                height = 16.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.pencil_line),
+                                contentDescription = null,
+                                tint = Color.Gray,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+        }
+    }
 }

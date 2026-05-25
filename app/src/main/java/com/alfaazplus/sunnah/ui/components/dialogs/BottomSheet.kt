@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.components.dialogs
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +27,7 @@ fun BottomSheet(
     onDismiss: () -> Unit,
     icon: Int? = null,
     title: String? = null,
+    titleStyle: TextStyle? = null,
     headerArrangement: Arrangement.Horizontal = Arrangement.Center,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     content: @Composable ColumnScope.() -> Unit,
@@ -59,7 +60,7 @@ fun BottomSheet(
                 if (title != null) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleMedium.merge(titleStyle),
                     )
                 }
             }

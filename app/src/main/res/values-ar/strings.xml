@@ -286,4 +286,84 @@
     <string name="noBanglaTranslation">ترجمة البنغالية غير متوفرة لهذا الحديث حالياً.</string>
     <string name="noFrenchTranslation">ترجمة الفرنسية غير متوفرة لهذا الحديث حالياً.</string>
     <string name="noIndonesianTranslation">ترجمة الإندونيسية غير متوفرة لهذا الحديث حالياً.</string>
+
+    <string name="hadith_grade_label_format">الحكم: %s</string>
+
+    <string name="hadith_grade_sahih">صحيح</string>
+    <string name="hadith_grade_sahih_desc">حديث صحيح</string>
+
+    <string name="hadith_grade_sahih_maqtu">صحيح مقطوع</string>
+    <string name="hadith_grade_sahih_maqtu_desc">أثر صحيح عن تابعي</string>
+
+    <string name="hadith_grade_sahih_marfu">صحيح مرفوع</string>
+    <string name="hadith_grade_sahih_marfu_desc">رواية مرفوعة صحيحة إلى النبي ﷺ</string>
+
+    <string name="hadith_grade_sahih_mauquf">صحيح موقوف</string>
+    <string name="hadith_grade_sahih_mauquf_desc">رواية صحيحة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">صحيح موقوف حكمًا مرفوع</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">رواية موقوفة لها حكم الرفع</string>
+
+    <string name="hadith_grade_sahih_mutawatir">صحيح متواتر</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">حديث صحيح متواتر</string>
+
+    <string name="hadith_grade_hasan">حسن</string>
+    <string name="hadith_grade_hasan_desc">حديث حسن</string>
+
+    <string name="hadith_grade_hasan_sahih">حسن صحيح</string>
+    <string name="hadith_grade_hasan_sahih_desc">حديث بين الحسن والصحيح</string>
+
+    <string name="hadith_grade_hasan_maqtu">حسن مقطوع</string>
+    <string name="hadith_grade_hasan_maqtu_desc">أثر حسن عن تابعي</string>
+
+    <string name="hadith_grade_hasan_mauquf">حسن موقوف</string>
+    <string name="hadith_grade_hasan_mauquf_desc">رواية حسنة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">حسن لغيره</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">حديث ضعيف تقوّى بالشواهد والمتابعات</string>
+
+    <string name="hadith_grade_daif">ضعيف</string>
+    <string name="hadith_grade_daif_desc">حديث ضعيف</string>
+
+    <string name="hadith_grade_daif_jiddan">ضعيف جدًا</string>
+    <string name="hadith_grade_daif_jiddan_desc">حديث شديد الضعف</string>
+
+    <string name="hadith_grade_daif_maqtu">ضعيف مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_desc">أثر ضعيف عن تابعي</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">ضعيف منكر مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">أثر منكر وضعيف عن تابعي</string>
+
+    <string name="hadith_grade_daif_marfu">ضعيف مرفوع</string>
+    <string name="hadith_grade_daif_marfu_desc">رواية مرفوعة ضعيفة إلى النبي ﷺ</string>
+
+    <string name="hadith_grade_daif_mauquf">ضعيف موقوف</string>
+    <string name="hadith_grade_daif_mauquf_desc">رواية ضعيفة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_daif_munkar">ضعيف منكر</string>
+    <string name="hadith_grade_daif_munkar_desc">رواية منكرة ضعيفة</string>
+
+    <string name="hadith_grade_daif_mursal">ضعيف مرسل</string>
+    <string name="hadith_grade_daif_mursal_desc">رواية مرسلة ضعيفة</string>
+
+    <string name="hadith_grade_maqtu">مقطوع</string>
+    <string name="hadith_grade_maqtu_desc">أثر عن تابعي</string>
+
+    <string name="hadith_grade_mauquf">موقوف</string>
+    <string name="hadith_grade_mauquf_desc">رواية موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_munkar">منكر</string>
+    <string name="hadith_grade_munkar_desc">رواية منكرة</string>
+
+    <string name="hadith_grade_mawdu">موضوع</string>
+    <string name="hadith_grade_mawdu_desc">حديث مكذوب مختلق</string>
+
+    <string name="hadith_grade_shadh">شاذ</string>
+    <string name="hadith_grade_shadh_desc">رواية شاذة</string>
+
+    <string name="hadith_grade_shadh_anha">شاذ عنه</string>
+    <string name="hadith_grade_shadh_anha_desc">نوع من الروايات الشاذة</string>
+
+    <string name="hadith_grade_shadh_maqtu">شاذ مقطوع</string>
+    <string name="hadith_grade_shadh_maqtu_desc">أثر شاذ عن تابعي</string>
 </resources>

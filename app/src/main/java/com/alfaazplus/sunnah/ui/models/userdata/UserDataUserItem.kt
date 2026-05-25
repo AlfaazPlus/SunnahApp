@@ -8,7 +8,7 @@ import com.alfaazplus.sunnah.db.relations.HadithWithContents
 
 data class UserDataUserItem(
     val hwc: HadithWithContents?,
-    val numbering: String,
+    val numbering: AnnotatedString,
     val bookTitle: String,
     val langCode: String,
     val translationText: AnnotatedString?,

@@ -7,7 +7,27 @@ object StringUtils {
     const val VERTICAL_BAR: String = "│"
     const val HYPHEN: String = "—"
     const val RTL_MARK: String = "\u200F"
+    private const val LTR_ISOLATE_START = "\u2066"
+    private const val LTR_ISOLATE_END = "\u2069"
     const val ELLIPSIS: String = "…"
+
+    /**
+     * Formats a collection name and hadith number for display, applying bidi isolates
+     * so mixed RTL labels and LTR references (e.g. "1551a") render in reading order.
+     */
+    fun formatCollectionNumbering(
+        collectionName: String?,
+        number: String?,
+        langCode: String?,
+    ): String {
+        val resolvedName = collectionName ?: "?"
+        val resolvedNumber = number ?: "?"
+        return if (isRtlLanguage(langCode)) {
+            "$resolvedName : $LTR_ISOLATE_START$resolvedNumber$LTR_ISOLATE_END"
+        } else {
+            "$resolvedName: $resolvedNumber"
+        }
+    }
 
 
     /**

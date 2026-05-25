@@ -14,6 +14,8 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.models.HadithChapterUi
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
+import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.text.ArabicTextStyleParams
 import com.alfaazplus.sunnah.ui.utils.text.TextBuilderParams
@@ -22,7 +24,7 @@ import com.alfaazplus.sunnah.ui.utils.text.buildHadithAnnotatedString
 import com.alfaazplus.sunnah.ui.utils.text.getArabicTextStyle
 import com.alfaazplus.sunnah.ui.utils.text.getTranslationTextStyle
 import com.alfaazplus.sunnah.ui.utils.text.parseHadithText
-import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
+import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -130,7 +132,11 @@ object ReaderItemsBuilder {
                     hwc = hwc,
                     params = params,
                     chapterUi = buildChapter(chapter, params),
-                    numbering = "$collectionName: ${hwc.hadith.number}",
+                    numbering = buildNumbering(
+                        collectionName = collectionName,
+                        hwc.hadith.number,
+                        params.translationId,
+                    ),
                     showDivider = true,
                     hasNarratorsChain = hwc.hadithId in hadithIdsWithNarrators,
                 )
@@ -177,7 +183,11 @@ object ReaderItemsBuilder {
                     hwc = hwc,
                     params = params,
                     chapterUi = null,
-                    numbering = "$collectionName: ${hwc.hadith.number}",
+                    numbering = buildNumbering(
+                        collectionName = collectionName,
+                        hwc.hadith.number,
+                        params.translationId,
+                    ),
                     showDivider = true,
                 )
             }
@@ -188,17 +198,17 @@ object ReaderItemsBuilder {
         hwc: HadithWithContents,
         params: TextBuilderParams,
         chapterUi: HadithChapterUi?,
-        numbering: String,
+        numbering: AnnotatedString,
         showDivider: Boolean,
         hasNarratorsChain: Boolean? = null,
     ): ReaderLayoutItem.HadithUI {
         val resolvedHasNarratorsChain = hasNarratorsChain ?: (repo.dao.countNarratorsForHadith(hwc.hadithId) > 0)
 
         val gradeText = hwc.grades
-            .firstOrNull { it.lang == "en" } // for grades, use English source
-            ?.let(HadithHelper::getHadithGradeText) ?: hwc.grades
+            .firstOrNull { it.lang == params.translationId }
+            ?.let { HadithHelper.getHadithGradeText(params.uiConfig.context, it) } ?: hwc.grades
             .firstOrNull()
-            ?.let(HadithHelper::getHadithGradeText)
+            ?.let { HadithHelper.getHadithGradeText(params.uiConfig.context, it) }
 
         return ReaderLayoutItem.HadithUI(
             hwc = hwc,
@@ -211,6 +221,30 @@ object ReaderItemsBuilder {
             showDivider = showDivider,
             key = "hadith-${hwc.hadith.id}",
         )
+    }
+
+    fun buildNumbering(
+        collectionName: String?,
+        number: String?,
+        langCode: String,
+    ): AnnotatedString {
+        return buildAnnotatedString {
+            withStyle(
+                tightTextStyle
+                    .merge(
+                        textDirection = textDirectionForLang(langCode)
+                    )
+                    .toParagraphStyle()
+            ) {
+                append(
+                    StringUtils.formatCollectionNumbering(
+                        collectionName,
+                        number,
+                        langCode,
+                    )
+                )
+            }
+        }
     }
 
     private fun buildChapter(chapter: ChapterWithTranslation?, params: TextBuilderParams): HadithChapterUi? {
@@ -348,8 +382,9 @@ object ReaderItemsBuilder {
     private fun parseTranslation(hwc: HadithWithContents, params: TextBuilderParams): AnnotatedString? {
         if (params.hadithTextOption == HadithTextOption.ONLY_ARABIC) return null
 
-        val content = hwc.contents.firstOrNull { it.lang == params.translationId } ?: return TranslationUtils
-            .getNoTranslationMessage(params.uiConfig.context, params.translationId)
+        val content = hwc.contents.firstOrNull { it.lang == params.translationId } ?: return TranslationUtils.getNoTranslationMessage(
+            params.uiConfig.context, params.translationId
+        )
 
         val blocks = content.blocks
 

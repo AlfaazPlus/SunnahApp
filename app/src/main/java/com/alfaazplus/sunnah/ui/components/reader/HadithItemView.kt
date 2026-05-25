@@ -414,7 +414,7 @@ private fun HadithGrade(hadithUi: ReaderLayoutItem.HadithUI) {
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
-            "Grade: ${gradeText.label}",
+            gradeText.label,
             style = MaterialTheme.typography.labelMedium.merge(tightTextStyle),
             color = gradeText.colors.first,
         )

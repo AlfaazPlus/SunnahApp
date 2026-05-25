@@ -70,7 +70,8 @@
     <string name="light">لائٹ</string>
     <string name="dark">ڈارک</string>
     <string name="system_default">سسٹم کے مطابق</string>
-    <string name="theme_dark_description">ڈارک تھیم آنکھوں کے لیے آرام دہ ہے اور بیٹری کم استعمال کرتی ہے</string>
+    <string name="theme_dark_description">ڈارک تھیم آنکھوں کے لیے آرام دہ ہے اور بیٹری کم استعمال
+        کرتی ہے</string>
     <string name="theme_default_description">سسٹم سیٹنگ کے مطابق خودکار تبدیلی</string>
     <string name="dynamic_color">ڈائنامک کلر</string>
     <string name="dynamic_color_description">وال پیپر کے مطابق تھیم رنگ تبدیل کریں</string>
@@ -81,10 +82,13 @@
     <string name="rate_app">ایپ کو ریٹ کریں</string>
     <string name="share_app">ایپ شیئر کریں</string>
 
-    <string name="share_app_msg">SunnahApp ایک مفت اور اوپن سورس ایپ ہے جس کے ذریعے آپ نبی ﷺ کی سنت پڑھ اور دریافت کر سکتے ہیں۔ اس میں خوبصورت اور آسان انٹرفیس کے ساتھ ترجمہ، ایڈوانس سرچ، یاد دہانی اور بہت سے مفید فیچرز شامل ہیں۔ \n\nابھی ڈاؤن لوڈ کریں:\n%s</string>
+    <string name="share_app_msg">SunnahApp ایک مفت اور اوپن سورس ایپ ہے جس کے ذریعے آپ نبی ﷺ کی سنت
+        پڑھ اور دریافت کر سکتے ہیں۔ اس میں خوبصورت اور آسان انٹرفیس کے ساتھ ترجمہ، ایڈوانس سرچ، یاد
+        دہانی اور بہت سے مفید فیچرز شامل ہیں۔ \n\nابھی ڈاؤن لوڈ کریں:\n%s</string>
 
     <string name="install_quranapp">QuranApp انسٹال کریں</string>
-    <string name="install_quranapp_description">ترجمہ، لفظی معنی، تلاوت اور مزید خصوصیات کے ساتھ قرآن پڑھیں۔ QuranApp مفت، محفوظ اور اوپن سورس ہے</string>
+    <string name="install_quranapp_description">ترجمہ، لفظی معنی، تلاوت اور مزید خصوصیات کے ساتھ
+        قرآن پڑھیں۔ QuranApp مفت، محفوظ اور اوپن سورس ہے</string>
     <string name="install_quranapp_description_short">مفت، محفوظ اور اوپن سورس</string>
 
     <string name="install_from_google_play">Google Play سے انسٹال کریں</string>
@@ -93,7 +97,8 @@
     <string name="donate">تعاون کریں</string>
 
     <string name="hadith_layout">حدیث لے آؤٹ</string>
-    <string name="hadith_layout_description">افقی — احادیث دائیں اور بائیں اسکرول ہوں گی۔\nعمودی — احادیث اوپر اور نیچے اسکرول ہوں گی۔</string>
+    <string name="hadith_layout_description">افقی — احادیث دائیں اور بائیں اسکرول ہوں گی۔\nعمودی —
+        احادیث اوپر اور نیچے اسکرول ہوں گی۔</string>
 
     <string name="horizontal">افقی</string>
     <string name="vertical">عمودی</string>
@@ -168,19 +173,23 @@
     <string name="no_collections">ابھی تک کوئی کلیکشن نہیں بنایا گیا۔</string>
 
     <string name="no_collection_items">
-اس کلیکشن میں کوئی حدیث موجود نہیں۔ آپ اپنی پسندیدہ احادیث کو آسان رسائی کے لیے کلیکشنز میں محفوظ کر سکتے ہیں۔
-</string>
+        اس کلیکشن میں کوئی حدیث موجود نہیں۔ آپ اپنی پسندیدہ احادیث کو آسان رسائی کے لیے کلیکشنز میں
+        محفوظ کر سکتے ہیں۔
+    </string>
 
     <string name="create_collection">کلیکشن بنائیں</string>
     <string name="update_collection">کلیکشن اپ ڈیٹ کریں</string>
 
-    <string name="msg_delete_user_collection">کیا آپ واقعی یہ کلیکشن حذف کرنا چاہتے ہیں؟ اس کلیکشن میں محفوظ تمام احادیث بھی حذف ہو جائیں گی۔</string>
+    <string name="msg_delete_user_collection">کیا آپ واقعی یہ کلیکشن حذف کرنا چاہتے ہیں؟ اس کلیکشن
+        میں محفوظ تمام احادیث بھی حذف ہو جائیں گی۔</string>
 
     <string name="copied_to_clipboard">کلپ بورڈ میں کاپی کر دیا گیا</string>
 
-    <string name="paste_log_github_issue">لاگ کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم اسے GitHub issue میں پیسٹ کریں۔</string>
+    <string name="paste_log_github_issue">لاگ کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم اسے GitHub
+        issue میں پیسٹ کریں۔</string>
 
-    <string name="paste_reference_github_issue">حدیث ریفرنس کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم اسے GitHub issue میں پیسٹ کریں۔</string>
+    <string name="paste_reference_github_issue">حدیث ریفرنس کلپ بورڈ میں کاپی ہو گیا ہے۔ براہِ کرم
+        اسے GitHub issue میں پیسٹ کریں۔</string>
 
     <string name="hadith_of_the_day">آج کی حدیث</string>
 
@@ -243,7 +252,8 @@
 
     <string name="resource_download_source">ریسورس ڈاؤن لوڈ سورس</string>
 
-    <string name="resource_download_source_desc">اگر ایک سورس کام نہ کرے تو حدیث ریسورس کسی دوسرے سورس سے ڈاؤن لوڈ کریں۔</string>
+    <string name="resource_download_source_desc">اگر ایک سورس کام نہ کرے تو حدیث ریسورس کسی دوسرے
+        سورس سے ڈاؤن لوڈ کریں۔</string>
 
     <string name="open_github_issues">GitHub issues کھولیں</string>
 
@@ -253,9 +263,11 @@
 
     <string name="notification_permission">نوٹیفکیشن اجازت</string>
 
-    <string name="notification_permission_desc">روزانہ حدیث یاد دہانی حاصل کرنے کے لیے نوٹیفکیشن کی اجازت دیں۔</string>
+    <string name="notification_permission_desc">روزانہ حدیث یاد دہانی حاصل کرنے کے لیے نوٹیفکیشن کی
+        اجازت دیں۔</string>
 
-    <string name="download_collection_first">اس فیچر کے استعمال کے لیے پہلے کم از کم ایک حدیث کلیکشن ڈاؤن لوڈ کریں۔</string>
+    <string name="download_collection_first">اس فیچر کے استعمال کے لیے پہلے کم از کم ایک حدیث کلیکشن
+        ڈاؤن لوڈ کریں۔</string>
 
     <string name="setting_up">سیٹ اپ ہو رہا ہے… اس میں چند سیکنڈ لگ سکتے ہیں۔</string>
 
@@ -286,4 +298,84 @@
     <string name="noBanglaTranslation">اس حدیث کا بنگالی ترجمہ ابھی دستیاب نہیں ہے۔</string>
     <string name="noFrenchTranslation">اس حدیث کا فرانسیسی ترجمہ ابھی دستیاب نہیں ہے۔</string>
     <string name="noIndonesianTranslation">اس حدیث کا انڈونیشیائی ترجمہ ابھی دستیاب نہیں ہے۔</string>
+
+    <string name="hadith_grade_label_format">حکم: %s</string>
+
+    <string name="hadith_grade_sahih">صحیح</string>
+    <string name="hadith_grade_sahih_desc">صحیح حدیث</string>
+
+    <string name="hadith_grade_sahih_maqtu">صحیح مقطوع</string>
+    <string name="hadith_grade_sahih_maqtu_desc">تابعی سے صحیح سند کے ساتھ مروی اثر</string>
+
+    <string name="hadith_grade_sahih_marfu">صحیح مرفوع</string>
+    <string name="hadith_grade_sahih_marfu_desc">رسول اللہ ﷺ تک صحیح سند کے ساتھ مرفوع روایت</string>
+
+    <string name="hadith_grade_sahih_mauquf">صحیح موقوف</string>
+    <string name="hadith_grade_sahih_mauquf_desc">صحابی پر موقوف صحیح روایت</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">صحیح موقوف حکماً مرفوع</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">موقوف روایت جسے حکماً مرفوع شمار کیا جاتا ہے</string>
+
+    <string name="hadith_grade_sahih_mutawatir">صحیح متواتر</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">متواتر صحیح حدیث</string>
+
+    <string name="hadith_grade_hasan">حسن</string>
+    <string name="hadith_grade_hasan_desc">حسن حدیث</string>
+
+    <string name="hadith_grade_hasan_sahih">حسن صحیح</string>
+    <string name="hadith_grade_hasan_sahih_desc">حسن اور صحیح کے درمیان درجہ کی حدیث</string>
+
+    <string name="hadith_grade_hasan_maqtu">حسن مقطوع</string>
+    <string name="hadith_grade_hasan_maqtu_desc">تابعی سے حسن سند کے ساتھ مروی اثر</string>
+
+    <string name="hadith_grade_hasan_mauquf">حسن موقوف</string>
+    <string name="hadith_grade_hasan_mauquf_desc">صحابی پر موقوف حسن روایت</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">حسن لغیرہ</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">ضعیف روایت جو شواہد و متابعات سے حسن بن جائے</string>
+
+    <string name="hadith_grade_daif">ضعیف</string>
+    <string name="hadith_grade_daif_desc">ضعیف حدیث</string>
+
+    <string name="hadith_grade_daif_jiddan">ضعیف جداً</string>
+    <string name="hadith_grade_daif_jiddan_desc">شدید ضعیف حدیث</string>
+
+    <string name="hadith_grade_daif_maqtu">ضعیف مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_desc">تابعی سے ضعیف سند کے ساتھ مروی اثر</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">ضعیف منکر مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">تابعی سے منکر و ضعیف اثر</string>
+
+    <string name="hadith_grade_daif_marfu">ضعیف مرفوع</string>
+    <string name="hadith_grade_daif_marfu_desc">رسول اللہ ﷺ تک ضعیف سند کے ساتھ مرفوع روایت</string>
+
+    <string name="hadith_grade_daif_mauquf">ضعیف موقوف</string>
+    <string name="hadith_grade_daif_mauquf_desc">صحابی پر موقوف ضعیف روایت</string>
+
+    <string name="hadith_grade_daif_munkar">ضعیف منکر</string>
+    <string name="hadith_grade_daif_munkar_desc">منکر و ضعیف روایت</string>
+
+    <string name="hadith_grade_daif_mursal">ضعیف مرسل</string>
+    <string name="hadith_grade_daif_mursal_desc">مرسل ضعیف روایت</string>
+
+    <string name="hadith_grade_maqtu">مقطوع</string>
+    <string name="hadith_grade_maqtu_desc">تابعی سے مروی اثر</string>
+
+    <string name="hadith_grade_mauquf">موقوف</string>
+    <string name="hadith_grade_mauquf_desc">صحابی پر موقوف روایت</string>
+
+    <string name="hadith_grade_munkar">منکر</string>
+    <string name="hadith_grade_munkar_desc">منکر روایت</string>
+
+    <string name="hadith_grade_mawdu">موضوع</string>
+    <string name="hadith_grade_mawdu_desc">من گھڑت روایت</string>
+
+    <string name="hadith_grade_shadh">شاذ</string>
+    <string name="hadith_grade_shadh_desc">شاذ روایت</string>
+
+    <string name="hadith_grade_shadh_anha">شاذ عنہ</string>
+    <string name="hadith_grade_shadh_anha_desc">شاذ قسم کی روایت</string>
+
+    <string name="hadith_grade_shadh_maqtu">شاذ مقطوع</string>
+    <string name="hadith_grade_shadh_maqtu_desc">تابعی سے مروی شاذ اثر</string>
 </resources>

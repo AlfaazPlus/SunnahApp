@@ -44,6 +44,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,9 +64,9 @@ import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
-import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.formatDateTimeShort
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -319,10 +321,9 @@ private fun CollectionItemCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 NumberingCard(
                     numbering = item.ui.numbering,
-                    translationId = item.ui.langCode,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -345,7 +346,7 @@ private fun CollectionItemCard(
 
             if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
-                    text = item.ui.translationText!!,
+                    text = item.ui.translationText,
                     style = typography.bodyMedium,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
@@ -363,17 +364,16 @@ private fun CollectionItemCard(
 
 @Composable
 fun NumberingCard(
-    numbering: String,
-    translationId: String,
+    numbering: AnnotatedString,
 ) {
     Surface(
         shape = MaterialTheme.shapes.small,
-        color = colorScheme.background,
+        color = colorScheme.surfaceContainer,
     ) {
         Text(
-            numbering,
+            text = numbering,
             modifier = Modifier.padding(10.dp),
-            style = typography.labelMedium.merge(tightTextStyle),
+            style = typography.labelMedium,
         )
     }
 }
@@ -388,7 +388,8 @@ private fun CollectionItemMenu(
     val scope = rememberCoroutineScope()
 
     BottomSheetMenu(
-        title = item.ui.numbering,
+        title = item.ui.numbering.toString(),
+        titleStyle = TextStyle(textDirection = textDirectionForLang(item.ui.langCode)),
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Center,

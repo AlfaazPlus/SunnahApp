@@ -22,7 +22,7 @@ sealed class ReaderLayoutItem {
         val parsedArabicText: AnnotatedString?,
         val parsedTranslationText: AnnotatedString?,
         val hasNarratorsChain: Boolean,
-        val visibleNumbering: String,
+        val visibleNumbering: AnnotatedString,
         val gradeText: HadithGradeText?,
         val showDivider: Boolean = true,
         override val key: String,

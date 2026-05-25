@@ -2,6 +2,8 @@
 
 package com.alfaazplus.sunnah.ui.utils.reader
 
+import com.alfaazplus.sunnah.ui.utils.AppLocale
+import com.alfaazplus.sunnah.ui.utils.appLocaleFlow
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +12,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 
 
 data class ChangeConfig(
+    val appLangCode: String,
     val selectedTranslationLangCode: String,
     val hadithTextOption: HadithTextOption,
     val isSanadEnabled: Boolean,
@@ -21,6 +24,7 @@ data class ChangeConfig(
 object ReaderChangeManager {
     fun changeFlow(): Flow<ChangeConfig> {
         return combine<Any, ChangeConfig>(
+            appLocaleFlow,
             ReaderPreferences.hadithTranslationFlow(),
             ReaderPreferences.hadithTextOptionFlow(),
             ReaderPreferences.isSanadEnabledFlow(),
@@ -29,12 +33,13 @@ object ReaderChangeManager {
             ReaderPreferences.isSerifFontStyleFlow(),
         ) { values ->
             ChangeConfig(
-                selectedTranslationLangCode = values[0] as String,
-                hadithTextOption = values[1] as HadithTextOption,
-                isSanadEnabled = values[2] as Boolean,
-                txtSizePercentArabic = values[3] as Int,
-                txtSizePercentTranslation = values[4] as Int,
-                isSerifFontStyle = values[5] as Boolean,
+                appLangCode = (values[0] as AppLocale).platformLocale.language,
+                selectedTranslationLangCode = values[1] as String,
+                hadithTextOption = values[2] as HadithTextOption,
+                isSanadEnabled = values[3] as Boolean,
+                txtSizePercentArabic = values[4] as Int,
+                txtSizePercentTranslation = values[5] as Int,
+                isSerifFontStyle = values[6] as Boolean,
             )
         }.distinctUntilChanged()
     }

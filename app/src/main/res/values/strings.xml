@@ -241,4 +241,84 @@
     <string name="noBanglaTranslation">Bengali translation is not available for this item.</string>
     <string name="noFrenchTranslation">French translation is not available for this item.</string>
     <string name="noIndonesianTranslation">Indonesian translation is not available for this item.</string>
+
+    <string name="hadith_grade_label_format">Grade: %s</string>
+
+    <string name="hadith_grade_sahih">Sahih</string>
+    <string name="hadith_grade_sahih_desc">Authentic hadith</string>
+
+    <string name="hadith_grade_sahih_maqtu">Sahih Maqtu\'</string>
+    <string name="hadith_grade_sahih_maqtu_desc">Authentic narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_sahih_marfu">Sahih Marfu\'</string>
+    <string name="hadith_grade_sahih_marfu_desc">Authentic narration attributed to the Prophet ﷺ</string>
+
+    <string name="hadith_grade_sahih_mauquf">Sahih Mawquf</string>
+    <string name="hadith_grade_sahih_mauquf_desc">Authentic narration from a Companion</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">Sahih Mawquf with Marfu\' ruling</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">Companion narration treated as effectively prophetic</string>
+
+    <string name="hadith_grade_sahih_mutawatir">Sahih Mutawatir</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">Mass-transmitted authentic hadith</string>
+
+    <string name="hadith_grade_hasan">Hasan</string>
+    <string name="hadith_grade_hasan_desc">Good and reliable hadith</string>
+
+    <string name="hadith_grade_hasan_sahih">Hasan Sahih</string>
+    <string name="hadith_grade_hasan_sahih_desc">Hadith graded between Hasan and Sahih</string>
+
+    <string name="hadith_grade_hasan_maqtu">Hasan Maqtu\'</string>
+    <string name="hadith_grade_hasan_maqtu_desc">Good narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_hasan_mauquf">Hasan Mawquf</string>
+    <string name="hadith_grade_hasan_mauquf_desc">Good narration from a Companion</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">Hasan li-Ghayrih</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">Weak narration strengthened by supporting chains</string>
+
+    <string name="hadith_grade_daif">Da\'if</string>
+    <string name="hadith_grade_daif_desc">Weak hadith</string>
+
+    <string name="hadith_grade_daif_jiddan">Very Weak</string>
+    <string name="hadith_grade_daif_jiddan_desc">Extremely weak hadith</string>
+
+    <string name="hadith_grade_daif_maqtu">Weak Maqtu\'</string>
+    <string name="hadith_grade_daif_maqtu_desc">Weak narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">Weak Munkar Maqtu\'</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">Rejected weak narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_daif_marfu">Weak Marfu\'</string>
+    <string name="hadith_grade_daif_marfu_desc">Weak narration attributed to the Prophet ﷺ</string>
+
+    <string name="hadith_grade_daif_mauquf">Weak Mawquf</string>
+    <string name="hadith_grade_daif_mauquf_desc">Weak narration from a Companion</string>
+
+    <string name="hadith_grade_daif_munkar">Weak Munkar</string>
+    <string name="hadith_grade_daif_munkar_desc">Weak narration contradicting reliable narrators</string>
+
+    <string name="hadith_grade_daif_mursal">Weak Mursal</string>
+    <string name="hadith_grade_daif_mursal_desc">Narration with a missing Companion in the chain</string>
+
+    <string name="hadith_grade_maqtu">Maqtu\'</string>
+    <string name="hadith_grade_maqtu_desc">Narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_mauquf">Mawquf</string>
+    <string name="hadith_grade_mauquf_desc">Narration from a Companion</string>
+
+    <string name="hadith_grade_munkar">Munkar</string>
+    <string name="hadith_grade_munkar_desc">Rejected narration due to contradiction or weakness</string>
+
+    <string name="hadith_grade_mawdu">Mawdu\'</string>
+    <string name="hadith_grade_mawdu_desc">Fabricated hadith</string>
+
+    <string name="hadith_grade_shadh">Shadh</string>
+    <string name="hadith_grade_shadh_desc">Irregular narration contradicting stronger reports</string>
+
+    <string name="hadith_grade_shadh_anha">Shadh Anha</string>
+    <string name="hadith_grade_shadh_anha_desc">Anomalous narration variant</string>
+
+    <string name="hadith_grade_shadh_maqtu">Shadh Maqtu\'</string>
+    <string name="hadith_grade_shadh_maqtu_desc">Irregular narration from a Tabi‘i</string>
 </resources>

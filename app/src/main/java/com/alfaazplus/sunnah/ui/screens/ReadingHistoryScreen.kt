@@ -56,7 +56,7 @@ private fun ItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surfaceContainer,
+            containerColor = colorScheme.surfaceContainerLow,
             contentColor = colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
@@ -69,7 +69,6 @@ private fun ItemCard(
             Row {
                 NumberingCard(
                     numbering = item.ui.numbering,
-                    translationId = item.ui.langCode,
                 )
             }
 
@@ -77,8 +76,6 @@ private fun ItemCard(
                 Text(
                     text = item.ui.translationText,
                     style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 8,
-                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -109,11 +106,11 @@ private fun Content(
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 300.dp),
-        contentPadding = paddingValues,
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(paddingValues),
     ) {
         items(
             historyItems.size, key = { historyItems[it].item.hadithId }) { index ->

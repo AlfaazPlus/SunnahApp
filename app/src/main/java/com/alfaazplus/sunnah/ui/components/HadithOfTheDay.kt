@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,6 +49,7 @@ import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
+import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
 import com.alfaazplus.sunnah.ui.viewModels.HotdViewModel
 
 private data class HotdPalette(
@@ -201,7 +203,6 @@ private fun HotdFooter(
     val actions = LocalHadithActions.current
     val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
-    val hadithNumber = hadithUi.hwc.hadith.number.orEmpty()
     val collectionName by produceState("", hadithUi.collectionId, translationLangCode) {
         value = repo.getCollectionName(hadithUi.collectionId, translationLangCode)
     }
@@ -221,11 +222,16 @@ private fun HotdFooter(
         horizontalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Text(
-            modifier = Modifier.weight(1f),
-            text = "${collectionName}: $hadithNumber",
-            style = MaterialTheme.typography.labelMedium.merge(tightTextStyle),
+            text = hadithUi.visibleNumbering,
+            style = MaterialTheme.typography.labelMedium
+                .merge(tightTextStyle)
+                .copy(
+                    textDirection = textDirectionForLang(translationLangCode)
+                ),
             color = iconTint,
         )
+
+        Spacer(Modifier.weight(1f))
 
         if (hadithUi.hasNarratorsChain) {
             IconButton(

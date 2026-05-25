@@ -69,6 +69,7 @@ import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 
 @Composable
@@ -237,7 +238,11 @@ private fun ReadHistoryItemCard(
         ) {
             Text(
                 text = history.ui.numbering,
-                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle),
+                style = MaterialTheme.typography.titleSmall
+                    .merge(tightTextStyle)
+                    .copy(
+                        textDirection = textDirectionForLang(history.ui.langCode)
+                    ),
             )
 
             Text(
@@ -310,7 +315,11 @@ private fun UserBookmarkCard(
         ) {
             Text(
                 text = bookmark.ui.numbering,
-                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle),
+                style = MaterialTheme.typography.titleSmall
+                    .merge(tightTextStyle)
+                    .copy(
+                        textDirection = textDirectionForLang(bookmark.ui.langCode)
+                    ),
             )
 
             if (bookmark.item.remark.isNotEmpty()) {

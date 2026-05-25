@@ -335,7 +335,7 @@ private fun Header(
             )
             Text(
                 text = stringResource(R.string.info),
-                style = typography.labelMedium,
+                style = typography.labelMedium.merge(tightTextStyle),
             )
         }
     }

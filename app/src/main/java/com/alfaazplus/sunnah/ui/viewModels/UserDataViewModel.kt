@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
 import android.app.Application
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.core.text.parseAsHtml
@@ -17,8 +18,10 @@ import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
 import com.alfaazplus.sunnah.ui.models.userdata.UserDataUserItem
+import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -233,7 +236,7 @@ class UserDataViewModel @Inject constructor(
 
         val trTextStyle = textStyleForLang(
             langCode,
-            isSerifFontStyle =  serifFontStyle,
+            isSerifFontStyle = serifFontStyle,
         )
         val trParagraphStyle = trTextStyle.toParagraphStyle();
         val trSpanStyle = trTextStyle.toSpanStyle();
@@ -242,7 +245,7 @@ class UserDataViewModel @Inject constructor(
             val hwc = hadithsMap[hadithId] ?: return@mapIndexed transform(
                 index, UserDataUserItem(
                     hwc = null,
-                    numbering = "?",
+                    numbering = AnnotatedString("?"),
                     bookTitle = "?",
                     langCode = langCode,
                     translationText = null,
@@ -255,20 +258,26 @@ class UserDataViewModel @Inject constructor(
                 val content = hwc.contents.firstOrNull { content -> content.lang == langCode }
 
                 content?.let { content ->
+                    val text = buildString {
+                        val blocks = content.blocks
+
+                        blocks.forEachIndexed { index, block ->
+                            if (!block.text.isNullOrEmpty()) {
+                                append(block.text.parseAsHtml())
+
+                                if (index < blocks.lastIndex) {
+                                    append(" ")
+                                }
+                            }
+                        }
+                    }.let { raw ->
+                        if (raw.length > 250) raw.take(300) + StringUtils.ELLIPSIS else raw
+                    }
+
                     buildAnnotatedString {
                         withStyle(trParagraphStyle) {
                             withStyle(trSpanStyle) {
-                                val blocks = content.blocks
-
-                                blocks.forEachIndexed { index, block ->
-                                    if (!block.text.isNullOrEmpty()) {
-                                        append(block.text.parseAsHtml())
-
-                                        if (index < blocks.lastIndex) {
-                                            append(" ")
-                                        }
-                                    }
-                                }
+                                append(text)
                             }
                         }
                     }
@@ -278,7 +287,11 @@ class UserDataViewModel @Inject constructor(
             transform(
                 index, UserDataUserItem(
                     hwc = hwc,
-                    numbering = "${collectionName}: ${hwc.hadith.number}",
+                    numbering = ReaderItemsBuilder.buildNumbering(
+                        collectionName,
+                        hwc.hadith.number,
+                        langCode,
+                    ),
                     bookTitle = bookNamesMap[hwc.bookId] ?: "?",
                     langCode = langCode,
                     translationText = hadithText,

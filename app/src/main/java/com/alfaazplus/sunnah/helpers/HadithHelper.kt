@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.text.parseAsHtml
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeType
@@ -44,41 +45,43 @@ object HadithHelper {
         return INCLUDED_COLLECTIONS.contains(id)
     }
 
-    fun getHadithGradeText(grade: HadithGradeEntity): HadithGradeText? {
+    fun getHadithGradeText(ctx: Context, grade: HadithGradeEntity): HadithGradeText? {
         val gradeType = grade.gradeType
 
-        val texts = when (gradeType) {
-            HadithGradeType.SAHIH -> Triple("Sahih", "Authentic hadith", "صحيح")
-            HadithGradeType.SAHIH_MAQTU -> Triple("Sahih Maqtu'", "Authentic narration from a Tabi‘i", "صحيح مقطوع")
-            HadithGradeType.SAHIH_MARFU -> Triple("Sahih Marfu'", "Authentic narration attributed to the Prophet ﷺ", "صحيح مرفوع")
-            HadithGradeType.SAHIH_MAUQUF -> Triple("Sahih Mawquf", "Authentic narration from a Companion", "صحيح موقوف")
-            HadithGradeType.SAHIH_MAUQUF_MARFU -> Triple(
-                "Sahih Mawquf with Marfu' ruling", "Companion narration treated as effectively prophetic", "صحيح موقوف له حكم المرفوع"
-            )
-
-            HadithGradeType.SAHIH_MUTAWATIR -> Triple("Sahih Mutawatir", "Mass-transmitted authentic hadith", "صحيح متواتر")
-            HadithGradeType.HASAN -> Triple("Hasan", "Good and reliable hadith", "حسن")
-            HadithGradeType.HASAN_SAHIH -> Triple("Hasan Sahih", "Hadith graded between Hasan and Sahih", "حسن صحيح")
-            HadithGradeType.HASAN_MAQTU -> Triple("Hasan Maqtu'", "Good narration from a Tabi‘i", "حسن مقطوع")
-            HadithGradeType.HASAN_MAUQUF -> Triple("Hasan Mawquf", "Good narration from a Companion", "حسن موقوف")
-            HadithGradeType.HASAN_LI_GHAIRIH -> Triple("Hasan li-Ghayrih", "Weak narration strengthened by supporting chains", "حسن لغيره")
-            HadithGradeType.DAIF -> Triple("Da'if", "Weak hadith", "ضعيف")
-            HadithGradeType.DAIF_JIDDAN -> Triple("Very Weak", "Extremely weak hadith", "ضعيف جدًا")
-            HadithGradeType.DAIF_MAQTU -> Triple("Weak Maqtu'", "Weak narration from a Tabi‘i", "ضعيف مقطوع")
-            HadithGradeType.DAIF_MAQTU_MUNKAR -> Triple("Weak Munkar Maqtu'", "Rejected weak narration from a Tabi‘i", "ضعيف منكر مقطوع")
-            HadithGradeType.DAIF_MARFU -> Triple("Weak Marfu'", "Weak narration attributed to the Prophet ﷺ", "ضعيف مرفوع")
-            HadithGradeType.DAIF_MAUQUF -> Triple("Weak Mawquf", "Weak narration from a Companion", "ضعيف موقوف")
-            HadithGradeType.DAIF_MUNKAR -> Triple("Weak Munkar", "Weak narration contradicting reliable narrators", "ضعيف منكر")
-            HadithGradeType.DAIF_MURSAL -> Triple("Weak Mursal", "Narration with a missing Companion in the chain", "ضعيف مرسل")
-            HadithGradeType.MAQTU -> Triple("Maqtu'", "Narration from a Tabi‘i", "مقطوع")
-            HadithGradeType.MAUQUF -> Triple("Mawquf", "Narration from a Companion", "موقوف")
-            HadithGradeType.MUNKAR -> Triple("Munkar", "Rejected narration due to contradiction or weakness", "منكر")
-            HadithGradeType.MAWDU -> Triple("Mawdu'", "Fabricated hadith", "موضوع")
-            HadithGradeType.SHADH -> Triple("Shadh", "Irregular narration contradicting stronger reports", "شاذ")
-            HadithGradeType.SHADH_ANHA -> Triple("Shadh Anha", "Anomalous narration variant", "شاذ")
-            HadithGradeType.SHADH_MAQTU -> Triple("Shadh Maqtu'", "Irregular narration from a Tabi‘i", "شاذ مقطوع")
+        val (labelRes, descRes) = when (gradeType) {
+            HadithGradeType.SAHIH -> R.string.hadith_grade_sahih to R.string.hadith_grade_sahih_desc
+            HadithGradeType.SAHIH_MAQTU -> R.string.hadith_grade_sahih_maqtu to R.string.hadith_grade_sahih_maqtu_desc
+            HadithGradeType.SAHIH_MARFU -> R.string.hadith_grade_sahih_marfu to R.string.hadith_grade_sahih_marfu_desc
+            HadithGradeType.SAHIH_MAUQUF -> R.string.hadith_grade_sahih_mauquf to R.string.hadith_grade_sahih_mauquf_desc
+            HadithGradeType.SAHIH_MAUQUF_MARFU -> R.string.hadith_grade_sahih_mauquf_marfu to R.string.hadith_grade_sahih_mauquf_marfu_desc
+            HadithGradeType.SAHIH_MUTAWATIR -> R.string.hadith_grade_sahih_mutawatir to R.string.hadith_grade_sahih_mutawatir_desc
+            HadithGradeType.HASAN -> R.string.hadith_grade_hasan to R.string.hadith_grade_hasan_desc
+            HadithGradeType.HASAN_SAHIH -> R.string.hadith_grade_hasan_sahih to R.string.hadith_grade_hasan_sahih_desc
+            HadithGradeType.HASAN_MAQTU -> R.string.hadith_grade_hasan_maqtu to R.string.hadith_grade_hasan_maqtu_desc
+            HadithGradeType.HASAN_MAUQUF -> R.string.hadith_grade_hasan_mauquf to R.string.hadith_grade_hasan_mauquf_desc
+            HadithGradeType.HASAN_LI_GHAIRIH -> R.string.hadith_grade_hasan_li_ghairih to R.string.hadith_grade_hasan_li_ghairih_desc
+            HadithGradeType.DAIF -> R.string.hadith_grade_daif to R.string.hadith_grade_daif_desc
+            HadithGradeType.DAIF_JIDDAN -> R.string.hadith_grade_daif_jiddan to R.string.hadith_grade_daif_jiddan_desc
+            HadithGradeType.DAIF_MAQTU -> R.string.hadith_grade_daif_maqtu to R.string.hadith_grade_daif_maqtu_desc
+            HadithGradeType.DAIF_MAQTU_MUNKAR -> R.string.hadith_grade_daif_maqtu_munkar to R.string.hadith_grade_daif_maqtu_munkar_desc
+            HadithGradeType.DAIF_MARFU -> R.string.hadith_grade_daif_marfu to R.string.hadith_grade_daif_marfu_desc
+            HadithGradeType.DAIF_MAUQUF -> R.string.hadith_grade_daif_mauquf to R.string.hadith_grade_daif_mauquf_desc
+            HadithGradeType.DAIF_MUNKAR -> R.string.hadith_grade_daif_munkar to R.string.hadith_grade_daif_munkar_desc
+            HadithGradeType.DAIF_MURSAL -> R.string.hadith_grade_daif_mursal to R.string.hadith_grade_daif_mursal_desc
+            HadithGradeType.MAQTU -> R.string.hadith_grade_maqtu to R.string.hadith_grade_maqtu_desc
+            HadithGradeType.MAUQUF -> R.string.hadith_grade_mauquf to R.string.hadith_grade_mauquf_desc
+            HadithGradeType.MUNKAR -> R.string.hadith_grade_munkar to R.string.hadith_grade_munkar_desc
+            HadithGradeType.MAWDU -> R.string.hadith_grade_mawdu to R.string.hadith_grade_mawdu_desc
+            HadithGradeType.SHADH -> R.string.hadith_grade_shadh to R.string.hadith_grade_shadh_desc
+            HadithGradeType.SHADH_ANHA -> R.string.hadith_grade_shadh_anha to R.string.hadith_grade_shadh_anha_desc
+            HadithGradeType.SHADH_MAQTU -> R.string.hadith_grade_shadh_maqtu to R.string.hadith_grade_shadh_maqtu_desc
             HadithGradeType.OTHER -> return null
         }
+
+        val texts = Pair(
+            ctx.getString(labelRes),
+            ctx.getString(descRes),
+        )
 
         val colors = when {
             gradeType.type.startsWith("sahih") -> Color(76, 175, 80) to Color.White
@@ -90,7 +93,7 @@ object HadithHelper {
         return HadithGradeText(
             type = gradeType,
             colors = colors,
-            label = "${texts.first} (${texts.third})",
+            label = ctx.getString(R.string.hadith_grade_label_format, texts.first),
             descriptions = listOf(
                 grade.label,
                 texts.second,
