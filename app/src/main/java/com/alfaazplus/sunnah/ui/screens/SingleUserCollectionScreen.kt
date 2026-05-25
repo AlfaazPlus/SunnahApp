@@ -291,7 +291,7 @@ private fun CollectionItems(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(
-            start = 16.dp, top = 16.dp, end = 16.dp, bottom = 64.dp
+            start = 16.dp, top = 16.dp, end = 16.dp, bottom = 128.dp
         ),
     ) {
         item { header() }
@@ -377,11 +377,11 @@ fun NumberingCard(
 ) {
     Surface(
         shape = MaterialTheme.shapes.small,
-        color = colorScheme.surfaceContainer,
+        color = colorScheme.surfaceContainerHigh,
     ) {
         Text(
             text = numbering,
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             style = typography.labelMedium,
         )
     }

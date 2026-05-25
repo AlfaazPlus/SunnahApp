@@ -51,6 +51,7 @@
 
     <string name="hadithNumber">Hadith %s</string>
     <string name="hadithNumberFull">Hadith number %s</string>
+    <string name="bookNumberTitle">Book %s: %s</string>
 
     <string name="books">Books</string>
     <string name="hadiths">Hadiths</string>
@@ -328,4 +329,7 @@
     <string name="msgUpdateAvailable">UPDATE AVAILABLE! Please update the app to get the latest features.</string>
     <string name="msgUpdateAvailable4Dialog">UPDATE AVAILABLE!\nPlease update the app.</string>
     <string name="msgUpdateAvailable2Continue">UPDATE REQUIRED!\nPlease update the app to continue.</string>
+
+    <string name="noResults">No results found</string>
+    <string name="searchTips">Search for hadiths, books, or scholars</string>
 </resources>

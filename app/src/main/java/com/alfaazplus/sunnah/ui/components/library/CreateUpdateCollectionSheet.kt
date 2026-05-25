@@ -84,8 +84,8 @@ private fun ColumnScope.Content(
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f, false)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

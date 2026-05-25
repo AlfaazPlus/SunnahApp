@@ -21,6 +21,7 @@
 
     <string name="hadithNumber">حديث %s</string>
     <string name="hadithNumberFull">رقم الحديث %s</string>
+    <string name="bookNumberTitle">كتاب %1$s: %2$s</string>
 
     <string name="books">الكتب</string>
     <string name="hadiths">الأحاديث</string>
@@ -47,6 +48,8 @@
     <string name="n_results_found" formatted="false">%d نتائج</string>
     <string name="search_result_menu">قائمة نتائج البحث</string>
     <string name="clear_search">مسح البحث</string>
+    <string name="noResults">لم يُعثر على نتائج</string>
+    <string name="searchTips">ابحث عن الأحاديث أو الكتب أو العلماء</string>
 
     <string name="settings">الإعدادات</string>
     <string name="app_settings">إعدادات التطبيق</string>

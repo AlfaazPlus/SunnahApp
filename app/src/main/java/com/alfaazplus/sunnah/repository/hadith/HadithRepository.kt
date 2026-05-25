@@ -4,8 +4,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.core.text.parseAsHtml
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -32,13 +33,16 @@ import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.models.HadithSearchResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchRow
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
+import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class HadithRepository(
@@ -46,6 +50,7 @@ class HadithRepository(
     private val scholarsDao: ScholarsDao,
 ) {
     val dao get() = database.hadithDao
+    val searchDao get() = database.searchDao
     val importDao get() = database.importDao
 
     suspend fun isAnyCollectionDownloaded(): Boolean {
@@ -190,26 +195,49 @@ class HadithRepository(
         query: String,
         collectionIds: List<String>?,
         color: Color,
-        langCode: String,
+        displayLangCode: String,
     ): Flow<PagingData<HadithSearchResult>> {
         Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
 
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                initialLoadSize = 10,
-                enablePlaceholders = true,
-                prefetchDistance = 3,
-            ),
-            pagingSourceFactory = {
-                if (query.isBlank()) {
-                    EmptyPagingSource()
-                } else {
-                    dao.searchHadiths(query, collectionIds, langCode)
-                }
-            },
-        ).flow.map { pagingData ->
-            pagingData.map { row -> row.toSearchResult(query, color) }
+        if (query.isBlank()) {
+            return flow { emit(PagingData.empty()) }
+        }
+
+        return flow {
+            emitAll(
+                Pager(
+                    config = PagingConfig(
+                        pageSize = 10,
+                        initialLoadSize = 10,
+                        enablePlaceholders = true,
+                        prefetchDistance = 3,
+                    ),
+                    pagingSourceFactory = {
+                        searchDao.searchHadiths(
+                            query,
+                            collectionIds,
+                            displayLangCode,
+                        )
+                    },
+                ).flow.map { pagingData ->
+                    pagingData.map { row ->
+                        val plainText = row.blocksJson.toPlainSearchText()
+
+                        HadithSearchResult(
+                            hadithId = row.hadithId,
+                            bookId = row.bookId,
+                            collectionId = row.collectionId,
+                            numbering = ReaderItemsBuilder.buildNumbering(
+                                row.collectionName,
+                                row.hadithNumber,
+                                displayLangCode,
+                            ),
+                            matchedLang = row.matchedLang,
+                            snippetText = plainText.toSearchSnippet(query, color, row.matchedLang),
+                        )
+                    }
+                },
+            )
         }
     }
 
@@ -231,7 +259,7 @@ class HadithRepository(
                 if (query.isBlank()) {
                     EmptyPagingSource()
                 } else {
-                    dao.searchBooks(query, collectionIds, langCode)
+                    searchDao.searchBooks(query, collectionIds, langCode)
                 }
             },
         ).flow
@@ -268,11 +296,11 @@ class HadithRepository(
             val hadithOrder = parseSearchNumber(parts[1]) ?: return emptyList()
             val offset = (hadithOrder.second - 1).coerceAtLeast(0)
 
-            return dao.searchQuickHadithByBookOrder(bookNumber.first, offset, langCode)
+            return searchDao.searchQuickHadithByBookOrder(bookNumber.first, offset, langCode)
         }
 
         val hadithNumber = parseSearchNumber(query)?.first ?: return emptyList()
-        return dao.searchQuickHadithsByHadithNumber(hadithNumber, langCode)
+        return searchDao.searchQuickHadithsByHadithNumber(hadithNumber, langCode)
     }
 
     suspend fun getQuickBookSearchResults(
@@ -280,7 +308,7 @@ class HadithRepository(
         langCode: String,
     ): List<BookSearchQuickResult> {
         val bookNumber = parseSearchNumber(query)?.first ?: return emptyList()
-        return dao.searchQuickBooks(bookNumber, langCode)
+        return searchDao.searchQuickBooks(bookNumber, langCode)
     }
 
     suspend fun getScholarInfo(scholarId: Int): Scholar? {
@@ -331,20 +359,6 @@ class HadithRepository(
         }
     }
 
-    private fun HadithSearchRow.toSearchResult(query: String, highlightColor: Color): HadithSearchResult {
-        val plainText = blocksJson.toPlainSearchText()
-        return HadithSearchResult(
-            hadithId = hadithId,
-            bookId = bookId,
-            collectionId = collectionId,
-            hadithNumber = hadithNumber,
-            collectionName = collectionName,
-            plainText = plainText,
-        ).apply {
-            translationText = plainText.toHighlightedText(query, highlightColor)
-        }
-    }
-
     private fun String.toPlainSearchText(): String = try {
         JsonHelper.json
             .decodeFromString<List<HadithBlock>>(this)
@@ -352,40 +366,84 @@ class HadithRepository(
             .filter {
                 it.type == HadithBlockType.MATN || it.type == HadithBlockType.TRANSLATION || it.type == HadithBlockType.NARRATOR
             }
-            .mapNotNull { it.text?.trim() }
-            .filter { it.isNotEmpty() }
+            .mapNotNull { block ->
+                block.text
+                    ?.trim()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.parseAsHtml()
+                    ?.takeIf { it.isNotEmpty() }
+            }
             .joinToString(" ")
     } catch (_: Exception) {
-        this
+        ""
     }
 
-    private fun String.toHighlightedText(query: String, color: Color): AnnotatedString {
-        if (isBlank()) return buildAnnotatedString { }
+    private fun String.toSearchSnippet(
+        query: String,
+        highlightColor: Color,
+        langCode: String,
+    ): AnnotatedString {
+        val textStyle = textStyleForLang(langCode, sizePercent = 100)
+        val highlightStyle = SpanStyle(
+            color = highlightColor,
+            fontWeight = FontWeight.Bold,
+        )
 
-        val highlightStart = indexOf(query, ignoreCase = true)
-        if (highlightStart == -1) {
-            return buildAnnotatedString {
-                append(take(400))
-                if (length > 400) append("…")
+        fun AnnotatedString.Builder.appendSnippet(body: CharSequence) {
+            if (body.isEmpty()) return
+            append(body)
+        }
+
+        if (isBlank() || query.isBlank()) return buildAnnotatedString { }
+
+        val source = this
+        val snippetBody = when {
+            source.length <= 400 -> source
+            else -> {
+                val highlightStart = source.indexOf(query, ignoreCase = true)
+                if (highlightStart == -1) {
+                    source.take(400)
+                } else {
+                    val highlightEnd = (highlightStart + query.length).coerceAtMost(source.length)
+                    val padding = 200
+                    val preContextStart = (highlightStart - padding).coerceAtLeast(0)
+                    val postContextEnd = (highlightEnd + padding).coerceAtMost(source.length)
+                    buildString {
+                        if (preContextStart > 0) append('…')
+                        append(source, preContextStart, postContextEnd)
+                        if (postContextEnd < source.length) append('…')
+                    }
+                }
             }
         }
 
-        val highlightEnd = highlightStart + query.length
-        val padding = 200
-        val preContextStart = (highlightStart - padding).coerceAtLeast(0)
-        val postContextEnd = (highlightEnd + padding).coerceAtMost(length)
+        val relativeHighlightStart = snippetBody.indexOf(query, ignoreCase = true)
 
         return buildAnnotatedString {
-            if (preContextStart > 0) append("…")
-            append(subSequence(preContextStart, highlightStart))
-            addStyle(
-                SpanStyle(color = color, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic),
-                length,
-                length + query.length,
-            )
-            append(subSequence(highlightStart, highlightEnd))
-            append(subSequence(highlightEnd, postContextEnd))
-            if (postContextEnd < length) append("…")
+            withStyle(textStyle.toParagraphStyle()) {
+                withStyle(textStyle.toSpanStyle()) {
+                    if (relativeHighlightStart == -1) {
+                        appendSnippet(snippetBody)
+                        return@withStyle
+                    }
+
+                    val relativeHighlightEnd = (relativeHighlightStart + query.length).coerceAtMost(snippetBody.length)
+
+                    if (relativeHighlightStart > 0) {
+                        appendSnippet(snippetBody.substring(0, relativeHighlightStart))
+                    }
+
+                    pushStyle(highlightStyle)
+
+                    appendSnippet(snippetBody.substring(relativeHighlightStart, relativeHighlightEnd))
+
+                    pop()
+
+                    if (relativeHighlightEnd < snippetBody.length) {
+                        appendSnippet(snippetBody.substring(relativeHighlightEnd))
+                    }
+                }
+            }
         }
     }
 

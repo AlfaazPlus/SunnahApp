@@ -3,10 +3,8 @@ package com.alfaazplus.sunnah.ui.models
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
-import androidx.room.Ignore
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 
 enum class SearchResultTab(val type: Int) {
@@ -34,19 +32,17 @@ data class HadithSearchRow(
     @ColumnInfo(name = "hadith_number") val hadithNumber: String?,
     @ColumnInfo(name = "collection_name") val collectionName: String,
     @ColumnInfo(name = "blocks_json") val blocksJson: String,
+    @ColumnInfo(name = "matched_lang") val matchedLang: String,
 )
 
 data class HadithSearchResult(
     val hadithId: String,
     val bookId: String,
     val collectionId: String,
-    val hadithNumber: String?,
-    val collectionName: String,
-    val plainText: String,
+    val numbering: AnnotatedString,
+    val matchedLang: String,
+    val snippetText: AnnotatedString,
 ) {
-    @Ignore
-    var translationText: AnnotatedString = buildAnnotatedString { }
-
     override fun equals(other: Any?) =
         this === other || (other is HadithSearchResult && hadithId == other.hadithId)
 

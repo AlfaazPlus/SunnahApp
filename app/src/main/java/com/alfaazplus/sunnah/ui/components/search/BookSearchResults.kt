@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -148,7 +149,9 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
         ) { index ->
             val item = quickSearchResults[index]
             QuickHadithSearchResult(
-                title = "${item.bookNumber}. ${item.bookTitle}",
+                title = buildAnnotatedString {
+                    append("${item.bookNumber}. ${item.bookTitle}")
+                },
                 description = {
                     Text(
                         text = item.collectionName,

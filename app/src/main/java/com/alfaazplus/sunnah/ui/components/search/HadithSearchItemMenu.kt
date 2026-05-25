@@ -80,7 +80,7 @@ fun HadithSearchItemMenu(
     }
 
     BottomSheetMenu(
-        title = "${item.collectionName}: ${item.hadithNumber}",
+        title = item.numbering.toString(),
         isOpen = isOpen,
         onDismiss = onClose,
         headerArrangement = Arrangement.Start,
@@ -114,7 +114,7 @@ fun HadithSearchItemMenu(
                 }
 
                 HadithMenuAction.COPY_HADITH_NUMBER -> {
-                    context.copyToClipboard("${item.collectionName}: ${item.hadithNumber}")
+                    context.copyToClipboard(item.numbering.toString())
 
                     MessageUtils.showClipboardMessage(
                         context,

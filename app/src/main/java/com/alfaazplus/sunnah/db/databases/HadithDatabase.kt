@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.alfaazplus.sunnah.db.converters.HadithDbConverters
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.HadithImportDao
+import com.alfaazplus.sunnah.db.dao.HadithSearchDao
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 import com.alfaazplus.sunnah.db.entities.v2.BookTranslationEntity
 import com.alfaazplus.sunnah.db.entities.v2.ChapterEntity
@@ -39,5 +40,6 @@ import com.alfaazplus.sunnah.db.entities.v2.HadithRelatedEntity
 @TypeConverters(HadithDbConverters::class)
 abstract class HadithDatabase : RoomDatabase() {
     abstract val hadithDao: HadithDao
+    abstract val searchDao: HadithSearchDao
     abstract val importDao: HadithImportDao
 }

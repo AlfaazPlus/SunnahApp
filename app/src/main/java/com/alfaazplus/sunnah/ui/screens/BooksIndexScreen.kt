@@ -151,7 +151,7 @@ private fun ScreenContent(
             columns = GridCells.Fixed(columnCount),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 100.dp),
+            contentPadding = PaddingValues(bottom = 128.dp),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
