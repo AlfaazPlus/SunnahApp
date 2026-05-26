@@ -2,6 +2,7 @@
 
 package com.alfaazplus.sunnah.ui.utils.reader
 
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.app.AppLocale
 import com.alfaazplus.sunnah.ui.utils.app.appLocaleFlow
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
@@ -19,6 +20,7 @@ data class ChangeConfig(
     val txtSizePercentArabic: Int,
     val txtSizePercentTranslation: Int,
     val isSerifFontStyle: Boolean,
+    val themeKey: String,
 )
 
 object ReaderChangeManager {
@@ -31,6 +33,7 @@ object ReaderChangeManager {
             ReaderPreferences.textSizePercentArabicFlow(),
             ReaderPreferences.textSizePercentTranslationFlow(),
             ReaderPreferences.isSerifFontStyleFlow(),
+            ThemeUtils.themeFlow(),
         ) { values ->
             ChangeConfig(
                 appLangCode = (values[0] as AppLocale).platformLocale.language,
@@ -40,6 +43,7 @@ object ReaderChangeManager {
                 txtSizePercentArabic = values[4] as Int,
                 txtSizePercentTranslation = values[5] as Int,
                 isSerifFontStyle = values[6] as Boolean,
+                themeKey = values[7] as String,
             )
         }.distinctUntilChanged()
     }

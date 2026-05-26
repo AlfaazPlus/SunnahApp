@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.utils.app.ResourceUpdateManager
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
@@ -77,7 +78,7 @@ fun TranslationUpdateBanner() {
             )
 
             FilledTonalButton(
-                onClick = { navController.navigate(Routes.SETTINGS_TRANSLATIONS) },
+                onClick = { navController.safeNavigate(Routes.SETTINGS_TRANSLATIONS) },
             ) {
                 Text(text = stringResource(R.string.update))
             }

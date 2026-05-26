@@ -15,6 +15,8 @@ class CollectionListViewModel @Inject constructor(
     val collections = repo
         .getAllCollectionsFlow()
         .stateIn(
-            viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList()
+            viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList(),
         )
 }

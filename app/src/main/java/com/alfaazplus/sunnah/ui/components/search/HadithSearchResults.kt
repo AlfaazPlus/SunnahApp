@@ -38,7 +38,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
 import com.alfaazplus.sunnah.ui.screens.NumberingCard
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences

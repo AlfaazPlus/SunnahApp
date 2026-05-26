@@ -4,23 +4,25 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,13 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.ui.components.common.SearchTextField
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookItemCard
+import com.alfaazplus.sunnah.ui.utils.extension.verticalFadingEdge
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -64,7 +66,7 @@ fun ReaderNavigator(
 
     fun navigateBook(bookId: String) {
         scope.launch {
-            readerVm.initReaderIfNeeded(bookId)
+            readerVm.initReader(bookId)
 
             onClose()
         }
@@ -75,7 +77,7 @@ fun ReaderNavigator(
             if (readerVm.activeBookId.value == bookId) {
                 readerVm.requestHadithNavigation(hadithId)
             } else {
-                readerVm.initReaderIfNeeded(bookId, hadithId)
+                readerVm.initReader(bookId, hadithId)
             }
 
             onClose()
@@ -86,7 +88,7 @@ fun ReaderNavigator(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(if (isInModal) 0.9f else 1f)
-            .background(colorScheme.surfaceContainer)
+            .then(if (!isInModal) Modifier.background(colorScheme.surfaceContainer) else Modifier)
     ) {
         SecondaryTabRow(
             selectedTabIndex = selectedTabIndex,
@@ -151,28 +153,49 @@ private fun BookList(
         }
     }
 
-    val bookListState = rememberLazyListState(filteredBooks.indexOfFirst { it.book.id == currentBookId })
+    val activeIndex = filteredBooks
+        .indexOfFirst { it.book.id == currentBookId }
+        .fastCoerceAtLeast(0)
 
-    LazyColumn(
-        state = bookListState,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        stickyHeader {
-            SearchTextField(
-                modifier = Modifier.padding(top = 16.dp),
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = stringResource(R.string.search_book),
-            )
-        }
+    val gridState = rememberLazyGridState(
+        initialFirstVisibleItemIndex = activeIndex,
+        initialFirstVisibleItemScrollOffset = -100,
+    )
 
-        items(filteredBooks.size, key = { index -> filteredBooks[index].book.id }) {
-            BookItemCard(
-                bwt = filteredBooks[it],
-                isCurrent = filteredBooks[it].book.id == currentBookId,
+    LaunchedEffect(activeIndex) {
+        gridState.scrollToItem(activeIndex, -100)
+    }
+
+
+    Column {
+        SearchTextField(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = stringResource(R.string.search_book),
+        )
+
+        BoxWithConstraints(
+            Modifier.verticalFadingEdge(gridState)
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(if (maxWidth < 800.dp) 1 else 2),
+                modifier = Modifier.fillMaxWidth(),
+                state = gridState,
+                contentPadding = PaddingValues(
+                    start = 16.dp, end = 16.dp, top = 16.dp, bottom = 64.dp
+                ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                onBookSelected(filteredBooks[it].book.id)
+                items(filteredBooks.size, key = { index -> filteredBooks[index].book.id }) {
+                    BookItemCard(
+                        bwt = filteredBooks[it],
+                        isCurrent = filteredBooks[it].book.id == currentBookId,
+                    ) {
+                        onBookSelected(filteredBooks[it].book.id)
+                    }
+                }
             }
         }
     }
@@ -214,70 +237,71 @@ private fun HadithList(
         }
     }
 
-    val hadithListState =
-        rememberLazyListState(
-            filteredItems
-                .indexOfFirst { it.hadithId == currentHadithId }
-                .takeIf { it != -1 } ?: 0)
+    val activeIndex = filteredItems
+        .indexOfFirst { it.hadithId == currentHadithId }
+        .fastCoerceAtLeast(0)
 
-    LazyColumn(
-        state = hadithListState,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        stickyHeader {
-            SearchTextField(
-                modifier = Modifier.padding(top = 16.dp),
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = stringResource(R.string.search_hadith),
-            )
-        }
+    val hadithGridState = rememberLazyGridState(
+        initialFirstVisibleItemIndex = activeIndex,
+        initialFirstVisibleItemScrollOffset = -100,
+    )
 
-        items(
-            filteredItems.size,
-        ) {
-            val item = filteredItems[it]
-
-            HadithItem(
-                item = item,
-                isCurrent = item.hadithId == currentHadithId,
-            ) { onHadithSelected(item.bookId, item.hadithId) }
-        }
+    LaunchedEffect(activeIndex) {
+        hadithGridState.scrollToItem(activeIndex, -100)
     }
-}
 
 
-@Composable
-private fun HadithItem(
-    item: HadithNavigationItem,
-    isCurrent: Boolean,
-    onClick: () -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (isCurrent) colorScheme.primary
-            else colorScheme.outlineVariant.copy(alpha = 0.4f),
-        ),
-        onClick = onClick,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+    Column {
+        SearchTextField(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = stringResource(R.string.search_hadith),
+        )
+
+        BoxWithConstraints(
+            Modifier.verticalFadingEdge(hadithGridState)
         ) {
-            Text(
-                text = item.visibleNumbering,
-                style = typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(if (maxWidth < 800.dp) 2 else 3),
+                state = hadithGridState,
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 64.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    count = filteredItems.size,
+                    key = { index -> filteredItems[index].hadithId },
+                ) { index ->
+                    val item = filteredItems[index]
+                    val isCurrent = item.hadithId == currentHadithId
+
+                    Surface(
+                        onClick = { onHadithSelected(item.bookId, item.hadithId) },
+                        shape = RoundedCornerShape(8.dp),
+                        color = colorScheme.surface,
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = if (isCurrent) colorScheme.primary else colorScheme.outlineVariant.copy(
+                                alpha = 0.4f
+                            ),
+                        ),
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp),
+                        ) {
+                            Text(
+                                text = item.visibleNumbering,
+                                style = typography.labelMedium,
+                                color = colorScheme.onSurface,
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

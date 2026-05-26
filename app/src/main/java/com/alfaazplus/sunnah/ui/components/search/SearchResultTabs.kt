@@ -6,14 +6,28 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.models.SearchResultTab
-import com.alfaazplus.sunnah.ui.models.SearchResultTabSaver
+
+enum class SearchResultTab(val type: Int) {
+    Hadiths(0),
+    Books(1),
+    Scholars(2);
+
+    companion object {
+        fun fromType(type: Int): SearchResultTab {
+            return entries.firstOrNull { it.type == type } ?: Hadiths
+        }
+    }
+}
+
+val SearchResultTabSaver: Saver<SearchResultTab, Any> = listSaver(
+    save = { listOf(it.type) },
+    restore = { SearchResultTab.fromType(it[0]) },
+)
 
 @Composable
 fun SearchResultTabs(

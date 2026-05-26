@@ -72,7 +72,7 @@ fun ReaderScreen(
     )
 
     LaunchedEffect(bookId, hadithId) {
-        readerVm.initReaderIfNeeded(bookId, hadithId)
+        readerVm.onArguments(bookId, hadithId)
     }
 
     DisposableEffect(lifecycleOwner) {

@@ -31,47 +31,51 @@ import com.alfaazplus.sunnah.ui.utils.text.getArabicTextStyle
 import com.alfaazplus.sunnah.ui.utils.text.getTranslationTextStyle
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun HadithTextPreview(
-    translationId: String,
-    sizePercent: Int,
-    isArabic: Boolean,
-    isSerif: Boolean,
-) {
-    // hadith id = nasai_urn_1122120
-    val previewText = when {
-        isArabic -> "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
-        else -> when (translationId) {
-            "en" -> "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins."
-            "bn" -> ""
-            "fr" -> ""
-            "in" -> ""
-            "ur" -> "جس نے رمضان میں ایمان کے ساتھ ثواب کی نیت سے روزہ رکھا تو اس کے پچھلے گناہ بخش دئیے جائیں گے"
-            else -> ""
+fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val translationId = ReaderPreferences.observeHadithTranslation()
+    val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
+
+    BottomSheet(
+        isOpen = isOpen,
+        onDismiss = onDismiss,
+        icon = R.drawable.ic_text_size,
+        title = stringResource(R.string.text_size_and_style),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            TextSizeSlider(
+                KEY_TEXT_SIZE_PER_TRANSLATION,
+                R.string.translation_text_size,
+                translationId,
+                isSerifFontStyle,
+            )
+
+            if (translationId == "en") {
+                SwitchItem(
+                    modifier = Modifier.padding(top = 16.dp),
+                    title = R.string.serif_font_style,
+                    checked = isSerifFontStyle,
+                ) {
+                    coroutineScope.launch {
+                        DataStoreManager.write(KEY_IS_SERIF_FONT_STYLE, it)
+                    }
+                }
+            }
+
+            TextSizeSlider(
+                KEY_TEXT_SIZE_PER_ARABIC,
+                R.string.arabic_text_size,
+                translationId,
+            )
         }
-    } // fixme
-
-    val style = if (isArabic) {
-        getArabicTextStyle(
-            params = ArabicTextStyleParams(
-                sizePercent = sizePercent,
-            )
-        )
-    } else {
-        getTranslationTextStyle(
-            params = TranslationTextStyleParams(
-                translationId = translationId,
-                sizePercent = sizePercent,
-                isSerif = isSerif,
-            )
-        )
     }
-
-    Text(
-        previewText,
-        modifier = Modifier.fillMaxWidth(),
-        style = style,
-    )
 }
 
 @Composable
@@ -123,46 +127,44 @@ private fun TextSizeSlider(key: PrefKey<Int>, title: Int, translationId: String,
 }
 
 @Composable
-fun TextSizeSheet(isOpen: Boolean, onDismiss: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-
-    val translationId = ReaderPreferences.observeHadithTranslation()
-    val isSerifFontStyle = ReaderPreferences.observeIsSerifFontStyle()
-
-    BottomSheet(
-        isOpen = isOpen,
-        onDismiss = onDismiss,
-        icon = R.drawable.ic_text_size,
-        title = stringResource(R.string.text_size_and_style),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            TextSizeSlider(
-                KEY_TEXT_SIZE_PER_ARABIC,
-                R.string.arabic_text_size,
-                translationId,
-            )
-            TextSizeSlider(
-                KEY_TEXT_SIZE_PER_TRANSLATION,
-                R.string.translation_text_size,
-                translationId,
-                isSerifFontStyle,
-            )
-
-            if (translationId == "en") {
-                SwitchItem(
-                    modifier = Modifier.padding(top = 16.dp),
-                    title = R.string.serif_font_style,
-                    checked = isSerifFontStyle,
-                ) {
-                    coroutineScope.launch {
-                        DataStoreManager.write(KEY_IS_SERIF_FONT_STYLE, it)
-                    }
-                }
-            }
+fun HadithTextPreview(
+    translationId: String,
+    sizePercent: Int,
+    isArabic: Boolean,
+    isSerif: Boolean,
+) {
+    // hadith id = nasai_urn_1122120
+    val previewText = when {
+        isArabic -> "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
+        else -> when (translationId) {
+            "en" -> "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins."
+            "bn" -> ""
+            "fr" -> ""
+            "in" -> ""
+            "ur" -> "جس نے رمضان میں ایمان کے ساتھ ثواب کی نیت سے روزہ رکھا تو اس کے پچھلے گناہ بخش دئیے جائیں گے"
+            else -> ""
         }
+    } // fixme
+
+    val style = if (isArabic) {
+        getArabicTextStyle(
+            params = ArabicTextStyleParams(
+                sizePercent = sizePercent,
+            )
+        )
+    } else {
+        getTranslationTextStyle(
+            params = TranslationTextStyleParams(
+                translationId = translationId,
+                sizePercent = sizePercent,
+                isSerif = isSerif,
+            )
+        )
     }
+
+    Text(
+        previewText,
+        modifier = Modifier.fillMaxWidth(),
+        style = style,
+    )
 }

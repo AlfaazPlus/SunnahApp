@@ -193,7 +193,7 @@ private fun BookInfoHeader(bwt: BookWithTranslation, translationLangCode: String
                             text = number,
                             style = typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = colorScheme.onPrimaryContainer,
+                            color = colorScheme.onPrimary,
                         )
                     }
                 }

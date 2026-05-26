@@ -1,4 +1,4 @@
-package com.alfaazplus.sunnah.ui.models
+package com.alfaazplus.sunnah.ui.search
 
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -7,22 +7,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 
-enum class SearchResultTab(val type: Int) {
-    Hadiths(0),
-    Books(1),
-    Scholars(2);
 
-    companion object {
-        fun fromType(type: Int): SearchResultTab {
-            return entries.firstOrNull { it.type == type } ?: Hadiths
-        }
-    }
-}
-
-val SearchResultTabSaver: Saver<SearchResultTab, Any> = listSaver(
-    save = { listOf(it.type) },
-    restore = { SearchResultTab.fromType(it[0]) },
-)
 
 /** Room paging projection; mapped to [HadithSearchResult] in the repository. */
 data class HadithSearchRow(
@@ -52,7 +37,8 @@ data class HadithSearchResult(
 data class BooksSearchResult(
     @Embedded val book: BookEntity,
     @ColumnInfo(name = "collection_name") val collectionName: String,
-    @ColumnInfo(name = "title_en") val titleEn: String?,
+    @ColumnInfo(name = "lang_code") val langCode: String,
+    @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "title_ar") val titleAr: String?,
     @ColumnInfo(name = "hadith_count") val hadithCount: Int,
 )

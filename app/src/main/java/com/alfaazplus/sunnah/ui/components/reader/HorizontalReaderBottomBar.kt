@@ -107,10 +107,8 @@ private fun NavigationButton(
     isPrevious: Boolean,
     onClick: () -> Unit,
 ) {
-    val isDarkTheme = ThemeUtils.observeDarkTheme()
-
-    val bgColor = if (isDarkTheme) colorScheme.background else colorScheme.surfaceContainer
-    val txtColor = if (isDarkTheme) colorScheme.onBackground else colorScheme.onSurface
+    val bgColor = colorScheme.background
+    val txtColor = colorScheme.onBackground
 
     Card(
         modifier = modifier

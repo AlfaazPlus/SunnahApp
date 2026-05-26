@@ -29,6 +29,7 @@ import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.HadithCollectionList
 import com.alfaazplus.sunnah.ui.components.homepage.AppUpdateBanner
 import com.alfaazplus.sunnah.ui.components.homepage.TranslationUpdateBanner
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 
 @Composable
@@ -85,7 +86,7 @@ fun HomeScreen() {
             HadithOfTheDay()
             HadithCollectionList(
                 onCollectionClick = { collectionId ->
-                    navController.navigate(route = Routes.BOOKS_INDEX.arg(collectionId))
+                    navController.safeNavigate(route = Routes.BOOKS_INDEX.arg(collectionId))
                 },
             )
         }

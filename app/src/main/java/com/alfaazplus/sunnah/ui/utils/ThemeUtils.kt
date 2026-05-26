@@ -100,6 +100,16 @@ object ThemeUtils {
         DataStoreManager.write(KEY_THEME_DYNAMIC_COLOR, isDynamicColor)
     }
 
+    fun themeFlow(): Flow<String> {
+        return combine(
+            DataStoreManager.flow(KEY_THEME_MODE),
+            DataStoreManager.flow(KEY_THEME_COLOR),
+            DataStoreManager.flow(KEY_THEME_DYNAMIC_COLOR),
+        ) { mode, color, isDynamic ->
+            "$mode-$color-$isDynamic"
+        }.distinctUntilChanged()
+    }
+
     @Composable
     fun observeColorScheme(context: Context, isDarkTheme: Boolean = observeDarkTheme()): ColorScheme {
         val themeColor = observeThemeColor()

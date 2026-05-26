@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -45,16 +47,25 @@ class PrefResult(private val map: Map<PrefKey<*>, Any?>) {
 object DataStoreManager {
     private lateinit var appContext: Context
 
+    @Volatile
+    private var latestPreferences: Preferences? = null
+
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     fun init(context: Context) {
         appContext = context.applicationContext
+        scope.launch {
+            dataFlow.first()
+        }
     }
 
     private val dataFlow by lazy {
         appContext.dataStore.data
             .distinctUntilChanged()
+            .onEach { latestPreferences = it }
             .shareIn(
-                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-                started = SharingStarted.WhileSubscribed(5000),
+                scope = scope,
+                started = SharingStarted.Eagerly,
                 replay = 1,
             )
     }
@@ -166,6 +177,11 @@ object DataStoreManager {
                 .distinctUntilChanged()
         }
 
-        return flow.collectAsStateWithLifecycle(initialValue = defaultValue).value
+        val initialValue = remember(key) {
+            @Suppress("UNCHECKED_CAST")
+            (latestPreferences?.get(key) as? T) ?: defaultValue
+        }
+
+        return flow.collectAsStateWithLifecycle(initialValue = initialValue).value
     }
 }

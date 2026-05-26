@@ -383,6 +383,7 @@ private fun HadithActionBar(
                 Text(
                     hadithUi.visibleNumbering,
                     style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Icon(

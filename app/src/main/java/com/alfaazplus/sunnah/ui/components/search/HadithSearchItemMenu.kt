@@ -19,7 +19,7 @@ import com.alfaazplus.sunnah.ui.components.library.AddToCollectionSheet
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
 import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.components.reader.HadithMenuAction
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
 import com.alfaazplus.sunnah.ui.utils.extension.copyToClipboard
 import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel

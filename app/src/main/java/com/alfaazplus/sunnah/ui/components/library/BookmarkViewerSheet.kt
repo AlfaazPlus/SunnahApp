@@ -35,6 +35,7 @@ import com.alfaazplus.sunnah.ui.components.common.IconButton
 import com.alfaazplus.sunnah.ui.components.common.TextButton
 import com.alfaazplus.sunnah.ui.components.common.TextIconButton
 import com.alfaazplus.sunnah.ui.components.common.TextInput
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
@@ -263,7 +264,7 @@ private fun Content(
                 modifier = Modifier.padding(16.dp),
             ) {
                 val bookId = hwc?.bookId ?: return@TextButton
-                navController.navigate(
+                navController.safeNavigate(
                     Routes.READER.args(bookId, hadithId),
                 )
             }

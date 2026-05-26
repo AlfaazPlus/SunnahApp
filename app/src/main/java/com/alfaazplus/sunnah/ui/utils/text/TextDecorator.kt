@@ -7,9 +7,11 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.theme.fontUrdu
@@ -45,10 +47,13 @@ data class ArabicTextStyleParams(
     val sizePercent: Int,
 )
 
+private val TranslationBaselineFontSize = 16.sp
+private val ArabicBaselineFontSize = 20.sp
+
 fun getTranslationTextStyle(
     params: TranslationTextStyleParams,
 ): TextStyle {
-    val baselineFontSize = 16.sp
+    val baselineFontSize = TranslationBaselineFontSize
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
     val langCode = TranslationUtils.langCodeFromId(params.translationId)
     val isUrdu = langCode.isUrduLanguageCode()
@@ -70,7 +75,7 @@ fun getTranslationTextStyle(
 fun getArabicTextStyle(
     params: ArabicTextStyleParams,
 ): TextStyle {
-    val baselineFontSize = 20.sp
+    val baselineFontSize = ArabicBaselineFontSize
     val resolvedFontSize = baselineFontSize * params.sizePercent / 100
 
     return TextStyle(
@@ -92,7 +97,6 @@ fun textDirectionForLang(
     return if (StringUtils.isRtlLanguage(langCode)) TextDirection.Rtl else TextDirection.Ltr
 }
 
-
 fun textStyleForLang(
     langCode: String,
     sizePercent: Int = 100,
@@ -113,6 +117,50 @@ fun textStyleForLang(
             ),
         )
     }
+}
+
+fun textStyle(
+    langCode: String,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+): TextStyle {
+    val base = textStyleForLang(langCode)
+
+    val sized = if (fontSize == TextUnit.Unspecified) {
+        base
+    } else {
+        val targetFontSize = if (langCode == TranslationUtils.ARABIC_LANG) {
+            (fontSize.value * ArabicBaselineFontSize.value / TranslationBaselineFontSize.value).sp
+        } else {
+            fontSize
+        }
+        scaleTextStyleFontSize(base, targetFontSize)
+    }
+
+    return if (fontWeight != null) {
+        sized.copy(fontWeight = fontWeight)
+    } else {
+        sized
+    }
+}
+
+private fun scaleTextStyleFontSize(
+    base: TextStyle,
+    fontSize: TextUnit,
+): TextStyle {
+    val baseFontSize = base.fontSize
+    val baseLineHeight = base.lineHeight
+
+    if (baseFontSize == TextUnit.Unspecified || baseLineHeight == TextUnit.Unspecified) {
+        return base.copy(fontSize = fontSize)
+    }
+
+    val lineHeightScale = fontSize.value / baseFontSize.value
+
+    return base.copy(
+        fontSize = fontSize,
+        lineHeight = (baseLineHeight.value * lineHeightScale).sp,
+    )
 }
 
 fun buildStyledHadithAnnotatedString(

@@ -28,11 +28,12 @@ import com.alfaazplus.sunnah.db.relations.ChapterWithTranslation
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.db.relations.HadithWithContents
 import com.alfaazplus.sunnah.ui.misc.EmptyPagingSource
-import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
 import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
-import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
+import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
@@ -193,7 +194,7 @@ class HadithRepository(
 
     fun searchHadiths(
         query: String,
-        collectionIds: List<String>?,
+        collectionIds: Set<String>?,
         color: Color,
         displayLangCode: String,
     ): Flow<PagingData<HadithSearchResult>> {
@@ -215,7 +216,7 @@ class HadithRepository(
                     pagingSourceFactory = {
                         searchDao.searchHadiths(
                             query,
-                            collectionIds,
+                            collectionIds?.toList(),
                             displayLangCode,
                         )
                     },
@@ -243,8 +244,8 @@ class HadithRepository(
 
     fun searchBooks(
         query: String,
-        collectionIds: List<String>?,
-        langCode: String,
+        collectionIds: Set<String>?,
+        displayLangCode: String,
     ): Flow<PagingData<BooksSearchResult>> {
         Logger.d("Searching for books with query: $query", "CollectionIds: $collectionIds")
 
@@ -259,7 +260,7 @@ class HadithRepository(
                 if (query.isBlank()) {
                     EmptyPagingSource()
                 } else {
-                    searchDao.searchBooks(query, collectionIds, langCode)
+                    searchDao.searchBooks(query, collectionIds?.toList(), displayLangCode)
                 }
             },
         ).flow
@@ -287,7 +288,7 @@ class HadithRepository(
 
     suspend fun getQuickHadithSearchResults(
         query: String,
-        langCode: String,
+        displayLangCode: String,
     ): List<HadithSearchQuickResult> {
         val parts = query.split(":")
 
@@ -296,19 +297,19 @@ class HadithRepository(
             val hadithOrder = parseSearchNumber(parts[1]) ?: return emptyList()
             val offset = (hadithOrder.second - 1).coerceAtLeast(0)
 
-            return searchDao.searchQuickHadithByBookOrder(bookNumber.first, offset, langCode)
+            return searchDao.searchQuickHadithByBookOrder(bookNumber.first, offset, displayLangCode)
         }
 
         val hadithNumber = parseSearchNumber(query)?.first ?: return emptyList()
-        return searchDao.searchQuickHadithsByHadithNumber(hadithNumber, langCode)
+        return searchDao.searchQuickHadithsByHadithNumber(hadithNumber, displayLangCode)
     }
 
     suspend fun getQuickBookSearchResults(
         query: String,
-        langCode: String,
+        displayLangCode: String,
     ): List<BookSearchQuickResult> {
         val bookNumber = parseSearchNumber(query)?.first ?: return emptyList()
-        return searchDao.searchQuickBooks(bookNumber, langCode)
+        return searchDao.searchQuickBooks(bookNumber, displayLangCode)
     }
 
     suspend fun getScholarInfo(scholarId: Int): Scholar? {
@@ -383,10 +384,12 @@ class HadithRepository(
         highlightColor: Color,
         langCode: String,
     ): AnnotatedString {
-        val textStyle = textStyleForLang(langCode, sizePercent = 100)
+        val textStyle = textStyleForLang(langCode)
+
         val highlightStyle = SpanStyle(
             color = highlightColor,
             fontWeight = FontWeight.Bold,
+            background = highlightColor.alpha(0.15f),
         )
 
         fun AnnotatedString.Builder.appendSnippet(body: CharSequence) {

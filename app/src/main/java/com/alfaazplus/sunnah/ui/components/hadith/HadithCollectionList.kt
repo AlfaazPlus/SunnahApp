@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -30,16 +29,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.v2.CollectionType
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
-import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
+import com.alfaazplus.sunnah.ui.utils.text.textStyle
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
-
 
 @Composable
 fun HadithCollectionList(
@@ -47,6 +45,7 @@ fun HadithCollectionList(
     vm: CollectionListViewModel = hiltViewModel(),
 ) {
     val collections by vm.collections.collectAsState()
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
 
     val grouped by remember {
         derivedStateOf {
@@ -64,9 +63,7 @@ fun HadithCollectionList(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
             ) {
                 Image(
                     painterResource(R.drawable.vector_1),
@@ -103,7 +100,10 @@ fun HadithCollectionList(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         it.forEach { cwt ->
-                            HadithCollectionItem(cwt) {
+                            HadithCollectionItem(
+                                cwt = cwt,
+                                translationLangCode = translationLangCode,
+                            ) {
                                 onCollectionClick(cwt.collection.id)
                             }
                         }
@@ -117,10 +117,9 @@ fun HadithCollectionList(
 @Composable
 private fun RowScope.HadithCollectionItem(
     cwt: CollectionWithTranslation,
+    translationLangCode: String,
     onClick: () -> Unit,
 ) {
-    val translationLangCode = ReaderPreferences.observeHadithTranslation()
-
     Surface(
         modifier = Modifier.weight(1f),
         color = colorScheme.surfaceContainerLow,
@@ -139,12 +138,11 @@ private fun RowScope.HadithCollectionItem(
                     ?.let {
                         Text(
                             text = it,
-                            style = textStyleForLang(langCode)
-                                .merge(tightTextStyle)
-                                .copy(
-                                    fontSize = typography.titleSmall.fontSize,
-                                    fontWeight = FontWeight.SemiBold,
-                                ),
+                            style = textStyle(
+                                langCode = langCode,
+                                fontSize = typography.titleSmall.fontSize,
+                                fontWeight = FontWeight.SemiBold,
+                            ),
                             textAlign = TextAlign.Center,
                         )
                     }

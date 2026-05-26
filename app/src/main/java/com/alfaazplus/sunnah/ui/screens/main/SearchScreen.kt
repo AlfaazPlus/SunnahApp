@@ -1,14 +1,18 @@
 package com.alfaazplus.sunnah.ui.screens.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,8 +37,8 @@ import com.alfaazplus.sunnah.ui.components.search.GlobalSearchTextField
 import com.alfaazplus.sunnah.ui.components.search.HadithSearchResults
 import com.alfaazplus.sunnah.ui.components.search.ScholarsSearchResults
 import com.alfaazplus.sunnah.ui.components.search.SearchFilterSheet
+import com.alfaazplus.sunnah.ui.components.search.SearchResultTab
 import com.alfaazplus.sunnah.ui.components.search.SearchResultTabs
-import com.alfaazplus.sunnah.ui.models.SearchResultTab
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
@@ -43,19 +47,26 @@ fun SearchScreen(
     withBackButton: Boolean = true,
     vm: SearchViewModel = hiltViewModel(),
 ) {
-    vm.primaryColor = MaterialTheme.colorScheme.primary
+    vm.primaryColor = colorScheme.primary
 
     var showSearchFilterSheet by remember { mutableStateOf(false) }
 
     val hadithListState = rememberLazyListState()
     val bookListState = rememberLazyListState()
     val scholarsListState = rememberLazyListState()
-    val searchQuery = vm.searchQuery.collectAsState().value
+
+    val currentFilters by vm.currentFilters.collectAsState()
+    val searchQuery by vm.searchQuery.collectAsState()
+    var previousSearchQuery by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(searchQuery) {
-        hadithListState.scrollToItem(0)
-        bookListState.scrollToItem(0)
-        scholarsListState.scrollToItem(0)
+        if (previousSearchQuery != null && previousSearchQuery != searchQuery) {
+            hadithListState.scrollToItem(0)
+            bookListState.scrollToItem(0)
+            scholarsListState.scrollToItem(0)
+        }
+
+        previousSearchQuery = searchQuery
     }
 
     Scaffold(
@@ -63,16 +74,25 @@ fun SearchScreen(
             AppBar(
                 title = stringResource(R.string.global_search), showNavigationIcon = withBackButton,
                 actions = {
+
                     SimpleTooltip(stringResource(R.string.search_filter)) {
                         IconButton(
-                            onClick = {
-                                showSearchFilterSheet = true
-                            },
+                            onClick = { showSearchFilterSheet = true },
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_filter),
-                                contentDescription = stringResource(R.string.search_filter),
-                            )
+                            Box {
+                                Icon(
+                                    painterResource(R.drawable.ic_filter),
+                                    contentDescription = stringResource(R.string.search_filter),
+                                )
+                                if (!currentFilters.isEmpty) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .size(8.dp)
+                                            .background(colorScheme.primary, CircleShape)
+                                    )
+                                }
+                            }
                         }
                     }
                 },
@@ -97,13 +117,13 @@ fun SearchScreen(
                         modifier = Modifier
                             .size(60.dp)
                             .align(Alignment.CenterHorizontally),
-                        tint = MaterialTheme.colorScheme.onBackground.alpha(0.6f),
+                        tint = colorScheme.onBackground.alpha(0.6f),
                     )
                     Text(
                         text = stringResource(R.string.searchTips),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onBackground.alpha(0.6f),
+                        color = colorScheme.onBackground.alpha(0.6f),
                     )
                 }
             } else {
@@ -120,7 +140,8 @@ fun SearchScreen(
 
     SearchFilterSheet(
         isOpen = showSearchFilterSheet,
-        onClose = { showSearchFilterSheet = false },
         searchVm = vm,
+        currentFilters = currentFilters,
+        onClose = { showSearchFilterSheet = false },
     )
 }

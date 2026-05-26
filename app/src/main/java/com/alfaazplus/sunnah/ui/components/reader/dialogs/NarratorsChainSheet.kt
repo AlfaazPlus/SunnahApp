@@ -32,6 +32,7 @@ import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.helpers.ScholarsHelper
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.NarratorsViewModel
@@ -134,7 +135,7 @@ private fun NarratorCard(
             color = rankColor.alpha(0.5f), width = 1.dp
         ),
         onClick = {
-            navController.navigate(route = Routes.SCHOLAR_INFO.arg(narrator.id))
+            navController.safeNavigate(route = Routes.SCHOLAR_INFO.arg(narrator.id))
         },
     ) {
         Column(

@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -51,6 +52,13 @@ val popEnterTransition = slideInHorizontally(
 val popExitTransition = slideOutHorizontally(
     targetOffsetX = { fullWidth -> fullWidth }, animationSpec = tween(durationMillis = 100)
 )
+
+fun NavController.safeNavigate(route: String) {
+    navigate(route) {
+        launchSingleTop = true
+        restoreState = true
+    }
+}
 
 private fun NavGraphBuilder.route(
     route: String,

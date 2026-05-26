@@ -40,6 +40,7 @@
     <string name="create">Create</string>
     <string name="goBack">Go back</string>
     <string name="copy">Copy</string>
+    <string name="selectAll">Select all</string>
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="enabled">Enabled</string>

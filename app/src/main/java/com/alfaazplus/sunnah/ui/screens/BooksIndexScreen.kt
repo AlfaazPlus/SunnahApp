@@ -45,14 +45,13 @@ import com.alfaazplus.sunnah.ui.components.common.SearchTextField
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.AboutCollectionSheet
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookItemCard
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
-import com.alfaazplus.sunnah.ui.theme.tightTextStyle
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.theme.type
 import com.alfaazplus.sunnah.ui.utils.extension.bottomBorder
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
-import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
+import com.alfaazplus.sunnah.ui.utils.text.textStyle
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
 
@@ -65,9 +64,6 @@ fun BooksIndexScreen(collectionId: String) {
     ) {
         ScreenContent(
             collectionId,
-            onBookItemClick = { bookId ->
-                navController.navigate(Routes.READER.args(bookId))
-            },
         )
 
         Column(
@@ -109,9 +105,10 @@ fun BooksIndexScreen(collectionId: String) {
 @Composable
 private fun ScreenContent(
     collectionId: String,
-    onBookItemClick: (String) -> Unit,
     vm: BookListViewModel = hiltViewModel(),
 ) {
+    val navController = LocalNavHostController.current
+
     LaunchedEffect(collectionId) {
         vm.setCollectionId(collectionId)
     }
@@ -176,12 +173,11 @@ private fun ScreenContent(
                                 ?.let {
                                     Text(
                                         text = it,
-                                        style = textStyleForLang(langCode)
-                                            .merge(tightTextStyle)
-                                            .copy(
-                                                fontSize = typography.titleMedium.fontSize,
-                                                fontWeight = FontWeight.SemiBold,
-                                            ),
+                                        style = textStyle(
+                                            langCode = langCode,
+                                            fontSize = typography.titleMedium.fontSize,
+                                            fontWeight = FontWeight.SemiBold,
+                                        ),
                                         textAlign = TextAlign.Center,
                                     )
                                 }
@@ -227,7 +223,9 @@ private fun ScreenContent(
                         .padding(top = if (index == 0) 6.dp else 0.dp)
                         .padding(start = leftPad.dp, end = rightPad.dp),
                     bwt = bwt,
-                ) { onBookItemClick(bwt.book.id) }
+                ) {
+                    navController.safeNavigate(Routes.READER.args(bwt.book.id))
+                }
             }
         }
     }
@@ -240,9 +238,9 @@ fun BookMetaInfoCard(
 ) {
     Box(
         modifier = Modifier
-            .clip(shapes.extraSmall)
-            .background(colorScheme.surfaceVariant)
-            .padding(PaddingValues(horizontal = 5.dp, vertical = 2.dp)),
+            .clip(shapes.small)
+            .background(colorScheme.background)
+            .padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp)),
         contentAlignment = Alignment.Center,
     ) {
         Text(

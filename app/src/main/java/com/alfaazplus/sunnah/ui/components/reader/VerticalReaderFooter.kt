@@ -89,7 +89,7 @@ fun VerticalReaderFooter(
         ) {
             scope.launch {
                 prevBook?.let {
-                    readerVm.initReaderIfNeeded(it.book.id)
+                    readerVm.initReader(it.book.id)
                 }
             }
         }
@@ -124,7 +124,7 @@ fun VerticalReaderFooter(
         ) {
             scope.launch {
                 nextBook?.let {
-                    readerVm.initReaderIfNeeded(it.book.id)
+                    readerVm.initReader(it.book.id)
                 }
             }
         }

@@ -3,10 +3,10 @@ package com.alfaazplus.sunnah.db.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
-import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchRow
+import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchRow
 
 @Dao
 interface HadithSearchDao {
@@ -73,25 +73,53 @@ interface HadithSearchDao {
             b.collection_id AS collection_id,
             b.number AS number,
             ct.title AS collection_name,
-            bt_en.title AS title_en,
-            bt_ar.title AS title_ar,
+            (
+                SELECT bt.lang
+                FROM book_translations AS bt
+                WHERE bt.book_id = b.id
+                ORDER BY CASE bt.lang
+                    WHEN :displayLangCode THEN 0
+                    WHEN 'en' THEN 1
+                    WHEN 'ar' THEN 2
+                    ELSE 3
+                END
+                LIMIT 1
+            ) AS lang_code,
+            (
+                SELECT bt.title
+                FROM book_translations AS bt
+                WHERE bt.book_id = b.id
+                ORDER BY CASE bt.lang
+                    WHEN :displayLangCode THEN 0
+                    WHEN 'en' THEN 1
+                    WHEN 'ar' THEN 2
+                    ELSE 3
+                END
+                LIMIT 1
+            ) AS title,
+            (
+                SELECT bt.title
+                FROM book_translations AS bt
+                WHERE bt.book_id = b.id AND bt.lang = 'ar'
+            ) AS title_ar,
             (
                 SELECT COUNT(*)
                 FROM hadiths AS h
                 WHERE h.book_id = b.id
             ) AS hadith_count
         FROM books AS b
-        INNER JOIN book_translations AS bt_en
-            ON b.id = bt_en.book_id AND bt_en.lang = :langCode
         INNER JOIN collection_translations AS ct
-            ON b.collection_id = ct.collection_id AND ct.lang = :langCode
-        LEFT JOIN book_translations AS bt_ar
-            ON b.id = bt_ar.book_id AND bt_ar.lang = 'ar'
-        WHERE (
-            bt_en.title LIKE '%' || :query || '%' COLLATE NOCASE
-            OR bt_en.intro LIKE '%' || :query || '%' COLLATE NOCASE
-            OR bt_en.notes LIKE '%' || :query || '%' COLLATE NOCASE
-            OR bt_en.preamble LIKE '%' || :query || '%' COLLATE NOCASE
+            ON b.collection_id = ct.collection_id AND ct.lang = :displayLangCode
+        WHERE EXISTS (
+            SELECT 1
+            FROM book_translations AS bt
+            WHERE bt.book_id = b.id
+                AND (
+                    bt.title LIKE '%' || :query || '%' COLLATE NOCASE
+                    OR bt.intro LIKE '%' || :query || '%' COLLATE NOCASE
+                    OR bt.notes LIKE '%' || :query || '%' COLLATE NOCASE
+                    OR bt.preamble LIKE '%' || :query || '%' COLLATE NOCASE
+                )
         )
         AND (
             COALESCE(:collectionIds, '') = ''
@@ -103,7 +131,7 @@ interface HadithSearchDao {
     fun searchBooks(
         query: String,
         collectionIds: List<String>?,
-        langCode: String,
+        displayLangCode: String,
     ): PagingSource<Int, BooksSearchResult>
 
     @Query(
@@ -125,16 +153,16 @@ interface HadithSearchDao {
         FROM hadiths AS h
         INNER JOIN books AS b ON h.book_id = b.id
         INNER JOIN book_translations AS bt
-            ON b.id = bt.book_id AND bt.lang = :langCode
+            ON b.id = bt.book_id AND bt.lang = :displayLangCode
         INNER JOIN collection_translations AS ct
-            ON h.collection_id = ct.collection_id AND ct.lang = :langCode
+            ON h.collection_id = ct.collection_id AND ct.lang = :displayLangCode
         WHERE h.number = :hadithNumber COLLATE NOCASE
         ORDER BY h.urn
         """
     )
     suspend fun searchQuickHadithsByHadithNumber(
         hadithNumber: String,
-        langCode: String,
+        displayLangCode: String,
     ): List<HadithSearchQuickResult>
 
     @Query(
@@ -156,9 +184,9 @@ interface HadithSearchDao {
         FROM hadiths AS h
         INNER JOIN books AS b ON h.book_id = b.id
         INNER JOIN book_translations AS bt
-            ON b.id = bt.book_id AND bt.lang = :langCode
+            ON b.id = bt.book_id AND bt.lang = :displayLangCode
         INNER JOIN collection_translations AS ct
-            ON h.collection_id = ct.collection_id AND ct.lang = :langCode
+            ON h.collection_id = ct.collection_id AND ct.lang = :displayLangCode
         WHERE b.number = :bookNumber
         ORDER BY h.urn
         LIMIT 1 OFFSET :offset
@@ -167,7 +195,7 @@ interface HadithSearchDao {
     suspend fun searchQuickHadithByBookOrder(
         bookNumber: String,
         offset: Int,
-        langCode: String,
+        displayLangCode: String,
     ): List<HadithSearchQuickResult>
 
     @Query(
@@ -180,15 +208,15 @@ interface HadithSearchDao {
             bt.title AS book_title
         FROM books AS b
         INNER JOIN book_translations AS bt
-            ON b.id = bt.book_id AND bt.lang = :langCode
+            ON b.id = bt.book_id AND bt.lang = :displayLangCode
         INNER JOIN collection_translations AS ct
-            ON b.collection_id = ct.collection_id AND ct.lang = :langCode
+            ON b.collection_id = ct.collection_id AND ct.lang = :displayLangCode
         WHERE b.number = :bookNumber
         ORDER BY b.number + 0
         """
     )
     suspend fun searchQuickBooks(
         bookNumber: String,
-        langCode: String,
+        displayLangCode: String,
     ): List<BookSearchQuickResult>
 }

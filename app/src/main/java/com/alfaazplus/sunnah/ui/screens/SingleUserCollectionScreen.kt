@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -383,6 +384,7 @@ fun NumberingCard(
             text = numbering,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             style = typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }

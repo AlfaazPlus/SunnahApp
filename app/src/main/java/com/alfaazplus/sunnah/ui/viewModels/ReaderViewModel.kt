@@ -1,8 +1,11 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
@@ -37,6 +40,7 @@ private const val READER_PREFETCH_DISTANCE = 8
 class ReaderViewModel @Inject constructor(
     private val repo: HadithRepository,
     private val userRepo: UserRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val layoutMode = ReaderPreferences
@@ -49,11 +53,13 @@ class ReaderViewModel @Inject constructor(
 
     var selectedNavigationTabIndex = mutableIntStateOf(1)
 
-    private val _activeBookId = MutableStateFlow<String?>(null)
+    private val _activeBookId = savedStateHandle.getMutableStateFlow<String?>("bookId", null)
     val activeBookId: StateFlow<String?> = _activeBookId.asStateFlow()
 
-    private val _activeHadithId = MutableStateFlow<String?>(null)
+    private val _activeHadithId = savedStateHandle.getMutableStateFlow<String?>("hadithId", null)
     val activeHadithId: StateFlow<String?> = _activeHadithId.asStateFlow()
+
+    private var _lastPersistedHadithId = mutableStateOf<String?>(null)
 
     val books = _activeBookId
         .combine(ReaderPreferences.hadithTranslationFlow()) { bookId, langCode ->
@@ -98,6 +104,27 @@ class ReaderViewModel @Inject constructor(
     private var lastBuiltChangeConfig: ChangeConfig? = null
     private var nextPageOffset: Int = 0
     private var isPageLoadComplete: Boolean = false
+    private var currentArgs: Pair<String, String?>? = null
+
+    init {
+        startNewSession()
+    }
+
+    private fun startNewSession() {
+        _lastPersistedHadithId.value = null
+    }
+
+    suspend fun onArguments(bookId: String, startHadithId: String? = null) {
+        val newArgs = bookId to startHadithId
+
+        if (currentArgs == newArgs) {
+            return
+        }
+
+        currentArgs = newArgs
+
+        initReader(bookId, startHadithId)
+    }
 
     /**
      * Collects UI-driving prefs and rebuilds reader content. Intended to run only while this
@@ -139,13 +166,13 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    suspend fun initReaderIfNeeded(bookId: String, startHadithId: String? = null) {
+    suspend fun initReader(bookId: String, startHadithId: String? = null) {
         initReaderMutex.withLock {
-            startHadithId?.let { requestHadithNavigation(it) }
-
             if (_activeBookId.value != bookId) {
                 _activeBookId.value = bookId
             }
+
+            startHadithId?.let { requestHadithNavigation(it) }
         }
     }
 
@@ -154,6 +181,7 @@ class ReaderViewModel @Inject constructor(
         params: TextBuilderParams,
         changeConfig: ChangeConfig,
     ) {
+        Logger.d("REBUILDING")
         pageLoadMutex.withLock {
             activeBuildParams = params
             lastBuiltChangeConfig = changeConfig
@@ -328,9 +356,17 @@ class ReaderViewModel @Inject constructor(
 
     fun saveReadHistory() {
         val hadithId = _activeHadithId.value ?: return
+        val lastHadithId = _lastPersistedHadithId.value
+        if (lastHadithId == hadithId) return
+
+        _lastPersistedHadithId.value = hadithId
 
         viewModelScope.launch {
-            userRepo.saveReadHistory(
+            if (lastHadithId != null) {
+                userRepo.deleteReadHistoryItem(lastHadithId)
+            }
+
+            userRepo.saveReadHistoryItem(
                 hadithId = hadithId,
             )
         }

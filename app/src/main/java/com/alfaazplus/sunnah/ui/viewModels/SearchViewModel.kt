@@ -7,10 +7,12 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
-import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.SearchFilters
+import com.alfaazplus.sunnah.ui.search.SearchFiltersStore
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,12 +21,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -34,24 +38,24 @@ open class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
-    private var _searchCollectionIds = MutableStateFlow<List<String>?>(null)
+    val searchQuery = _searchQuery.asStateFlow()
 
-    val searchQuery: StateFlow<String> = _searchQuery
-    val searchCollectionIds: StateFlow<List<String>?> = _searchCollectionIds
+    private val _currentFilters = MutableStateFlow(SearchFiltersStore.read())
+    val currentFilters = _currentFilters.asStateFlow()
 
     val hadithsSearchResults: Flow<PagingData<HadithSearchResult>> = combine(
-        _searchCollectionIds
-            .debounce(300)
-            .distinctUntilChanged(),
+        _currentFilters,
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
         ReaderPreferences.hadithTranslationFlow(),
-    ) { collectionIds, query, langCode -> Triple(collectionIds, query, langCode) }
-        .flatMapLatest { (collectionIds, query, langCode) ->
+    ) { filters, query, langCode ->
+        Triple(filters, query, langCode)
+    }
+        .flatMapLatest { (filters, query, langCode) ->
             repo.searchHadiths(
                 query,
-                collectionIds?.takeIf { it.isNotEmpty() },
+                collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
                 primaryColor,
                 langCode,
             )
@@ -65,14 +69,20 @@ open class SearchViewModel @Inject constructor(
 
 
     val booksSearchResults: Flow<PagingData<BooksSearchResult>> = combine(
-        searchCollectionIds,
+        _currentFilters,
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
         ReaderPreferences.hadithTranslationFlow(),
-    ) { collectionIds, query, langCode -> Triple(collectionIds, query, langCode) }
-        .flatMapLatest { (collectionIds, query, langCode) ->
-            repo.searchBooks(query, collectionIds?.takeIf { it.isNotEmpty() }, langCode)
+    ) { filters, query, langCode ->
+        Triple(filters, query, langCode)
+    }
+        .flatMapLatest { (filters, query, langCode) ->
+            repo.searchBooks(
+                query,
+                collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
+                langCode,
+            )
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -128,9 +138,11 @@ open class SearchViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun applyFilters(
-        searchCollectionIds: List<String>,
-    ) {
-        _searchCollectionIds.value = searchCollectionIds
+    fun setFilters(filters: SearchFilters) {
+        _currentFilters.value = filters
+
+        viewModelScope.launch {
+            SearchFiltersStore.write(filters)
+        }
     }
 }

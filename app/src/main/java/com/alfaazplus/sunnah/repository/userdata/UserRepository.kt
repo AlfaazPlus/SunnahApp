@@ -110,7 +110,7 @@ class UserRepository(
         dao.clearUserBookmarks()
     }
 
-    suspend fun saveReadHistory(hadithId: String) {
+    suspend fun saveReadHistoryItem(hadithId: String) {
         dao.upsertReadHistory(
             ReadHistory(
                 hadithId = hadithId,
@@ -119,6 +119,10 @@ class UserRepository(
         )
 
         dao.deleteOldReadHistory(100)
+    }
+
+    suspend fun deleteReadHistoryItem(hadithId: String) {
+        dao.deleteReadHistoryForHadithIds(listOf(hadithId))
     }
 
     suspend fun clearReadHistory() {
