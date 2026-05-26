@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.db.entities.userdata
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
+import androidx.room3.ColumnInfo
+import androidx.room3.Entity
 import com.alfaazplus.sunnah.db.contracts.userdata.ReadHistoryContract
 import com.alfaazplus.sunnah.db.contracts.userdata.ReadHistoryContract.Columns
 import java.util.Date

@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.db.relations
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
+import androidx.room3.ColumnInfo
+import androidx.room3.Embedded
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 
 data class BookWithHadithCount(

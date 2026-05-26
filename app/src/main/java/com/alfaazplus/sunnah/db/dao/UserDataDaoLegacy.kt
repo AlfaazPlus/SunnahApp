@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.db.dao
 
-import androidx.room.Dao
-import androidx.room.Query
+import androidx.room3.Dao
+import androidx.room3.Query
 import com.alfaazplus.sunnah.db.entities.userdata.ReadHistoryLegacy
 import com.alfaazplus.sunnah.db.entities.userdata.UserBookmarkLegacy
 import com.alfaazplus.sunnah.db.entities.userdata.UserCollectionLegacy

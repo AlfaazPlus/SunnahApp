@@ -1,12 +1,12 @@
 package com.alfaazplus.sunnah.db.entities.v2
 
 import androidx.core.text.parseAsHtml
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room3.ColumnInfo
+import androidx.room3.Entity
+import androidx.room3.ForeignKey
+import androidx.room3.Ignore
+import androidx.room3.Index
+import androidx.room3.PrimaryKey
 import com.alfaazplus.sunnah.api.JsonHelper
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

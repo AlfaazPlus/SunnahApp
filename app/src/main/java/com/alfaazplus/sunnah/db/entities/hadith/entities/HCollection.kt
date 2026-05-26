@@ -1,8 +1,8 @@
 package com.alfaazplus.sunnah.db.entities.hadith.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room3.ColumnInfo
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
 import com.alfaazplus.sunnah.db.contracts.CollectionContract
 import com.alfaazplus.sunnah.db.contracts.CollectionContract.Columns
 

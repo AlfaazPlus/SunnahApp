@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
-import androidx.room.withTransaction
+import androidx.room3.withWriteTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
@@ -86,7 +86,7 @@ class TranslationDownloadWorker @AssistedInject constructor(
             val bundle = CorpusBundle.parseFrom(decodePayload(tmpFile))
             val payload = bundle.toImportPayloadOrNull() ?: error("")
 
-            database.withTransaction {
+            database.withWriteTransaction {
                 database.importDao.deleteTranslationData(translationId)
                 database.insertCorpusImportPayload(payload)
             }

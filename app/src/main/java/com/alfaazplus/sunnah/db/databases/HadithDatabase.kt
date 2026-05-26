@@ -1,8 +1,10 @@
 package com.alfaazplus.sunnah.db.databases
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room3.DaoReturnTypeConverters
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
+import androidx.room3.TypeConverters
+import androidx.room3.paging.PagingSourceDaoReturnTypeConverter
 import com.alfaazplus.sunnah.db.converters.HadithDbConverters
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.HadithImportDao
@@ -38,6 +40,7 @@ import com.alfaazplus.sunnah.db.entities.v2.HadithRelatedEntity
     version = 1,
 )
 @TypeConverters(HadithDbConverters::class)
+@DaoReturnTypeConverters(PagingSourceDaoReturnTypeConverter::class)
 abstract class HadithDatabase : RoomDatabase() {
     abstract val hadithDao: HadithDao
     abstract val searchDao: HadithSearchDao

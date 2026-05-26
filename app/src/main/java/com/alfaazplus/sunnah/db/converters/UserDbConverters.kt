@@ -1,6 +1,6 @@
 package com.alfaazplus.sunnah.db.converters
 
-import androidx.room.TypeConverter
+import androidx.room3.TypeConverter
 import java.util.Date
 
 class UserDbConverters {

@@ -1,6 +1,6 @@
 package com.alfaazplus.sunnah.helpers
 
-import androidx.room.withTransaction
+import androidx.room3.withWriteTransaction
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.dao.HadithDao
 import com.alfaazplus.sunnah.db.dao.HadithDaoLegacy
@@ -92,7 +92,7 @@ object UserDataMigrator {
 
         Logger.d(hadithIdByRefKey)
 
-        userDatabaseV2.withTransaction {
+        userDatabaseV2.withWriteTransaction {
             val collectionIdMap = migrateCollections(legacyCollections, userDaoV2, stats)
             migrateCollectionItems(legacyItems, collectionIdMap, hadithIdByRefKey, userDaoV2, stats)
             migrateBookmarks(legacyBookmarks, hadithIdByRefKey, userDaoV2, stats)

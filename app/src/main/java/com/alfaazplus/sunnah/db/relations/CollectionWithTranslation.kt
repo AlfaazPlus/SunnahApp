@@ -1,8 +1,8 @@
 package com.alfaazplus.sunnah.db.relations
 
-import androidx.room.Embedded
-import androidx.room.Ignore
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Ignore
+import androidx.room3.Relation
 import com.alfaazplus.sunnah.db.entities.v2.CollectionEntity
 import com.alfaazplus.sunnah.db.entities.v2.CollectionTranslationEntity
 
@@ -10,8 +10,8 @@ data class CollectionWithTranslation(
     @Embedded
     val collection: CollectionEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "collection_id",
+        parentColumns = ["id"],
+        entityColumns = ["collection_id"],
     )
     val translations: List<CollectionTranslationEntity>,
 ) {

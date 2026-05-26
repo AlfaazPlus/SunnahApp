@@ -3,8 +3,8 @@ package com.alfaazplus.sunnah.ui.search
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.text.AnnotatedString
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
+import androidx.room3.ColumnInfo
+import androidx.room3.Embedded
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 
 

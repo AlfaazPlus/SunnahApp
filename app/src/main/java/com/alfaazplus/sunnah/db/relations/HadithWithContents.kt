@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.db.relations
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Relation
 import com.alfaazplus.sunnah.db.entities.v2.HadithContentEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
@@ -12,14 +12,14 @@ data class HadithWithContents(
     val hadith: HadithEntity,
     @Relation(
         entity = HadithContentEntity::class,
-        parentColumn = "id",
-        entityColumn = "hadith_id",
+        parentColumns = ["id"],
+        entityColumns = ["hadith_id"],
     )
     val contents: List<HadithContentEntity>,
     @Relation(
         entity = HadithGradeEntity::class,
-        parentColumn = "id",
-        entityColumn = "hadith_id",
+        parentColumns = ["id"],
+        entityColumns = ["hadith_id"],
     )
     val grades: List<HadithGradeEntity>,
 ) : HadithMethods {

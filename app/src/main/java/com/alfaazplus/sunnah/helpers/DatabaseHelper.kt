@@ -2,7 +2,7 @@ package com.alfaazplus.sunnah.helpers
 
 import android.content.Context
 import android.content.res.AssetManager
-import androidx.room.withTransaction
+import androidx.room3.withWriteTransaction
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
@@ -74,7 +74,7 @@ object DatabaseHelper {
 
                 val payload = bundle.toImportPayloadOrNull() ?: continue
 
-                database.withTransaction {
+                database.withWriteTransaction {
                     database.importDao.deleteCollectionData(collectionId)
                     database.insertCorpusImportPayload(payload)
                 }

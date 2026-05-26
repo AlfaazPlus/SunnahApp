@@ -240,7 +240,7 @@ fun CorpusBundle.toImportPayloadOrNull(): CorpusImportPayload? {
 }
 
 /**
- * Inserts one corpus in FK-safe order. Call inside [androidx.room.withTransaction] so one corpus
+ * Inserts one corpus in FK-safe order. Call inside withWriteTransaction so one corpus
  * commits in a single transaction.
  */
 suspend fun HadithDatabase.insertCorpusImportPayload(payload: CorpusImportPayload) {

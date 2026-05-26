@@ -1,6 +1,6 @@
 package com.alfaazplus.sunnah.db.entities.migration
 
-import androidx.room.ColumnInfo
+import androidx.room3.ColumnInfo
 
 data class LegacyHadithUrnLookup(
     @ColumnInfo(name = "collection_id")

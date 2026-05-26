@@ -1,8 +1,8 @@
 package com.alfaazplus.sunnah.db.databases
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
+import androidx.room3.TypeConverters
 import com.alfaazplus.sunnah.db.dao.UserDataDaoLegacy
 import com.alfaazplus.sunnah.db.entities.userdata.ReadHistoryLegacy
 import com.alfaazplus.sunnah.db.entities.userdata.UserBookmarkLegacy

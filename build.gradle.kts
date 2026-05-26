@@ -6,4 +6,6 @@ plugins {
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.daggerHilt) apply false
     alias(libs.plugins.protobuf) apply false
+    id("com.google.devtools.ksp") version "2.3.4" apply false
+    alias(libs.plugins.androidx.room3) apply false
 }

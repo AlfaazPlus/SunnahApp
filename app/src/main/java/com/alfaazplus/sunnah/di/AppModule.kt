@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.di
 
 import android.app.Application
-import androidx.room.Room
+import androidx.room3.Room
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.ScholarsDatabase

@@ -1,7 +1,7 @@
 package com.alfaazplus.sunnah.db.databases
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
 import com.alfaazplus.sunnah.db.dao.HadithDaoLegacy
 import com.alfaazplus.sunnah.db.entities.hadith.entities.HBook
 import com.alfaazplus.sunnah.db.entities.hadith.entities.HBookInfo

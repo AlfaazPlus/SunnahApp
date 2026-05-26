@@ -1,8 +1,8 @@
 package com.alfaazplus.sunnah.db.relations
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.Relation
+import androidx.room3.ColumnInfo
+import androidx.room3.Embedded
+import androidx.room3.Relation
 import com.alfaazplus.sunnah.db.entities.v2.BookEntity
 import com.alfaazplus.sunnah.db.entities.v2.BookTranslationEntity
 
@@ -10,8 +10,8 @@ data class BookWithTranslation(
     @Embedded
     val book: BookEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "book_id",
+        parentColumns = ["id"],
+        entityColumns = ["book_id"],
     )
     val translations: List<BookTranslationEntity>,
 

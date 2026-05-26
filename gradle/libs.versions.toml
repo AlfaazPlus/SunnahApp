@@ -28,7 +28,7 @@ navigation-ui-ktx = "2.9.8"
 asynclayoutinflater = "1.1.0"
 lifecycle-livedata-ktx = "2.10.0"
 lifecycle-viewmodel-ktx = "2.10.0"
-room = "2.8.4"
+room3 = "3.0.0-alpha05"
 workManager = "2.11.2"
 dataStore = "1.2.1"
 retrofit = "3.0.0"
@@ -83,9 +83,9 @@ hiltWork = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }
 
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room3-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room3" }
+androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room3" }
+androidx-room3-common = { module = "androidx.room3:room3-common", version.ref = "room3" }
 
 workManager = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 dataStore = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }
@@ -95,12 +95,13 @@ kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
-roomPaging = { module = "androidx.room:room-paging", version.ref = "room" }
+androidx-room3-paging = { module = "androidx.room3:room3-paging", version.ref = "room3" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protobuf" }
 
 [plugins]
+androidx-room3 = { id = "androidx.room3", version.ref = "room3" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

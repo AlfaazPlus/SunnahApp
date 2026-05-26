@@ -1,11 +1,11 @@
 package com.alfaazplus.sunnah.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import androidx.room.Upsert
+import androidx.room3.Dao
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
+import androidx.room3.Update
+import androidx.room3.Upsert
 import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
 import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem

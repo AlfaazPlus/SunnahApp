@@ -6,8 +6,9 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     id("com.google.dagger.hilt.android")
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.androidx.room3)
 }
 
 android {
@@ -29,14 +30,6 @@ android {
             useSupportLibrary = true
         }
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    "room.schemaLocation" to "$projectDir/schemas",
-                    "room.incremental" to "true",
-                )
-            }
-        }
     }
 
     buildTypes {
@@ -96,12 +89,8 @@ base {
     archivesName = android.defaultConfig.versionName
 }
 
-kapt {
-    correctErrorTypes = true
-
-    javacOptions {
-        option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
-    }
+room3 {
+    schemaDirectory("$projectDir/schemas")
 }
 
 protobuf {
@@ -145,22 +134,20 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.asynclayoutinflater)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // Room
-    implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room3.common)
+    implementation(libs.androidx.room3.runtime)
+    ksp(libs.androidx.room3.compiler)
 
-    // Kotlin Extensions and Coroutines support for Room
-    implementation(libs.androidx.room.ktx)
     implementation(libs.workManager)
     implementation(libs.dataStore)
     implementation(libs.hiltWork)
@@ -170,7 +157,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.paging)
     implementation(libs.pagingCompose)
-    implementation(libs.roomPaging)
+    implementation(libs.androidx.room3.paging)
 
     implementation(libs.accompanist.permissions)
     implementation(libs.protobuf.java)

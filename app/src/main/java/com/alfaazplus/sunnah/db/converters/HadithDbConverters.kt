@@ -1,6 +1,6 @@
 package com.alfaazplus.sunnah.db.converters
 
-import androidx.room.TypeConverter
+import androidx.room3.TypeConverter
 import com.alfaazplus.sunnah.db.entities.v2.CollectionType
 import com.alfaazplus.sunnah.db.entities.v2.HadithGradeType
 import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceType
