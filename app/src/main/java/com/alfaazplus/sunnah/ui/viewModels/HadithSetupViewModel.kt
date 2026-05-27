@@ -40,7 +40,7 @@ class HadithSetupViewModel @Inject constructor(
             val storedVersion = AppPreferences.getAssetHadithsImportedVersion()
             val userDataMigrated = AppPreferences.getUserDataV2MigratedVersion()
 
-            val needsHadithImport = storedVersion < currentVersion
+            val needsHadithImport = storedVersion != currentVersion
             val needsUserDataMigration = !userDataMigrated
 
             if (!needsHadithImport && !needsUserDataMigration) {

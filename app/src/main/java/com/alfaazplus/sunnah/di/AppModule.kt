@@ -5,9 +5,11 @@ import androidx.room3.Room
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.ScholarsDatabase
+import com.alfaazplus.sunnah.db.databases.SearchIndexDatabase
 import com.alfaazplus.sunnah.db.databases.UserDatabase
 import com.alfaazplus.sunnah.db.databases.UserDatabaseLegacy
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.SearchRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -64,6 +66,15 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSearchDatabase(app: Application): SearchIndexDatabase {
+        return Room
+            .databaseBuilder(app, SearchIndexDatabase::class.java, "search_index")
+            .fallbackToDestructiveMigration(true)
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideHadithRepository2(hadithDb: HadithDatabase, scholarsDb: ScholarsDatabase): HadithRepository {
         return HadithRepository(hadithDb, scholarsDb.scholarsDao)
     }
@@ -72,5 +83,11 @@ object AppModule {
     @Singleton
     fun provideUserRepository(hadithDb: HadithDatabase, userDb: UserDatabase): UserRepository {
         return UserRepository(hadithDb.hadithDao, userDb.dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchRepository(searchDb: SearchIndexDatabase, hadithRepo: HadithRepository): SearchRepository {
+        return SearchRepository( searchDb, hadithRepo)
     }
 }

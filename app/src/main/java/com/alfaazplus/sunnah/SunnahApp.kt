@@ -7,11 +7,13 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
+import com.alfaazplus.sunnah.ui.utils.app.refreshAppLocale
 import com.alfaazplus.sunnah.ui.utils.extended.ExceptionHandler
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
-import com.alfaazplus.sunnah.ui.utils.app.refreshAppLocale
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferencesRepairer
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import javax.inject.Inject
 
@@ -24,6 +26,9 @@ class SunnahApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var readerPreferencesRepairer: ReaderPreferencesRepairer
 
     override fun attachBaseContext(base: Context) {
         beforeAttachBaseContext(base)
@@ -52,6 +57,12 @@ class SunnahApp : Application(), Configuration.Provider {
 
         // Handler for uncaught exceptions
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
+
+
+        runBlocking {
+            readerPreferencesRepairer.repairIfNeeded()
+        }
+//        SearchIndexScheduler.scheduleSearchIndexIfNeeded(applicationContext)
     }
 
     override val workManagerConfiguration: Configuration

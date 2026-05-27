@@ -18,7 +18,7 @@ enum class HadithTranslation(val langCode: String, val label: String, val isComi
     URDU("ur", "اردو"),
     BENGALI("bn", "বাংলা", true),
     INDONESIAN("id", "Bahasa Indonesia", true),
-    FRENCH("fr", "Française", true);
+    FRENCH("fr", "Française");
 
     companion object {
         fun fromLangCode(langCode: String): HadithTranslation {
