@@ -1,8 +1,9 @@
 package com.alfaazplus.sunnah.ui.models
 
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollection
-import com.alfaazplus.sunnah.db.models.hadith.entities.HCollectionInfo
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollection
+import com.alfaazplus.sunnah.db.entities.hadith.entities.HCollectionInfo
 
+@Deprecated("v2")
 data class CollectionWithInfo(
     val collection: HCollection,
     val info: HCollectionInfo?,

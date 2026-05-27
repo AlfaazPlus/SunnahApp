@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,13 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.models.userdata.ReadHistoryNormalized
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
@@ -53,8 +56,8 @@ private fun ItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = colorScheme.surfaceContainerLow,
+            contentColor = colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
         onClick = { onClick(item) },
@@ -64,23 +67,15 @@ private fun ItemCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
+                NumberingCard(
+                    numbering = item.ui.numbering,
+                )
             }
 
-            if (!item.translationText.isNullOrEmpty()) {
+            if (!item.ui.translationText.isNullOrEmpty()) {
                 Text(
-                    text = item.translationText!!,
+                    text = item.ui.translationText,
                     style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 8,
-                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -111,22 +106,22 @@ private fun Content(
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 300.dp),
-        contentPadding = paddingValues,
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 128.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(paddingValues),
     ) {
         items(
-            historyItems.size, key = { historyItems[it].key() }) { index ->
+            historyItems.size, key = { historyItems[it].item.hadithId }) { index ->
             ItemCard(
                 item = historyItems[index],
-                onClick = { it ->
+                onClick = {
+                    val bookId = it.ui.hwc?.bookId ?: return@ItemCard
                     navController.navigate(
                         Routes.READER.args(
-                            it.item.hadithCollectionId,
-                            it.item.hadithBookId,
-                            it.item.hadithNumber,
+                            bookId,
+                            it.item.hadithId,
                         )
                     )
                 },
@@ -150,14 +145,14 @@ fun ReadingHistoryScreen(
             AppBar(
                 title = stringResource(R.string.reading_history),
                 actions = {
-                    if (readHistory.isNotEmpty()) {
+                    if (!readHistory.isNullOrEmpty()) {
                         IconButton(
                             onClick = {
                                 showDeleteAllAlert = true
                             },
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = MaterialTheme.colorScheme.error
+                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = colorScheme.error
                             )
                         }
                     }
@@ -165,30 +160,45 @@ fun ReadingHistoryScreen(
             )
         },
     ) { paddingValues ->
-        Content(
-            paddingValues = paddingValues,
-            readHistory,
-        )
+        if (readHistory == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else {
+            Content(
+                paddingValues = paddingValues,
+                readHistory!!,
+            )
+        }
     }
 
     AlertDialog(
         isOpen = showDeleteAllAlert,
         onClose = { showDeleteAllAlert = false },
         title = stringResource(R.string.clear_reading_history),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            scope.launch {
-                viewModel.repo.clearReadHistory()
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    scope.launch {
+                        viewModel.repo.clearReadHistory()
 
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.reading_history_cleared, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        },
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.reading_history_cleared, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
         content = {
             Text(
                 text = stringResource(R.string.action_cannot_be_undone),

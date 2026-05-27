@@ -14,20 +14,27 @@ import com.alfaazplus.sunnah.R
 
 @Composable
 fun CollectionIcon(
-    collectionId: Int = 0,
+    collectionId: String,
     height: Dp = 55.dp,
 ) {
-    fun resolveCollectionIcon(collectionId: Int): Int {
+    fun resolveCollectionIcon(collectionId: String): Int {
         return when (collectionId) {
-            1 -> return R.drawable.book_bukhari
-            2 -> return R.drawable.book_muslim
-            3 -> return R.drawable.book_nasai
-            4 -> return R.drawable.book_abudawud
-            5 -> return R.drawable.book_tirmidhi
-            6 -> return R.drawable.book_ibnmajah
+            "bukhari" -> R.drawable.book_bukhari
+            "muslim" -> R.drawable.book_muslim
+            "nasai" -> R.drawable.book_nasai
+            "abudawud" -> R.drawable.book_abudawud
+            "tirmidhi" -> R.drawable.book_tirmidhi
+            "ibnmajah" -> R.drawable.book_ibnmajah
+            "malik" -> R.drawable.book_malik
+            "riyadussalihin" -> R.drawable.book_riyadussalihin
+            "forty" -> R.drawable.book_forty
             else -> 0
         }
     }
+
+    val iconId = resolveCollectionIcon(collectionId)
+
+    if (iconId == 0) return
 
     Image(
         painter = painterResource(resolveCollectionIcon(collectionId)),

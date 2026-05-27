@@ -1,0 +1,273 @@
+package com.alfaazplus.sunnah.ui.components.library
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.R
+import com.alfaazplus.sunnah.db.relations.HadithWithContents
+import com.alfaazplus.sunnah.ui.LocalNavHostController
+import com.alfaazplus.sunnah.ui.components.common.IconButton
+import com.alfaazplus.sunnah.ui.components.common.TextButton
+import com.alfaazplus.sunnah.ui.components.common.TextIconButton
+import com.alfaazplus.sunnah.ui.components.common.TextInput
+import com.alfaazplus.sunnah.ui.safeNavigate
+import com.alfaazplus.sunnah.ui.utils.composable.tryOrNull
+import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.viewModels.AppViewModel
+import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Date
+
+
+data class BookmarkViewerData(
+    val hadithId: String,
+    val openInReader: Boolean,
+    val editMode: Boolean = false,
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BookmarkViewerSheet(
+    data: BookmarkViewerData?,
+    onClose: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
+
+    if (data == null) {
+        return
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            onClose()
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = {},
+    ) {
+        Content(
+            data = data,
+            onClose = onClose,
+        )
+    }
+}
+
+
+@Composable
+private fun Content(
+    data: BookmarkViewerData,
+    onClose: () -> Unit,
+    viewModel: UserDataViewModel = hiltViewModel(),
+    appViewModel: AppViewModel = hiltViewModel(),
+) {
+    val hadithId = data.hadithId
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
+
+    val hwc = produceState<HadithWithContents?>(initialValue = null, hadithId, translationLangCode) {
+        value = tryOrNull { appViewModel.repo.getHadithById(hadithId, translationLangCode) }
+    }.value
+
+    val collectionName = produceState<String?>(initialValue = null, hwc, translationLangCode) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo
+                    .getCollectionById(it.collectionId, translationLangCode)
+                    ?.getTitle(translationLangCode)
+            }
+        }
+    }.value
+
+    val bookTitle = produceState<String?>(initialValue = null, hwc, translationLangCode) {
+        value = hwc?.let {
+            tryOrNull {
+                appViewModel.repo
+                    .getBookById(it.bookId, translationLangCode)
+                    ?.getTitle(translationLangCode)
+            }
+        }
+    }.value
+
+    val oBookmark by viewModel.repo
+        .observeUserBookmark(hadithId)
+        .collectAsState(initial = null)
+
+    var isEditing by remember { mutableStateOf(data.editMode) }
+    var remark by remember { mutableStateOf(oBookmark?.remark ?: "") }
+
+    val scope = rememberCoroutineScope()
+    val navController = LocalNavHostController.current
+
+    LaunchedEffect(oBookmark) {
+        if (remark.isNotEmpty()) {
+            return@LaunchedEffect
+        }
+
+        remark = oBookmark?.remark ?: ""
+    }
+
+    val bookmark = oBookmark ?: return
+
+    Column(
+        modifier = Modifier.fillMaxHeight(0.9f),
+    ) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.bookmarks),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            if (!isEditing) {
+                TextIconButton(
+                    painter = painterResource(R.drawable.pencil_line),
+                    text = stringResource(R.string.edit),
+                    small = true,
+                ) {
+                    isEditing = true
+                }
+
+                IconButton(
+                    painter = painterResource(R.drawable.ic_delete),
+                    small = true,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                ) {
+                    scope.launch {
+                        viewModel.repo.deleteUserBookmark(bookmark.id)
+
+                        withContext(Dispatchers.Main) {
+                            onClose()
+                        }
+                    }
+                }
+            } else {
+                TextButton(
+                    text = stringResource(R.string.done),
+                    small = true,
+                    colors = ButtonDefaults.buttonColors(),
+                ) {
+                    isEditing = false
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+
+                    Text(
+                        text = "${collectionName ?: "? "}: ${hwc?.hadith?.number ?: hadithId}",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = "Book: ${bookTitle ?: "? "}",
+                    )
+                }
+            }
+
+            Text(
+                stringResource(R.string.note),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+
+            if (isEditing) {
+                TextInput(
+                    value = remark,
+                    onValueChange = {
+                        remark = it
+
+                        scope.launch {
+                            viewModel.repo.updateUserBookmark(
+                                bookmark.copy(
+                                    remark = it,
+                                    updatedAt = Date(),
+                                ),
+                            )
+                        }
+                    },
+                    minLines = 4,
+                    placeholder = stringResource(R.string.optional_note),
+                )
+            } else if (bookmark.remark.isNotBlank()) {
+                Text(
+                    text = bookmark.remark,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.no_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        if (!isEditing && data.openInReader) {
+            TextButton(
+                text = stringResource(R.string.open_in_reader),
+                fullWidth = true,
+                modifier = Modifier.padding(16.dp),
+            ) {
+                val bookId = hwc?.bookId ?: return@TextButton
+                navController.safeNavigate(
+                    Routes.READER.args(bookId, hadithId),
+                )
+            }
+        }
+    }
+}

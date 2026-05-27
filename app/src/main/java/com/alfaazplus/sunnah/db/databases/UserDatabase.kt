@@ -1,14 +1,14 @@
 package com.alfaazplus.sunnah.db.databases
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
+import androidx.room3.TypeConverters
+import com.alfaazplus.sunnah.db.converters.UserDbConverters
 import com.alfaazplus.sunnah.db.dao.UserDataDao
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
-import com.alfaazplus.sunnah.helpers.UserDbConverters
+import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
 
 @Database(
     entities = [

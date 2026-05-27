@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +20,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -40,152 +44,154 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.AppBar
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenu
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheetMenuItem
 import com.alfaazplus.sunnah.ui.components.library.CreateUpdateCollectionSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserCollectionItemNormalized
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.formatDateTimeShort
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.text.textDirectionForLang
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
 @Composable
-private fun CollectionItemMenu(
-    item: UserCollectionItemNormalized,
-    isOpen: Boolean,
-    onClose: () -> Unit,
+fun SingleUserCollectionScreen(
+    userCollectionId: Long,
     viewModel: UserDataViewModel = hiltViewModel(),
 ) {
-    val scope = rememberCoroutineScope()
+    var showDeleteAlert by remember { mutableStateOf(false) }
+    var showUpdateCollectionSheet by remember { mutableStateOf(false) }
 
-    BottomSheetMenu(
-        title = "${item.collectionName ?: "? "}: ${item.item.hadithNumber}",
-        isOpen = isOpen,
-        onDismiss = onClose,
-        headerArrangement = Arrangement.Center,
-    ) {
-        BottomSheetMenuItem(
-            text = stringResource(R.string.remove_from_collection),
-            icon = R.drawable.ic_delete,
-        ) {
-            scope.launch {
-                viewModel.repo.removeItemFromUserCollection(
-                    item.item.id,
-                    item.item.hadithCollectionId,
-                    item.item.hadithBookId,
-                    item.item.hadithNumber,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CollectionItemCard(
-    item: UserCollectionItemNormalized,
-    onClick: (UserCollectionItemNormalized) -> Unit,
-) {
-    var isMenuOpen by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-        border = CardDefaults.outlinedCardBorder(),
-        onClick = { onClick(item) },
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        "${item.collectionName  ?: "? "}: ${item.item.hadithNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-                Box(modifier = Modifier.weight(1f)) {}
-                IconButton(
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .size(32.dp),
-                    onClick = {
-                        isMenuOpen = true
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(6.dp),
-                        painter = painterResource(R.drawable.ic_ellipsis_vertical),
-                        contentDescription = stringResource(R.string.desc_hadith_options),
-                    )
-                }
-            }
-
-            if (!item.translationText.isNullOrEmpty()) {
-                Text(
-                    text = item.translationText!!,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 8,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
-
-    CollectionItemMenu(
-        item = item,
-        isOpen = isMenuOpen,
-        onClose = { isMenuOpen = false },
-    )
-}
-
-@Composable
-private fun CollectionItems(
-    collectionItems: List<UserCollectionItemNormalized>,
-    header: @Composable () -> Unit,
-) {
+    val context = LocalContext.current
     val navController = LocalNavHostController.current
 
+    val scope = rememberCoroutineScope()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        item { header() }
-        items(collectionItems.size) { index ->
-            CollectionItemCard(collectionItems[index]) { item ->
-                navController.navigate(
-                    Routes.READER.args(
-                        item.item.hadithCollectionId,
-                        item.item.hadithBookId,
-                        item.item.hadithNumber,
-                    )
-                )
+    val uCollection by viewModel.repo
+        .observeUserCollectionById(userCollectionId)
+        .collectAsState(null)
+
+    val bgColor = remember(uCollection?.color) {
+        uCollection?.color?.let { Color(it.toColorInt()) } ?: Color.DarkGray
+    }
+
+    val isDarkHeader = bgColor.luminance() < 0.5f
+    val textColor = if (isDarkHeader) Color.White else Color.Black
+    val isDarkTheme = ThemeUtils.observeDarkTheme()
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        DisposableEffect(isDarkTheme, isDarkHeader) {
+            val window = (view.context as Activity).window
+            val controller = WindowCompat.getInsetsController(window, view)
+
+            controller.isAppearanceLightNavigationBars = !isDarkHeader
+            controller.isAppearanceLightStatusBars = !isDarkHeader
+
+            onDispose {
+                controller.isAppearanceLightNavigationBars = isDarkTheme
+                controller.isAppearanceLightStatusBars = isDarkTheme
             }
         }
     }
+
+    val userCollection = uCollection ?: return
+
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = userCollection.name,
+                containerColor = bgColor,
+                contentColor = textColor,
+                actions = {
+                    IconButton(onClick = { showDeleteAlert = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = null,
+                            tint = colorScheme.error,
+                        )
+                    }
+
+                    IconButton(onClick = { showUpdateCollectionSheet = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.pencil_line),
+                            tint = textColor,
+                            contentDescription = null,
+                        )
+                    }
+                },
+                shadowElevation = 0.dp,
+            )
+        },
+    ) { paddingValues ->
+        Content(
+            paddingValues,
+            userCollection,
+            bgColor,
+            textColor,
+        )
+    }
+
+    CreateUpdateCollectionSheet(
+        showUpdateCollectionSheet,
+        onClose = { showUpdateCollectionSheet = false },
+        collectionToUpdate = userCollection,
+    )
+
+    AlertDialog(
+        isOpen = showDeleteAlert,
+        onClose = { showDeleteAlert = false },
+        title = stringResource(R.string.delete_collection),
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    navController.popBackStack()
+
+                    scope.launch {
+                        viewModel.repo.deleteUserCollection(userCollectionId)
+
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.msg_collection_deleted, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
+        content = {
+            Text(
+                text = stringResource(R.string.msg_delete_user_collection),
+            )
+        },
+    )
 }
 
 @Composable
@@ -206,7 +212,7 @@ private fun Content(
     val gradientColors = listOf(
         bgColor,
         bgColor,
-        MaterialTheme.colorScheme.background,
+        colorScheme.background,
     )
 
     Box(
@@ -229,8 +235,8 @@ private fun Content(
                     .fillMaxWidth()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = colorScheme.surface,
+                    contentColor = colorScheme.onSurface,
                 ),
             ) {
                 Icon(
@@ -264,7 +270,7 @@ private fun Content(
                     Text(
                         formatDateTimeShort(userCollection.updatedAt),
                         color = textColor,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = typography.labelMedium,
                         modifier = Modifier.alpha(0.8f),
                         fontStyle = FontStyle.Italic,
                     )
@@ -276,105 +282,139 @@ private fun Content(
 }
 
 @Composable
-fun SingleUserCollectionScreen(
-    userCollectionId: Long,
-    viewModel: UserDataViewModel = hiltViewModel(),
+private fun CollectionItems(
+    collectionItems: List<UserCollectionItemNormalized>,
+    header: @Composable () -> Unit,
 ) {
-    var showDeleteAlert by remember { mutableStateOf(false) }
-    var showUpdateCollectionSheet by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
-    val view = LocalView.current
     val navController = LocalNavHostController.current
 
-    val scope = rememberCoroutineScope()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(
+            start = 16.dp, top = 16.dp, end = 16.dp, bottom = 128.dp
+        ),
+    ) {
+        item { header() }
+        items(collectionItems.size) { index ->
+            CollectionItemCard(collectionItems[index]) { item ->
+                val bookId = item.ui.hwc?.bookId ?: return@CollectionItemCard
+                navController.navigate(
+                    Routes.READER.args(
+                        bookId,
+                        item.item.hadithId,
+                    )
+                )
+            }
+        }
+    }
+}
 
-    val uCollection by viewModel.repo
-        .observeUserCollectionById(userCollectionId)
-        .collectAsState(null)
 
-    val userCollection = uCollection ?: return
+@Composable
+private fun CollectionItemCard(
+    item: UserCollectionItemNormalized,
+    onClick: (UserCollectionItemNormalized) -> Unit,
+) {
+    var isMenuOpen by remember { mutableStateOf(false) }
 
-    val bgColor = userCollection.color?.let { Color(it.toColorInt()) } ?: Color.DarkGray
-    val textColor = if (bgColor.luminance() < 0.6f) Color.White else Color.Black
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface,
+        ),
+        border = CardDefaults.outlinedCardBorder(),
+        onClick = { onClick(item) },
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                NumberingCard(
+                    numbering = item.ui.numbering,
+                )
 
-    DisposableEffect(textColor) {
-        val isDarkBg = textColor == Color.White
+                Spacer(modifier = Modifier.weight(1f))
 
-        val insetsController = WindowCompat.getInsetsController((view.context as Activity).window, view)
-        val orgLightStatusBar = insetsController.isAppearanceLightStatusBars
+                IconButton(
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .size(32.dp),
+                    onClick = {
+                        isMenuOpen = true
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(6.dp),
+                        painter = painterResource(R.drawable.ic_ellipsis_vertical),
+                        contentDescription = stringResource(R.string.desc_hadith_options),
+                    )
+                }
+            }
 
-        insetsController.isAppearanceLightStatusBars = !isDarkBg
-
-        onDispose {
-            insetsController.isAppearanceLightStatusBars = orgLightStatusBar
+            if (!item.ui.translationText.isNullOrEmpty()) {
+                Text(
+                    text = item.ui.translationText,
+                    style = typography.bodyMedium,
+                    maxLines = 8,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                title = userCollection.name,
-                bgColor = bgColor,
-                color = textColor,
-                actions = {
-                    IconButton(onClick = { showDeleteAlert = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_delete),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                        )
-                    }
+    CollectionItemMenu(
+        item = item,
+        isOpen = isMenuOpen,
+        onClose = { isMenuOpen = false },
+    )
+}
 
-                    IconButton(onClick = { showUpdateCollectionSheet = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.pencil_line),
-                            tint = textColor,
-                            contentDescription = null,
-                        )
-                    }
-                },
-            )
-        },
-    ) { paddingValues ->
-        Content(
-            paddingValues,
-            userCollection,
-            bgColor,
-            textColor,
+@Composable
+fun NumberingCard(
+    numbering: AnnotatedString,
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = colorScheme.surfaceContainerHigh,
+    ) {
+        Text(
+            text = numbering,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            style = typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
         )
     }
+}
 
-    CreateUpdateCollectionSheet(
-        showUpdateCollectionSheet,
-        onClose = { showUpdateCollectionSheet = false },
-        collectionToUpdate = userCollection,
-    )
+@Composable
+private fun CollectionItemMenu(
+    item: UserCollectionItemNormalized,
+    isOpen: Boolean,
+    onClose: () -> Unit,
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    val scope = rememberCoroutineScope()
 
-    AlertDialog(
-        isOpen = showDeleteAlert,
-        onClose = { showDeleteAlert = false },
-        title = stringResource(R.string.delete_collection),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            navController.popBackStack()
-
+    BottomSheetMenu(
+        title = item.ui.numbering.toString(),
+        titleStyle = TextStyle(textDirection = textDirectionForLang(item.ui.langCode)),
+        isOpen = isOpen,
+        onDismiss = onClose,
+        headerArrangement = Arrangement.Center,
+    ) {
+        BottomSheetMenuItem(
+            text = stringResource(R.string.remove_from_collection),
+            icon = R.drawable.ic_delete,
+        ) {
             scope.launch {
-                viewModel.repo.deleteUserCollection(userCollectionId)
-
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.msg_collection_deleted, Toast.LENGTH_LONG)
-                        .show()
-                }
+                viewModel.repo.removeItemFromUserCollections(
+                    userCollectionIds = listOf(item.item.userCollectionId),
+                    hadithId = item.item.hadithId,
+                )
             }
-        },
-        content = {
-            Text(
-                text = stringResource(R.string.msg_delete_user_collection),
-            )
-        },
-    )
+        }
+    }
 }

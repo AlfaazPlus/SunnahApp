@@ -2,13 +2,18 @@ package com.alfaazplus.sunnah
 
 import android.app.Application
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
+import com.alfaazplus.sunnah.ui.utils.ThemeUtils
+import com.alfaazplus.sunnah.ui.utils.app.refreshAppLocale
 import com.alfaazplus.sunnah.ui.utils.extended.ExceptionHandler
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferencesRepairer
 import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import javax.inject.Inject
 
@@ -22,20 +27,42 @@ class SunnahApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var readerPreferencesRepairer: ReaderPreferencesRepairer
+
     override fun attachBaseContext(base: Context) {
         beforeAttachBaseContext(base)
         super.attachBaseContext(base)
+    }
+
+    private fun beforeAttachBaseContext(base: Context) {
+        appFilesDir = base.filesDir
+    }
+
+    private fun updateTheme() {
+        AppCompatDelegate.setDefaultNightMode(ThemeUtils.resolveThemeModeForDelegate())
     }
 
     override fun onCreate() {
         super.onCreate()
 
         DataStoreManager.init(this)
+
+        refreshAppLocale(applicationContext)
+
         DownloadSourceUtils.resetDownloadSourceBaseUrl()
         NotificationUtils.createNotificationChannels(this)
 
+        updateTheme()
+
         // Handler for uncaught exceptions
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
+
+
+        runBlocking {
+            readerPreferencesRepairer.repairIfNeeded()
+        }
+//        SearchIndexScheduler.scheduleSearchIndexIfNeeded(applicationContext)
     }
 
     override val workManagerConfiguration: Configuration
@@ -43,8 +70,4 @@ class SunnahApp : Application(), Configuration.Provider {
             .Builder()
             .setWorkerFactory(workerFactory)
             .build()
-
-    private fun beforeAttachBaseContext(base: Context) {
-        appFilesDir = base.filesDir
-    }
 }

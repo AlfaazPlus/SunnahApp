@@ -32,205 +32,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
-import com.alfaazplus.sunnah.ui.components.common.TextInput
-import com.alfaazplus.sunnah.ui.controllers.ModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToCollectionRequest
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
+import com.alfaazplus.sunnah.ui.components.common.Loader
+import com.alfaazplus.sunnah.ui.screens.main.CollectionsEmptyState
 import com.alfaazplus.sunnah.ui.screens.main.UserCollectionCard
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.launch
-
-@Composable
-private fun Content(
-    request: AddToCollectionRequest,
-    onCancel: () -> Unit,
-    onCreate: () -> Unit,
-    viewModel: UserDataViewModel = hiltViewModel(),
-) {
-    val userCollections by viewModel.userCollections.collectAsState()
-
-    var remark by remember { mutableStateOf("") }
-
-    var initialCollectionIds by remember { mutableStateOf(setOf<Long>()) }
-    var selectedCollectionIds by remember { mutableStateOf(setOf<Long>()) }
-
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(userCollections) {
-        /**
-         * Load current selected collections for the hadith.
-         */
-        viewModel.repo
-            .loadCollectionsForHadith(
-                hadithCollectionId = request.hadithCollectionId,
-                hadithBookId = request.hadithBookId,
-                hadithNumber = request.hadithNumber,
-            )
-            .collect { items ->
-                val currentSelectionIds = items
-                    .map { it.id }
-                    .toSet()
-
-                initialCollectionIds = currentSelectionIds
-                selectedCollectionIds = currentSelectionIds
-            }
-    }
-
-    val isDeleting = initialCollectionIds.isNotEmpty() && selectedCollectionIds.isEmpty()
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        TextInput(
-            value = remark,
-            onValueChange = {
-                remark = it
-            },
-            maxLines = 4,
-            minLines = 2,
-            label = stringResource(R.string.note),
-            placeholder = stringResource(R.string.optional_note),
-            bgColor = MaterialTheme.colorScheme.background,
-        )
-
-        Text(
-            stringResource(R.string.select_collections),
-            modifier = Modifier.padding(vertical = 8.dp),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        LazyVerticalGrid(
-            userScrollEnabled = false,
-            columns = GridCells.Adaptive(160.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.heightIn(max = 1000.dp)
-        ) {
-            items(userCollections.size) {
-                Box {
-                    UserCollectionCard(userCollections[it]) { collection ->
-                        val collectionId = collection.id
-
-                        selectedCollectionIds = if (selectedCollectionIds.contains(collectionId)) {
-                            selectedCollectionIds - collectionId
-                        } else {
-                            selectedCollectionIds + collectionId
-                        }
-                    }
-
-                    if (selectedCollectionIds.contains(userCollections[it].id)) {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(24.dp)
-                                .align(Alignment.TopEnd)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary.alpha(0.5f),
-                                    shape = RoundedCornerShape(100),
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(15.dp),
-                                painter = painterResource(R.drawable.check),
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Button(
-            modifier = Modifier.weight(1f),
-            onClick = onCancel,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ),
-        ) {
-            Text(stringResource(R.string.cancel))
-        }
-
-        Button(
-            modifier = Modifier.weight(1f),
-            onClick = {
-                scope.launch {
-                    val removedCollectionIds = initialCollectionIds - selectedCollectionIds
-                    val addedOrUpdatedCollectionIds = selectedCollectionIds
-
-                    removedCollectionIds.forEach {
-                        viewModel.repo.removeItemFromUserCollection(
-                            hadithCollectionId = request.hadithCollectionId,
-                            hadithBookId = request.hadithBookId,
-                            hadithNumber = request.hadithNumber,
-                            userCollectionId = it,
-                        )
-                    }
-
-                    addedOrUpdatedCollectionIds.map {
-                        viewModel.repo.addUserCollectionItem(
-                            UserCollectionItem(
-                                userCollectionId = it,
-                                hadithCollectionId = request.hadithCollectionId,
-                                hadithBookId = request.hadithBookId,
-                                hadithNumber = request.hadithNumber,
-                                remark = remark,
-                            )
-                        )
-                    }
-
-                    onCreate()
-                }
-            },
-            enabled = isDeleting || selectedCollectionIds.isNotEmpty(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isDeleting) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
-
-                contentColor = if (isDeleting) {
-                    MaterialTheme.colorScheme.onError
-                } else {
-                    MaterialTheme.colorScheme.onPrimary
-                },
-            ),
-        ) {
-            Text(
-                if (isDeleting) stringResource(R.string.remove)
-                else if (initialCollectionIds.isEmpty()) stringResource(R.string.add_to_collection)
-                else stringResource(R.string.update)
-            )
-        }
-    }
-}
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToCollectionSheet(
-    controller: ModalController<AddToCollectionRequest>,
+    hadithId: String?,
+    onClose: () -> Unit,
 ) {
-    val request = controller.data
     val sheetState = rememberModalBottomSheetState(true) { sheetValue ->
         when (sheetValue) {
             SheetValue.Hidden -> false
@@ -240,13 +61,13 @@ fun AddToCollectionSheet(
         }
     }
 
-    if (!controller.isVisible) {
+    if (hadithId == null) {
         return
     }
 
     ModalBottomSheet(
         onDismissRequest = {
-            controller.hide()
+            onClose()
         },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
@@ -270,15 +91,190 @@ fun AddToCollectionSheet(
 
         }
 
-        if (request != null) {
-            Content(
-                request = request,
-                onCancel = {
-                    controller.hide()
+        Content(
+            hadithId = hadithId,
+            onClose = onClose,
+        )
+    }
+}
+
+
+@Composable
+private fun Content(
+    hadithId: String,
+    onClose: () -> Unit,
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    var showCreateCollectionSheet by remember { mutableStateOf(false) }
+
+    CreateUpdateCollectionSheet(
+        showCreateCollectionSheet,
+        onClose = { showCreateCollectionSheet = false },
+    )
+
+    val _userCollections by viewModel.userCollections.collectAsState()
+    val userCollections = _userCollections
+
+    var initialCollectionIds by remember { mutableStateOf(setOf<Long>()) }
+    var selectedCollectionIds by remember { mutableStateOf(setOf<Long>()) }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(userCollections, hadithId) {
+        viewModel.repo
+            .loadCollectionsForHadith(hadithId)
+            .collect { items ->
+                val currentSelectionIds = items
+                    .map { it.id }
+                    .toSet()
+
+                initialCollectionIds = currentSelectionIds
+                selectedCollectionIds = currentSelectionIds
+            }
+    }
+
+    val isDeleting = initialCollectionIds.isNotEmpty() && selectedCollectionIds.isEmpty()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            stringResource(R.string.select_collections),
+            modifier = Modifier.padding(vertical = 8.dp),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
+
+        if (userCollections == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else if (userCollections.isEmpty()) {
+            CollectionsEmptyState(
+                onCreateCollection = { showCreateCollectionSheet = true },
+            )
+        } else {
+            LazyVerticalGrid(
+                userScrollEnabled = false,
+                columns = GridCells.Adaptive(160.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.heightIn(max = 1000.dp)
+            ) {
+                items(userCollections.size) {
+                    Box {
+                        UserCollectionCard(userCollections[it]) { collection ->
+                            val collectionId = collection.id
+
+                            selectedCollectionIds = if (selectedCollectionIds.contains(collectionId)) {
+                                selectedCollectionIds - collectionId
+                            } else {
+                                selectedCollectionIds + collectionId
+                            }
+                        }
+
+                        if (selectedCollectionIds.contains(userCollections[it].id)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .size(24.dp)
+                                    .align(Alignment.TopEnd)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary.alpha(0.5f),
+                                        shape = RoundedCornerShape(100),
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(15.dp),
+                                    painter = painterResource(R.drawable.check),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Button(
+            modifier = Modifier.weight(1f),
+            onClick = onClose,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        ) {
+            Text(stringResource(R.string.cancel))
+        }
+
+        Button(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                scope.launch {
+                    val removedCollectionIds = initialCollectionIds - selectedCollectionIds
+                    val addedOrUpdatedCollectionIds = selectedCollectionIds
+
+                    viewModel.repo.removeItemFromUserCollections(
+                        userCollectionIds = removedCollectionIds.toList(),
+                        hadithId = hadithId,
+                    )
+
+                    addedOrUpdatedCollectionIds.forEach {
+                        viewModel.repo.addUserCollectionItem(
+                            UserCollectionItem(
+                                userCollectionId = it,
+                                hadithId = hadithId,
+                                remark = "",
+                            )
+                        )
+                    }
+
+                    val updateIds = (removedCollectionIds + addedOrUpdatedCollectionIds).distinct()
+
+                    if (updateIds.isNotEmpty()) {
+                        viewModel.repo.dao.updateUserCollectionsTimestamp(
+                            ids = updateIds,
+                            updatedAt = Date(),
+                        )
+                    }
+
+                    onClose()
+                }
+            },
+            enabled = isDeleting || selectedCollectionIds.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isDeleting) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primary
                 },
-                onCreate = {
-                    controller.hide()
+
+                contentColor = if (isDeleting) {
+                    MaterialTheme.colorScheme.onError
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
                 },
+            ),
+        ) {
+            Text(
+                if (isDeleting) stringResource(R.string.remove)
+                else if (initialCollectionIds.isEmpty()) stringResource(R.string.add_to_collection)
+                else stringResource(R.string.update)
             )
         }
     }

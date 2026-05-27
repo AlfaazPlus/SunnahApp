@@ -1,6 +1,5 @@
 package com.alfaazplus.sunnah.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,10 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -22,14 +22,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,102 +41,61 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
-import com.alfaazplus.sunnah.ui.components.common.BorderedCard
-import com.alfaazplus.sunnah.ui.components.common.StatusBar
+import com.alfaazplus.sunnah.ui.components.common.SearchTextField
 import com.alfaazplus.sunnah.ui.components.hadith.CollectionIcon
-import com.alfaazplus.sunnah.ui.components.reader.AboutCollectionSheet
-import com.alfaazplus.sunnah.ui.models.BookWithInfo
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.components.reader.dialogs.AboutCollectionSheet
+import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookItemCard
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.theme.type
+import com.alfaazplus.sunnah.ui.utils.extension.bottomBorder
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
+import com.alfaazplus.sunnah.ui.utils.text.textStyle
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
+
 @Composable
-fun BookMetaInfoCard(
-    text: String,
-) {
+fun BooksIndexScreen(collectionId: String) {
+    val navController = LocalNavHostController.current
+
     Box(
-        modifier = Modifier
-            .clip(shapes.extraSmall)
-            .background(colorScheme.surfaceVariant)
-            .padding(PaddingValues(horizontal = 5.dp, vertical = 2.dp)),
-        contentAlignment = Alignment.Center,
+        modifier = Modifier.background(colorScheme.background)
     ) {
-        Text(
-            text = text, style = typography.bodyMedium
+        ScreenContent(
+            collectionId,
         )
-    }
-}
 
-@Composable
-fun BookItem(
-    bookWithInfo: BookWithInfo,
-    leftPad: Int = 0,
-    rightPad: Int = 0,
-    onClick: () -> Unit,
-) {
-    val book = bookWithInfo.book
-    val info = bookWithInfo.info
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = leftPad.dp, end = rightPad.dp
-            )
-    ) {
-        BorderedCard(
-            padding = PaddingValues(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 15.dp), onClick = onClick
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
         ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Box(
-                        modifier = Modifier.size(38.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Image(
-                            painterResource(R.drawable.vector_bg2), null, colorFilter = ColorFilter.tint(colorScheme.primary)
-                        )
-                        Text(
-                            text = book.serialNumber,
-                            color = colorScheme.onPrimary,
-                            style = typography.labelSmall,
-                        )
-                    }
-                    Text(
-                        text = info?.title ?: "",
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 8.dp, end = 8.dp, top = 5.dp),
-                        fontWeight = FontWeight.Bold,
-                        style = typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.size(38.dp))
-                }
-                Text(
-                    text = book.title,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold,
-                    style = typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    fontFamily = fontUthmani,
-                )
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .background(colorScheme.surfaceContainer)
+                    .statusBarsPadding()
+            )
 
-                Spacer(
-                    modifier = Modifier.weight(1f)
-                )
-
-                Row(
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 15.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                        .padding(10.dp)
+                        .background(colorScheme.surfaceVariant, CircleShape)
+                        .size(38.dp)
                 ) {
-                    BookMetaInfoCard("Range: ${book.hadithStart} - ${book.hadithEnd}")
-                    BookMetaInfoCard("Total Hadith: ${book.hadithCount}")
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_left),
+                        contentDescription = stringResource(R.string.goBack),
+                        tint = colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
@@ -142,18 +104,42 @@ fun BookItem(
 
 @Composable
 private fun ScreenContent(
-    collectionId: Int,
-    onBookItemClick: (Int) -> Unit,
+    collectionId: String,
     vm: BookListViewModel = hiltViewModel(),
 ) {
+    val navController = LocalNavHostController.current
+
     LaunchedEffect(collectionId) {
         vm.setCollectionId(collectionId)
     }
 
-    val books = vm.books
-    val cwi = vm.collectionWithInfo
+    var searchQuery by rememberSaveable { mutableStateOf("") }
 
-    val totalHadiths = books.sumOf { it.book.hadithCount }
+    val books = vm.books
+    val cwt = vm.cwt
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
+
+    val totalBooks = books.size
+    val totalHadiths = books.sumOf { it.hadithCount ?: 0 }
+
+    val filteredBooks = remember(searchQuery, books) {
+        if (searchQuery.isBlank()) books
+        else {
+            books.filter { bwt ->
+                val searchString = buildString {
+                    bwt.book.number?.let { append(it) }
+                    bwt.translations.forEach { translation ->
+                        translation.title?.let { append(it) }
+                        translation.intro?.let { append(it) }
+                        translation.notes?.let { append(it) }
+                        translation.preamble?.let { append(it) }
+                    }
+                }
+
+                searchString.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     BoxWithConstraints {
         val columnCount = maxOf(1, (maxWidth / 300.dp).toInt())
@@ -162,15 +148,15 @@ private fun ScreenContent(
             columns = GridCells.Fixed(columnCount),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 100.dp),
+            contentPadding = PaddingValues(bottom = 128.dp),
         ) {
-            item(
-                span = { GridItemSpan(maxLineSpan) }) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 10.dp)
-                        .background(colorScheme.surface)
+                        .background(colorScheme.surfaceContainer)
+                        .statusBarsPadding()
+                        .bottomBorder()
                         .padding(25.dp),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -178,42 +164,68 @@ private fun ScreenContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         CollectionIcon(collectionId, height = 70.dp)
+
+                        Spacer(Modifier.height(12.dp))
+
+                        metadataLangCodes(translationLangCode).forEach { langCode ->
+                            cwt
+                                ?.getTitle(langCode)
+                                ?.let {
+                                    Text(
+                                        text = it,
+                                        style = textStyle(
+                                            langCode = langCode,
+                                            fontSize = typography.titleMedium.fontSize,
+                                            fontWeight = FontWeight.SemiBold,
+                                        ),
+                                        textAlign = TextAlign.Center,
+                                    )
+                                }
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
                         Text(
-                            modifier = Modifier.padding(top = 10.dp),
-                            text = cwi?.info?.name ?: "",
-                            style = type.titleSmall,
-                            textAlign = TextAlign.Center,
-                        )
-                        Text(
-                            modifier = Modifier.padding(top = 5.dp),
-                            text = "Total Books: ${books.size} • Total Hadiths: $totalHadiths",
+                            text = "${stringResource(R.string.totalBooks, totalBooks)} • ${stringResource(R.string.totalHadiths, totalHadiths)}",
                             style = type.bodyMedium,
                             color = colorScheme.onSurfaceVariant,
                         )
 
-                        if (cwi?.info?.intro != null) {
-                            AboutCollectionSheet(cwi)
+                        if (cwt != null) {
+                            AboutCollectionSheet(cwt)
                         }
                     }
                 }
             }
 
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SearchTextField(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    placeholder = stringResource(R.string.search_book),
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                )
+            }
+
             items(
-                count = books.size,
+                count = filteredBooks.size,
                 key = { index ->
-                    val bwi = books[index]
+                    val bwi = filteredBooks[index]
                     bwi.book.id
                 },
             ) { index ->
-                val bwi = books[index]
-                val leftPad = if (index % columnCount == 0) 12 else 0
-                val rightPad = if (index % columnCount == columnCount - 1) 12 else 0
+                val bwt = filteredBooks[index]
+                val leftPad = if (index % columnCount == 0) 16 else 0
+                val rightPad = if (index % columnCount == columnCount - 1) 16 else 0
 
-                BookItem(
-                    bwi,
-                    leftPad = leftPad,
-                    rightPad = rightPad,
-                ) { onBookItemClick(bwi.book.id) }
+                BookItemCard(
+                    modifier = Modifier
+                        .padding(top = if (index == 0) 6.dp else 0.dp)
+                        .padding(start = leftPad.dp, end = rightPad.dp),
+                    bwt = bwt,
+                ) {
+                    navController.safeNavigate(Routes.READER.args(bwt.book.id))
+                }
             }
         }
     }
@@ -221,51 +233,18 @@ private fun ScreenContent(
 }
 
 @Composable
-fun BooksIndexScreen(collectionId: Int) {
-    val navController = LocalNavHostController.current
-
-    Scaffold(
-        topBar = { StatusBar() },
+fun BookMetaInfoCard(
+    text: String,
+) {
+    Box(
+        modifier = Modifier
+            .clip(shapes.small)
+            .background(colorScheme.background)
+            .padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp)),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier.padding(it)
-        ) {
-            ScreenContent(
-                collectionId, onBookItemClick = { bookId ->
-                    navController.navigate(Routes.READER.args(collectionId, bookId))
-                })
-            IconButton(
-                onClick = {
-                    navController.popBackStack()
-                },
-                modifier = Modifier
-                    .padding(10.dp)
-                    .background(colorScheme.surfaceVariant, CircleShape)
-                    .size(38.dp)
-                    .align(Alignment.TopStart)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_left),
-                    contentDescription = stringResource(R.string.goBack),
-                    tint = colorScheme.onSurfaceVariant
-                )
-            }
-            IconButton(
-                onClick = {
-                    navController.navigate(Routes.SEARCH)
-                },
-                modifier = Modifier
-                    .padding(10.dp)
-                    .background(colorScheme.surfaceVariant, CircleShape)
-                    .size(38.dp)
-                    .align(Alignment.TopEnd)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_search),
-                    contentDescription = stringResource(R.string.search),
-                    tint = colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        Text(
+            text = text, style = typography.bodyMedium
+        )
     }
 }

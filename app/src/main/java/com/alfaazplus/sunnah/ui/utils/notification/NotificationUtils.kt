@@ -13,6 +13,7 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.work.ForegroundInfo
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.utils.receivers.CrashReceiver
 
@@ -100,11 +101,14 @@ object NotificationUtils {
             .build()
     }
 
+    fun createForegroundInfoFallback(
+        context: Context,
+    ): ForegroundInfo {
+        return ForegroundInfo(1, createEmptyNotification(context, CHANNEL_ID_DEFAULT))
+    }
+
     fun showCrashNotification(ctx: Context, stackTraceString: String) {
-        var flag = PendingIntent.FLAG_UPDATE_CURRENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            flag = flag or PendingIntent.FLAG_IMMUTABLE
-        }
+        var flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
         val copyIntent = Intent(ctx, CrashReceiver::class.java).apply {
             action = CrashReceiver.CRASH_ACTION_COPY_LOG

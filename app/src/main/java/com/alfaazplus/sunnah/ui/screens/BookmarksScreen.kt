@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.InlineTextContent
@@ -44,16 +43,143 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AppBar
+import com.alfaazplus.sunnah.ui.components.common.Loader
 import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialog
-import com.alfaazplus.sunnah.ui.components.library.AddToBookmarksSheet
-import com.alfaazplus.sunnah.ui.controllers.rememberModalController
-import com.alfaazplus.sunnah.ui.models.userdata.AddToBookmarkRequest
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogAction
+import com.alfaazplus.sunnah.ui.components.dialogs.AlertDialogActionStyle
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerData
+import com.alfaazplus.sunnah.ui.components.library.BookmarkViewerSheet
 import com.alfaazplus.sunnah.ui.models.userdata.UserBookmarkNormalized
 import com.alfaazplus.sunnah.ui.viewModels.UserDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
+@Composable
+fun BookmarksScreen(
+    viewModel: UserDataViewModel = hiltViewModel(),
+) {
+    var showDeleteAllAlert by remember { mutableStateOf(false) }
+    val userBookmarks by viewModel.allUserBookmarks.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = stringResource(R.string.bookmarks),
+                actions = {
+                    if (!userBookmarks.isNullOrEmpty()) {
+                        IconButton(
+                            onClick = {
+                                showDeleteAllAlert = true
+                            },
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                },
+            )
+        },
+    ) { paddingValues ->
+        if (userBookmarks == null) {
+            Box(
+                modifier = Modifier.padding(36.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Loader()
+            }
+        } else {
+            Content(
+                paddingValues = paddingValues,
+                userBookmarks!!,
+            )
+        }
+    }
+
+    AlertDialog(
+        isOpen = showDeleteAllAlert,
+        onClose = { showDeleteAllAlert = false },
+        title = stringResource(R.string.delete_all_bookmarks),
+        actions = listOf(
+            AlertDialogAction(
+                text = stringResource(R.string.cancel),
+            ),
+            AlertDialogAction(
+                text = stringResource(R.string.delete),
+                style = AlertDialogActionStyle.Danger,
+                onClick = {
+                    scope.launch {
+                        viewModel.repo.clearUserBookmarks()
+
+                        withContext(Dispatchers.Main) {
+                            Toast
+                                .makeText(context, R.string.all_bookmarks_deleted, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                },
+            ),
+        ),
+        content = {
+            Text(
+                text = stringResource(R.string.action_cannot_be_undone),
+            )
+        },
+    )
+}
+
+@Composable
+private fun Content(
+    paddingValues: PaddingValues,
+    userBookmarks: List<UserBookmarkNormalized>,
+) {
+    var bookmarkViewerData by remember { mutableStateOf<BookmarkViewerData?>(null) }
+
+    BookmarkViewerSheet(bookmarkViewerData) {
+        bookmarkViewerData = null
+    }
+
+    if (userBookmarks.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.no_bookmarks),
+            )
+        }
+
+        return
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 300.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 128.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+    ) {
+        items(userBookmarks.size) { index ->
+            BookmarkItemCard(
+                bookmark = userBookmarks[index],
+                onClick = {
+                    bookmarkViewerData = BookmarkViewerData(
+                        hadithId = it.item.hadithId,
+                        openInReader = true,
+                    )
+                },
+            )
+        }
+    }
+}
 
 @Composable
 private fun BookmarkItemCard(
@@ -63,7 +189,7 @@ private fun BookmarkItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         border = CardDefaults.outlinedCardBorder(),
@@ -74,24 +200,16 @@ private fun BookmarkItemCard(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Row {
-                    Card(
-                        shape = MaterialTheme.shapes.extraSmall
-                    ) {
-                        Text(
-                            "${bookmark.collectionName ?: "? "}: ${bookmark.item.hadithNumber}",
-                            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    NumberingCard(
+                        numbering = bookmark.ui.numbering,
+                    )
                 }
 
-                if (!bookmark.translationText.isNullOrEmpty()) {
+                if (!bookmark.ui.translationText.isNullOrEmpty()) {
                     Text(
-                        text = bookmark.translationText!!,
+                        text = bookmark.ui.translationText,
                         style = MaterialTheme.typography.bodyMedium,
-                        maxLines = if (bookmark.item.remark.isNotBlank()) 5 else 8,
-                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
@@ -130,114 +248,4 @@ private fun BookmarkItemCard(
             }
         }
     }
-}
-
-@Composable
-private fun Content(
-    paddingValues: PaddingValues,
-    userBookmarks: List<UserBookmarkNormalized>,
-) {
-    val bookmarksModalController = rememberModalController<AddToBookmarkRequest>()
-    AddToBookmarksSheet(bookmarksModalController)
-
-    if (userBookmarks.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(R.string.no_bookmarks),
-            )
-        }
-
-        return
-    }
-
-    LazyVerticalGrid (
-        columns = GridCells.Adaptive(minSize = 300.dp),
-        contentPadding = paddingValues,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        items(userBookmarks.size) { index ->
-            BookmarkItemCard(
-                bookmark = userBookmarks[index],
-                onClick = { it ->
-                    bookmarksModalController.show(
-                        AddToBookmarkRequest(
-                            hadithCollectionId = it.item.hadithCollectionId,
-                            hadithBookId = it.item.hadithBookId,
-                            hadithNumber = it.item.hadithNumber,
-                        )
-                    )
-                },
-            )
-        }
-    }
-}
-
-@Composable
-fun BookmarksScreen(
-    viewModel: UserDataViewModel = hiltViewModel(),
-) {
-    var showDeleteAllAlert by remember { mutableStateOf(false) }
-    val userBookmarks by viewModel.allUserBookmarks.collectAsState()
-
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    Scaffold(
-        topBar = {
-            AppBar(
-                title = stringResource(R.string.bookmarks),
-                actions = {
-                    if (userBookmarks.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                showDeleteAllAlert = true
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_delete), contentDescription = null, tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                },
-            )
-        },
-    ) { paddingValues ->
-        Content(
-            paddingValues = paddingValues,
-            userBookmarks,
-        )
-    }
-
-    AlertDialog(
-        isOpen = showDeleteAllAlert,
-        onClose = { showDeleteAllAlert = false },
-        title = stringResource(R.string.delete_all_bookmarks),
-        cancelText = stringResource(R.string.cancel),
-        confirmText = stringResource(R.string.delete),
-        confirmColors = MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError,
-        onConfirm = {
-            scope.launch {
-                viewModel.repo.clearUserBookmarks()
-
-                withContext(Dispatchers.Main) {
-                    Toast
-                        .makeText(context, R.string.all_bookmarks_deleted, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        },
-        content = {
-            Text(
-                text = stringResource(R.string.action_cannot_be_undone),
-            )
-        },
-    )
 }

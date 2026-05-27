@@ -3,11 +3,11 @@ package com.alfaazplus.sunnah.ui.models
 import java.util.Date
 
 data class HadithOfTheDayHolder(
-    val urn: String,
+    val hadithId: String,
     val createdAt: Date,
 ) {
     override fun toString(): String {
-        return "$urn@${createdAt.time}"
+        return "$hadithId@${createdAt.time}"
     }
 
     companion object {
@@ -19,7 +19,7 @@ data class HadithOfTheDayHolder(
 
             try {
                 val hotd = HadithOfTheDayHolder(
-                    urn = parts[0],
+                    hadithId = parts[0],
                     createdAt = Date(parts[1].toLong()),
                 )
 

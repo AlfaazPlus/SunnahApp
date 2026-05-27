@@ -1,26 +1,36 @@
 package com.alfaazplus.sunnah.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import androidx.room.Upsert
-import com.alfaazplus.sunnah.db.models.userdata.ReadHistory
-import com.alfaazplus.sunnah.db.models.userdata.UserBookmark
-import com.alfaazplus.sunnah.db.models.userdata.UserCollection
-import com.alfaazplus.sunnah.db.models.userdata.UserCollectionItem
+import androidx.room3.Dao
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
+import androidx.room3.Update
+import androidx.room3.Upsert
+import com.alfaazplus.sunnah.db.entities.userdata.v2.ReadHistory
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserBookmark
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItem
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollection
+import com.alfaazplus.sunnah.db.entities.userdata.v2.UserCollectionItemsCount
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface UserDataDao {
-    @Query("SELECT * from user_collection ORDER BY updated_at DESC")
+    @Query("SELECT * FROM user_collections ORDER BY updated_at DESC")
     fun observeUserCollections(): Flow<List<UserCollection>>
 
-    @Query("SELECT COUNT(id) FROM user_collection_item WHERE u_collection_id = :collectionId")
-    fun observeUserCollectionItemsCount(collectionId: Long): Flow<Int>
+    @Query("SELECT COUNT(id) FROM user_collection_items WHERE collection_id = :collectionId")
+    suspend  fun getUserCollectionItemsCount(collectionId: Long): Int
 
-    @Query("SELECT * from user_collection WHERE id = :id")
+    @Query("""
+        SELECT collection_id AS id, COUNT(id) AS count
+        FROM user_collection_items
+        WHERE collection_id IN (:collectionIds)
+        GROUP BY collection_id
+    """)
+    suspend fun getUserCollectionItemCounts(collectionIds: List<Long>): List<UserCollectionItemsCount>
+
+    @Query("SELECT * FROM user_collections WHERE id = :id")
     fun observeUserCollectionById(id: Long): Flow<UserCollection?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -29,48 +39,46 @@ interface UserDataDao {
     @Update
     suspend fun updateUserCollection(userCollection: UserCollection)
 
-    @Query("DELETE FROM user_collection WHERE id = :id")
+    @Query(
+        """
+            UPDATE user_collections SET updated_at = :updatedAt  WHERE id in (:ids)
+        """
+    )
+    suspend fun updateUserCollectionsTimestamp(ids: List<Long>, updatedAt: Date)
+
+    @Query("DELETE FROM user_collections WHERE id = :id")
     suspend fun deleteUserCollection(id: Long)
 
     @Query(
         """
-        SELECT uc.* FROM user_collection uc
-        JOIN user_collection_item uci ON uc.id = uci.u_collection_id
-        WHERE uci.h_collection_id = :hadithCollectionId AND uci.h_book_id = :hadithBookId AND uci.hadith_number = :hadithNumber
-    """
+        SELECT uc.* FROM user_collections uc
+        JOIN user_collection_items uci ON uc.id = uci.collection_id
+        WHERE uci.hadith_id = :hadithId
+        """
     )
-    fun getUserCollectionsForHadith(
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
-    ): Flow<List<UserCollection>>
-
+    fun getUserCollectionsForHadith(hadithId: String): Flow<List<UserCollection>>
 
     @Query(
         """
-        SELECT * from user_collection_item
-        WHERE u_collection_id = :collectionId
+        SELECT * FROM user_collection_items
+        WHERE collection_id = :collectionId
         ORDER BY updated_at DESC
-    """
+        """
     )
     fun observeUserCollectionItems(collectionId: Long): Flow<List<UserCollectionItem>>
 
-    @Query("SELECT * from user_collection_item WHERE id = :id")
+    @Query("SELECT * FROM user_collection_items WHERE id = :id")
     suspend fun getUserCollectionItemById(id: Long): UserCollectionItem
 
-    // is in collection
     @Query(
         """
-        SELECT * FROM user_collection_item
-        WHERE u_collection_id = :userCollectionId AND h_collection_id = :hadithCollectionId
-        AND h_book_id = :hadithBookId AND hadith_number = :hadithNumber
-    """
+        SELECT * FROM user_collection_items
+        WHERE collection_id = :userCollectionId AND hadith_id = :hadithId
+        """
     )
     suspend fun getUserCollectionItem(
         userCollectionId: Long,
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
+        hadithId: String,
     ): UserCollectionItem?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -79,40 +87,33 @@ interface UserDataDao {
     @Update
     suspend fun updateUserCollectionItem(userCollectionItem: UserCollectionItem)
 
-    @Query("DELETE FROM user_collection_item WHERE id = :id")
+    @Query("DELETE FROM user_collection_items WHERE id = :id")
     suspend fun deleteUserCollectionItem(id: Long)
 
     @Query(
         """
-        DELETE FROM user_collection_item
-        WHERE u_collection_id = :userCollectionId AND h_collection_id = :hadithCollectionId
-        AND h_book_id = :hadithBookId AND hadith_number = :hadithNumber
-    """
+        DELETE FROM user_collection_items
+        WHERE collection_id IN (:userCollectionIds) AND hadith_id = :hadithId
+        """
     )
-    suspend fun removeItemFromUserCollection(
-        userCollectionId: Long,
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
+    suspend fun removeItemFromUserCollections(
+        userCollectionIds: List<Long>,
+        hadithId: String,
     )
 
-    @Query("DELETE FROM user_collection_item WHERE u_collection_id = :collectionId")
+    @Query("DELETE FROM user_collection_items WHERE collection_id = :collectionId")
     suspend fun clearUserCollectionItems(collectionId: Long)
 
-    @Query("SELECT * from user_bookmark ORDER BY updated_at DESC LIMIT 10")
+    @Query("SELECT * FROM user_bookmarks ORDER BY updated_at DESC LIMIT 10")
     fun observeRecentUserBookmarks(): Flow<List<UserBookmark>>
 
-    @Query("SELECT * from user_bookmark ORDER BY updated_at DESC")
+    @Query("SELECT * FROM user_bookmarks ORDER BY updated_at DESC")
     fun observeUserBookmarks(): Flow<List<UserBookmark>>
 
-    @Query("SELECT * from user_bookmark WHERE h_collection_id = :hadithCollectionId AND h_book_id = :hadithBookId AND hadith_number = :hadithNumber")
-    fun observeUserBookmark(
-        hadithCollectionId: Int,
-        hadithBookId: Int,
-        hadithNumber: String,
-    ): Flow<UserBookmark?>
+    @Query("SELECT * FROM user_bookmarks WHERE hadith_id = :hadithId")
+    fun observeUserBookmark(hadithId: String): Flow<UserBookmark?>
 
-    @Query("SELECT * from user_bookmark WHERE id = :id")
+    @Query("SELECT * FROM user_bookmarks WHERE id = :id")
     suspend fun getUserBookmarkById(id: Long): UserBookmark
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -121,17 +122,16 @@ interface UserDataDao {
     @Update
     suspend fun updateUserBookmark(bookmark: UserBookmark)
 
-    @Query("DELETE FROM user_bookmark WHERE id = :id")
+    @Query("DELETE FROM user_bookmarks WHERE id = :id")
     suspend fun deleteUserBookmark(id: Long)
 
-    @Query("DELETE FROM user_bookmark")
+    @Query("DELETE FROM user_bookmarks")
     suspend fun clearUserBookmarks()
 
-    @Query("SELECT * from read_history ORDER BY created_at DESC LIMIT 10")
+    @Query("SELECT * FROM read_history ORDER BY created_at DESC LIMIT 10")
     fun observeRecentReadHistory(): Flow<List<ReadHistory>>
 
-
-    @Query("SELECT * from read_history ORDER BY created_at DESC")
+    @Query("SELECT * FROM read_history ORDER BY created_at DESC")
     fun observeReadHistory(): Flow<List<ReadHistory>>
 
     @Upsert
@@ -139,6 +139,9 @@ interface UserDataDao {
 
     @Query("DELETE FROM read_history")
     suspend fun clearReadHistory()
+
+    @Query("DELETE FROM read_history WHERE hadith_id IN (:hadithIds)")
+    suspend fun deleteReadHistoryForHadithIds(hadithIds: List<String>)
 
     @Query(
         """
@@ -148,12 +151,19 @@ interface UserDataDao {
             ORDER BY created_at DESC
             LIMIT :keepCount
         )
-    """
+        """
     )
     suspend fun deleteOldReadHistory(keepCount: Int)
 
-    // delete read history for collection
-    @Query("DELETE FROM read_history WHERE h_collection_id = :collectionId")
-    suspend fun deleteReadHistoryForCollection(collectionId: Int)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUserCollections(collections: List<UserCollection>): List<Long>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUserCollectionItems(items: List<UserCollectionItem>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUserBookmarks(bookmarks: List<UserBookmark>)
+
+    @Upsert
+    suspend fun upsertReadHistory(entries: List<ReadHistory>)
 }

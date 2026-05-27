@@ -2,9 +2,10 @@ package com.alfaazplus.sunnah.ui.components.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,10 +20,10 @@ fun TextInput(
     placeholder: String? = null,
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
-    bgColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    bgColor: Color = colorScheme.background,
     enabled: Boolean = true,
 ) {
-    TextField(
+    OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = value,
         onValueChange = onValueChange,
@@ -35,12 +36,12 @@ fun TextInput(
             { Text(text = placeholder) }
         } else null,
         shape = MaterialTheme.shapes.medium,
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
+        colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = bgColor,
             focusedContainerColor = bgColor,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.alpha(0.6f),
+            unfocusedLabelColor = colorScheme.onBackground.alpha(0.6f),
+            unfocusedBorderColor = colorScheme.outline.alpha(0.3f),
+            focusedBorderColor = colorScheme.primary,
         ),
         enabled = enabled,
     )

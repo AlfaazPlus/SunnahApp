@@ -8,36 +8,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
-import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithTextOption
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import kotlinx.coroutines.launch
 
 @Composable
 fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
-    val selectedHadithTextOption = DataStoreManager.observe(stringPreferencesKey(Keys.HADITH_TEXT_OPTION), ReaderUtils.HADITH_TEXT_OPTION_BOTH)
+    val selectedTranslationId = ReaderPreferences.observeHadithTranslation()
+    val selectedHadithTextOption = ReaderPreferences.observeHadithTextOption()
+    val arabicTextSizePercent = ReaderPreferences.observeTextSizePercentArabic()
+    val translationTextSizePercent = ReaderPreferences.observeTextSizePercentTranslation()
+
     val coroutineScope = rememberCoroutineScope()
 
     val items = listOf(
-        Pair(ReaderUtils.HADITH_TEXT_OPTION_BOTH, R.string.show_arabic_and_translation),
-        Pair(ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC, R.string.show_only_arabic),
-        Pair(ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION, R.string.show_only_translation),
+        Pair(HadithTextOption.BOTH, R.string.show_arabic_and_translation),
+        Pair(HadithTextOption.ONLY_ARABIC, R.string.show_only_arabic),
+        Pair(HadithTextOption.ONLY_TRANSLATION, R.string.show_only_translation),
     )
 
-    val showArabic = selectedHadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_TRANSLATION
-    val showTranslation = selectedHadithTextOption != ReaderUtils.HADITH_TEXT_OPTION_ONLY_ARABIC
+    val showArabic = selectedHadithTextOption != HadithTextOption.ONLY_TRANSLATION
+    val showTranslation = selectedHadithTextOption != HadithTextOption.ONLY_ARABIC
 
     BottomSheet(
         isOpen = isOpen,
@@ -59,32 +58,32 @@ fun HadithTextOptionsSheet(isOpen: Boolean, onClose: () -> Unit) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    if (showArabic) {
-                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                            HadithTextPreview(
-                                true,
-                                previewText = " آيَةُ الْمُنَافِقِ ثَلاَثٌ إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ",
-                                false,
-                            )
-                        }
-                    }
-
                     if (showTranslation) {
                         HadithTextPreview(
+                            selectedTranslationId,
+                            translationTextSizePercent,
+                            isArabic = false,
                             false,
-                            previewText = "The Prophet (ﷺ) said, \"The signs of a hypocrite are three: 1. Whenever he speaks, he tells a lie. 2. Whenever he promises, he always breaks it (his promise ). 3. If you trust him, he proves to be dishonest. (If you keep something as a trust with him, he will not return it.)\"",
+                        )
+                    }
+
+                    if (showArabic) {
+                        HadithTextPreview(
+                            selectedTranslationId,
+                            arabicTextSizePercent,
+                            isArabic = true,
                             false,
                         )
                     }
                 }
             }
 
-            items.forEach { (key, title) ->
+            items.forEach { (option, title) ->
                 RadioItem(
-                    title = title, selected = key == selectedHadithTextOption,
+                    title = title, selected = option == selectedHadithTextOption,
                     onClick = {
                         coroutineScope.launch {
-                            DataStoreManager.write(stringPreferencesKey(Keys.HADITH_TEXT_OPTION), key)
+                            ReaderPreferences.setHadithTextOption(option)
                         }
                     },
                 )

@@ -2,7 +2,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,30 +22,26 @@ import javax.inject.Inject
 class NarratorsViewModel @Inject constructor(
     private val repo: HadithRepository,
 ) : ViewModel() {
-    private var _urn = MutableStateFlow<Int?>(null)
+    private val _hadithId = MutableStateFlow<String?>(null)
 
-    val narrators: StateFlow<List<Scholar>> = _urn
-        .flatMapLatest { urn ->
-            if (urn != null) {
+    val narrators: StateFlow<List<Scholar>> = _hadithId
+        .flatMapLatest { hadithId ->
+            if (hadithId != null) {
                 flow {
-                    emit(repo.getNarratorsOfHadith(urn))
+                    emit(repo.getNarratorsOfHadith(hadithId))
                 }
             } else {
-                flow {
-                    val empty = listOf<Scholar>()
-                    emit(empty)
-                }
+                flow { emit(emptyList()) }
             }
         }
         .flowOn(Dispatchers.IO)
         .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = listOf(),
+            initialValue = emptyList(),
         )
 
-
-    fun setUrn(urn: Int) {
-        _urn.value = urn
+    fun setHadithId(hadithId: String) {
+        _hadithId.value = hadithId
     }
 }

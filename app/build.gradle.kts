@@ -1,9 +1,14 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
     id("com.google.dagger.hilt.android")
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.androidx.room3)
 }
 
 android {
@@ -12,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId = "com.alfaazplus.sunnah"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = 19
         versionName = "0.1.4"
@@ -25,13 +30,6 @@ android {
             useSupportLibrary = true
         }
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    "room.schemaLocation" to "$projectDir/schemas", "room.incremental" to "true"
-                )
-            }
-        }
     }
 
     buildTypes {
@@ -77,17 +75,35 @@ android {
     }
 
     buildToolsVersion = "36.0.0"
-} // Allow references to generated code
+
+    sourceSets.named("main") {
+        java.srcDir(
+            layout.buildDirectory
+                .dir("generated/java/generateDebugProto/java")
+                .get().asFile
+        )
+    }
+}
 
 base {
     archivesName = android.defaultConfig.versionName
 }
 
-kapt {
-    correctErrorTypes = true
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
 
-    javacOptions {
-        option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {}
+            }
+        }
     }
 }
 
@@ -100,7 +116,9 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.viewmodel)
     implementation(libs.compose.livedata)
-    implementation(libs.activity.compose)
+    implementation(libs.compose.material3.windowSizeClass)
+    implementation(libs.compose.material3.adaptive)
+    implementation(libs.androidx.activityCompose)
     implementation(libs.ui.graphics)
     implementation(libs.material3)
     implementation(libs.google.fonts)
@@ -116,23 +134,20 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.asynclayoutinflater)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // Room
-    implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room3.common)
+    implementation(libs.androidx.room3.runtime)
+    ksp(libs.androidx.room3.compiler)
 
-    // Kotlin Extensions and Coroutines support for Room
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.commons.compress)
     implementation(libs.workManager)
     implementation(libs.dataStore)
     implementation(libs.hiltWork)
@@ -142,8 +157,18 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.paging)
     implementation(libs.pagingCompose)
-    implementation(libs.roomPaging)
+    implementation(libs.androidx.room3.paging)
 
     implementation(libs.accompanist.permissions)
-    implementation(libs.material3.adaptive)
+    implementation(libs.protobuf.java)
 }
+
+tasks
+    .withType<KotlinCompile>()
+    .configureEach {
+        if (name.contains("Debug", ignoreCase = true)) {
+            dependsOn("generateDebugProto")
+        } else if (name.contains("Release", ignoreCase = true)) {
+            dependsOn("generateReleaseProto")
+        }
+    }

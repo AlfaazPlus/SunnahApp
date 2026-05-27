@@ -1,50 +1,8 @@
 <resources>
-    <string name="app_name">SunnahApp</string>
-    <string name="app_name_generated">SunnahApp</string>
-    <string name="app_description">SunnahApp</string>
-
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-    <string name="cancel">Cancel</string>
-    <string name="close">Close</string>
-    <string name="delete">Delete</string>
-    <string name="create">Create</string>
-    <string name="goBack">Go back</string>
-    <string name="copy">Copy</string>
-    <string name="enable">Enable</string>
-    <string name="disable">Disable</string>
-    <string name="enabled">Enabled</string>
-    <string name="disabled">Disabled</string>
-    <string name="allow">Allow</string>
-
-    <string name="hadithNumber">Hadith %s</string>
-    <string name="hadithNumberFull">Hadith number %s</string>
-
-    <string name="books">Books</string>
-    <string name="hadiths">Hadiths</string>
-    <string name="hadithRangeValue" formatted="false">%d to %d</string>
-    <string name="hadithCountValue" formatted="false">Total Hadiths: %d</string>
-    <string name="previousHadith">Previous Hadith</string>
-    <string name="nextHadith">Next Hadith</string>
-    <string name="previousBook">Previous Book</string>
-    <string name="nextBook">Next Book</string>
-
-    <string name="search">Search</string>
-    <string name="global_search">Global Search</string>
-    <string name="search_placeholder">Enter search term…</string>
-    <string name="search_book">Search book…</string>
-    <string name="search_hadith">Search hadith…</string>
-    <string name="search_filter">Search filter</string>
-    <string name="search_in">Search in…</string>
-    <string name="search_for">Search for…</string>
-    <string name="apply_filter">Apply filter</string>
-    <string name="no_results_found">No results found</string>
-    <string name="one_result_found">1 result found</string>
-    <string name="n_results_found" formatted="false">%d results found</string>
-    <string name="search_result_menu">Search result menu</string>
-    <string name="clear_search">Clear search</string>
-
-    <string name="lorem_ipsum">
+    <string name="app_name" translatable="false">SunnahApp</string>
+    <string name="app_name_generated" translatable="false">SunnahApp</string>
+    <string name="app_description" translatable="false">SunnahApp</string>
+    <string name="lorem_ipsum" translatable="false">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris volutpat, dolor id interdum
         ullamcorper, risus dolor egestas lectus, sit amet mattis purus dui nec risus. Maecenas non sodales nisi, vel dictum dolor.
         Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend diam,
@@ -72,6 +30,56 @@
         bibendum enim a justo luctus vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
 
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="top">Top</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="clear">Clear</string>
+    <string name="delete">Delete</string>
+    <string name="create">Create</string>
+    <string name="goBack">Go back</string>
+    <string name="copy">Copy</string>
+    <string name="selectAll">Select all</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="allow">Allow</string>
+    <string name="downloading">Downloading…</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="viewAll">View all</string>
+
+    <string name="hadithNumber">Hadith %s</string>
+    <string name="hadithNumberFull">Hadith number %s</string>
+    <string name="bookNumberTitle">Book %s: %s</string>
+
+    <string name="books">Books</string>
+    <string name="hadiths">Hadiths</string>
+    <string name="hadithRangeValue" formatted="false">%d to %d</string>
+    <string name="totalBooks" formatted="false">Total books: %d</string>
+    <string name="totalHadiths" formatted="false">Total hadiths: %d</string>
+    <string name="previousHadith">Previous Hadith</string>
+    <string name="nextHadith">Next Hadith</string>
+    <string name="previousBook">Previous Book</string>
+    <string name="nextBook">Next Book</string>
+
+    <string name="search">Search</string>
+    <string name="global_search">Global Search</string>
+    <string name="search_placeholder">Enter search term…</string>
+    <string name="search_book">Search book…</string>
+    <string name="search_hadith">Search hadith…</string>
+    <string name="search_filter">Search filter</string>
+    <string name="search_in">Search in…</string>
+    <string name="search_for">Search for…</string>
+    <string name="search_hint">Search…</string>
+    <string name="apply_filter">Apply filter</string>
+    <string name="no_results_found">No results found</string>
+    <string name="one_result_found">1 result found</string>
+    <string name="n_results_found" formatted="false">%d results found</string>
+    <string name="search_result_menu">Search result menu</string>
+    <string name="clear_search">Clear search</string>
+
     <string name="settings">Settings</string>
     <string name="app_settings">App Settings</string>
     <string name="reader_settings">Reader Settings</string>
@@ -89,7 +97,7 @@
     <string name="theme_yellow">Yellow</string>
     <string name="theme_mono">Mono</string>
     <string name="app_langauge">App Language</string>
-    <string name="app_theme">App Theme</string>
+    <string name="app_theme">Theme</string>
     <string name="theme_colors">Theme Colors</string>
     <string name="theme_mode">Theme Mode</string>
     <string name="light">Light</string>
@@ -107,7 +115,10 @@
     <string name="share_app">Share App</string>
     <string name="share_app_msg">SunnahApp is a free and open-source app to read and explore the Sunnah of the Prophet ﷺ. This app has a nice and clean interface with features like translation, advanced search, reminder and many more. \n\nDOWNLOAD NOW:\n%s</string>
     <string name="install_quranapp">Install QuranApp</string>
-    <string name="install_quranapp_description">Free, secure &amp; open source</string>
+    <string name="install_quranapp_description">Read this Quran reference with translations, word-by-word meaning, recitation, and more. QuranApp is Free, secure &amp; open source</string>
+    <string name="install_quranapp_description_short">Free, secure &amp; open source</string>
+    <string name="install_from_google_play">Install from Google Play</string>
+    <string name="install_from_github">Install from GitHub</string>
     <string name="donate">Donate</string>
     <string name="hadith_layout">Hadith Layout</string>
     <string name="hadith_layout_description">Horizontal — Hadiths are scrollable left and right.\nVertical — Hadiths are scrollable up and down.</string>
@@ -178,6 +189,18 @@
     <string name="optional_note">Optional Note</string>
     <string name="no_note">No note added</string>
     <string name="open_in_reader">Open in Reader</string>
+    <string name="quick_reference_n_hadiths">%1$d hadiths</string>
+    <string name="quick_reference_not_found">Could not load the referenced hadith.</string>
+    <string name="hadith_references">Hadith References</string>
+    <string name="ref_type_sunnahcom">Reference</string>
+    <string name="ref_type_app">App reference</string>
+    <string name="ref_type_in_book">In-book reference</string>
+    <string name="ref_type_english_translation">English reference</string>
+    <string name="ref_type_arabic_english_book">Arabic/English book reference</string>
+    <string name="ref_type_arabic">Arabic reference</string>
+    <string name="ref_type_us_msa">USC-MSA web (English) reference</string>
+    <string name="ref_deprecated">(deprecated)</string>
+    <string name="no_references">No references available.</string>
     <string name="no_bookmarks">No bookmarks yet.</string>
     <string name="reading_history">Reading History</string>
     <string name="no_reading_history">Your reading history appears here.</string>
@@ -193,19 +216,121 @@
     <string name="create_issue">Create issue</string>
     <string name="no_logs_found">No logs found</string>
     <string name="resource_download_source">Resource Download Source</string>
-    <string name="resource_download_source_desc">
-        Use this option to download Hadith resources from a different source if one is not working.
-    </string>
+    <string name="resource_download_source_desc">Use this option to download Hadith resources from a different source if one is not working.</string>
     <string name="open_github_issues">Open GitHub issues</string>
     <string name="daily_reminder">Daily Reminder</string>
     <string name="daily_reminder_desc">Get a daily reminder for Hadith.</string>
-    <string name="notification_permission">
-        Notification Permission
-    </string>
-    <string name="notification_permission_desc">
-        Please allow notification permission to receive daily Hadith reminders.
-    </string>
-    <string name="download_collection_first">
-        To use this feature, please download at least one Hadith collection first.
-    </string>
+    <string name="notification_permission">Notification Permission</string>
+    <string name="notification_permission_desc">Please allow notification permission to receive daily Hadith reminders.</string>
+    <string name="download_collection_first">To use this feature, please download at least one Hadith collection first.</string>
+    <string name="setting_up">Setting up… This will take a few seconds.</string>
+    <string name="selectABook">Select a book first.</string>
+    <string name="chapter">Chapter</string>
+    <string name="workInProgress">Work in progress</string>
+    <string name="selectTranslation">Select translation</string>
+    <string name="info">Info</string>
+    <string name="book_info">Book information</string>
+    <string name="book_section_preamble">Preamble</string>
+    <string name="book_section_intro">Introduction</string>
+    <string name="book_section_notes">Notes</string>
+    <string name="book_no_details">No additional information for this book.</string>
+    <string name="deleteTranslation">Delete Translation?</string>
+    <string name="updateAvailable">Update available</string>
+    <string name="comingSoon">Coming soon</string>
+    <string name="msgTranslationUpdateAvailable">A newer version of your translation is available.</string>
+
+    <string name="primaryCollections">Primary Collections</string>
+    <string name="selection">Selection</string>
+
+    <string name="noUrduTranslation">Urdu translation is not available for this item.</string>
+    <string name="noBanglaTranslation">Bengali translation is not available for this item.</string>
+    <string name="noFrenchTranslation">French translation is not available for this item.</string>
+    <string name="noIndonesianTranslation">Indonesian translation is not available for this item.</string>
+
+    <string name="hadith_grade_label_format">Grade: %s</string>
+
+    <string name="hadith_grade_sahih">Sahih</string>
+    <string name="hadith_grade_sahih_desc">Authentic hadith</string>
+
+    <string name="hadith_grade_sahih_maqtu">Sahih Maqtu\'</string>
+    <string name="hadith_grade_sahih_maqtu_desc">Authentic narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_sahih_marfu">Sahih Marfu\'</string>
+    <string name="hadith_grade_sahih_marfu_desc">Authentic narration attributed to the Prophet ﷺ</string>
+
+    <string name="hadith_grade_sahih_mauquf">Sahih Mawquf</string>
+    <string name="hadith_grade_sahih_mauquf_desc">Authentic narration from a Companion</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">Sahih Mawquf with Marfu\' ruling</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">Companion narration treated as effectively prophetic</string>
+
+    <string name="hadith_grade_sahih_mutawatir">Sahih Mutawatir</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">Mass-transmitted authentic hadith</string>
+
+    <string name="hadith_grade_hasan">Hasan</string>
+    <string name="hadith_grade_hasan_desc">Good and reliable hadith</string>
+
+    <string name="hadith_grade_hasan_sahih">Hasan Sahih</string>
+    <string name="hadith_grade_hasan_sahih_desc">Hadith graded between Hasan and Sahih</string>
+
+    <string name="hadith_grade_hasan_maqtu">Hasan Maqtu\'</string>
+    <string name="hadith_grade_hasan_maqtu_desc">Good narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_hasan_mauquf">Hasan Mawquf</string>
+    <string name="hadith_grade_hasan_mauquf_desc">Good narration from a Companion</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">Hasan li-Ghayrih</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">Weak narration strengthened by supporting chains</string>
+
+    <string name="hadith_grade_daif">Da\'if</string>
+    <string name="hadith_grade_daif_desc">Weak hadith</string>
+
+    <string name="hadith_grade_daif_jiddan">Very Weak</string>
+    <string name="hadith_grade_daif_jiddan_desc">Extremely weak hadith</string>
+
+    <string name="hadith_grade_daif_maqtu">Weak Maqtu\'</string>
+    <string name="hadith_grade_daif_maqtu_desc">Weak narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">Weak Munkar Maqtu\'</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">Rejected weak narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_daif_marfu">Weak Marfu\'</string>
+    <string name="hadith_grade_daif_marfu_desc">Weak narration attributed to the Prophet ﷺ</string>
+
+    <string name="hadith_grade_daif_mauquf">Weak Mawquf</string>
+    <string name="hadith_grade_daif_mauquf_desc">Weak narration from a Companion</string>
+
+    <string name="hadith_grade_daif_munkar">Weak Munkar</string>
+    <string name="hadith_grade_daif_munkar_desc">Weak narration contradicting reliable narrators</string>
+
+    <string name="hadith_grade_daif_mursal">Weak Mursal</string>
+    <string name="hadith_grade_daif_mursal_desc">Narration with a missing Companion in the chain</string>
+
+    <string name="hadith_grade_maqtu">Maqtu\'</string>
+    <string name="hadith_grade_maqtu_desc">Narration from a Tabi‘i</string>
+
+    <string name="hadith_grade_mauquf">Mawquf</string>
+    <string name="hadith_grade_mauquf_desc">Narration from a Companion</string>
+
+    <string name="hadith_grade_munkar">Munkar</string>
+    <string name="hadith_grade_munkar_desc">Rejected narration due to contradiction or weakness</string>
+
+    <string name="hadith_grade_mawdu">Mawdu\'</string>
+    <string name="hadith_grade_mawdu_desc">Fabricated hadith</string>
+
+    <string name="hadith_grade_shadh">Shadh</string>
+    <string name="hadith_grade_shadh_desc">Irregular narration contradicting stronger reports</string>
+
+    <string name="hadith_grade_shadh_anha">Shadh Anha</string>
+    <string name="hadith_grade_shadh_anha_desc">Anomalous narration variant</string>
+
+    <string name="hadith_grade_shadh_maqtu">Shadh Maqtu\'</string>
+    <string name="hadith_grade_shadh_maqtu_desc">Irregular narration from a Tabi‘i</string>
+
+    <string name="msgUpdateAvailable">UPDATE AVAILABLE! Please update the app to get the latest features.</string>
+    <string name="msgUpdateAvailable4Dialog">UPDATE AVAILABLE!\nPlease update the app.</string>
+    <string name="msgUpdateAvailable2Continue">UPDATE REQUIRED!\nPlease update the app to continue.</string>
+
+    <string name="noResults">No results found</string>
+    <string name="searchTips">Search for hadiths, books, or scholars</string>
 </resources>

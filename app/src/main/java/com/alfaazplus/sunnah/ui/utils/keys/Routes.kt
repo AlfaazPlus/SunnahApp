@@ -34,11 +34,11 @@ object Routes {
     val SETTINGS = SingleArgRoute("settings", Keys.SHOW_READER_SETTINGS_ONLY)
     const val SETTINGS_THEME = "settings_theme"
     const val SETTINGS_LANGUAGE = "settings_language"
-    const val SETTINGS_MANAGE_COLLECTIONS = "settings_manage_collections"
+    const val SETTINGS_TRANSLATIONS = "settings_translations"
+
     const val APP_LOGS = "app_logs"
     val BOOKS_INDEX = SingleArgRoute("books_index", Keys.COLLECTION_ID)
-    val READER = MultiArgRoute("reader", listOf(Keys.COLLECTION_ID, Keys.BOOK_ID, Keys.HADITH_NUMBER))
-    val NARRATOR_CHAIN = SingleArgRoute("narrators_chain", Keys.HADITH_URN)
+    val READER = MultiArgRoute("reader", listOf(Keys.BOOK_ID, Keys.HADITH_ID))
     val SCHOLAR_INFO = SingleArgRoute("scholar_info", Keys.SCHOLAR_ID)
     val READING_HISTORY = "reading_history"
     val BOOKMARKS = "bookmarks"

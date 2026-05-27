@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package sunnahapp.deliverable.v1;
+
+// Wire format version for Android: reject unknown values.
+option java_multiple_files = true;
+option java_package = "com.alfaazplus.sunnah.deliverable.v1";
+
+message CollectionRow {
+    string id = 1;
+    string type = 2;
+    int32 sort_order = 3;
+    bool has_volumes = 4;
+    bool has_books = 5;
+    bool has_chapters = 6;
+    string numbering_source = 7;
+}
+
+message CollectionTranslationRow {
+    string collection_id = 1;
+    string lang = 2;
+    string title = 3;
+    string intro = 4;
+    string description = 5;
+}
+
+message BookRow {
+    string id = 1;
+    string collection_id = 2;
+    string number = 3;
+}
+
+message BookTranslationRow {
+    string book_id = 1;
+    string lang = 2;
+    string title = 3;
+    string intro = 4;
+    string preamble = 5;
+    string notes = 6;
+}
+
+message ChapterRow {
+    string id = 1;
+    string collection_id = 2;
+    string book_id = 3;
+    string number = 4;
+}
+
+message ChapterTranslationRow {
+    string chapter_id = 1;
+    string lang = 2;
+    string title = 3;
+    string intro = 4;
+}
+
+message HadithRow {
+    string id = 1;
+    optional int64 urn = 2;
+    string collection_id = 3;
+    string book_id = 4;
+    optional string chapter_id = 5;
+    string number = 6;
+}
+
+message HadithContentRow {
+    string hadith_id = 1;
+    string lang = 2;
+    string blocks_json = 3;
+}
+
+message HadithReferenceRow {
+    string hadith_id = 1;
+    string type = 2;
+    string value = 3;
+}
+
+// Cross-corpus link: `related_hadith_id` may name a hadith that is not in this
+// `CorpusBundle` (another collection / not installed yet). Consumers must not
+// assume the target row exists in the same payload or DB yet.
+message HadithRelatedRow {
+    // Source hadith; always within this bundle's `hadiths` when emitted from factory.
+    string hadith_id = 1;
+    // Target hadith id; may belong to another corpus or be absent until that corpus is loaded.
+    string related_hadith_id = 2;
+}
+
+message HadithGradeRow {
+    string hadith_id = 1;
+    string grade_id = 2;
+    string label = 3;
+    string lang = 4;
+}
+
+message HadithNarratorRow {
+    string hadith_id = 1;
+    string source = 2;
+    int32 narrator_id = 3;
+    int32 position = 4;
+}
+
+// One gzip blob per corpus directory under intermediate/.
+message CorpusBundle {
+    int32 schema_version = 1;
+    string corpus_id = 2;
+    int32 content_version = 3;
+    repeated CollectionRow collections = 4;
+    repeated CollectionTranslationRow collection_translations = 5;
+    repeated BookRow books = 6;
+    repeated BookTranslationRow book_translations = 7;
+    repeated ChapterRow chapters = 8;
+    repeated ChapterTranslationRow chapter_translations = 9;
+    repeated HadithRow hadiths = 10;
+    repeated HadithContentRow hadith_contents = 11;
+    repeated HadithReferenceRow hadith_references = 12;
+    // Edges may point out of this bundle; see `HadithRelatedRow`.
+    repeated HadithRelatedRow hadith_related = 13;
+    repeated HadithGradeRow hadith_grades = 14;
+    repeated HadithNarratorRow hadith_narrators = 15;
+}

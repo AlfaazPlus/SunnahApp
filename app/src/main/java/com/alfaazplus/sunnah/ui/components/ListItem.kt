@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,20 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-@Composable
-fun ListItemIcon(
-    icon: Int,
-    contentDescription: String? = null,
-    tint: Color = Color.Unspecified
-) {
-    Icon(
-        painter = painterResource(id = icon),
-        contentDescription = contentDescription,
-        modifier = Modifier.padding(end = 15.dp),
-        tint = tint,
-    )
-}
+import com.alfaazplus.sunnah.ui.theme.tightTextStyle
 
 @Composable
 fun ListItemContent(
@@ -51,13 +39,13 @@ fun ListItemContent(
         if (titleText != null) {
             Text(
                 text = titleText,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall.merge(tightTextStyle)
             )
         }
         if (subtitleText != null) {
             Text(
                 text = subtitleText,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.merge(tightTextStyle),
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier
                     .padding(top = 3.dp)
@@ -89,7 +77,8 @@ fun ListItem(
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
                 .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (leading != null) leading()
 

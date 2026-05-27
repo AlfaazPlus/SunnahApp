@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.alfaazplus.sunnah.db.models.scholars.Scholar
+import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
-import com.alfaazplus.sunnah.ui.models.BookSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.SearchFilters
+import com.alfaazplus.sunnah.ui.search.SearchFiltersStore
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -18,12 +21,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -33,21 +38,27 @@ open class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
-    private var _searchCollectionIds = MutableStateFlow<List<Int>?>(null)
+    val searchQuery = _searchQuery.asStateFlow()
 
-    val searchQuery: StateFlow<String> = _searchQuery
-    val searchCollectionIds: StateFlow<List<Int>?> = _searchCollectionIds
+    private val _currentFilters = MutableStateFlow(SearchFiltersStore.read())
+    val currentFilters = _currentFilters.asStateFlow()
 
     val hadithsSearchResults: Flow<PagingData<HadithSearchResult>> = combine(
-        _searchCollectionIds
-            .debounce(300)
-            .distinctUntilChanged(),
+        _currentFilters,
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
-    ) { collectionIds, query -> Pair(collectionIds, query) }
-        .flatMapLatest { (collectionIds, query) ->
-            repo.searchHadiths(query, collectionIds, primaryColor)
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { filters, query, langCode ->
+        Triple(filters, query, langCode)
+    }
+        .flatMapLatest { (filters, query, langCode) ->
+            repo.searchHadiths(
+                query,
+                collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
+                primaryColor,
+                langCode,
+            )
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -58,13 +69,20 @@ open class SearchViewModel @Inject constructor(
 
 
     val booksSearchResults: Flow<PagingData<BooksSearchResult>> = combine(
-        searchCollectionIds,
+        _currentFilters,
         _searchQuery
             .debounce(300)
             .distinctUntilChanged(),
-    ) { collectionIds, query -> Pair(collectionIds, query) }
-        .flatMapLatest { (collectionIds, query) ->
-            repo.searchBooks(query, collectionIds)
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { filters, query, langCode ->
+        Triple(filters, query, langCode)
+    }
+        .flatMapLatest { (filters, query, langCode) ->
+            repo.searchBooks(
+                query,
+                collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
+                langCode,
+            )
         }
         .cachedIn(viewModelScope)
         .stateIn(
@@ -86,11 +104,14 @@ open class SearchViewModel @Inject constructor(
             initialValue = PagingData.empty(),
         )
 
-    val quickHadithResults: StateFlow<List<HadithSearchQuickResult>> = _searchQuery
-        .debounce(300)
-        .distinctUntilChanged()
-        .mapLatest { query ->
-            repo.getQuickHadithSearchResults(query)
+    val quickHadithResults: StateFlow<List<HadithSearchQuickResult>> = combine(
+        _searchQuery
+            .debounce(300)
+            .distinctUntilChanged(),
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { query, langCode -> query to langCode }
+        .mapLatest { (query, langCode) ->
+            repo.getQuickHadithSearchResults(query, langCode)
         }
         .stateIn(
             viewModelScope,
@@ -98,11 +119,14 @@ open class SearchViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    val quickBookResults: StateFlow<List<BookSearchQuickResult>> = _searchQuery
-        .debounce(300)
-        .distinctUntilChanged()
-        .mapLatest { query ->
-            repo.getQuickBookSearchResults(query)
+    val quickBookResults: StateFlow<List<BookSearchQuickResult>> = combine(
+        _searchQuery
+            .debounce(300)
+            .distinctUntilChanged(),
+        ReaderPreferences.hadithTranslationFlow(),
+    ) { query, langCode -> query to langCode }
+        .mapLatest { (query, langCode) ->
+            repo.getQuickBookSearchResults(query, langCode)
         }
         .stateIn(
             viewModelScope,
@@ -114,9 +138,11 @@ open class SearchViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun applyFilters(
-        searchCollectionIds: List<Int>,
-    ) {
-        _searchCollectionIds.value = searchCollectionIds
+    fun setFilters(filters: SearchFilters) {
+        _currentFilters.value = filters
+
+        viewModelScope.launch {
+            SearchFiltersStore.write(filters)
+        }
     }
 }

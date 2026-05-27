@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,18 +20,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.text.parseAsHtml
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.models.BooksSearchResult
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
+import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.screens.BookMetaInfoCard
-import com.alfaazplus.sunnah.ui.theme.fontUthmani
+import com.alfaazplus.sunnah.ui.screens.NumberingCard
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
+import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
+import com.alfaazplus.sunnah.ui.utils.text.textStyle
+import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
@@ -55,48 +61,34 @@ private fun BookSearchItem(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                ) {
+            NumberingCard(
+                numbering = ReaderItemsBuilder.buildNumbering(
+                    item.collectionName,
+                    item.book.number,
+                    item.langCode,
+                ),
+            )
+
+            metadataLangCodes(item.langCode).forEach { langCode ->
+                val title = when (langCode) {
+                    "ar" -> item.titleAr
+                    else -> item.title
+                }
+                title?.let {
                     Text(
-                        "${item.collectionName} : ${item.book.serialNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
+                        text = it
+                            .parseAsHtml()
+                            .toAnnotatedString(),
+                        style = textStyle(
+                            langCode = langCode,
+                            fontSize = typography.titleSmall.fontSize,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
                     )
                 }
             }
 
-            Text(
-                text = item.info.title,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 5.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center,
-            )
-
-            Text(
-                text = item.book.title,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                fontFamily = fontUthmani,
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-            ) {
-                BookMetaInfoCard("Range: ${item.book.hadithStart} - ${item.book.hadithEnd}")
-                BookMetaInfoCard("Total Hadith: ${item.book.hadithCount}")
-            }
+            BookMetaInfoCard(stringResource(R.string.totalHadiths, item.hadithCount))
         }
     }
 }
@@ -145,7 +137,9 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
         ) { index ->
             val item = quickSearchResults[index]
             QuickHadithSearchResult(
-                title = "${item.serialNumber}. ${item.bookTitle}",
+                title = buildAnnotatedString {
+                    append("${item.bookNumber}. ${item.bookTitle}")
+                },
                 description = {
                     Text(
                         text = item.collectionName,
@@ -154,7 +148,7 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
                     )
                 },
             ) {
-                navController.navigate(Routes.READER.args(item.collectionId, item.bookId))
+                navController.safeNavigate(Routes.READER.args(item.bookId))
             }
         }
 
@@ -172,19 +166,13 @@ fun BookSearchResults(vm: SearchViewModel, listState: LazyListState) {
             booksSearchResults.itemCount,
             key = { index ->
                 val item = booksSearchResults[index]
-                if (item != null) {
-                    return@items "${item.book.id}-${item.book.collectionId}"
-                } else {
-                    index
-                }
+                "${item?.book?.id}-${item?.book?.collectionId}-$index"
             },
         ) { index ->
             val item = booksSearchResults[index]
             if (item != null) {
                 BookSearchItem(item) {
-                    navController.navigate(
-                        Routes.READER.args(item.book.collectionId, item.book.id)
-                    )
+                    navController.safeNavigate(Routes.READER.args(item.book.id))
                 }
             }
         }

@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -37,13 +38,16 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.models.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchResult
+import com.alfaazplus.sunnah.ui.screens.NumberingCard
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
 
 @Composable
 fun QuickHadithSearchResult(
-    title: String,
+    title: AnnotatedString,
     description: @Composable ColumnScope.() -> Unit,
     onClick: () -> Unit,
 ) {
@@ -63,7 +67,9 @@ fun QuickHadithSearchResult(
             Icon(
                 painter = painterResource(R.drawable.bolt),
                 contentDescription = null,
-                modifier = Modifier.padding(top = 5.dp).size(20.dp),
+                modifier = Modifier
+                    .padding(top = 5.dp)
+                    .size(20.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
             Column(
@@ -135,16 +141,8 @@ private fun HadithSearchItem(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Row {
-                Card(
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        "${item.collectionName}: ${item.hadith.hadithNumber}",
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                NumberingCard(numbering = item.numbering)
                 Box(modifier = Modifier.weight(1f)) {}
                 IconButton(
                     modifier = Modifier
@@ -162,10 +160,7 @@ private fun HadithSearchItem(
                 }
             }
 
-            Text(
-                text = item.translationText,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            Text(text = item.snippetText)
         }
     }
 
@@ -183,6 +178,7 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
     val navController = LocalNavHostController.current
     val hadithSearchResults = vm.hadithsSearchResults.collectAsLazyPagingItems()
     val quickSearchResults by vm.quickHadithResults.collectAsState()
+    val displayLangCode = ReaderPreferences.observeHadithTranslation()
     val isLoading = hadithSearchResults.loadState.refresh is LoadState.Loading
 
 
@@ -199,7 +195,7 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
                 .padding(16.dp), contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No results found",
+                text = stringResource(R.string.noResults),
                 style = MaterialTheme.typography.headlineSmall,
             )
         }
@@ -217,14 +213,18 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
         items(
             count = quickSearchResults.size,
             key = { index ->
-                val item = quickSearchResults[index]
-                "${item.hadithNumber}-${item.collectionId}-quick"
+                "${quickSearchResults[index].hadithId}-quick"
             },
         ) { index ->
             val item = quickSearchResults[index]
 
             QuickHadithSearchResult(
-                title = "${item.collectionName}: ${item.hadithNumber}", description = {
+                title = ReaderItemsBuilder.buildNumbering(
+                    item.collectionName,
+                    item.hadithNumber,
+                    displayLangCode,
+                ),
+                description = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -235,33 +235,15 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
                             modifier = Modifier.size(14.dp),
                         )
                         Text(
-                            text = "Book ${item.bookSerial}: ${item.bookTitle}",
+                            text = stringResource(R.string.bookNumberTitle, item.bookNumber ?: "", item.bookTitle ?: ""),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
                         )
                     }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_hash),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                        )
-                        Text(
-                            text = "Hadith: ${item.hadithOrder}",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    }
-                }) {
+                },
+            ) {
                 navController.navigate(
-                    Routes.READER.args(
-                        item.collectionId,
-                        item.bookId,
-                        item.hadithNumber,
-                    )
+                    Routes.READER.args(item.bookId, item.hadithId),
                 )
             }
         }
@@ -280,22 +262,14 @@ fun HadithSearchResults(vm: SearchViewModel, hadithListState: LazyListState) {
             hadithSearchResults.itemCount,
             key = { index ->
                 val item = hadithSearchResults[index]
-                if (item != null) {
-                    return@items item.hadith.urn
-                } else {
-                    index
-                }
+                "${item?.hadithId}-$index"
             },
         ) { index ->
             val item = hadithSearchResults[index]
             if (item != null) {
                 HadithSearchItem(item) {
                     navController.navigate(
-                        Routes.READER.args(
-                            item.hadith.collectionId,
-                            item.hadith.bookId,
-                            item.hadith.hadithNumber,
-                        )
+                        Routes.READER.args(item.bookId, item.hadithId),
                     )
                 }
             }

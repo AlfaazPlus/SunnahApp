@@ -31,15 +31,19 @@ height="80">](https://github.com/alfaazplus/sunnahapp/releases/latest)
 
 ## Screenshots
 
-<div align="center" style="width:100%; display:flex; justify-content:space-between;">
-      <img src="repo_assets/screenshots/1_homepage-portrait.png" alt='Screenshot 1' width='30%' />
-      <img src="repo_assets/screenshots/2_books_index-portrait.png" alt='Screenshot 2' width='30%' />
-      <img src="repo_assets/screenshots/3_reader-portrait.png" alt='Screenshot 3' width='30%' />
-      <img src="repo_assets/screenshots/4_narrators_chain-portrait.png" alt='Screenshot 4' width='30%' />
-      <img src="repo_assets/screenshots/5_scholar_info-portrait.png" alt='Screenshot 5' width='30%' />
-      <img src="repo_assets/screenshots/6_search_results-portrait.png" alt='Screenshot 6' width='30%' />
-      <img src="repo_assets/screenshots/7_library-portrait.png" alt='Screenshot 7' width='30%' />
-      <img src="repo_assets/screenshots/8_collection_items-portrait.png" alt='Screenshot 8' width='30%' />
-      <img src="repo_assets/screenshots/9_layout_options-portrait.png" alt='Screenshot 9' width='30%' />
-      <img src="repo_assets/screenshots/10_theme_settings-portrait.png" alt='Screenshot 10' width='30%' />
+<div style="width:100%;">
+      <img src="repo_assets/screenshots/1_homepage-portrait.png" alt='Screenshot 1' width='24%' />
+      <img src="repo_assets/screenshots/2_books_index-portrait.png" alt='Screenshot 2' width='24%' />
+      <img src="repo_assets/screenshots/3_reader-portrait.png" alt='Screenshot 3' width='24%' />
+      <img src="repo_assets/screenshots/4_narrators_chain-portrait.png" alt='Screenshot 4' width='24%' />
+</div> 
+<div style="width:100%;">
+      <img src="repo_assets/screenshots/5_scholar_info-portrait.png" alt='Screenshot 5' width='24%' />
+      <img src="repo_assets/screenshots/6_search_results-portrait.png" alt='Screenshot 6' width='24%' />
+      <img src="repo_assets/screenshots/7_library-portrait.png" alt='Screenshot 7' width='24%' />
+      <img src="repo_assets/screenshots/8_collection_items-portrait.png" alt='Screenshot 8' width='24%' />
+</div> 
+<div style="width:100%;">
+      <img src="repo_assets/screenshots/9_layout_options-portrait.png" alt='Screenshot 9' width='24%' />
+      <img src="repo_assets/screenshots/10_theme_settings-portrait.png" alt='Screenshot 10' width='24%' />
 </div> 

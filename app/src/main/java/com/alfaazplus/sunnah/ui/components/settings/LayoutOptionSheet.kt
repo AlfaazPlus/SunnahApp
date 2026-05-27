@@ -26,15 +26,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.text.parseAsHtml
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.AlertCard
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
-import com.alfaazplus.sunnah.ui.utils.keys.Keys
-import com.alfaazplus.sunnah.ui.utils.shared_preference.DataStoreManager
-import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
+import com.alfaazplus.sunnah.ui.utils.preferences.HadithLayout
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -80,12 +76,13 @@ private fun RowScope.LayoutButton(
 @Composable
 fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    val selectedLayoutOption = ReaderUtils.getHadithLayoutOption()
-    fun onSelected(option: String) {
+    val selectedLayoutOption = ReaderPreferences.observeHadithLayout()
+
+    fun onSelected(option: HadithLayout) {
         if (option == selectedLayoutOption) return
 
         coroutineScope.launch {
-            DataStoreManager.write(stringPreferencesKey(Keys.HADITH_LAYOUT), option)
+            ReaderPreferences.setHadithLayout(option)
 
             withContext(Dispatchers.Main) {
                 onDismiss()
@@ -115,14 +112,15 @@ fun LayoutOptionSheet(isOpen: Boolean, onDismiss: () -> Unit) {
                 .padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             LayoutButton(
-                R.drawable.ic_carousel_horizontal, R.string.horizontal, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+                R.drawable.ic_carousel_horizontal, R.string.horizontal, isSelected = selectedLayoutOption == HadithLayout.HORIZONTAL
             ) {
-                onSelected(ReaderUtils.HADITH_LAYOUT_HORIZONTAL)
+                onSelected(HadithLayout.HORIZONTAL)
             }
+
             LayoutButton(
-                R.drawable.ic_carousel_vertical, R.string.vertical, isSelected = selectedLayoutOption == ReaderUtils.HADITH_LAYOUT_VERTICAL
+                R.drawable.ic_carousel_vertical, R.string.vertical, isSelected = selectedLayoutOption == HadithLayout.VERTICAL
             ) {
-                onSelected(ReaderUtils.HADITH_LAYOUT_VERTICAL)
+                onSelected(HadithLayout.VERTICAL)
             }
         }
     }

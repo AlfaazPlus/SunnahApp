@@ -1,18 +1,18 @@
 [versions]
 agp = "9.1.0"
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 core-ktx = "1.18.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.3.0"
 espresso-core = "3.7.0"
 appcompat = "1.7.1"
-google-fonts = "1.10.5"
+google-fonts = "1.11.2"
 
 # compose
-compose-bom = "2026.03.00"
+compose-bom = "2026.05.01"
 compose-viewmodel = "2.10.0"
 activity-compose = "1.13.0"
-compose-navigation = "2.9.7"
+compose-navigation = "2.9.8"
 
 hilt-navigation-compose = "1.3.0"
 daggerHilt = "2.59.2"
@@ -23,22 +23,22 @@ hiltWork = "1.3.0"
 lifecycle-runtime-ktx = "2.10.0"
 
 constraintlayout = "2.2.1"
-navigation-fragment-ktx = "2.9.7"
-navigation-ui-ktx = "2.9.7"
+navigation-fragment-ktx = "2.9.8"
+navigation-ui-ktx = "2.9.8"
 asynclayoutinflater = "1.1.0"
 lifecycle-livedata-ktx = "2.10.0"
 lifecycle-viewmodel-ktx = "2.10.0"
-room = "2.8.4"
-commons-compress = "1.28.0"
-workManager = "2.11.1"
+room3 = "3.0.0-alpha05"
+workManager = "2.11.2"
 dataStore = "1.2.1"
 retrofit = "3.0.0"
 kotlinxRetrofit = "1.0.0"
-kotlinxSerialization = "1.10.0"
-guava = "33.5.0-jre"
-paging = "3.4.2"
+kotlinxSerialization = "1.11.0"
+guava = "33.6.0-jre"
+paging = "3.5.0"
 accompanist = "0.37.3"
-material3Adaptive = "1.0.0-alpha06"
+protobufPlugin = "0.10.0"
+protobuf = "4.35.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -60,10 +60,12 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 material3 = { module = "androidx.compose.material3:material3" }
+compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
 
 
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation-fragment-ktx" }
@@ -81,11 +83,10 @@ hiltWork = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }
 
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room3-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room3" }
+androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room3" }
+androidx-room3-common = { module = "androidx.room3:room3-common", version.ref = "room3" }
 
-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
 workManager = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 dataStore = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
@@ -94,16 +95,19 @@ kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
-roomPaging = { module = "androidx.room:room-paging", version.ref = "room" }
+androidx-room3-paging = { module = "androidx.room3:room3-paging", version.ref = "room3" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
-material3-adaptive = { module = "androidx.compose.material3:material3-adaptive", version.ref = "material3Adaptive" }
+protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protobuf" }
 
 [plugins]
+androidx-room3 = { id = "androidx.room3", version.ref = "room3" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 daggerHilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 
 [bundles]
 

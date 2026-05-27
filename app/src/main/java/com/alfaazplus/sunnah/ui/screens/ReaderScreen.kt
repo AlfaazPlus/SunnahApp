@@ -1,83 +1,84 @@
 package com.alfaazplus.sunnah.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.components.reader.HorizontalReader
-import com.alfaazplus.sunnah.ui.components.reader.VerticalReader
-import com.alfaazplus.sunnah.ui.utils.ReaderUtils
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.window.core.layout.WindowSizeClass
+import com.alfaazplus.sunnah.ui.components.reader.LocalHadithActions
+import com.alfaazplus.sunnah.ui.components.reader.LocalReader
+import com.alfaazplus.sunnah.ui.components.reader.ReaderAppBar
+import com.alfaazplus.sunnah.ui.components.reader.ReaderLayout
+import com.alfaazplus.sunnah.ui.components.reader.ReaderNavigator
+import com.alfaazplus.sunnah.ui.components.reader.ReaderProvider
+import com.alfaazplus.sunnah.ui.components.reader.rememberAppBarDimensions
+import com.alfaazplus.sunnah.ui.theme.alpha
+import com.alfaazplus.sunnah.ui.utils.text.ComposeUiConfig
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
-import kotlinx.coroutines.launch
 
+class ReaderScaffoldController {
+    var bottomBar by mutableStateOf<(@Composable () -> Unit)?>(null)
+}
 
+val LocalReaderScaffoldController = compositionLocalOf<ReaderScaffoldController> {
+    error("LocalReaderBottomBarController not provided")
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
-    collectionId: Int = 1,
-    bookId: Int = 1,
-    hadithNumber: String? = null,
-    vm: ReaderViewModel = hiltViewModel(),
+    bookId: String,
+    hadithId: String? = null,
+    readerVm: ReaderViewModel = hiltViewModel(),
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    vm.primaryColor = MaterialTheme.colorScheme.primary
-    vm.onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-
-    LaunchedEffect(collectionId, bookId) {
-        if (!vm.initialized) {
-            vm.initialHadithNumber = Pair(hadithNumber, false)
-            vm.collectionId = collectionId
-            vm.bookId.value = bookId
-
-            coroutineScope.launch {
-                vm.loadEssentials()
-            }
-        }
-    }
-
-    if (vm.cwi?.isFailure == true || vm.bwi?.isFailure == true) {
-        return Box(
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Not found")
-        }
-    }
-
-    val hadithList = vm.parsedHadithList
-
-    if (vm.cwi == null || vm.bwi == null || !vm.initialized) {
-        return Box(
-            contentAlignment = Alignment.Center
-        ) {
-            Loader(size = 24.dp)
-        }
-    }
-
-    if (hadithList.isEmpty()) {
-        return Box(
-            contentAlignment = Alignment.Center
-        ) {
-            Text("No Hadiths found")
-        }
-    }
-
-
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val colors by rememberUpdatedState(colorScheme)
+
+    val showTwoPane = currentWindowAdaptiveInfo().windowSizeClass.isAtLeastBreakpoint(
+        WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND,
+        WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND,
+    )
+
+    LaunchedEffect(bookId, hadithId) {
+        readerVm.onArguments(bookId, hadithId)
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                vm.saveReadHistory()
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                readerVm.saveReadHistory()
             }
         }
 
@@ -88,15 +89,98 @@ fun ReaderScreen(
         }
     }
 
-    val isHorizontal = vm.hadithLayout == ReaderUtils.HADITH_LAYOUT_HORIZONTAL
+    ReaderProvider {
+        CompositionLocalProvider(
+            LocalReaderScaffoldController provides ReaderScaffoldController()
+        ) {
+            val reader = LocalReader.current
+            val hadithActions = LocalHadithActions.current
 
-    BoxWithConstraints {
-        val isWideScreen = maxWidth > 600.dp
+            LaunchedEffect(lifecycleOwner, colors) {
+                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    readerVm.observeChanges(
+                        uiConfig = ComposeUiConfig(
+                            context = context,
+                            colors = colors,
+                        ),
+                        hadithActions,
+                    )
+                }
+            }
 
-        if (isHorizontal) {
-            HorizontalReader(vm, isWideScreen)
-        } else {
-            VerticalReader(vm, isWideScreen)
+            val appBarDims = rememberAppBarDimensions(showTwoPane)
+            val density = LocalDensity.current
+
+            val readerTopBarState = rememberTopAppBarState(
+                initialHeightOffsetLimit = with(density) { -appBarDims.expandedHeight.toPx() },
+            )
+            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(readerTopBarState)
+
+            val scaffoldController = LocalReaderScaffoldController.current
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    containerColor = reader.containerColor,
+                    contentColor = reader.contentColor,
+                    topBar = {
+                        ReaderAppBar(
+                            readerVm = readerVm,
+                            isWideScreen = showTwoPane,
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                    bottomBar = {
+                        scaffoldController.bottomBar?.invoke()
+                    },
+                ) { padding ->
+                    val contentModifier = Modifier.padding(padding)
+
+                    if (showTwoPane) {
+                        Row(
+                            modifier = contentModifier.fillMaxSize(),
+                        ) {
+                            ReaderWideSidebar(
+                                readerVm = readerVm,
+                            )
+
+                            VerticalDivider(color = colors.outlineVariant.alpha(0.6f))
+
+                            ReaderLayout(
+                                readerVm = readerVm,
+                                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                            )
+                        }
+                    } else {
+                        Box(contentModifier) {
+                            ReaderLayout(
+                                readerVm = readerVm,
+                                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                            )
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun ReaderWideSidebar(
+    readerVm: ReaderViewModel,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(360.dp)
+            .background(colorScheme.surfaceContainerLow),
+    ) {
+        ReaderNavigator(
+            readerVm = readerVm,
+            isInModal = false,
+            onClose = {},
+        )
     }
 }

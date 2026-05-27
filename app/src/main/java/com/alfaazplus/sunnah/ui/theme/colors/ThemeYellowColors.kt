@@ -8,65 +8,91 @@ import androidx.compose.ui.graphics.Color
 class ThemeYellowColors : BaseColors() {
     override fun lightColors(): ColorScheme {
         return lightColorScheme(
-            primary = Color(0xFF745B00),
+            primary = Color(0xFF7B5A3A),
             onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFFFE08D),
-            onPrimaryContainer = Color(0xFF241A00),
-            secondary = Color(0xFF695D3F),
+
+            primaryContainer = Color(0xFFF0DEC9),
+            onPrimaryContainer = Color(0xFF2E1D10),
+
+            secondary = Color(0xFF8A6A50),
             onSecondary = Color(0xFFFFFFFF),
-            secondaryContainer = Color(0xFFF2E1BB),
-            onSecondaryContainer = Color(0xFF231B04),
-            tertiary = Color(0xFF47664A),
+
+            secondaryContainer = Color(0xFFF5E4D3),
+            onSecondaryContainer = Color(0xFF352216),
+
+            tertiary = Color(0xFF6E7458),
             onTertiary = Color(0xFFFFFFFF),
-            tertiaryContainer = Color(0xFFC9ECC8),
-            onTertiaryContainer = Color(0xFF04210B),
+
+            tertiaryContainer = Color(0xFFE3E8D7),
+            onTertiaryContainer = Color(0xFF202515),
+
             error = Color(0xFFBA1A1A),
             onError = Color(0xFFFFFFFF),
+
             errorContainer = Color(0xFFFFDAD6),
             onErrorContainer = Color(0xFF410002),
-            background = Color(0xFFF0F0F0),
-            onBackground = Color(0xFF1E1B16),
-            surface = Color(0xFFFFFBFF),
-            onSurface = Color(0xFF1E1B16),
-            surfaceVariant = Color(0xFFEBE1CF),
-            onSurfaceVariant = Color(0xFF4C4639),
-            inverseOnSurface = Color(0xFFF7F0E7),
-            inverseSurface = Color(0xFF33302A),
-            inversePrimary = Color(0xFFEBC248),
-            surfaceContainer = Color(0xFF1E1B16),
-            surfaceContainerLow = Color(0xFF1E1B16),
+
+            background = Color(0xFFF6EBDD),
+            onBackground = Color(0xFF2F241B),
+
+            surface = Color(0xFFFFF8EF),
+            onSurface = Color(0xFF2F241B),
+
+            surfaceVariant = Color(0xFFE6D6C5),
+            onSurfaceVariant = Color(0xFF5B4A3D),
+
+            surfaceContainerLow = Color(0xFFFFFBF5),
+            surfaceContainer = Color(0xFFF9F0E5),
+
+            inverseOnSurface = Color(0xFFFFF7EE),
+            inverseSurface = Color(0xFF3B2F27),
+
+            inversePrimary = Color(0xFFD8B58E),
         )
     }
 
     override fun darkColors(): ColorScheme {
         return darkColorScheme(
-            primary = Color(0xFFEBC248),
-            onPrimary = Color(0xFF3D2F00),
-            primaryContainer = Color(0xFF584400),
-            onPrimaryContainer = Color(0xFFFFE08D),
-            secondary = Color(0xFFD5C5A1),
-            onSecondary = Color(0xFF392F15),
-            secondaryContainer = Color(0xFF50462A),
-            onSecondaryContainer = Color(0xFFF2E1BB),
-            tertiary = Color(0xFFADCFAD),
-            onTertiary = Color(0xFF19361F),
-            tertiaryContainer = Color(0xFF304D34),
-            onTertiaryContainer = Color(0xFFC9ECC8),
+            primary = Color(0xFFD8B58E),
+            onPrimary = Color(0xFF422D19),
+
+            primaryContainer = Color(0xFF5A412C),
+            onPrimaryContainer = Color(0xFFF0DEC9),
+
+            secondary = Color(0xFFE0C2A6),
+            onSecondary = Color(0xFF493121),
+
+            secondaryContainer = Color(0xFF644A38),
+            onSecondaryContainer = Color(0xFFF5E4D3),
+
+            tertiary = Color(0xFFC8D0BA),
+            onTertiary = Color(0xFF313827),
+
+            tertiaryContainer = Color(0xFF49503E),
+            onTertiaryContainer = Color(0xFFE3E8D7),
+
             error = Color(0xFFFFB4AB),
-            onError = Color(0xFFFFFFFF),
+            onError = Color(0xFF690005),
+
             errorContainer = Color(0xFF93000A),
             onErrorContainer = Color(0xFFFFDAD6),
-            background = Color(0xFF191712),
-            onBackground = Color(0xFFE8E1D9),
-            surface = Color(0xFF2B261F),
-            onSurface = Color(0xFFE8E1D9),
-            surfaceVariant = Color(0xFF4C4639),
-            onSurfaceVariant = Color(0xFFCFC5B4),
-            inverseOnSurface = Color(0xFF1E1B16),
-            inverseSurface = Color(0xFFE8E1D9),
-            inversePrimary = Color(0xFF745B00),
-            surfaceContainer = Color(0xFF2B261F),
-            surfaceContainerLow = Color(0xFF2B261F),
+
+            background = Color(0xFF1E1712),
+            onBackground = Color(0xFFF0E2D3),
+
+            surface = Color(0xFF2A211A),
+            onSurface = Color(0xFFF0E2D3),
+
+            surfaceVariant = Color(0xFF5B4A3D),
+            onSurfaceVariant = Color(0xFFE0CEBC),
+
+            surfaceContainerLow = Color(0xFF241C16),
+            surfaceContainer = Color(0xFF342920),
+
+            inverseOnSurface = Color(0xFF2A211A),
+            inverseSurface = Color(0xFFF0E2D3),
+
+            inversePrimary = Color(0xFF7B5A3A),
         )
     }
 }

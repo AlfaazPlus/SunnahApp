@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.components.settings
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -18,12 +19,12 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    val themeMode = ThemeUtils.getThemeMode()
+    val themeMode = ThemeUtils.observeThemeMode()
 
     val items = listOf(
-        Triple(ThemeUtils.THEME_DEFAULT, R.string.system_default, R.string.theme_default_description),
-        Triple(ThemeUtils.THEME_DARK, R.string.dark, R.string.theme_dark_description),
-        Triple(ThemeUtils.THEME_LIGHT, R.string.light, null),
+        Triple(ThemeUtils.THEME_MODE_DEFAULT, R.string.system_default, R.string.theme_default_description),
+        Triple(ThemeUtils.THEME_MODE_DARK, R.string.dark, R.string.theme_dark_description),
+        Triple(ThemeUtils.THEME_MODE_LIGHT, R.string.light, null),
     )
 
     BottomSheet(
@@ -43,12 +44,17 @@ fun ThemeSelectorSheet(isOpen: Boolean, onDismiss: () -> Unit) {
                     onClick = {
                         coroutineScope.launch {
                             ThemeUtils.setThemeMode(theme)
+                            AppCompatDelegate.setDefaultNightMode(
+                                ThemeUtils.resolveThemeModeForDelegate(
+                                    theme
+                                )
+                            )
 
                             withContext(Dispatchers.Main) {
                                 onDismiss()
                             }
                         }
-                    }
+                    },
                 )
             }
         }

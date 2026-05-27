@@ -11,12 +11,14 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.db.models.HadithOfTheDay
+import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
+import com.alfaazplus.sunnah.db.entities.v2.HadithBlockType
 import com.alfaazplus.sunnah.helpers.HadithHelper
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.ui.activities.MainActivity
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.CHANNEL_ID_HOTD
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,44 +27,47 @@ import kotlinx.coroutines.withContext
 
 @HiltWorker
 class HadithOfTheDayWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
+    @Assisted
+    context: Context,
+    @Assisted
+    params: WorkerParameters,
     private val repo: HadithRepository,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val hotd = HadithHelper.getHadithOfTheDay(repo) ?: return@withContext Result.failure()
+        val translationLangCode = ReaderPreferences.getHadithTranslation()
 
-        sendNotification(hotd)
+        sendNotification(hotd, translationLangCode)
 
         return@withContext Result.success()
     }
 
-    private fun sendNotification(hotd: HadithOfTheDay) {
+    private fun sendNotification(hotd: HadithOfTheDay, translationLangCode: String) {
         val notificationId = 10
         val context = applicationContext
-        val translation = hotd.translation
+        val blocks = hotd.hwc.contents.firstOrNull { it.lang == translationLangCode }?.blocks ?: return
 
         val manager = ContextCompat.getSystemService(
             context, NotificationManager::class.java
         ) ?: return
 
         val hadithText = buildString {
-            if (!translation.narratorPrefix.isNullOrBlank()) {
-                appendLine(translation.narratorPrefix.parseAsHtml())
+            blocks.forEach {
+                if ((it.type == HadithBlockType.NARRATOR || it.type == HadithBlockType.MATN) && !it.text.isNullOrEmpty()) {
+                    appendLine(it.text.parseAsHtml())
+                }
             }
-            appendLine(translation.hadithText.parseAsHtml())
         }
 
-        val hadithReference = "${hotd.collectionName} : ${hotd.hadith.hadithNumber}"
+        val hadithReference = "${hotd.collectionName} : ${hotd.hwc.hadith.number}"
 
         val intent = Intent(context, MainActivity::class.java).apply {
             putExtra(
                 Keys.NAV_DESTINATION,
                 Routes.READER.args(
-                    hotd.hadith.collectionId,
-                    hotd.hadith.bookId,
-                    hotd.hadith.hadithNumber,
+                    hotd.hwc.collectionId,
+                    hotd.hwc.hadithId,
                 ),
             )
         }

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="next">التالي</string>
+    <string name="previous">السابق</string>
+    <string name="top">الأعلى</string>
+    <string name="cancel">إلغاء</string>
+    <string name="close">إغلاق</string>
+    <string name="clear">مسح</string>
+    <string name="delete">حذف</string>
+    <string name="create">إنشاء</string>
+    <string name="goBack">رجوع</string>
+    <string name="copy">نسخ</string>
+    <string name="enable">تفعيل</string>
+    <string name="disable">إيقاف</string>
+    <string name="enabled">مفعّل</string>
+    <string name="disabled">معطّل</string>
+    <string name="allow">السماح</string>
+    <string name="downloading">جارٍ التنزيل…</string>
+    <string name="downloaded">تم التنزيل</string>
+    <string name="viewAll">عرض الكل</string>
+
+    <string name="hadithNumber">حديث %s</string>
+    <string name="hadithNumberFull">رقم الحديث %s</string>
+    <string name="bookNumberTitle">كتاب %1$s: %2$s</string>
+
+    <string name="books">الكتب</string>
+    <string name="hadiths">الأحاديث</string>
+    <string name="hadithRangeValue" formatted="false">%d إلى %d</string>
+    <string name="totalBooks" formatted="false">إجمالي الكتب: %d</string>
+    <string name="totalHadiths" formatted="false">إجمالي الأحاديث: %d</string>
+    <string name="previousHadith">الحديث السابق</string>
+    <string name="nextHadith">الحديث التالي</string>
+    <string name="previousBook">الكتاب السابق</string>
+    <string name="nextBook">الكتاب التالي</string>
+
+    <string name="search">بحث</string>
+    <string name="global_search">بحث شامل</string>
+    <string name="search_placeholder">أدخل كلمة البحث…</string>
+    <string name="search_book">البحث في الكتاب…</string>
+    <string name="search_hadith">البحث في الحديث…</string>
+    <string name="search_filter">تصفية البحث</string>
+    <string name="search_in">البحث في…</string>
+    <string name="search_for">البحث عن…</string>
+    <string name="search_hint">بحث…</string>
+    <string name="apply_filter">تطبيق التصفية</string>
+    <string name="no_results_found">لم يُعثر على نتائج</string>
+    <string name="one_result_found">نتيجة واحدة</string>
+    <string name="n_results_found" formatted="false">%d نتائج</string>
+    <string name="search_result_menu">قائمة نتائج البحث</string>
+    <string name="clear_search">مسح البحث</string>
+    <string name="noResults">لم يُعثر على نتائج</string>
+    <string name="searchTips">ابحث عن الأحاديث أو الكتب أو العلماء</string>
+
+    <string name="settings">الإعدادات</string>
+    <string name="app_settings">إعدادات التطبيق</string>
+    <string name="reader_settings">إعدادات القارئ</string>
+    <string name="other_settings">أخرى</string>
+
+    <string name="home">الرئيسية</string>
+    <string name="history">السجل</string>
+    <string name="library">المكتبة</string>
+    <string name="theme_default">افتراضي</string>
+    <string name="theme_blue">أزرق</string>
+    <string name="theme_red">أحمر</string>
+    <string name="theme_purple">بنفسجي</string>
+    <string name="theme_violet">أرجواني</string>
+    <string name="theme_yellow">أصفر</string>
+    <string name="theme_mono">أحادي</string>
+    <string name="app_langauge">لغة التطبيق</string>
+    <string name="app_theme">المظهر</string>
+    <string name="theme_colors">ألوان المظهر</string>
+    <string name="theme_mode">وضع المظهر</string>
+    <string name="light">فاتح</string>
+    <string name="dark">داكن</string>
+    <string name="system_default">حسب النظام</string>
+    <string name="theme_dark_description">الوضع الداكن مريح للعين ويوفّر استهلاك البطارية</string>
+    <string name="theme_default_description">يتغيّر تلقائياً حسب إعدادات النظام</string>
+    <string name="dynamic_color">ألوان ديناميكية</string>
+    <string name="dynamic_color_description">تغيير لون المظهر حسب خلفية الشاشة</string>
+    <string name="github">GitHub</string>
+    <string name="github_description">زيارة مستودع GitHub للتطبيق للإبلاغ عن مشكلات أو المساهمة</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="about_us">من نحن</string>
+    <string name="rate_app">تقييم التطبيق</string>
+    <string name="share_app">مشاركة التطبيق</string>
+
+    <string name="share_app_msg">SunnahApp تطبيق مجاني ومفتوح المصدر لقراءة سُنّة النبي ﷺ واستكشافها. واجهة جميلة وسهلة مع ميزات الترجمة والبحث المتقدّم والتذكير وغيرها.\n\nحمّله الآن:\n%s</string>
+
+    <string name="install_quranapp">تثبيت QuranApp</string>
+    <string name="install_quranapp_description">اقرأ مرجع القرآن مع الترجمة ومعاني الكلمات والتلاوة والمزيد. QuranApp مجاني وآمن ومفتوح المصدر</string>
+    <string name="install_quranapp_description_short">مجاني وآمن ومفتوح المصدر</string>
+
+    <string name="install_from_google_play">التثبيت من Google Play</string>
+    <string name="install_from_github">التثبيت من GitHub</string>
+
+    <string name="donate">تبرّع</string>
+
+    <string name="hadith_layout">طريقة عرض الأحاديث</string>
+    <string name="hadith_layout_description">أفقي — التمرير يميناً ويساراً.\nعمودي — التمرير لأعلى وأسفل.</string>
+
+    <string name="horizontal">أفقي</string>
+    <string name="vertical">عمودي</string>
+
+    <string name="add">إضافة</string>
+    <string name="label_new">جديد</string>
+    <string name="remove">إزالة</string>
+    <string name="update">تحديث</string>
+    <string name="edit">تعديل</string>
+    <string name="done">تم</string>
+    <string name="reset">إعادة ضبط</string>
+
+    <string name="select_color">اختيار اللون</string>
+
+    <string name="change_to_horizontal_layout">التبديل إلى العرض الأفقي</string>
+    <string name="change_to_vertical_layout">التبديل إلى العرض العمودي</string>
+
+    <string name="text_size_and_style">حجم الخط والنمط</string>
+    <string name="serif_font_style">خط Serif</string>
+    <string name="arabic_text_size">حجم النص العربي</string>
+    <string name="translation_text_size">حجم نص الترجمة</string>
+
+    <string name="hadith_text_option">خيارات نص الحديث</string>
+    <string name="show_arabic_and_translation">عرض العربية والترجمة معاً</string>
+    <string name="show_only_arabic">عرض العربية فقط</string>
+    <string name="show_only_translation">عرض الترجمة فقط</string>
+
+    <string name="show_sanad">إظهار السند</string>
+    <string name="show_sanad_description">إظهار سلسلة رواة الحديث</string>
+
+    <string name="show_chapter">إظهار الباب</string>
+
+    <string name="manage_collections">إدارة المجموعات</string>
+    <string name="about_collection">عن هذه المجموعة</string>
+    <string name="delete_collection">حذف المجموعة؟</string>
+
+    <string name="collection_name">اسم المجموعة</string>
+    <string name="collection_name_hint">أدخل اسم المجموعة</string>
+
+    <string name="description">الوصف</string>
+    <string name="collection_description_hint">أدخل وصف المجموعة</string>
+
+    <string name="msg_delete_collection">هل تريد حذف هذه المجموعة؟</string>
+    <string name="msg_collection_deleted">تم حذف المجموعة بنجاح.</string>
+
+    <string name="desc_hadith_options">خيارات الحديث</string>
+
+    <string name="narrators_chain">سلسلة الرواة</string>
+    <string name="desc_narrators_chain">عرض سلسلة الرواة</string>
+
+    <string name="scholar_info">معلومات العالم</string>
+    <string name="scholars">العلماء</string>
+
+    <string name="copy_hadith_number">نسخ رقم الحديث</string>
+
+    <string name="add_to_bookmarks">إضافة إلى الإشارات</string>
+    <string name="added_to_bookmarks">تمت الإضافة إلى الإشارات</string>
+    <string name="remove_from_bookmarks">إزالة من الإشارات</string>
+
+    <string name="add_to_collection">إضافة إلى المجموعة</string>
+    <string name="remove_from_collection">إزالة من المجموعة</string>
+
+    <string name="select_collections">اختيار المجموعات</string>
+
+    <string name="bookmarks">الإشارات المرجعية</string>
+
+    <string name="delete_all_bookmarks">حذف جميع الإشارات؟</string>
+    <string name="all_bookmarks_deleted">تم حذف جميع الإشارات.</string>
+
+    <string name="collections">المجموعات</string>
+
+    <string name="no_collections">لم تُنشأ أي مجموعة بعد.</string>
+
+    <string name="no_collection_items">
+        لا توجد أحاديث في هذه المجموعة. يمكنك حفظ أحاديثك المفضّلة في مجموعات للوصول السريع.
+    </string>
+
+    <string name="create_collection">إنشاء مجموعة</string>
+    <string name="update_collection">تحديث المجموعة</string>
+
+    <string name="msg_delete_user_collection">هل تريد حذف هذه المجموعة؟ سيتم حذف جميع الأحاديث المحفوظة فيها.</string>
+
+    <string name="copied_to_clipboard">تم النسخ</string>
+
+    <string name="paste_log_github_issue">تم نسخ السجل. يرجى لصقه في بلاغ GitHub.</string>
+
+    <string name="paste_reference_github_issue">تم نسخ مرجع الحديث. يرجى لصقه في بلاغ GitHub.</string>
+
+    <string name="hadith_of_the_day">حديث اليوم</string>
+
+    <string name="hadith_options">خيارات الحديث</string>
+
+    <string name="share_this_hadith">مشاركة هذا الحديث</string>
+
+    <string name="copy_hadith_text">نسخ نص الحديث</string>
+
+    <string name="report_issue">الإبلاغ عن مشكلة</string>
+
+    <string name="note">ملاحظة</string>
+    <string name="optional_note">ملاحظة اختيارية</string>
+    <string name="no_note">لم تُضف ملاحظة</string>
+
+    <string name="open_in_reader">فتح في القارئ</string>
+
+    <string name="quick_reference_n_hadiths">%1$d أحاديث</string>
+
+    <string name="quick_reference_not_found">تعذّر تحميل الحديث المشار إليه.</string>
+
+    <string name="hadith_references">مراجع الحديث</string>
+
+    <string name="ref_type_sunnahcom">المرجع</string>
+    <string name="ref_type_app">مرجع التطبيق</string>
+    <string name="ref_type_in_book">مرجع داخل الكتاب</string>
+    <string name="ref_type_english_translation">مرجع إنجليزي</string>
+    <string name="ref_type_arabic_english_book">مرجع كتاب عربي/إنجليزي</string>
+    <string name="ref_type_arabic">مرجع عربي</string>
+    <string name="ref_type_us_msa">مرجع USC-MSA (إنجليزي)</string>
+    <string name="ref_deprecated">(مهمل)</string>
+
+    <string name="no_references">لا توجد مراجع.</string>
+
+    <string name="no_bookmarks">لا توجد إشارات مرجعية بعد.</string>
+
+    <string name="reading_history">سجل القراءة</string>
+
+    <string name="no_reading_history">يظهر سجل قراءتك هنا.</string>
+
+    <string name="clear_reading_history">مسح سجل القراءة؟</string>
+
+    <string name="reading_history_cleared">تم مسح سجل القراءة.</string>
+
+    <string name="action_cannot_be_undone">لا يمكن التراجع عن هذا الإجراء.</string>
+
+    <string name="last_crash_log">آخر سجل تعطّل</string>
+
+    <string name="app_logs">سجلات التطبيق</string>
+    <string name="app_logs_desc">سجلات التعطّل والسجلات المكبوتة</string>
+
+    <string name="crash_logs">سجلات التعطّل</string>
+    <string name="suppressed_logs">سجلات مكبوتة</string>
+
+    <string name="log_removed">تم حذف السجل</string>
+
+    <string name="create_issue">إنشاء بلاغ</string>
+
+    <string name="no_logs_found">لم يُعثر على سجلات</string>
+
+    <string name="resource_download_source">مصدر تنزيل الموارد</string>
+
+    <string name="resource_download_source_desc">استخدم مصدراً آخر لتنزيل موارد الأحاديث إذا لم يعمل المصدر الحالي.</string>
+
+    <string name="open_github_issues">فتح بلاغات GitHub</string>
+
+    <string name="daily_reminder">تذكير يومي</string>
+
+    <string name="daily_reminder_desc">تلقّ تذكيراً يومياً بحديث.</string>
+
+    <string name="notification_permission">إذن الإشعارات</string>
+
+    <string name="notification_permission_desc">يرجى السماح بالإشعارات لتلقّي تذكير الحديث اليومي.</string>
+
+    <string name="download_collection_first">لاستخدام هذه الميزة، يرجى تنزيل مجموعة أحاديث واحدة على الأقل أولاً.</string>
+
+    <string name="setting_up">جارٍ الإعداد… سيستغرق بضع ثوانٍ.</string>
+
+    <string name="selectABook">اختر كتاباً أولاً.</string>
+
+    <string name="chapter">الباب</string>
+
+    <string name="workInProgress">قيد التطوير</string>
+
+    <string name="selectTranslation">اختر الترجمة</string>
+
+    <string name="info">معلومات</string>
+
+    <string name="book_info">معلومات الكتاب</string>
+
+    <string name="book_section_preamble">المقدمة</string>
+    <string name="book_section_intro">التمهيد</string>
+    <string name="book_section_notes">ملاحظات</string>
+
+    <string name="book_no_details">لا توجد معلومات إضافية لهذا الكتاب.</string>
+
+    <string name="deleteTranslation">حذف الترجمة؟</string>
+    <string name="updateAvailable">تحديث متاح</string>
+    <string name="comingSoon">قريبًا</string>
+    <string name="msgTranslationUpdateAvailable">يتوفر إصدار أحدث من ترجمتك.</string>
+
+    <string name="primaryCollections">المجموعات الأساسية</string>
+    <string name="selection">مجموعات مختارة</string>
+
+    <string name="noUrduTranslation">ترجمة الأردية غير متوفرة لهذا الحديث حالياً.</string>
+    <string name="noBanglaTranslation">ترجمة البنغالية غير متوفرة لهذا الحديث حالياً.</string>
+    <string name="noFrenchTranslation">ترجمة الفرنسية غير متوفرة لهذا الحديث حالياً.</string>
+    <string name="noIndonesianTranslation">ترجمة الإندونيسية غير متوفرة لهذا الحديث حالياً.</string>
+
+    <string name="hadith_grade_label_format">الحكم: %s</string>
+
+    <string name="hadith_grade_sahih">صحيح</string>
+    <string name="hadith_grade_sahih_desc">حديث صحيح</string>
+
+    <string name="hadith_grade_sahih_maqtu">صحيح مقطوع</string>
+    <string name="hadith_grade_sahih_maqtu_desc">أثر صحيح عن تابعي</string>
+
+    <string name="hadith_grade_sahih_marfu">صحيح مرفوع</string>
+    <string name="hadith_grade_sahih_marfu_desc">رواية مرفوعة صحيحة إلى النبي ﷺ</string>
+
+    <string name="hadith_grade_sahih_mauquf">صحيح موقوف</string>
+    <string name="hadith_grade_sahih_mauquf_desc">رواية صحيحة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">صحيح موقوف حكمًا مرفوع</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">رواية موقوفة لها حكم الرفع</string>
+
+    <string name="hadith_grade_sahih_mutawatir">صحيح متواتر</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">حديث صحيح متواتر</string>
+
+    <string name="hadith_grade_hasan">حسن</string>
+    <string name="hadith_grade_hasan_desc">حديث حسن</string>
+
+    <string name="hadith_grade_hasan_sahih">حسن صحيح</string>
+    <string name="hadith_grade_hasan_sahih_desc">حديث بين الحسن والصحيح</string>
+
+    <string name="hadith_grade_hasan_maqtu">حسن مقطوع</string>
+    <string name="hadith_grade_hasan_maqtu_desc">أثر حسن عن تابعي</string>
+
+    <string name="hadith_grade_hasan_mauquf">حسن موقوف</string>
+    <string name="hadith_grade_hasan_mauquf_desc">رواية حسنة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">حسن لغيره</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">حديث ضعيف تقوّى بالشواهد والمتابعات</string>
+
+    <string name="hadith_grade_daif">ضعيف</string>
+    <string name="hadith_grade_daif_desc">حديث ضعيف</string>
+
+    <string name="hadith_grade_daif_jiddan">ضعيف جدًا</string>
+    <string name="hadith_grade_daif_jiddan_desc">حديث شديد الضعف</string>
+
+    <string name="hadith_grade_daif_maqtu">ضعيف مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_desc">أثر ضعيف عن تابعي</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">ضعيف منكر مقطوع</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">أثر منكر وضعيف عن تابعي</string>
+
+    <string name="hadith_grade_daif_marfu">ضعيف مرفوع</string>
+    <string name="hadith_grade_daif_marfu_desc">رواية مرفوعة ضعيفة إلى النبي ﷺ</string>
+
+    <string name="hadith_grade_daif_mauquf">ضعيف موقوف</string>
+    <string name="hadith_grade_daif_mauquf_desc">رواية ضعيفة موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_daif_munkar">ضعيف منكر</string>
+    <string name="hadith_grade_daif_munkar_desc">رواية منكرة ضعيفة</string>
+
+    <string name="hadith_grade_daif_mursal">ضعيف مرسل</string>
+    <string name="hadith_grade_daif_mursal_desc">رواية مرسلة ضعيفة</string>
+
+    <string name="hadith_grade_maqtu">مقطوع</string>
+    <string name="hadith_grade_maqtu_desc">أثر عن تابعي</string>
+
+    <string name="hadith_grade_mauquf">موقوف</string>
+    <string name="hadith_grade_mauquf_desc">رواية موقوفة على الصحابي</string>
+
+    <string name="hadith_grade_munkar">منكر</string>
+    <string name="hadith_grade_munkar_desc">رواية منكرة</string>
+
+    <string name="hadith_grade_mawdu">موضوع</string>
+    <string name="hadith_grade_mawdu_desc">حديث مكذوب مختلق</string>
+
+    <string name="hadith_grade_shadh">شاذ</string>
+    <string name="hadith_grade_shadh_desc">رواية شاذة</string>
+
+    <string name="hadith_grade_shadh_anha">شاذ عنه</string>
+    <string name="hadith_grade_shadh_anha_desc">نوع من الروايات الشاذة</string>
+
+    <string name="hadith_grade_shadh_maqtu">شاذ مقطوع</string>
+    <string name="hadith_grade_shadh_maqtu_desc">أثر شاذ عن تابعي</string>
+
+    <string name="msgUpdateAvailable">تحديث متاح! يرجى تحديث التطبيق للحصول على أحدث الميزات.</string>
+    <string name="msgUpdateAvailable4Dialog">تحديث متاح!
+\nيرجى تحديث التطبيق.</string>
+    <string name="msgUpdateAvailable2Continue">مطلوب التحديث!
+\nيرجى تحديث التطبيق للإستمرار.</string>
+
+</resources>
