@@ -16,8 +16,7 @@ import kotlinx.coroutines.runBlocking
 enum class HadithTranslation(val langCode: String, val label: String, val isComingSoon: Boolean = false) {
     ENGLISH("en", "English"),
     URDU("ur", "اردو"),
-    BENGALI("bn", "বাংলা", true),
-    INDONESIAN("id", "Bahasa Indonesia", true),
+    BENGALI("bn", "বাংলা"),
     FRENCH("fr", "Française");
 
     companion object {
