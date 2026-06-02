@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="next">Suivant</string>
+    <string name="skip">Ignorer</string>
+    <string name="back">Retour</string>
+    <string name="getStarted">Commencer</string>
     <string name="previous">Précédent</string>
     <string name="top">Haut</string>
     <string name="cancel">Annuler</string>
@@ -157,6 +160,13 @@
 
     <string name="scholar_info">Informations sur le savant</string>
     <string name="scholars">Savants</string>
+    <string name="scholar_rank_prophet">Prophète</string>
+    <string name="scholar_rank_companion">Compagnons (Ṣaḥāba)</string>
+    <string name="scholar_rank_follower">Successeurs des Compagnons (Tābiʿūn)</string>
+    <string name="scholar_rank_successor">Successeurs des Successeurs (Tābiʿ al-Tābiʿīn)</string>
+    <string name="scholar_rank_3rd_century">IIIe siècle de l\'Hégire</string>
+    <string name="scholar_rank_4th_century">IVe siècle de l\'Hégire</string>
+    <string name="scholar_rank_5th_century">Ve siècle de l\'Hégire</string>
 
     <string name="copy_hadith_number">Copier le n° du hadith</string>
 
@@ -268,7 +278,13 @@
 
     <string name="download_collection_first">Pour utiliser cette fonction, téléchargez d\'abord au moins une collection de hadiths.</string>
 
-    <string name="setting_up">Configuration… Cela prend quelques secondes.</string>
+    <string name="setting_up">Configuration… %1$d%%. Cela prend quelques secondes.</string>
+    <string name="downloadingTranslationProgress">Téléchargement de la traduction… %1$d%%</string>
+    <string name="setupDontClose">Veuillez ne pas fermer l\'application.</string>
+    <string name="onboardDescLanguage">Personnalisez l\'application dans votre langue. Vous pourrez la modifier plus tard dans les paramètres.</string>
+    <string name="onboardDescTheme">Choisissez l\'apparence de l\'application. Vous pourrez la modifier plus tard dans les paramètres.</string>
+    <string name="onboardDescTranslation">Choisissez la langue de traduction des hadiths. Elle sera téléchargée après la configuration.</string>
+    <string name="onboardTranslationWillDownload">Sera téléchargé après la configuration</string>
 
     <string name="selectABook">Sélectionnez d\'abord un livre.</string>
 

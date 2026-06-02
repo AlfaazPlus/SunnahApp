@@ -31,6 +31,9 @@
     </string>
 
     <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="back">Back</string>
+    <string name="getStarted">Get started</string>
     <string name="previous">Previous</string>
     <string name="top">Top</string>
     <string name="cancel">Cancel</string>
@@ -166,6 +169,13 @@
     <string name="desc_narrators_chain">View narrators chain</string>
     <string name="scholar_info">Scholar Information</string>
     <string name="scholars">Scholars</string>
+    <string name="scholar_rank_prophet">Prophet</string>
+    <string name="scholar_rank_companion">Companion (Ṣaḥābah)</string>
+    <string name="scholar_rank_follower">Follower (Tābiʿūn)</string>
+    <string name="scholar_rank_successor">Successor to the Followers (Tābiʿ al-Tābiʿīn)</string>
+    <string name="scholar_rank_3rd_century">3rd Century AH Scholar</string>
+    <string name="scholar_rank_4th_century">4th Century AH Scholar</string>
+    <string name="scholar_rank_5th_century">5th Century AH Scholar</string>
     <string name="copy_hadith_number">Copy hadith number</string>
     <string name="add_to_bookmarks">Add to Bookmarks</string>
     <string name="added_to_bookmarks">Added to Bookmarks</string>
@@ -230,7 +240,13 @@
     <string name="notification_permission">Notification Permission</string>
     <string name="notification_permission_desc">Please allow notification permission to receive daily Hadith reminders.</string>
     <string name="download_collection_first">To use this feature, please download at least one Hadith collection first.</string>
-    <string name="setting_up">Setting up… This will take a few seconds.</string>
+    <string name="setting_up">Setting up… %1$d%%. This will take a few seconds.</string>
+    <string name="downloadingTranslationProgress">Downloading translation… %1$d%%</string>
+    <string name="setupDontClose">Please don\'t close the app.</string>
+    <string name="onboardDescLanguage">Personalize the app in your language. You can change this later in Settings.</string>
+    <string name="onboardDescTheme">Choose how the app looks. You can change this later in Settings.</string>
+    <string name="onboardDescTranslation">Choose your hadith translation language. It will be downloaded after setup.</string>
+    <string name="onboardTranslationWillDownload">Will download after setup</string>
     <string name="selectABook">Select a book first.</string>
     <string name="chapter">Chapter</string>
     <string name="workInProgress">Work in progress</string>

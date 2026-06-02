@@ -3,15 +3,20 @@ package com.alfaazplus.sunnah.helpers
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.alfaazplus.sunnah.R
 
 object ScholarsHelper {
+    @Composable
     fun getScholarRankName(rank: Int?): String? {
         return when (rank) {
-            0 -> "Prophet"
-            1 -> "Companion (RA)"
-            2 -> "Follower (Tabi')"
-            3 -> "Successor (Taba' Tabi')"
-            4 -> "3rd Century AH"
+            0 -> stringResource(R.string.scholar_rank_prophet)
+            1 -> stringResource(R.string.scholar_rank_companion)
+            2 -> stringResource(R.string.scholar_rank_follower)
+            3 -> stringResource(R.string.scholar_rank_successor)
+            4 -> stringResource(R.string.scholar_rank_3rd_century)
+            5 -> stringResource(R.string.scholar_rank_4th_century)
+            6 -> stringResource(R.string.scholar_rank_5th_century)
             else -> null
         }
     }
@@ -23,7 +28,6 @@ object ScholarsHelper {
             1 -> Color.Magenta
             2 -> Color.Cyan
             3 -> Color.Yellow
-            4 -> Color.Blue
             else -> Color.Blue
         }
     }

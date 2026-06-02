@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
@@ -149,7 +150,10 @@ private fun HotdCard(
                 ReadButton(hadithUi, palette)
             }
 
-            HotdTexts(hadithUi)
+            SelectionContainer {
+                HotdTexts(hadithUi)
+            }
+
             HotdFooter(
                 hadithUi = hadithUi,
                 palette = palette,

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="next">اگلا</string>
+    <string name="skip">چھوڑیں</string>
+    <string name="back">واپس</string>
+    <string name="getStarted">شروع کریں</string>
     <string name="previous">پچھلا</string>
     <string name="top">اوپر</string>
     <string name="cancel">منسوخ کریں</string>
@@ -162,6 +165,13 @@
 
     <string name="scholar_info">محدث کی معلومات</string>
     <string name="scholars">علماء</string>
+    <string name="scholar_rank_prophet">نبی</string>
+    <string name="scholar_rank_companion">صحابہ</string>
+    <string name="scholar_rank_follower">تابعین</string>
+    <string name="scholar_rank_successor">تبع تابعین</string>
+    <string name="scholar_rank_3rd_century">تیسری صدی ہجری</string>
+    <string name="scholar_rank_4th_century">چوتھی صدی ہجری</string>
+    <string name="scholar_rank_5th_century">پانچویں صدی ہجری</string>
 
     <string name="copy_hadith_number">حدیث نمبر کاپی کریں</string>
 
@@ -280,7 +290,13 @@
     <string name="download_collection_first">اس فیچر کے استعمال کے لیے پہلے کم از کم ایک حدیث کلیکشن
         ڈاؤن لوڈ کریں۔</string>
 
-    <string name="setting_up">سیٹ اپ ہو رہا ہے… اس میں چند سیکنڈ لگ سکتے ہیں۔</string>
+    <string name="setting_up">سیٹ اپ ہو رہا ہے… %1$d%%۔ اس میں چند سیکنڈ لگ سکتے ہیں۔</string>
+    <string name="downloadingTranslationProgress">ترجمہ ڈاؤن لوڈ ہو رہا ہے… %1$d%%</string>
+    <string name="setupDontClose">براہ کرم ایپ بند نہ کریں۔</string>
+    <string name="onboardDescLanguage">ایپ کو اپنی زبان میں ذاتی بنائیں۔ بعد میں سیٹنگز سے تبدیل کر سکتے ہیں۔</string>
+    <string name="onboardDescTheme">ایپ کی ظاہری شکل منتخب کریں۔ بعد میں سیٹنگز سے تبدیل کر سکتے ہیں۔</string>
+    <string name="onboardDescTranslation">حدیث ترجمے کی زبان منتخب کریں۔ سیٹ اپ کے بعد یہ ڈاؤن لوڈ ہوگا۔</string>
+    <string name="onboardTranslationWillDownload">سیٹ اپ کے بعد ڈاؤن لوڈ ہوگا</string>
 
     <string name="selectABook">پہلے ایک کتاب منتخب کریں۔</string>
 

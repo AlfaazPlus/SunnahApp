@@ -50,13 +50,14 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val isSettingUp by setupVm.isSettingUp.collectAsStateWithLifecycle()
+    val setupOverlay by setupVm.setupOverlay.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         setupVm.initializeHadiths(context)
     }
 
     if (isSettingUp) {
-        SettingUpOverlay()
+        SettingUpOverlay(state = setupOverlay)
     } else {
         Content()
     }

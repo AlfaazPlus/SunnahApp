@@ -32,22 +32,31 @@ private fun AssetManager.readCorpusAssetBytes(collectionId: String): Pair<String
 }
 
 object DatabaseHelper {
-    suspend fun populateHadithDataFromAssets(context: Context, database: HadithDatabase) {
+    suspend fun populateHadithDataFromAssets(
+        context: Context,
+        database: HadithDatabase,
+        onProgress: ((Int) -> Unit)? = null,
+    ) {
         val startTime = System.currentTimeMillis()
         Logger.d("Hadith v2 corpus import started")
 
         var importedAny = false
         val assets = context.applicationContext.assets
+        val collections = HadithHelper.INCLUDED_COLLECTIONS.toList()
+        val totalCollections = collections.size.coerceAtLeast(1)
+
+        onProgress?.invoke(0)
 
         // Collections are processed sequentially so only one corpus lives in memory at a time,
         // preventing OOM on low-RAM devices. All DB writes are committed in a single write
         // transaction so the overall import remains fast (one fsync instead of N).
         withContext(Dispatchers.IO) {
             database.withWriteTransaction {
-                for (collectionId in HadithHelper.INCLUDED_COLLECTIONS) {
+                collections.forEachIndexed { index, collectionId ->
                     val (assetPath, rawBytes) = assets.readCorpusAssetBytes(collectionId) ?: run {
                         Logger.d("DatabaseHelperV2: no corpus asset under prebuilt-hadiths/$collectionId")
-                        continue
+                        onProgress?.invoke(((index + 1) * 100 / totalCollections).coerceIn(0, 100))
+                        return@forEachIndexed
                     }
 
                     val bundle = try {
@@ -60,7 +69,8 @@ object DatabaseHelper {
                         }
                     } catch (e: Exception) {
                         Logger.d("DatabaseHelperV2: invalid protobuf for $assetPath: ${e.message}")
-                        continue
+                        onProgress?.invoke(((index + 1) * 100 / totalCollections).coerceIn(0, 100))
+                        return@forEachIndexed
                     }
 
                     if (bundle.corpusId.isNotBlank() && bundle.corpusId != collectionId) {
@@ -69,11 +79,15 @@ object DatabaseHelper {
                         )
                     }
 
-                    val payload = bundle.toImportPayloadOrNull() ?: continue
+                    val payload = bundle.toImportPayloadOrNull() ?: run {
+                        onProgress?.invoke(((index + 1) * 100 / totalCollections).coerceIn(0, 100))
+                        return@forEachIndexed
+                    }
 
                     database.importDao.deleteCollectionData(collectionId)
                     database.insertCorpusImportPayload(payload)
                     importedAny = true
+                    onProgress?.invoke(((index + 1) * 100 / totalCollections).coerceIn(0, 100))
                 }
             }
         }
@@ -84,6 +98,8 @@ object DatabaseHelper {
         } else {
             Logger.d("Hadith v2 corpus import skipped (no corpus assets loaded)")
         }
+
+        onProgress?.invoke(100)
     }
 
     suspend fun cleanupLegacyHadithData(legacy: HadithDatabaseLegacy) {

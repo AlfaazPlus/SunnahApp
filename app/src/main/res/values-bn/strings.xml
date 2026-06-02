@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="next">পরবর্তী</string>
+    <string name="skip">এড়িয়ে যান</string>
+    <string name="back">পেছনে</string>
+    <string name="getStarted">শুরু করুন</string>
     <string name="previous">পূর্ববর্তী</string>
     <string name="top">উপরে</string>
     <string name="cancel">বাতিল</string>
@@ -157,6 +160,13 @@
 
     <string name="scholar_info">আলিমের তথ্য</string>
     <string name="scholars">আলেম</string>
+    <string name="scholar_rank_prophet">নবী</string>
+    <string name="scholar_rank_companion">সাহাবা</string>
+    <string name="scholar_rank_follower">তাবেঈন</string>
+    <string name="scholar_rank_successor">তাবে তাবেঈন</string>
+    <string name="scholar_rank_3rd_century">৩য় শতাব্দী হিজরি</string>
+    <string name="scholar_rank_4th_century">৪র্থ শতাব্দী হিজরি</string>
+    <string name="scholar_rank_5th_century">৫ম শতাব্দী হিজরি</string>
 
     <string name="copy_hadith_number">হাদীস নং কপি</string>
 
@@ -268,7 +278,13 @@
 
     <string name="download_collection_first">এই সুবিধা ব্যবহার করতে আগে অন্তত একটি হাদীস সংগ্রহ ডাউনলোড করুন।</string>
 
-    <string name="setting_up">সেটআপ হচ্ছে… কয়েক সেকেন্ড লাগবে।</string>
+    <string name="setting_up">সেটআপ হচ্ছে… %1$d%%। কয়েক সেকেন্ড লাগবে।</string>
+    <string name="downloadingTranslationProgress">অনুবাদ ডাউনলোড হচ্ছে… %1$d%%</string>
+    <string name="setupDontClose">অ্যাপ বন্ধ করবেন না।</string>
+    <string name="onboardDescLanguage">আপনার ভাষায় অ্যাপটি ব্যক্তিগতকরণ করুন। পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।</string>
+    <string name="onboardDescTheme">অ্যাপ কেমন দেখাবে তা বেছে নিন। পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।</string>
+    <string name="onboardDescTranslation">হাদীস অনুবাদের ভাষা বেছে নিন। সেটআপের পর এটি ডাউনলোড হবে।</string>
+    <string name="onboardTranslationWillDownload">সেটআপের পর ডাউনলোড হবে</string>
 
     <string name="selectABook">আগে একটি কিতাব বেছে নিন।</string>
 

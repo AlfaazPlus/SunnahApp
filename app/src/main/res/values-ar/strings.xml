@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="next">التالي</string>
+    <string name="skip">تخطّ</string>
+    <string name="back">رجوع</string>
+    <string name="getStarted">ابدأ</string>
     <string name="previous">السابق</string>
     <string name="top">الأعلى</string>
     <string name="cancel">إلغاء</string>
@@ -157,6 +160,13 @@
 
     <string name="scholar_info">معلومات العالم</string>
     <string name="scholars">العلماء</string>
+    <string name="scholar_rank_prophet">النبي</string>
+    <string name="scholar_rank_companion">الصحابة</string>
+    <string name="scholar_rank_follower">التابعون</string>
+    <string name="scholar_rank_successor">تابعو التابعين</string>
+    <string name="scholar_rank_3rd_century">القرن الثالث الهجري</string>
+    <string name="scholar_rank_4th_century">القرن الرابع الهجري</string>
+    <string name="scholar_rank_5th_century">القرن الخامس الهجري</string>
 
     <string name="copy_hadith_number">نسخ رقم الحديث</string>
 
@@ -268,7 +278,13 @@
 
     <string name="download_collection_first">لاستخدام هذه الميزة، يرجى تنزيل مجموعة أحاديث واحدة على الأقل أولاً.</string>
 
-    <string name="setting_up">جارٍ الإعداد… سيستغرق بضع ثوانٍ.</string>
+    <string name="setting_up">جارٍ الإعداد… %1$d%%. سيستغرق بضع ثوانٍ.</string>
+    <string name="downloadingTranslationProgress">جارٍ تنزيل الترجمة… %1$d%%</string>
+    <string name="setupDontClose">يرجى عدم إغلاق التطبيق.</string>
+    <string name="onboardDescLanguage">خصّص التطبيق بلغتك. يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="onboardDescTheme">اختر مظهر التطبيق. يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="onboardDescTranslation">اختر لغة ترجمة الأحاديث. سيتم تنزيلها بعد الإعداد.</string>
+    <string name="onboardTranslationWillDownload">سيتم التنزيل بعد الإعداد</string>
 
     <string name="selectABook">اختر كتاباً أولاً.</string>
 

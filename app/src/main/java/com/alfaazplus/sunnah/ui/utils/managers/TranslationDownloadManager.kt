@@ -12,6 +12,8 @@ import com.alfaazplus.sunnah.ui.utils.workers.TranslationDownloadWorker
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import java.util.UUID
 
 object TranslationDownloadManager {
@@ -36,7 +38,7 @@ object TranslationDownloadManager {
             }
     }
 
-    fun startDownload(context: Context, translationId: String) {
+    fun startDownload(context: Context, translationId: String): UUID {
         val data = workDataOf("id" to translationId)
         val itemTag = "${ITEM_TAG_PREFIX}${translationId}"
 
@@ -52,6 +54,36 @@ object TranslationDownloadManager {
         )
 
         observeWork(context, translationId, request.id)
+        return request.id
+    }
+
+    suspend fun awaitDownload(
+        context: Context,
+        translationId: String,
+        onProgress: ((Int) -> Unit)? = null,
+    ): ResourceDownloadStatus {
+        initialize(context)
+
+        val wm = WorkManager.getInstance(context)
+        val workId = startDownload(context, translationId)
+        val info = wm.getWorkInfoByIdFlow(workId)
+            .onEach { workInfo ->
+                when (workInfo?.state) {
+                    WorkInfo.State.ENQUEUED -> onProgress?.invoke(0)
+                    WorkInfo.State.RUNNING -> {
+                        onProgress?.invoke(workInfo.progress.getInt("progress", 0))
+                    }
+                    else -> Unit
+                }
+            }
+            .first { it?.state?.isFinished == true }!!
+
+        return when (info.state) {
+            WorkInfo.State.SUCCEEDED -> ResourceDownloadStatus.Completed
+            WorkInfo.State.FAILED -> ResourceDownloadStatus.Failed(info.outputData.getString("error"))
+            WorkInfo.State.CANCELLED -> ResourceDownloadStatus.Cancelled
+            else -> ResourceDownloadStatus.Failed(null)
+        }
     }
 
     fun stopDownload(context: Context, id: String) {

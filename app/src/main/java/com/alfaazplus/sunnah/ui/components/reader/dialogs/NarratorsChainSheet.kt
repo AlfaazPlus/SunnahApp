@@ -144,7 +144,9 @@ private fun NarratorCard(
             verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
-                text = "${narrator.shortName}\n${narrator.arabic}", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center
+                text = "${narrator.shortName}\n${narrator.arabic}",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
             )
             Text(
                 modifier = Modifier.alpha(0.8f),
