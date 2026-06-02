@@ -43,6 +43,13 @@
     <string name="search_in">میں تلاش کریں…</string>
     <string name="search_for">تلاش کریں…</string>
     <string name="search_hint">تلاش کریں…</string>
+    <string name="search_match">مطابقت</string>
+    <string name="search_match_any_words">کوئی بھی الفاظ</string>
+    <string name="search_match_any_words_desc">ایسے نتائج تلاش کریں جن میں ایک یا زیادہ تلاش کے الفاظ ہوں۔</string>
+    <string name="search_match_all_words">تمام الفاظ</string>
+    <string name="search_match_all_words_desc">ایسے نتائج تلاش کریں جن میں ہر تلاش کا لفظ موجود ہو۔</string>
+    <string name="search_match_exact_phrase">عین عبارت</string>
+    <string name="search_match_exact_phrase_desc">الفاظ اسی ترتیب میں تلاش کریں، جیسے «پچھلے گناہ»۔</string>
     <string name="apply_filter">فلٹر لاگو کریں</string>
     <string name="no_results_found">کوئی نتیجہ نہیں ملا</string>
     <string name="one_result_found">1 نتیجہ ملا</string>

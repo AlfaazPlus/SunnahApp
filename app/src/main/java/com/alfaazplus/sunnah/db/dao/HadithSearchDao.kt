@@ -18,53 +18,40 @@ interface HadithSearchDao {
             h.collection_id AS collection_id,
             h.number AS hadith_number,
             ct.title AS collection_name,
-            (
-                SELECT hc.blocks_json
-                FROM hadith_contents AS hc
-                WHERE hc.hadith_id = h.id
-                    AND hc.blocks_json LIKE '%' || :query || '%' COLLATE NOCASE
-                ORDER BY CASE hc.lang
-                    WHEN :displayLangCode THEN 0
-                    WHEN 'en' THEN 1
-                    WHEN 'ar' THEN 2
-                    ELSE 3
-                END
-                LIMIT 1
+            COALESCE(
+                (
+                    SELECT hc.blocks_json
+                    FROM hadith_contents AS hc
+                    WHERE hc.hadith_id = h.id
+                        AND hc.lang = :matchedLangCode
+                    LIMIT 1
+                ),
+                (
+                    SELECT hc.blocks_json
+                    FROM hadith_contents AS hc
+                    WHERE hc.hadith_id = h.id
+                    ORDER BY CASE hc.lang
+                        WHEN :displayLangCode THEN 0
+                        WHEN 'en' THEN 1
+                        WHEN 'ar' THEN 2
+                        ELSE 3
+                    END
+                    LIMIT 1
+                ),
+                ''
             ) AS blocks_json,
-            (
-                SELECT hc.lang
-                FROM hadith_contents AS hc
-                WHERE hc.hadith_id = h.id
-                    AND hc.blocks_json LIKE '%' || :query || '%' COLLATE NOCASE
-                ORDER BY CASE hc.lang
-                    WHEN :displayLangCode THEN 0
-                    WHEN 'en' THEN 1
-                    WHEN 'ar' THEN 2
-                    ELSE 3
-                END
-                LIMIT 1
-            ) AS matched_lang
+            :matchedLangCode AS matched_lang
         FROM hadiths AS h
         INNER JOIN collection_translations AS ct
             ON h.collection_id = ct.collection_id AND ct.lang = :displayLangCode
-        WHERE EXISTS (
-            SELECT 1
-            FROM hadith_contents AS hc
-            WHERE hc.hadith_id = h.id
-                AND hc.blocks_json LIKE '%' || :query || '%' COLLATE NOCASE
-        )
-            AND (
-                COALESCE(:collectionIds, '') = ''
-                OR h.collection_id IN (:collectionIds)
-            )
-        ORDER BY h.urn
+        WHERE h.id IN (:hadithIds)
         """
     )
-    fun searchHadiths(
-        query: String,
-        collectionIds: List<String>?,
+    suspend fun getHadithSearchRowsByIds(
+        hadithIds: List<String>,
+        matchedLangCode: String,
         displayLangCode: String,
-    ): PagingSource<Int, HadithSearchRow>
+    ): List<HadithSearchRow>
 
     @Query(
         """

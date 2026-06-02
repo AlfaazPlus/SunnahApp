@@ -110,6 +110,7 @@ fun SearchScreen(
                         .padding(32.dp)
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(28.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_search),

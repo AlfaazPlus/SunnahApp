@@ -424,6 +424,7 @@ object ReaderItemsBuilder {
                     HadithBlockType.NARRATOR -> {
                         paragraph(styles.trParagraphStyle) {
                             span(mutedSpanStyle) { append(text) }
+                            appendLine()
                         }
                     }
 

@@ -20,6 +20,19 @@ data class HadithSearchRow(
     @ColumnInfo(name = "matched_lang") val matchedLang: String,
 )
 
+data class SearchIndexSourceRow(
+    @ColumnInfo(name = "hadith_id") val hadithId: String,
+    @ColumnInfo(name = "collection_id") val collectionId: String,
+    @ColumnInfo(name = "lang_code") val langCode: String,
+    @ColumnInfo(name = "blocks_json") val blocksJson: String,
+)
+
+data class SearchIndexMatchRow(
+    @ColumnInfo(name = "hadith_id") val hadithId: String,
+    @ColumnInfo(name = "matched_lang") val matchedLang: String,
+    @ColumnInfo(name = "matched_text") val matchedText: String,
+)
+
 data class HadithSearchResult(
     val hadithId: String,
     val bookId: String,

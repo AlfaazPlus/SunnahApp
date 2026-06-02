@@ -7,7 +7,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.hadith.SearchRepository
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
 import dagger.assisted.Assisted
@@ -33,7 +32,6 @@ class SearchIndexWorker @AssistedInject constructor(
     appContext: Context,
     @Assisted
     params: WorkerParameters,
-    private val hadithRepo: HadithRepository,
     private val searchRepo: SearchRepository,
 ) : CoroutineWorker(appContext, params) {
     companion object {
@@ -56,11 +54,11 @@ class SearchIndexWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        when (val mode = SearchIndexSyncMode.fromValue(inputData.getString(KEY_MODE))) {
+        when (SearchIndexSyncMode.fromValue(inputData.getString(KEY_MODE))) {
             SearchIndexSyncMode.MODE_REMOVE_LANG -> {
                 val langCode = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
 
-                removeLang(applicationContext, langCode)
+                removeLang(langCode)
 
                 Result.success()
             }
@@ -68,13 +66,13 @@ class SearchIndexWorker @AssistedInject constructor(
             SearchIndexSyncMode.MODE_SINGLE_LANG -> {
                 val slug = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
 
-                buildIndexForLangIfNeeded(applicationContext, slug)
+                buildIndexForLangIfNeeded(slug)
 
                 Result.success()
             }
 
             SearchIndexSyncMode.MODE_ALL -> {
-                // todo: all
+                searchRepo.buildAllIndexes()
                 Result.success()
             }
 
@@ -82,12 +80,12 @@ class SearchIndexWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun buildIndexForLangIfNeeded(context: Context, langCode: String): Unit = withContext(Dispatchers.IO) {
-
+    private suspend fun buildIndexForLangIfNeeded(langCode: String): Unit = withContext(Dispatchers.IO) {
+        searchRepo.buildIndexForLangIfNeeded(langCode)
     }
 
-    private suspend fun removeLang(context: Context, langCode: String) = withContext(Dispatchers.IO) {
-
+    private suspend fun removeLang(langCode: String) = withContext(Dispatchers.IO) {
+        searchRepo.removeLang(langCode)
     }
 
 }

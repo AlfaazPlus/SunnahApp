@@ -10,6 +10,7 @@ import com.alfaazplus.sunnah.ui.utils.app.ResourceUpdateState
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.managers.TranslationDownloadManager
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
+import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationManager
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.AVAILABLE_TRANSLATIONS
@@ -94,6 +95,7 @@ class TranslationDownloadViewModel @Inject constructor(
                     }
 
                     if (status is ResourceDownloadStatus.Completed) {
+                        SearchIndexScheduler.enqueueLang(context, id)
                         refreshRows()
                     }
                 }
@@ -170,6 +172,7 @@ class TranslationDownloadViewModel @Inject constructor(
 
         viewModelScope.launch {
             repo.deleteTranslationData(id)
+            SearchIndexScheduler.enqueueRemoveLang(context, id)
             ReaderPreferences.setHadithTranslation(DEFAULT_TRANSLATION.langCode)
             refreshRows()
         }

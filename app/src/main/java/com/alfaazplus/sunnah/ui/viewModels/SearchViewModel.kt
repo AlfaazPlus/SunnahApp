@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.alfaazplus.sunnah.db.entities.scholars.Scholar
 import com.alfaazplus.sunnah.repository.hadith.HadithRepository
+import com.alfaazplus.sunnah.repository.hadith.SearchRepository
 import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.search.BooksSearchResult
 import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
@@ -35,6 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 open class SearchViewModel @Inject constructor(
     private val repo: HadithRepository,
+    private val searchRepo: SearchRepository,
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
     private val _searchQuery = MutableStateFlow("")
@@ -53,9 +55,10 @@ open class SearchViewModel @Inject constructor(
         Triple(filters, query, langCode)
     }
         .flatMapLatest { (filters, query, langCode) ->
-            repo.searchHadiths(
+            searchRepo.searchHadiths(
                 query,
                 collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
+                matchingStrategy = filters.matchingStrategy,
                 primaryColor,
                 langCode,
             )
@@ -78,7 +81,7 @@ open class SearchViewModel @Inject constructor(
         Triple(filters, query, langCode)
     }
         .flatMapLatest { (filters, query, langCode) ->
-            repo.searchBooks(
+            searchRepo.searchBooks(
                 query,
                 collectionIds = filters.selectedCollections?.takeIf { it.isNotEmpty() },
                 langCode,

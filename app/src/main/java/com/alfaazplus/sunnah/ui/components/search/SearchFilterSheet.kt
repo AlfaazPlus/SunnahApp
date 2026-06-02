@@ -3,6 +3,7 @@ package com.alfaazplus.sunnah.ui.components.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,8 +29,10 @@ import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.CollectionWithTranslation
 import com.alfaazplus.sunnah.ui.components.common.CheckboxItem
+import com.alfaazplus.sunnah.ui.components.common.RadioItem
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
 import com.alfaazplus.sunnah.ui.search.SearchFilters
+import com.alfaazplus.sunnah.ui.search.SearchMatchingStrategy
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.CollectionListViewModel
 import com.alfaazplus.sunnah.ui.viewModels.SearchViewModel
@@ -67,7 +70,7 @@ fun SearchFilterSheet(
                     selectedCollections = finalSelection
                 )
             )
-            
+
             onClose()
         }
 
@@ -79,6 +82,11 @@ fun SearchFilterSheet(
                     .padding(top = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                MatchingStrategySection(
+                    draft = draft,
+                    onChange = { draft = it },
+                )
+
                 CollectionsSection(
                     draft = draft,
                     onChange = { draft = it },
@@ -104,6 +112,40 @@ fun SearchFilterSheet(
                     Text(stringResource(R.string.apply_filter))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MatchingStrategySection(
+    draft: SearchFilters,
+    onChange: (SearchFilters) -> Unit,
+) {
+    Column {
+        SectionTitle(
+            stringResource(R.string.search_match),
+            modifier = Modifier.padding(bottom = 10.dp),
+        )
+
+        SearchMatchingStrategy.entries.forEach { strategy ->
+            RadioItem(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                title = when (strategy) {
+                    SearchMatchingStrategy.ANY_WORD -> R.string.search_match_any_words
+                    SearchMatchingStrategy.ALL_WORDS -> R.string.search_match_all_words
+                    SearchMatchingStrategy.EXACT_PHRASE -> R.string.search_match_exact_phrase
+                },
+                subtitle = when (strategy) {
+                    SearchMatchingStrategy.ANY_WORD -> R.string.search_match_any_words_desc
+                    SearchMatchingStrategy.ALL_WORDS -> R.string.search_match_all_words_desc
+                    SearchMatchingStrategy.EXACT_PHRASE -> R.string.search_match_exact_phrase_desc
+                },
+                selected = draft.matchingStrategy == strategy,
+                onClick = {
+                    onChange(draft.copy(matchingStrategy = strategy))
+                },
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+            )
         }
     }
 }

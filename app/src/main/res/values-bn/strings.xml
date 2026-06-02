@@ -43,6 +43,13 @@
     <string name="search_in">যেখানে খুঁজবেন…</string>
     <string name="search_for">এটি খুঁজুন…</string>
     <string name="search_hint">খুঁজুন…</string>
+    <string name="search_match">মিল</string>
+    <string name="search_match_any_words">যেকোনো শব্দ</string>
+    <string name="search_match_any_words_desc">এমন ফলাফল খুঁজুন যাতে একটি বা একাধিক খোঁজার শব্দ থাকে।</string>
+    <string name="search_match_all_words">সব শব্দ</string>
+    <string name="search_match_all_words_desc">এমন ফলাফল খুঁজুন যাতে প্রতিটি খোঁজার শব্দ থাকে।</string>
+    <string name="search_match_exact_phrase">ঠিক একই বাক্যাংশ</string>
+    <string name="search_match_exact_phrase_desc">শব্দগুলো একই ক্রমে খুঁজুন, যেমন “পূর্বাপর সমস্ত গুনাহ”।</string>
     <string name="apply_filter">ফিল্টার প্রয়োগ</string>
     <string name="no_results_found">কিছু পাওয়া যায়নি</string>
     <string name="one_result_found">১টি ফলাফল</string>

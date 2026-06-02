@@ -1,7 +1,9 @@
 package com.alfaazplus.sunnah.db.databases
 
+import androidx.room3.DaoReturnTypeConverters
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
+import androidx.room3.paging.PagingSourceDaoReturnTypeConverter
 import com.alfaazplus.sunnah.db.dao.SearchIndexDao
 import com.alfaazplus.sunnah.db.entities.search.SearchContentEntity
 import com.alfaazplus.sunnah.db.entities.search.SearchFtsEntity
@@ -18,6 +20,7 @@ const val SEARCH_INDEX_DB_VERSION = 1
     version = SEARCH_INDEX_DB_VERSION,
     exportSchema = false,
 )
+@DaoReturnTypeConverters(PagingSourceDaoReturnTypeConverter::class)
 abstract class SearchIndexDatabase : RoomDatabase() {
     abstract val searchIndexDao: SearchIndexDao
 }

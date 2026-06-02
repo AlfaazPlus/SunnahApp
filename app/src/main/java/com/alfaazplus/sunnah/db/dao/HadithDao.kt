@@ -14,6 +14,7 @@ import com.alfaazplus.sunnah.db.entities.v2.HadithGradeEntity
 import com.alfaazplus.sunnah.db.entities.v2.HadithReferenceEntity
 import com.alfaazplus.sunnah.db.relations.BookWithHadithCount
 import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
+import com.alfaazplus.sunnah.ui.search.SearchIndexSourceRow
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -124,6 +125,33 @@ interface HadithDao {
 
     @Query("SELECT id FROM hadiths WHERE collection_id = :collectionId")
     suspend fun getHadithIdsForCollection(collectionId: String): List<String>
+
+    @Query("SELECT DISTINCT lang FROM hadith_contents ORDER BY lang")
+    suspend fun getSearchIndexLangCodes(): List<String>
+
+    @Query(
+        """
+        SELECT
+            h.id AS hadith_id,
+            h.collection_id AS collection_id,
+            hc.lang AS lang_code,
+            hc.blocks_json AS blocks_json
+        FROM hadith_contents AS hc
+        INNER JOIN hadiths AS h ON h.id = hc.hadith_id
+        WHERE (:langCode IS NULL OR hc.lang = :langCode)
+        ORDER BY hc.lang, h.urn
+        """
+    )
+    suspend fun getSearchIndexSourceRows(langCode: String?): List<SearchIndexSourceRow>
+
+    @Query(
+        """
+        SELECT COUNT(*) || ':' || COALESCE(SUM(LENGTH(blocks_json)), 0)
+        FROM hadith_contents
+        WHERE lang = :langCode
+        """
+    )
+    suspend fun getSearchIndexFingerprint(langCode: String): String
 
     @Query("SELECT * FROM hadiths WHERE book_id = :bookId ORDER BY urn")
     suspend fun getHadithsForBook(bookId: String): List<HadithEntity>

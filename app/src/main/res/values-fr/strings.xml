@@ -43,6 +43,13 @@
     <string name="search_in">Rechercher dans…</string>
     <string name="search_for">Rechercher…</string>
     <string name="search_hint">Rechercher…</string>
+    <string name="search_match">Correspondance</string>
+    <string name="search_match_any_words">N\'importe quels mots</string>
+    <string name="search_match_any_words_desc">Trouver des résultats contenant un ou plusieurs mots de recherche.</string>
+    <string name="search_match_all_words">Tous les mots</string>
+    <string name="search_match_all_words_desc">Trouver des résultats contenant chaque mot de recherche.</string>
+    <string name="search_match_exact_phrase">Expression exacte</string>
+    <string name="search_match_exact_phrase_desc">Trouver les mots dans le même ordre, par exemple « péchés antérieurs ».</string>
     <string name="apply_filter">Appliquer le filtre</string>
     <string name="no_results_found">Aucun résultat</string>
     <string name="one_result_found">1 résultat</string>

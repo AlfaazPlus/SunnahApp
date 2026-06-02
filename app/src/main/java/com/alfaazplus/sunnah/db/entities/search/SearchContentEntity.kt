@@ -19,6 +19,9 @@ data class SearchContentEntity(
     @ColumnInfo(name = "hadith_id")
     val hadithId: String,
 
+    @ColumnInfo(name = "collection_id")
+    val collectionId: String,
+
     @ColumnInfo(name = "langCode")
     val langCode: String,
 

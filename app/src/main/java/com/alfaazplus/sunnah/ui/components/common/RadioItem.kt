@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.components.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,13 +21,14 @@ fun RadioItem(
     subtitle: Int? = null,
     subtitleStr: String? = null,
     selected: Boolean,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     onClick: () -> Unit
 ) {
     Row(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(contentPadding),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
     ) {
         SettingsItemContent(

@@ -43,6 +43,13 @@
     <string name="search_in">البحث في…</string>
     <string name="search_for">البحث عن…</string>
     <string name="search_hint">بحث…</string>
+    <string name="search_match">مطابقة</string>
+    <string name="search_match_any_words">أي كلمة</string>
+    <string name="search_match_any_words_desc">اعثر على نتائج تحتوي على كلمة بحث واحدة أو أكثر.</string>
+    <string name="search_match_all_words">كل الكلمات</string>
+    <string name="search_match_all_words_desc">اعثر على نتائج تحتوي على كل كلمة من كلمات البحث.</string>
+    <string name="search_match_exact_phrase">عبارة مطابقة</string>
+    <string name="search_match_exact_phrase_desc">اعثر على الكلمات بنفس الترتيب، مثل «مَا تَقَدَّمَ مِنْ ذَنْبِهِ».</string>
     <string name="apply_filter">تطبيق التصفية</string>
     <string name="no_results_found">لم يُعثر على نتائج</string>
     <string name="one_result_found">نتيجة واحدة</string>

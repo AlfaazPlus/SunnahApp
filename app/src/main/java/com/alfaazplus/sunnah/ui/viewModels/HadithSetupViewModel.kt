@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.ui.viewModels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.UserDatabase
@@ -39,6 +40,8 @@ class HadithSetupViewModel @Inject constructor(
             val currentVersion = HadithHelper.PREBUILT_HADITHS_VERSION
             val storedVersion = AppPreferences.getAssetHadithsImportedVersion()
             val userDataMigrated = AppPreferences.getUserDataV2MigratedVersion()
+
+            Logger.d("sunnahapp.db, current:$currentVersion, stored:$storedVersion")
 
             val needsHadithImport = storedVersion != currentVersion
             val needsUserDataMigration = !userDataMigrated

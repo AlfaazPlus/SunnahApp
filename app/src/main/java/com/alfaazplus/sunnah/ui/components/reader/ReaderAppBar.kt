@@ -47,7 +47,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -283,11 +282,7 @@ private fun Header(
             color = colorScheme.onSurfaceVariant,
         )
         .merge(
-            tightTextStyle.copy(
-                platformStyle = PlatformTextStyle(
-                    includeFontPadding = translationLangCode == "bn",
-                ),
-            )
+            tightTextStyle
         )
 
     var showInfoSheet by rememberSaveable { mutableStateOf(false) }

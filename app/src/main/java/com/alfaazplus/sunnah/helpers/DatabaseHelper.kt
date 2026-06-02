@@ -4,17 +4,15 @@ import android.content.Context
 import android.content.res.AssetManager
 import androidx.room3.withWriteTransaction
 import com.alfaazplus.sunnah.Logger
-import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
+import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.deliverable.v1.CorpusBundle
 import com.alfaazplus.sunnah.ui.utils.preferences.AppPreferences
-import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
 import java.io.FileNotFoundException
 import java.util.zip.GZIPInputStream
-
 
 private fun isGzipPayload(bytes: ByteArray): Boolean = bytes.size >= 2 && (bytes[0].toInt() and 0xff) == 0x1f && (bytes[1].toInt() and 0xff) == 0x8b
 
@@ -41,45 +39,42 @@ object DatabaseHelper {
         var importedAny = false
         val assets = context.applicationContext.assets
 
+        // Collections are processed sequentially so only one corpus lives in memory at a time,
+        // preventing OOM on low-RAM devices. All DB writes are committed in a single write
+        // transaction so the overall import remains fast (one fsync instead of N).
         withContext(Dispatchers.IO) {
-            for (collectionId in HadithHelper.INCLUDED_COLLECTIONS) {
-                val (assetPath, rawBytes) = assets.readCorpusAssetBytes(collectionId) ?: run {
-                    Logger.d("DatabaseHelperV2: no corpus asset under prebuilt-hadiths/$collectionId")
-                    continue
-                }
-
-                val protoBytes = try {
-                    if (isGzipPayload(rawBytes)) {
-                        GZIPInputStream(ByteArrayInputStream(rawBytes)).use { it.readBytes() }
-                    } else {
-                        rawBytes
+            database.withWriteTransaction {
+                for (collectionId in HadithHelper.INCLUDED_COLLECTIONS) {
+                    val (assetPath, rawBytes) = assets.readCorpusAssetBytes(collectionId) ?: run {
+                        Logger.d("DatabaseHelperV2: no corpus asset under prebuilt-hadiths/$collectionId")
+                        continue
                     }
-                } catch (e: Exception) {
-                    Logger.d("DatabaseHelperV2: gzip decode failed for $assetPath: ${e.message}")
-                    continue
-                }
 
-                val bundle = try {
-                    CorpusBundle.parseFrom(protoBytes)
-                } catch (e: InvalidProtocolBufferException) {
-                    Logger.d("DatabaseHelperV2: invalid protobuf for $assetPath: ${e.message}")
-                    continue
-                }
+                    val bundle = try {
+                        if (isGzipPayload(rawBytes)) {
+                            GZIPInputStream(ByteArrayInputStream(rawBytes)).use {
+                                CorpusBundle.parseFrom(it)
+                            }
+                        } else {
+                            CorpusBundle.parseFrom(rawBytes)
+                        }
+                    } catch (e: Exception) {
+                        Logger.d("DatabaseHelperV2: invalid protobuf for $assetPath: ${e.message}")
+                        continue
+                    }
 
-                if (bundle.corpusId.isNotBlank() && bundle.corpusId != collectionId) {
-                    Logger.d(
-                        "DatabaseHelperV2: corpus_id mismatch for $assetPath (folder=$collectionId, bundle=${bundle.corpusId})"
-                    )
-                }
+                    if (bundle.corpusId.isNotBlank() && bundle.corpusId != collectionId) {
+                        Logger.d(
+                            "DatabaseHelperV2: corpus_id mismatch for $assetPath (folder=$collectionId, bundle=${bundle.corpusId})"
+                        )
+                    }
 
-                val payload = bundle.toImportPayloadOrNull() ?: continue
+                    val payload = bundle.toImportPayloadOrNull() ?: continue
 
-                database.withWriteTransaction {
                     database.importDao.deleteCollectionData(collectionId)
                     database.insertCorpusImportPayload(payload)
+                    importedAny = true
                 }
-
-                importedAny = true
             }
         }
 

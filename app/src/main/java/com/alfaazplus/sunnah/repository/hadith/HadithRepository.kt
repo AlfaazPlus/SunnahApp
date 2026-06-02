@@ -10,7 +10,6 @@ import androidx.core.text.parseAsHtml
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.api.JsonHelper
 import com.alfaazplus.sunnah.db.dao.ScholarsDao
@@ -32,19 +31,16 @@ import com.alfaazplus.sunnah.ui.models.HadithOfTheDay
 import com.alfaazplus.sunnah.ui.search.BookSearchQuickResult
 import com.alfaazplus.sunnah.ui.search.BooksSearchResult
 import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
-import com.alfaazplus.sunnah.ui.search.HadithSearchResult
+import com.alfaazplus.sunnah.ui.search.HadithSearchRow
+import com.alfaazplus.sunnah.ui.search.SearchIndexSourceRow
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
-import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 
 class HadithRepository(
     private val database: HadithDatabase,
@@ -188,58 +184,29 @@ class HadithRepository(
         return importDao.getDownloadedTranslations(langCodes)
     }
 
-    suspend fun deleteTranslationData(lang: String) {
-        importDao.deleteTranslationData(lang)
+    suspend fun getSearchIndexLangCodes(): List<String> {
+        return dao.getSearchIndexLangCodes()
     }
 
-    fun searchHadiths(
-        query: String,
-        collectionIds: Set<String>?,
-        color: Color,
+    suspend fun getSearchIndexSourceRows(langCode: String): List<SearchIndexSourceRow> {
+        return dao.getSearchIndexSourceRows(langCode)
+    }
+
+    suspend fun getSearchIndexFingerprint(langCode: String): String {
+        return dao.getSearchIndexFingerprint(langCode)
+    }
+
+    suspend fun getHadithSearchRowsByIds(
+        hadithIds: List<String>,
+        matchedLangCode: String,
         displayLangCode: String,
-    ): Flow<PagingData<HadithSearchResult>> {
-        Logger.d("Searching for hadiths with query: $query", "CollectionIds: $collectionIds")
+    ): List<HadithSearchRow> {
+        if (hadithIds.isEmpty()) return emptyList()
+        return searchDao.getHadithSearchRowsByIds(hadithIds, matchedLangCode, displayLangCode)
+    }
 
-        if (query.isBlank()) {
-            return flow { emit(PagingData.empty()) }
-        }
-
-        return flow {
-            emitAll(
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 10,
-                        initialLoadSize = 10,
-                        enablePlaceholders = true,
-                        prefetchDistance = 3,
-                    ),
-                    pagingSourceFactory = {
-                        searchDao.searchHadiths(
-                            query,
-                            collectionIds?.toList(),
-                            displayLangCode,
-                        )
-                    },
-                ).flow.map { pagingData ->
-                    pagingData.map { row ->
-                        val plainText = row.blocksJson.toPlainSearchText()
-
-                        HadithSearchResult(
-                            hadithId = row.hadithId,
-                            bookId = row.bookId,
-                            collectionId = row.collectionId,
-                            numbering = ReaderItemsBuilder.buildNumbering(
-                                row.collectionName,
-                                row.hadithNumber,
-                                displayLangCode,
-                            ),
-                            matchedLang = row.matchedLang,
-                            snippetText = plainText.toSearchSnippet(query, color, row.matchedLang),
-                        )
-                    }
-                },
-            )
-        }
+    suspend fun deleteTranslationData(lang: String) {
+        importDao.deleteTranslationData(lang)
     }
 
     fun searchBooks(
@@ -379,76 +346,6 @@ class HadithRepository(
         ""
     }
 
-    private fun String.toSearchSnippet(
-        query: String,
-        highlightColor: Color,
-        langCode: String,
-    ): AnnotatedString {
-        val textStyle = textStyleForLang(langCode)
-
-        val highlightStyle = SpanStyle(
-            color = highlightColor,
-            fontWeight = FontWeight.Bold,
-            background = highlightColor.alpha(0.15f),
-        )
-
-        fun AnnotatedString.Builder.appendSnippet(body: CharSequence) {
-            if (body.isEmpty()) return
-            append(body)
-        }
-
-        if (isBlank() || query.isBlank()) return buildAnnotatedString { }
-
-        val source = this
-        val snippetBody = when {
-            source.length <= 400 -> source
-            else -> {
-                val highlightStart = source.indexOf(query, ignoreCase = true)
-                if (highlightStart == -1) {
-                    source.take(400)
-                } else {
-                    val highlightEnd = (highlightStart + query.length).coerceAtMost(source.length)
-                    val padding = 200
-                    val preContextStart = (highlightStart - padding).coerceAtLeast(0)
-                    val postContextEnd = (highlightEnd + padding).coerceAtMost(source.length)
-                    buildString {
-                        if (preContextStart > 0) append('…')
-                        append(source, preContextStart, postContextEnd)
-                        if (postContextEnd < source.length) append('…')
-                    }
-                }
-            }
-        }
-
-        val relativeHighlightStart = snippetBody.indexOf(query, ignoreCase = true)
-
-        return buildAnnotatedString {
-            withStyle(textStyle.toParagraphStyle()) {
-                withStyle(textStyle.toSpanStyle()) {
-                    if (relativeHighlightStart == -1) {
-                        appendSnippet(snippetBody)
-                        return@withStyle
-                    }
-
-                    val relativeHighlightEnd = (relativeHighlightStart + query.length).coerceAtMost(snippetBody.length)
-
-                    if (relativeHighlightStart > 0) {
-                        appendSnippet(snippetBody.substring(0, relativeHighlightStart))
-                    }
-
-                    pushStyle(highlightStyle)
-
-                    appendSnippet(snippetBody.substring(relativeHighlightStart, relativeHighlightEnd))
-
-                    pop()
-
-                    if (relativeHighlightEnd < snippetBody.length) {
-                        appendSnippet(snippetBody.substring(relativeHighlightEnd))
-                    }
-                }
-            }
-        }
-    }
 
     private suspend fun CollectionEntity.withCollectionTranslations(langCode: String): CollectionWithTranslation {
         return listOf(this)
