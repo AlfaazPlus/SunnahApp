@@ -29,7 +29,7 @@ data class HadithActions(
     val onBookmarkViewerRequest: (BookmarkViewerData) -> Unit,
     val onNumberReferenceRequest: (hadithId: String) -> Unit,
     val onQuickReferenceRequest: (hadithId: String) -> Unit,
-    val onQuranReferenceRequest: (chapterNo: Int, verses: String) -> Unit,
+    val onQuranReferenceRequest: (QuranReference) -> Unit,
     val showGradeInfo: (gradeText: HadithGradeText) -> Unit,
     val showNarratorsChain: (hadithId: String) -> Unit,
 )
@@ -70,17 +70,9 @@ fun ActionsProvider(
             onQuickReferenceRequest = { id ->
                 activeQuickReference = QuickReferenceData(hadithIds = listOf(id))
             },
-            onQuranReferenceRequest = { chapterNo, verses ->
-                val verses = verses.split("-")
-                val fromVerse = verses[0].toInt()
-                var toVerse = fromVerse
-
-                if (verses.size > 1) {
-                    toVerse = verses[1].toInt()
-                }
-
+            onQuranReferenceRequest = { reference ->
                 try {
-                    NavigationHelper.openQuranReference(context, QuranReference(chapterNo, fromVerse, toVerse))
+                    NavigationHelper.openQuranReference(context, reference)
                 } catch (e: Exception) {
                     Logger.e(e)
                     showNoQuranAppBottomSheet = true

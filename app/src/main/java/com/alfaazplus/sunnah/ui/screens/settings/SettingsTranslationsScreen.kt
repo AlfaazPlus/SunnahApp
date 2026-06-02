@@ -139,7 +139,7 @@ private fun ItemRow(
             .clickable(isEnabled) {
                 if (isEnabled) onSelect()
             }
-            .padding(horizontal = 8.dp),
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(

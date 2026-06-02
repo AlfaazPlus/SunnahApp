@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
+import com.alfaazplus.sunnah.ui.models.QuranReference
 
 fun buildHadithAnnotatedString(
     text: String,
@@ -75,7 +76,8 @@ fun buildHadithAnnotatedString(
                             tag = "qref:${part.chapter}:${part.verses}",
                             styles = linkStyles,
                             linkInteractionListener = {
-                                actions.onQuranReferenceRequest(part.chapter, part.verses)
+                                QuranReference.parse(part.chapter, part.verses)
+                                    ?.let(actions.onQuranReferenceRequest)
                             },
                         )
                     ) {

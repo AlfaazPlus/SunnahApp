@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +60,7 @@ import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookInfoSheet
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.theme.tightTextStyle
+import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
@@ -280,7 +282,13 @@ private fun Header(
         .copy(
             color = colorScheme.onSurfaceVariant,
         )
-        .merge(tightTextStyle)
+        .merge(
+            tightTextStyle.copy(
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = translationLangCode == "bn",
+                ),
+            )
+        )
 
     var showInfoSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -304,7 +312,7 @@ private fun Header(
             )
 
             Text(
-                text = " : ${currentHadith?.hwc?.hadith?.number ?: "…"}",
+                text = " : ${StringUtils.formatNumbering(currentHadith?.hwc?.hadith?.number, translationLangCode)}",
                 style = textStyle,
             )
 

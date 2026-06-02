@@ -10,6 +10,7 @@
     <string name="create">إنشاء</string>
     <string name="goBack">رجوع</string>
     <string name="copy">نسخ</string>
+    <string name="selectAll">تحديد الكل</string>
     <string name="enable">تفعيل</string>
     <string name="disable">إيقاف</string>
     <string name="enabled">مفعّل</string>

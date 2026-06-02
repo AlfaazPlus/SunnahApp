@@ -10,6 +10,7 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
 import com.alfaazplus.sunnah.ui.models.ReaderLayoutItem
+import com.alfaazplus.sunnah.ui.utils.StringUtils
 import com.alfaazplus.sunnah.ui.utils.preferences.HadithLayout
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.ChangeConfig
@@ -77,14 +78,19 @@ class ReaderViewModel @Inject constructor(
         )
 
     val hadithNavigationItems = _activeBookId
-        .map { bookId ->
+        .combine(ReaderPreferences.hadithTranslationFlow()) { bookId, langCode -> bookId to langCode }
+        .distinctUntilChanged()
+        .map { (bookId, langCode) ->
             if (bookId != null) {
-                repo.dao.getHadithNavigationItemsForBook(bookId)
+                repo.dao.getHadithNavigationItemsForBook(bookId).map { item ->
+                    item.also {
+                        it.visibleNumbering = StringUtils.formatNumbering(item.number, langCode)
+                    }
+                }
             } else {
                 emptyList()
             }
         }
-        .distinctUntilChanged()
         .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,

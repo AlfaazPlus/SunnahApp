@@ -33,7 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.HadithNavigationItem
 import com.alfaazplus.sunnah.ui.theme.alpha
-import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 
 

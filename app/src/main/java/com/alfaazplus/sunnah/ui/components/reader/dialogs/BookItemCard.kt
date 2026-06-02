@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
+import com.alfaazplus.sunnah.ui.utils.StringUtils.formatNumbering
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
 import com.alfaazplus.sunnah.ui.utils.text.textStyle
@@ -37,12 +38,11 @@ import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
 @Composable
 fun BookItemCard(
     modifier: Modifier = Modifier,
+    translationLangCode: String,
     bwt: BookWithTranslation,
     isCurrent: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val translationLangCode = ReaderPreferences.observeHadithTranslation()
-
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
@@ -73,7 +73,7 @@ fun BookItemCard(
                         colorFilter = ColorFilter.tint(colorScheme.primary),
                     )
                     Text(
-                        text = bwt.book.number,
+                        text = formatNumbering(bwt.book.number, translationLangCode),
                         style = typography.labelMedium,
                         fontWeight = FontWeight.Normal,
                         color = colorScheme.onPrimary,

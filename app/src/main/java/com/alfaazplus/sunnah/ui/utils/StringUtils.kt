@@ -22,13 +22,42 @@ object StringUtils {
     ): String {
         val resolvedName = collectionName ?: "?"
         val resolvedNumber = number ?: "?"
+
+        val displayNumber = if (langCode == "bn") resolvedNumber.toBengaliDigits()
+        else resolvedNumber
+
         return if (isRtlLanguage(langCode)) {
-            "$resolvedName : $LTR_ISOLATE_START$resolvedNumber$LTR_ISOLATE_END"
+            "$resolvedName : $LTR_ISOLATE_START$displayNumber$LTR_ISOLATE_END"
         } else {
-            "$resolvedName: $resolvedNumber"
+            "$resolvedName: $displayNumber"
         }
     }
 
+    fun formatNumbering(
+        number: String?,
+        langCode: String?,
+    ): String {
+        if (number.isNullOrEmpty()) return ""
+
+        return if (langCode == "bn") number.toBengaliDigits()
+        else number
+    }
+
+    private fun String.toBengaliDigits(): String = map { ch ->
+        when (ch) {
+            '0' -> '০'
+            '1' -> '১'
+            '2' -> '২'
+            '3' -> '৩'
+            '4' -> '৪'
+            '5' -> '৫'
+            '6' -> '৬'
+            '7' -> '৭'
+            '8' -> '৮'
+            '9' -> '৯'
+            else -> ch
+        }
+    }.joinToString("")
 
     /**
      * Title case a text.

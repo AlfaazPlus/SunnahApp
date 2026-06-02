@@ -38,6 +38,7 @@ import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.components.common.SearchTextField
 import com.alfaazplus.sunnah.ui.components.reader.dialogs.BookItemCard
 import com.alfaazplus.sunnah.ui.utils.extension.verticalFadingEdge
+import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.viewModels.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -129,6 +130,7 @@ private fun BookList(
     readerVm: ReaderViewModel,
     onBookSelected: (String) -> Unit,
 ) {
+    val translationLangCode = ReaderPreferences.observeHadithTranslation()
     val books by readerVm.books.collectAsStateWithLifecycle()
     val currentBookId by readerVm.activeBookId.collectAsStateWithLifecycle()
 
@@ -190,6 +192,7 @@ private fun BookList(
             ) {
                 items(filteredBooks.size, key = { index -> filteredBooks[index].book.id }) {
                     BookItemCard(
+                        translationLangCode = translationLangCode,
                         bwt = filteredBooks[it],
                         isCurrent = filteredBooks[it].book.id == currentBookId,
                     ) {

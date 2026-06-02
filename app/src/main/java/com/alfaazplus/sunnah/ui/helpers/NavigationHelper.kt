@@ -17,23 +17,42 @@ object NavigationHelper {
     fun openQuranReference(context: Context, reference: QuranReference) {
         try {
             val intent = Intent(QuranAppContract.ACTION_SHOW_POPUP).apply {
-                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapter)
-
-                if (reference.isSingleVerse()) {
-                    putExtra(QuranAppContract.EXTRA_VERSES, "${reference.fromVerse}")
-                } else {
-                    putExtra(QuranAppContract.EXTRA_VERSES, "${reference.fromVerse}-${reference.toVerse}")
-                }
+                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapterNo)
+                putExtra(
+                    QuranAppContract.EXTRA_VERSES, when (reference) {
+                        is QuranReference.Single -> "${reference.verseNo}"
+                        is QuranReference.Range -> "${reference.fromVerseNo}-${reference.toVerseNo}"
+                        is QuranReference.Discrete -> reference.verses
+                            .sorted()
+                            .joinToString(",")
+                    }
+                )
             }
 
             context.startActivity(intent)
         } catch (_: Exception) {
             val intent = Intent(QuranAppContract.ACTION_OPEN_READER).apply {
-                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapter)
-                if (reference.isSingleVerse()) {
-                    putExtra(QuranAppContract.EXTRA_VERSE_NO, reference.fromVerse)
-                } else {
-                    putExtra(QuranAppContract.EXTRA_VERSES, intArrayOf(reference.fromVerse, reference.toVerse))
+                putExtra(QuranAppContract.EXTRA_CHAPTER_NUMBER, reference.chapterNo)
+                when (reference) {
+                    is QuranReference.Single -> {
+                        putExtra(QuranAppContract.EXTRA_VERSE_NO, reference.verseNo)
+                    }
+
+                    is QuranReference.Range -> {
+                        putExtra(
+                            QuranAppContract.EXTRA_VERSES,
+                            intArrayOf(reference.fromVerseNo, reference.toVerseNo),
+                        )
+                    }
+
+                    is QuranReference.Discrete -> {
+                        putExtra(
+                            QuranAppContract.EXTRA_VERSES,
+                            reference.verses
+                                .sorted()
+                                .toIntArray(),
+                        )
+                    }
                 }
             }
 

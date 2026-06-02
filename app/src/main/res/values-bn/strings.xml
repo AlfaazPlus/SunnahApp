@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="next">পরবর্তী</string>
+    <string name="previous">পূর্ববর্তী</string>
+    <string name="top">উপরে</string>
+    <string name="cancel">বাতিল</string>
+    <string name="close">বন্ধ</string>
+    <string name="clear">মুছুন</string>
+    <string name="delete">মুছে ফেলুন</string>
+    <string name="create">তৈরি করুন</string>
+    <string name="goBack">ফিরে যান</string>
+    <string name="copy">কপি</string>
+    <string name="selectAll">সব নির্বাচন</string>
+    <string name="enable">চালু করুন</string>
+    <string name="disable">বন্ধ করুন</string>
+    <string name="enabled">চালু</string>
+    <string name="disabled">বন্ধ</string>
+    <string name="allow">অনুমতি দিন</string>
+    <string name="downloading">ডাউনলোড হচ্ছে…</string>
+    <string name="downloaded">ডাউনলোড হয়েছে</string>
+    <string name="viewAll">সব দেখুন</string>
+
+    <string name="hadithNumber">হাদীস %s</string>
+    <string name="hadithNumberFull">হাদীস নং %s</string>
+    <string name="bookNumberTitle">কিতাব %1$s: %2$s</string>
+
+    <string name="books">কিতাব</string>
+    <string name="hadiths">হাদীস</string>
+    <string name="hadithRangeValue" formatted="false">%d থেকে %d</string>
+    <string name="totalBooks" formatted="false">মোট কিতাব: %d</string>
+    <string name="totalHadiths" formatted="false">মোট হাদীস: %d</string>
+    <string name="previousHadith">আগের হাদীস</string>
+    <string name="nextHadith">পরের হাদীস</string>
+    <string name="previousBook">আগের কিতাব</string>
+    <string name="nextBook">পরের কিতাব</string>
+
+    <string name="search">খুঁজুন</string>
+    <string name="global_search">সবখানে খুঁজুন</string>
+    <string name="search_placeholder">খুঁজতে লিখুন…</string>
+    <string name="search_book">কিতাবে খুঁজুন…</string>
+    <string name="search_hadith">হাদীসে খুঁজুন…</string>
+    <string name="search_filter">খোঁজার ফিল্টার</string>
+    <string name="search_in">যেখানে খুঁজবেন…</string>
+    <string name="search_for">এটি খুঁজুন…</string>
+    <string name="search_hint">খুঁজুন…</string>
+    <string name="apply_filter">ফিল্টার প্রয়োগ</string>
+    <string name="no_results_found">কিছু পাওয়া যায়নি</string>
+    <string name="one_result_found">১টি ফলাফল</string>
+    <string name="n_results_found" formatted="false">%dটি ফলাফল</string>
+    <string name="search_result_menu">খোঁজার ফলাফল মেনু</string>
+    <string name="clear_search">খোঁজা মুছুন</string>
+    <string name="noResults">কিছু পাওয়া যায়নি</string>
+    <string name="searchTips">হাদীস, কিতাব বা আলেম খুঁজুন</string>
+
+    <string name="settings">সেটিংস</string>
+    <string name="app_settings">অ্যাপ সেটিংস</string>
+    <string name="reader_settings">পাঠক সেটিংস</string>
+    <string name="other_settings">অন্যান্য</string>
+
+    <string name="home">হোম</string>
+    <string name="history">ইতিহাস</string>
+    <string name="library">লাইব্রেরি</string>
+    <string name="theme_default">ডিফল্ট</string>
+    <string name="theme_blue">নীল</string>
+    <string name="theme_red">লাল</string>
+    <string name="theme_purple">বেগুনি</string>
+    <string name="theme_violet">বেগুনি ঝাপসা</string>
+    <string name="theme_yellow">হলুদ</string>
+    <string name="theme_mono">মোনো</string>
+    <string name="app_langauge">অ্যাপের ভাষা</string>
+    <string name="app_theme">থিম</string>
+    <string name="theme_colors">থিমের রং</string>
+    <string name="theme_mode">থিম মোড</string>
+    <string name="light">হালকা</string>
+    <string name="dark">গাঢ়</string>
+    <string name="system_default">সিস্টেম অনুযায়ী</string>
+    <string name="theme_dark_description">গাঢ় থিম চোখের জন্য আরামদায়ক এবং ব্যাটারি কম খরচ করে</string>
+    <string name="theme_default_description">ফোনের সেটিং অনুযায়ী নিজে থেকে বদলাবে</string>
+    <string name="dynamic_color">ডায়নামিক রং</string>
+    <string name="dynamic_color_description">ওয়ালপেপার অনুযায়ী থিমের রং বদলাবে</string>
+    <string name="github">GitHub</string>
+    <string name="github_description">সমস্যা জানাতে বা অবদান রাখতে অ্যাপের GitHub রিপোজিটরি দেখুন</string>
+    <string name="privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="about_us">আমাদের সম্পর্কে</string>
+    <string name="rate_app">অ্যাপ রেট করুন</string>
+    <string name="share_app">অ্যাপ শেয়ার করুন</string>
+
+    <string name="share_app_msg">SunnahApp একটি বিনামূল্যে ওপেন সোর্স অ্যাপ—নবী ﷺ-এর সুন্নাহ পড়ুন ও অন্বেষণ করুন। সুন্দর ইন্টারফেসে অনুবাদ, উন্নত খোঁজ, দৈনিক স্মরণ ও আরও অনেক সুবিধা।\n\nএখনই ডাউনলোড করুন:\n%s</string>
+
+    <string name="install_quranapp">QuranApp ইনস্টল করুন</string>
+    <string name="install_quranapp_description">অনুবাদ, শব্দার্থ, তিলাওয়াতসহ কুরআনের এই রেফারেন্স পড়ুন। QuranApp বিনামূল্যে, নিরাপদ ও ওপেন সোর্স</string>
+    <string name="install_quranapp_description_short">বিনামূল্যে, নিরাপদ ও ওপেন সোর্স</string>
+
+    <string name="install_from_google_play">Google Play থেকে ইনস্টল</string>
+    <string name="install_from_github">GitHub থেকে ইনস্টল</string>
+
+    <string name="donate">অনুদান</string>
+
+    <string name="hadith_layout">হাদীস দেখার ধরন</string>
+    <string name="hadith_layout_description">আড়াআড়ি — হাদীস বাম-ডানে স্ক্রল হবে।\nউল্লম্ব — হাদীস উপর-নিচে স্ক্রল হবে।</string>
+
+    <string name="horizontal">আড়াআড়ি</string>
+    <string name="vertical">উল্লম্ব</string>
+
+    <string name="add">যোগ করুন</string>
+    <string name="label_new">নতুন</string>
+    <string name="remove">সরান</string>
+    <string name="update">আপডেট</string>
+    <string name="edit">সম্পাদনা</string>
+    <string name="done">সম্পন্ন</string>
+    <string name="reset">রিসেট</string>
+
+    <string name="select_color">রং বেছে নিন</string>
+
+    <string name="change_to_horizontal_layout">আড়াআড়ি দেখায় বদলান</string>
+    <string name="change_to_vertical_layout">উল্লম্ব দেখায় বদলান</string>
+
+    <string name="text_size_and_style">লেখার আকার ও ধরন</string>
+    <string name="serif_font_style">সেরিফ ফন্ট</string>
+    <string name="arabic_text_size">আরবি লেখার আকার</string>
+    <string name="translation_text_size">অনুবাদের আকার</string>
+
+    <string name="hadith_text_option">হাদীস দেখানোর ধরন</string>
+    <string name="show_arabic_and_translation">আরবি ও অনুবাদ দুটোই</string>
+    <string name="show_only_arabic">শুধু আরবি</string>
+    <string name="show_only_translation">শুধু অনুবাদ</string>
+
+    <string name="show_sanad">সনদ দেখান</string>
+    <string name="show_sanad_description">হাদীসে রাবীদের সনদ দেখান</string>
+
+    <string name="show_chapter">বাব দেখান</string>
+
+    <string name="manage_collections">সংগ্রহ পরিচালনা</string>
+    <string name="about_collection">এই সংগ্রহ সম্পর্কে</string>
+    <string name="delete_collection">সংগ্রহ মুছবেন?</string>
+
+    <string name="collection_name">সংগ্রহের নাম</string>
+    <string name="collection_name_hint">সংগ্রহের নাম লিখুন</string>
+
+    <string name="description">বিবরণ</string>
+    <string name="collection_description_hint">সংগ্রহের বিবরণ লিখুন</string>
+
+    <string name="msg_delete_collection">এই সংগ্রহ মুছে ফেলতে চান?</string>
+    <string name="msg_collection_deleted">সংগ্রহ মুছে ফেলা হয়েছে।</string>
+
+    <string name="desc_hadith_options">হাদীস অপশন</string>
+
+    <string name="narrators_chain">রাবীদের সনদ</string>
+    <string name="desc_narrators_chain">রাবীদের সনদ দেখুন</string>
+
+    <string name="scholar_info">আলিমের তথ্য</string>
+    <string name="scholars">আলেম</string>
+
+    <string name="copy_hadith_number">হাদীস নং কপি</string>
+
+    <string name="add_to_bookmarks">বুকমার্কে রাখুন</string>
+    <string name="added_to_bookmarks">বুকমার্কে যোগ হয়েছে</string>
+    <string name="remove_from_bookmarks">বুকমার্ক থেকে সরান</string>
+
+    <string name="add_to_collection">সংগ্রহে যোগ করুন</string>
+    <string name="remove_from_collection">সংগ্রহ থেকে সরান</string>
+
+    <string name="select_collections">সংগ্রহ বেছে নিন</string>
+
+    <string name="bookmarks">বুকমার্ক</string>
+
+    <string name="delete_all_bookmarks">সব বুকমার্ক মুছবেন?</string>
+    <string name="all_bookmarks_deleted">সব বুকমার্ক মুছে ফেলা হয়েছে।</string>
+
+    <string name="collections">সংগ্রহ</string>
+
+    <string name="no_collections">এখনো কোনো সংগ্রহ তৈরি হয়নি।</string>
+
+    <string name="no_collection_items">
+        এই সংগ্রহে কোনো হাদীস নেই। পছন্দের হাদীস সংগ্রহে রেখে সহজে খুঁজে নিতে পারবেন।
+    </string>
+
+    <string name="create_collection">সংগ্রহ তৈরি</string>
+    <string name="update_collection">সংগ্রহ আপডেট</string>
+
+    <string name="msg_delete_user_collection">এই সংগ্রহ মুছবেন? এতে সংরক্ষিত সব হাদীসও মুছে যাবে।</string>
+
+    <string name="copied_to_clipboard">ক্লিপবোর্ডে কপি হয়েছে</string>
+
+    <string name="paste_log_github_issue">লগ ক্লিপবোর্ডে কপি হয়েছে। GitHub issue-তে পেস্ট করুন।</string>
+
+    <string name="paste_reference_github_issue">হাদীস রেফারেন্স ক্লিপবোর্ডে কপি হয়েছে। GitHub issue-তে পেস্ট করুন।</string>
+
+    <string name="hadith_of_the_day">আজকের হাদীস</string>
+
+    <string name="hadith_options">হাদীস অপশন</string>
+
+    <string name="share_this_hadith">এই হাদীস শেয়ার করুন</string>
+
+    <string name="copy_hadith_text">হাদীসের লেখা কপি</string>
+
+    <string name="report_issue">সমস্যা জানান</string>
+
+    <string name="note">নোট</string>
+    <string name="optional_note">ঐচ্ছিক নোট</string>
+    <string name="no_note">কোনো নোট নেই</string>
+
+    <string name="open_in_reader">পাঠকে খুলুন</string>
+
+    <string name="quick_reference_n_hadiths">%1$dটি হাদীস</string>
+
+    <string name="quick_reference_not_found">উল্লেখিত হাদীস লোড করা যায়নি।</string>
+
+    <string name="hadith_references">হাদীস রেফারেন্স</string>
+
+    <string name="ref_type_sunnahcom">রেফারেন্স</string>
+    <string name="ref_type_app">অ্যাপ রেফারেন্স</string>
+    <string name="ref_type_in_book">কিতাবের রেফারেন্স</string>
+    <string name="ref_type_english_translation">ইংরেজি রেফারেন্স</string>
+    <string name="ref_type_arabic_english_book">আরবি/ইংরেজি কিতাব রেফারেন্স</string>
+    <string name="ref_type_arabic">আরবি রেফারেন্স</string>
+    <string name="ref_type_us_msa">USC-MSA ওয়েব রেফারেন্স (ইংরেজি)</string>
+    <string name="ref_deprecated">(পুরনো)</string>
+
+    <string name="no_references">কোনো রেফারেন্স নেই।</string>
+
+    <string name="no_bookmarks">এখনো কোনো বুকমার্ক নেই।</string>
+
+    <string name="reading_history">পড়ার ইতিহাস</string>
+
+    <string name="no_reading_history">আপনার পড়ার ইতিহাস এখানে দেখাবে।</string>
+
+    <string name="clear_reading_history">পড়ার ইতিহাস মুছবেন?</string>
+
+    <string name="reading_history_cleared">পড়ার ইতিহাস মুছে ফেলা হয়েছে।</string>
+
+    <string name="action_cannot_be_undone">এটি আর ফিরিয়ে আনা যাবে না।</string>
+
+    <string name="last_crash_log">শেষ ক্র্যাশ লগ</string>
+
+    <string name="app_logs">অ্যাপ লগ</string>
+    <string name="app_logs_desc">ক্র্যাশ লগ, দমানো লগ</string>
+
+    <string name="crash_logs">ক্র্যাশ লগ</string>
+    <string name="suppressed_logs">দমানো লগ</string>
+
+    <string name="log_removed">লগ মুছে ফেলা হয়েছে</string>
+
+    <string name="create_issue">Issue তৈরি</string>
+
+    <string name="no_logs_found">কোনো লগ নেই</string>
+
+    <string name="resource_download_source">ডাউনলোডের উৎস</string>
+
+    <string name="resource_download_source_desc">একটি উৎস কাজ না করলে অন্য উৎস থেকে হাদীস ডাউনলোড করতে পারবেন।</string>
+
+    <string name="open_github_issues">GitHub issues খুলুন</string>
+
+    <string name="daily_reminder">দৈনিক স্মরণ</string>
+
+    <string name="daily_reminder_desc">প্রতিদিন হাদীসের স্মরণ পাবেন।</string>
+
+    <string name="notification_permission">নোটিফিকেশন অনুমতি</string>
+
+    <string name="notification_permission_desc">দৈনিক হাদীস স্মরণ পেতে নোটিফিকেশন অনুমতি দিন।</string>
+
+    <string name="download_collection_first">এই সুবিধা ব্যবহার করতে আগে অন্তত একটি হাদীস সংগ্রহ ডাউনলোড করুন।</string>
+
+    <string name="setting_up">সেটআপ হচ্ছে… কয়েক সেকেন্ড লাগবে।</string>
+
+    <string name="selectABook">আগে একটি কিতাব বেছে নিন।</string>
+
+    <string name="chapter">বাব</string>
+
+    <string name="workInProgress">কাজ চলছে</string>
+
+    <string name="selectTranslation">অনুবাদ বেছে নিন</string>
+
+    <string name="info">তথ্য</string>
+
+    <string name="book_info">কিতাবের তথ্য</string>
+
+    <string name="book_section_preamble">সূচনা</string>
+    <string name="book_section_intro">ভূমিকা</string>
+    <string name="book_section_notes">নোট</string>
+
+    <string name="book_no_details">এই কিতাবের আর কোনো তথ্য নেই।</string>
+
+    <string name="deleteTranslation">অনুবাদ মুছবেন?</string>
+    <string name="updateAvailable">আপডেট আছে</string>
+    <string name="comingSoon">শীঘ্রই আসছে</string>
+    <string name="msgTranslationUpdateAvailable">আপনার অনুবাদের নতুন সংস্করণ পাওয়া যাচ্ছে।</string>
+
+    <string name="primaryCollections">প্রধান সংগ্রহ</string>
+    <string name="selection">নির্বাচিত সংগ্রহ</string>
+
+    <string name="noUrduTranslation">এই হাদীসের উর্দু অনুবাদ এখনো নেই।</string>
+    <string name="noBanglaTranslation">এই হাদীসের বাংলা অনুবাদ এখনো নেই।</string>
+    <string name="noFrenchTranslation">এই হাদীসের ফরাসি অনুবাদ এখনো নেই।</string>
+    <string name="noIndonesianTranslation">এই হাদীসের ইন্দোনেশীয় অনুবাদ এখনো নেই।</string>
+
+    <string name="hadith_grade_label_format">হুকুম: %s</string>
+
+    <string name="hadith_grade_sahih">সহীহ</string>
+    <string name="hadith_grade_sahih_desc">বিশুদ্ধ ও নির্ভরযোগ্য হাদিস</string>
+
+    <string name="hadith_grade_sahih_maqtu">সহীহ মাকতূ\'</string>
+    <string name="hadith_grade_sahih_maqtu_desc">তাবিঈ থেকে বিশুদ্ধ বর্ণনা</string>
+
+    <string name="hadith_grade_sahih_marfu">সহীহ মারফূ\'</string>
+    <string name="hadith_grade_sahih_marfu_desc">নবী ﷺ-এর প্রতি সম্বন্ধিত বিশুদ্ধ বর্ণনা</string>
+
+    <string name="hadith_grade_sahih_mauquf">সহীহ মাওকূফ</string>
+    <string name="hadith_grade_sahih_mauquf_desc">সাহাবি থেকে বিশুদ্ধ বর্ণনা</string>
+
+    <string name="hadith_grade_sahih_mauquf_marfu">মারফূ\' হুকুমযুক্ত সহীহ মাওকূফ</string>
+    <string name="hadith_grade_sahih_mauquf_marfu_desc">সাহাবির বর্ণনা যা কার্যত নবী ﷺ-এর বাণী হিসেবে গণ্য</string>
+
+    <string name="hadith_grade_sahih_mutawatir">সহীহ মুতাওয়াতির</string>
+    <string name="hadith_grade_sahih_mutawatir_desc">বহু সূত্রে ধারাবাহিকভাবে বর্ণিত বিশুদ্ধ হাদিস</string>
+
+    <string name="hadith_grade_hasan">হাসান</string>
+    <string name="hadith_grade_hasan_desc">উত্তম ও গ্রহণযোগ্য হাদিস</string>
+
+    <string name="hadith_grade_hasan_sahih">হাসান সহীহ</string>
+    <string name="hadith_grade_hasan_sahih_desc">হাসান ও সহীহের মধ্যবর্তী মানের হাদিস</string>
+
+    <string name="hadith_grade_hasan_maqtu">হাসান মাকতূ\'</string>
+    <string name="hadith_grade_hasan_maqtu_desc">তাবিঈ থেকে উত্তম বর্ণনা</string>
+
+    <string name="hadith_grade_hasan_mauquf">হাসান মাওকূফ</string>
+    <string name="hadith_grade_hasan_mauquf_desc">সাহাবি থেকে উত্তম বর্ণনা</string>
+
+    <string name="hadith_grade_hasan_li_ghairih">হাসান লি-গাইরিহি</string>
+    <string name="hadith_grade_hasan_li_ghairih_desc">সমর্থক সনদের কারণে শক্তিশালী হওয়া হাদিস</string>
+
+    <string name="hadith_grade_daif">যঈফ</string>
+    <string name="hadith_grade_daif_desc">দুর্বল হাদিস</string>
+
+    <string name="hadith_grade_daif_jiddan">যঈফ জিদ্দান</string>
+    <string name="hadith_grade_daif_jiddan_desc">অত্যন্ত দুর্বল হাদিস</string>
+
+    <string name="hadith_grade_daif_maqtu">যঈফ মাকতূ\'</string>
+    <string name="hadith_grade_daif_maqtu_desc">তাবিঈ থেকে দুর্বল বর্ণনা</string>
+
+    <string name="hadith_grade_daif_maqtu_munkar">যঈফ মুনকার মাকতূ\'</string>
+    <string name="hadith_grade_daif_maqtu_munkar_desc">তাবিঈ থেকে প্রত্যাখ্যাত দুর্বল বর্ণনা</string>
+
+    <string name="hadith_grade_daif_marfu">যঈফ মারফূ\'</string>
+    <string name="hadith_grade_daif_marfu_desc">নবী ﷺ-এর প্রতি সম্বন্ধিত দুর্বল বর্ণনা</string>
+
+    <string name="hadith_grade_daif_mauquf">যঈফ মাওকূফ</string>
+    <string name="hadith_grade_daif_mauquf_desc">সাহাবি থেকে দুর্বল বর্ণনা</string>
+
+    <string name="hadith_grade_daif_munkar">যঈফ মুনকার</string>
+    <string name="hadith_grade_daif_munkar_desc">নির্ভরযোগ্য বর্ণনার বিরোধী দুর্বল হাদিস</string>
+
+    <string name="hadith_grade_daif_mursal">যঈফ মুরসাল</string>
+    <string name="hadith_grade_daif_mursal_desc">সনদে সাহাবি অনুপস্থিত এমন দুর্বল বর্ণনা</string>
+
+    <string name="hadith_grade_maqtu">মাকতূ\'</string>
+    <string name="hadith_grade_maqtu_desc">তাবিঈ থেকে বর্ণিত হাদিস</string>
+
+    <string name="hadith_grade_mauquf">মাওকূফ</string>
+    <string name="hadith_grade_mauquf_desc">সাহাবি থেকে বর্ণিত হাদিস</string>
+
+    <string name="hadith_grade_munkar">মুনকার</string>
+    <string name="hadith_grade_munkar_desc">দুর্বলতা বা বিরোধিতার কারণে প্রত্যাখ্যাত হাদিস</string>
+
+    <string name="hadith_grade_mawdu">মাওযূ\'</string>
+    <string name="hadith_grade_mawdu_desc">জাল বা বানোয়াট হাদিস</string>
+
+    <string name="hadith_grade_shadh">শায</string>
+    <string name="hadith_grade_shadh_desc">অধিক শক্তিশালী বর্ণনার বিরোধী হাদিস</string>
+
+    <string name="hadith_grade_shadh_anha">শায আনহা</string>
+    <string name="hadith_grade_shadh_anha_desc">অস্বাভাবিক বা ব্যতিক্রমধর্মী বর্ণনার রূপ</string>
+
+    <string name="hadith_grade_shadh_maqtu">শায মাকতূ\'</string>
+    <string name="hadith_grade_shadh_maqtu_desc">তাবিঈ থেকে বর্ণিত অনিয়মিত বর্ণনা</string>
+
+    <string name="msgUpdateAvailable">আপডেট আছে! নতুন সুবিধার জন্য অ্যাপ আপডেট করুন।</string>
+    <string name="msgUpdateAvailable4Dialog">আপডেট আছে!
+\nঅ্যাপ আপডেট করুন।</string>
+    <string name="msgUpdateAvailable2Continue">আপডেট প্রয়োজন!
+\nচালিয়ে যেতে অ্যাপ আপডেট করুন।</string>
+</resources>

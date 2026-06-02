@@ -55,6 +55,8 @@ fun availableAppLocales(): Set<Pair<String, String>> {
         SPAppConfigs.LOCALE_DEFAULT to stringResource(R.string.system_default),
         "en" to "English",
         "ar" to "العربية",
+        "bn" to "বাংলা",
+        "fr" to "Français",
         "ur" to "اردو",
     )
 }

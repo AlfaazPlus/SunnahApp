@@ -14,6 +14,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.alfaazplus.sunnah.ui.components.reader.HadithActions
+import com.alfaazplus.sunnah.ui.theme.fontBengali
 import com.alfaazplus.sunnah.ui.theme.fontUrdu
 import com.alfaazplus.sunnah.ui.theme.fontUthmani
 import com.alfaazplus.sunnah.ui.utils.StringUtils
@@ -59,10 +60,15 @@ fun getTranslationTextStyle(
     val isUrdu = langCode.isUrduLanguageCode()
     val lineHeightMultiplier = if (isUrdu) 2.5f else 1.5f
 
+    val fontFamily = when (langCode) {
+        "ur" -> fontUrdu
+        "bn" -> fontBengali
+        else -> if (params.isSerif) FontFamily.Serif
+        else FontFamily.SansSerif
+    }
+
     return TextStyle(
-        fontFamily = if (isUrdu) fontUrdu
-        else if (params.isSerif) FontFamily.Serif
-        else FontFamily.SansSerif,
+        fontFamily = fontFamily,
         textDirection = textDirectionForLang(langCode),
         platformStyle = PlatformTextStyle(
             includeFontPadding = true

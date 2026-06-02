@@ -138,13 +138,12 @@ fun HadithTextPreview(
         isArabic -> "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ"
         else -> when (translationId) {
             "en" -> "Whoever fasts Ramadan out of faith and in the hope of reward, he will be forgiven his previous sins."
-            "bn" -> ""
-            "fr" -> ""
-            "in" -> ""
+            "bn" -> "যে ব্যক্তি আল্লাহ তা’আলার উপর দূঢ় বিশ্বাস রেখে সওয়াবের নিয়তে রমযান মাসের সাওম (রোযা) পালন করে, তার পূর্বাপর সমস্ত গুনাহ ক্ষমা করে দেওয়া হয়।"
+            "fr" -> "Quiconque jeûne pendant le Ramadan par foi et dans l'espoir d'une récompense, ses péchés antérieurs lui seront pardonnés."
             "ur" -> "جس نے رمضان میں ایمان کے ساتھ ثواب کی نیت سے روزہ رکھا تو اس کے پچھلے گناہ بخش دئیے جائیں گے"
             else -> ""
         }
-    } // fixme
+    }
 
     val style = if (isArabic) {
         getArabicTextStyle(

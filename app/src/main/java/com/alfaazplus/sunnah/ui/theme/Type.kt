@@ -31,6 +31,19 @@ val fontUrdu by lazy {
     )
 }
 
+val fontBengali by lazy {
+    FontFamily(
+        Font(
+            R.font.noto_serif_bengali_regular,
+            weight = FontWeight.Normal,
+        ),
+        Font(
+            R.font.noto_serif_bengali_bold,
+            weight = FontWeight.Bold,
+        ),
+    )
+}
+
 val fontUthmani by lazy {
     FontFamily(
         Font(
@@ -49,8 +62,7 @@ val tightTextStyle = TextStyle(
         mode = LineHeightStyle.Mode.Tight,
         alignment = LineHeightStyle.Alignment.Center,
         trim = LineHeightStyle.Trim.Both,
-    ),
-    platformStyle = PlatformTextStyle(
+    ), platformStyle = PlatformTextStyle(
         includeFontPadding = false,
     )
 )

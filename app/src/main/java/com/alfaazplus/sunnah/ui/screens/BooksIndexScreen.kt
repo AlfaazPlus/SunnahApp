@@ -219,6 +219,7 @@ private fun ScreenContent(
                 val rightPad = if (index % columnCount == columnCount - 1) 16 else 0
 
                 BookItemCard(
+                    translationLangCode = translationLangCode,
                     modifier = Modifier
                         .padding(top = if (index == 0) 6.dp else 0.dp)
                         .padding(start = leftPad.dp, end = rightPad.dp),
