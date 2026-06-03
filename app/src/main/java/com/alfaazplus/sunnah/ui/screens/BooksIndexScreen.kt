@@ -1,5 +1,8 @@
 package com.alfaazplus.sunnah.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +30,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,49 +63,79 @@ import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
 import com.alfaazplus.sunnah.ui.utils.text.textStyle
 import com.alfaazplus.sunnah.ui.viewModels.BookListViewModel
 
+private const val BOOK_SEARCH_GRID_KEY = "book_search"
+
+private val AppBarHeight = 72.dp
 
 @Composable
 fun BooksIndexScreen(collectionId: String) {
     val navController = LocalNavHostController.current
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val gridState = rememberLazyGridState()
+    val topChromeThresholdPx = with(LocalDensity.current) {
+        AppBarHeight.roundToPx()
+    }
+
+    val showTopSearch by remember(topChromeThresholdPx) {
+        derivedStateOf {
+            val searchItem = gridState.layoutInfo.visibleItemsInfo.find { it.key == BOOK_SEARCH_GRID_KEY }
+
+            if (searchItem != null) {
+                searchItem.offset.y < topChromeThresholdPx
+            } else {
+                gridState.firstVisibleItemIndex > 1
+            }
+        }
+    }
 
     Box(
-        modifier = Modifier.background(colorScheme.background)
+        modifier = Modifier.background(colorScheme.background),
     ) {
         ScreenContent(
-            collectionId,
+            collectionId = collectionId,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            gridState = gridState,
         )
 
-        Column(
+        Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
+                .shadow(if (showTopSearch) 4.dp else 0.dp)
+                .background(
+                    if (showTopSearch) colorScheme.surfaceContainer else Color.Transparent,
+                )
+                .statusBarsPadding()
+                .height(AppBarHeight)
+                .padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .background(colorScheme.surfaceContainer)
-                    .statusBarsPadding()
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .background(colorScheme.surfaceVariant, CircleShape)
+                    .size(38.dp),
             ) {
-                IconButton(
-                    onClick = {
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .background(colorScheme.surfaceVariant, CircleShape)
-                        .size(38.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_left),
-                        contentDescription = stringResource(R.string.goBack),
-                        tint = colorScheme.onSurfaceVariant
-                    )
-                }
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_left),
+                    contentDescription = stringResource(R.string.goBack),
+                    tint = colorScheme.onSurfaceVariant,
+                )
+            }
+
+            AnimatedVisibility(
+                visible = showTopSearch,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.weight(1f),
+            ) {
+                SearchTextField(
+                    placeholder = stringResource(R.string.search_book),
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                )
             }
         }
     }
@@ -105,6 +144,9 @@ fun BooksIndexScreen(collectionId: String) {
 @Composable
 private fun ScreenContent(
     collectionId: String,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    gridState: LazyGridState,
     vm: BookListViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavHostController.current
@@ -112,8 +154,6 @@ private fun ScreenContent(
     LaunchedEffect(collectionId) {
         vm.setCollectionId(collectionId)
     }
-
-    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     val books = vm.books
     val cwt = vm.cwt
@@ -145,6 +185,7 @@ private fun ScreenContent(
         val columnCount = maxOf(1, (maxWidth / 300.dp).toInt())
 
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(columnCount),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -198,12 +239,12 @@ private fun ScreenContent(
                 }
             }
 
-            item(span = { GridItemSpan(maxLineSpan) }) {
+            item(key = BOOK_SEARCH_GRID_KEY, span = { GridItemSpan(maxLineSpan) }) {
                 SearchTextField(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     placeholder = stringResource(R.string.search_book),
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = onSearchQueryChange,
                 )
             }
 
@@ -230,7 +271,6 @@ private fun ScreenContent(
             }
         }
     }
-
 }
 
 @Composable
@@ -245,7 +285,8 @@ fun BookMetaInfoCard(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = text, style = typography.bodyMedium
+            text = text,
+            style = typography.bodyMedium,
         )
     }
 }

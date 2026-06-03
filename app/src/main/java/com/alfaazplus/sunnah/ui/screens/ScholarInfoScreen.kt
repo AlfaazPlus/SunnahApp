@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.parseAsHtml
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.entities.scholars.Scholar
@@ -65,10 +64,7 @@ fun InformationTable(info: Map<String, String>) {
                             end = 10.dp,
                             top = 8.dp,
                             bottom = 8.dp,
-                        ),
-                    text = label,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                        ), text = label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold
                 )
                 Text(
                     modifier = Modifier
@@ -157,7 +153,6 @@ fun BiographySection(title: String, content: String) {
                 .padding(20.dp),
             text = content
                 .replace("\n", "<br/>")
-                .parseAsHtml()
                 .toAnnotatedString(),
             style = TextStyle(fontSize = 16.sp),
         )
@@ -185,8 +180,9 @@ private fun ScholarInfo(scholar: Scholar) {
                 content = scholar.bio,
             )
         }
-        InformationTable(mapOf(
-            "Full Name" to (scholar.fullName ?: "—"),
+        InformationTable(
+            mapOf(
+                "Full Name" to (scholar.fullName ?: "—"),
             "Kunya" to (scholar.kunya.takeIf { !it.isNullOrBlank() } ?: "—"),
             "Birth" to (scholar.birthDate
                 .takeIf { !it.isNullOrBlank() }

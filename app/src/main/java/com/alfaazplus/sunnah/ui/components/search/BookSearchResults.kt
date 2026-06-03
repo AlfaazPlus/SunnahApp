@@ -23,16 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.text.parseAsHtml
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.common.Loader
-import com.alfaazplus.sunnah.ui.search.BooksSearchResult
 import com.alfaazplus.sunnah.ui.safeNavigate
 import com.alfaazplus.sunnah.ui.screens.BookMetaInfoCard
 import com.alfaazplus.sunnah.ui.screens.NumberingCard
+import com.alfaazplus.sunnah.ui.search.BooksSearchResult
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
@@ -76,9 +75,7 @@ private fun BookSearchItem(
                 }
                 title?.let {
                     Text(
-                        text = it
-                            .parseAsHtml()
-                            .toAnnotatedString(),
+                        text = it.toAnnotatedString(),
                         style = textStyle(
                             langCode = langCode,
                             fontSize = typography.titleSmall.fontSize,

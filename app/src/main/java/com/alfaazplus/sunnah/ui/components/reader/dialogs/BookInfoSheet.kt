@@ -36,7 +36,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.ui.components.dialogs.BottomSheet
@@ -213,9 +212,7 @@ private fun BookInfoHeader(bwt: BookWithTranslation, translationLangCode: String
                 .getTitle(translationLangCode)
                 ?.let { enTitle ->
                     Text(
-                        text = enTitle
-                            .parseAsHtml()
-                            .toAnnotatedString(),
+                        text = enTitle.toAnnotatedString(),
                         style = typography.titleMedium,
                         color = colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,

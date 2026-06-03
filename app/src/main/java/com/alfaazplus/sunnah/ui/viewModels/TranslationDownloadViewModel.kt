@@ -55,8 +55,8 @@ class TranslationDownloadViewModel @Inject constructor(
 
         viewModelScope.launch {
             refreshRows()
-            ResourceUpdateManager.checkAndPerformUpdates()
         }
+        ResourceUpdateManager.ensureUpdatesChecked()
 
         viewModelScope.launch {
             ResourceUpdateManager.updateState.collect { state ->

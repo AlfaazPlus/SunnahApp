@@ -8,12 +8,17 @@ import com.alfaazplus.sunnah.ui.utils.createFile
 import com.alfaazplus.sunnah.ui.utils.getOtherDirectory
 import com.alfaazplus.sunnah.ui.utils.readFileText
 import com.alfaazplus.sunnah.ui.utils.writeFileText
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.CancellationException as JavaCancellationException
 
 enum class ResourceUpdateState {
     IDLE,
@@ -24,8 +29,16 @@ enum class ResourceUpdateState {
 }
 
 object ResourceUpdateManager {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val _updateState = MutableStateFlow(ResourceUpdateState.IDLE)
     val updateState: StateFlow<ResourceUpdateState> = _updateState.asStateFlow()
+
+    fun ensureUpdatesChecked(force: Boolean = false) {
+        scope.launch {
+            checkAndPerformUpdates(force)
+        }
+    }
 
     fun getLocalVersions(): ResourcesVersions? {
         val file = getResourcesVersionsFile()
@@ -39,7 +52,7 @@ object ResourceUpdateManager {
         }
     }
 
-    suspend fun checkAndPerformUpdates(force: Boolean = false) = withContext(Dispatchers.IO) {
+    private suspend fun checkAndPerformUpdates(force: Boolean = false) = withContext(Dispatchers.IO) {
         if (_updateState.value == ResourceUpdateState.CHECKING || _updateState.value == ResourceUpdateState.UPDATING) return@withContext
 
         _updateState.value = ResourceUpdateState.CHECKING
@@ -64,6 +77,7 @@ object ResourceUpdateManager {
                 _updateState.value = ResourceUpdateState.IDLE
             }
         } catch (e: Exception) {
+            if (e is CancellationException || e is JavaCancellationException) throw e
             Logger.saveError(e, "ResourceUpdateManager.checkAndPerformUpdates")
             _updateState.value = ResourceUpdateState.FAILED
         }

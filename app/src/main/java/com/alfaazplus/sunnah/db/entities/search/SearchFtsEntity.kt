@@ -11,9 +11,8 @@ import androidx.room3.FtsOptions
     tokenizer = FtsOptions.TOKENIZER_UNICODE61,
     tokenizerArgs = ["remove_diacritics", "2"],
     notIndexed = ["langCode", "hadith_id", "collection_id"],
-    prefix = [2, 3, 4],
     hasColumnSize = false,
-    detail = FtsOptions.Detail.COLUMN,
+    detail = FtsOptions.Detail.FULL,
 )
 @Entity(tableName = "search_fts")
 data class SearchFtsEntity(

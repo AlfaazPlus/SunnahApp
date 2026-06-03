@@ -6,7 +6,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.core.text.parseAsHtml
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -26,9 +25,16 @@ import com.alfaazplus.sunnah.ui.search.SearchIndexMatchRow
 import com.alfaazplus.sunnah.ui.search.SearchMatchingStrategy
 import com.alfaazplus.sunnah.ui.theme.alpha
 import com.alfaazplus.sunnah.ui.utils.reader.ReaderItemsBuilder
+import com.alfaazplus.sunnah.ui.utils.text.stripHtml
 import com.alfaazplus.sunnah.ui.utils.text.textStyleForLang
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 
 class SearchRepository(
     private val database: SearchIndexDatabase,
@@ -36,22 +42,34 @@ class SearchRepository(
 ) {
     private val dao get() = database.searchIndexDao
 
-    suspend fun buildIndexForLangIfNeeded(langCode: String) {
+    suspend fun buildIndexForLangIfNeeded(langCode: String, rebuildFts: Boolean = true): Boolean {
         val fingerprint = hadithRepo.getSearchIndexFingerprint(langCode)
         if (dao.getFingerprint(SearchIndexDao.metaKey(langCode)) == fingerprint) {
-            return
+            return false
         }
 
         buildIndexForLang(langCode, fingerprint)
+
+        if (rebuildFts) {
+            dao.rebuildFtsIndex()
+        }
+
+        return true
     }
 
     suspend fun buildAllIndexes() {
+        var anyUpdated = false
         hadithRepo
             .getSearchIndexLangCodes()
             .forEach { langCode ->
-                buildIndexForLangIfNeeded(langCode)
+                if (buildIndexForLangIfNeeded(langCode, rebuildFts = false)) {
+                    anyUpdated = true
+                }
             }
-        dao.rebuildFtsIndex()
+
+        if (anyUpdated) {
+            dao.rebuildFtsIndex()
+        }
     }
 
     suspend fun removeLang(langCode: String) {
@@ -156,19 +174,35 @@ class SearchRepository(
     }
 
     private suspend fun buildIndexForLang(langCode: String, fingerprint: String) {
-        val content = hadithRepo
-            .getSearchIndexSourceRows(langCode)
-            .mapNotNull { row ->
-                val text = row.blocksJson.toPlainSearchText()
-                if (text.isBlank()) return@mapNotNull null
+        val rows = hadithRepo.getSearchIndexSourceRows(langCode)
+        val maxConcurrency = Runtime
+            .getRuntime()
+            .availableProcessors()
+            .coerceIn(1, 4)
+        val semaphore = Semaphore(maxConcurrency)
 
-                SearchContentEntity(
-                    hadithId = row.hadithId,
-                    collectionId = row.collectionId,
-                    langCode = row.langCode,
-                    text = text,
-                )
-            }
+        val content = withContext(Dispatchers.Default) {
+            rows
+                .chunked(500)
+                .map { chunk ->
+                    async {
+                        semaphore.withPermit {
+                            chunk.mapNotNull { row ->
+                                val text = row.blocksJson.toPlainSearchText()
+                                if (text.isBlank()) null
+                                else SearchContentEntity(
+                                    hadithId = row.hadithId,
+                                    collectionId = row.collectionId,
+                                    langCode = row.langCode,
+                                    text = text,
+                                )
+                            }
+                        }
+                    }
+                }
+                .awaitAll()
+                .flatten()
+        }
 
         dao.replaceLang(langCode, content, fingerprint)
     }
@@ -236,41 +270,119 @@ private class HadithFtsPagingSource(
     }
 }
 
-private fun String.toFtsMatchQuery(strategy: SearchMatchingStrategy): String? {
+internal fun String.toFtsMatchQuery(strategy: SearchMatchingStrategy): String? {
     if (strategy == SearchMatchingStrategy.EXACT_PHRASE) {
         return normalizeSearchPhrase()
             .takeIf { it.isNotBlank() }
             ?.let { phrase -> "\"${phrase.replace("\"", "\"\"")}\"" }
     }
 
-    val quotedPhrases = Regex("\"([^\"]+)\"")
+    val tokenRegex = Regex("""("[^"]+"|\bNEAR(?:[/:]\d+)?\b|[\p{L}\p{N}\p{M}_]+)""", RegexOption.IGNORE_CASE)
+    val matches = tokenRegex
         .findAll(this)
-        .mapNotNull { match ->
-            match.groupValues
-                .getOrNull(1)
-                ?.normalizeSearchPhrase()
-                ?.takeIf { it.isNotBlank() }
-                ?.let { phrase -> "\"${phrase.replace("\"", "\"\"")}\"" }
-        }
         .toList()
 
-    val unquoted = replace(Regex("\"([^\"]+)\""), " ")
-    val terms = Regex("[\\p{L}\\p{N}\\p{M}_]+")
-        .findAll(unquoted)
-        .map { it.value.lowercase() }
-        .filter { it.isNotBlank() }
-        .distinct()
-        .map { "$it*" }
-        .toList()
+    val tokens = matches.mapNotNull { match ->
+        val text = match.value
+
+        if (text.startsWith("\"") && text.endsWith("\"") && text.length > 2) {
+            val inner = text.substring(1, text.length - 1)
+            val normalized = inner.normalizeSearchPhrase()
+            if (normalized.isNotBlank()) {
+                QueryToken.Term("\"${normalized.replace("\"", "\"\"")}\"")
+            } else {
+                null
+            }
+        } else if (text.equals("NEAR", ignoreCase = true) || text.startsWith("NEAR/", ignoreCase = true) || text.startsWith(
+                "NEAR:", ignoreCase = true
+            )
+        ) {
+            val distance = text
+                .substring(4)
+                .removePrefix("/")
+                .removePrefix(":")
+                .toIntOrNull()
+            QueryToken.Near(distance)
+        } else {
+            val normalized = text.lowercase()
+            if (normalized.isNotBlank()) {
+                QueryToken.Term("$normalized*")
+            } else {
+                null
+            }
+        }
+    }
+
+    if (tokens.isEmpty()) return null
+
+    val result = mutableListOf<String>()
+    val currentNearGroup = mutableListOf<String>()
+    var currentNearDistance: Int? = null
+
+    var i = 0
+    while (i < tokens.size) {
+        val token = tokens[i]
+
+        if (token is QueryToken.Near) {
+            val hasPrev = currentNearGroup.isNotEmpty() || result.isNotEmpty()
+            val nextToken = tokens.getOrNull(i + 1)
+            val hasNext = nextToken is QueryToken.Term
+
+            if (hasPrev && hasNext) {
+                if (currentNearGroup.isEmpty() && result.isNotEmpty()) {
+                    val prevTerm = result.removeAt(result.size - 1)
+                    currentNearGroup.add(prevTerm)
+                }
+                if (token.distance != null) {
+                    currentNearDistance = if (currentNearDistance == null) token.distance else minOf(currentNearDistance, token.distance)
+                }
+                val nextTerm = tokens[i + 1] as QueryToken.Term
+                currentNearGroup.add(nextTerm.text)
+                i += 2
+            } else {
+                if (currentNearGroup.isNotEmpty()) {
+                    result.add(formatNearGroup(currentNearGroup, currentNearDistance))
+                    currentNearGroup.clear()
+                    currentNearDistance = null
+                }
+                result.add("near*")
+                i++
+            }
+        } else if (token is QueryToken.Term) {
+            if (currentNearGroup.isNotEmpty()) {
+                result.add(formatNearGroup(currentNearGroup, currentNearDistance))
+                currentNearGroup.clear()
+                currentNearDistance = null
+            }
+
+            result.add(token.text)
+
+            i++
+        }
+    }
+
+    if (currentNearGroup.isNotEmpty()) {
+        result.add(formatNearGroup(currentNearGroup, currentNearDistance))
+    }
 
     val operator = when (strategy) {
         SearchMatchingStrategy.ANY_WORD -> " OR "
         SearchMatchingStrategy.ALL_WORDS -> " "
     }
 
-    return (quotedPhrases + terms)
+    return result
         .takeIf { it.isNotEmpty() }
         ?.joinToString(operator)
+}
+
+private sealed interface QueryToken {
+    data class Term(val text: String) : QueryToken
+    data class Near(val distance: Int?) : QueryToken
+}
+
+private fun formatNearGroup(terms: List<String>, distance: Int?): String {
+    val joined = terms.joinToString(" ")
+    return if (distance != null) "NEAR($joined, $distance)" else "NEAR($joined)"
 }
 
 private fun String.normalizeSearchPhrase(): String {
@@ -290,13 +402,14 @@ private fun String.toPlainSearchText(): String = try {
             block.text
                 ?.trim()
                 ?.takeIf { it.isNotEmpty() }
-                ?.parseAsHtml()
+                ?.stripHtml()
                 ?.takeIf { it.isNotEmpty() }
         }
         .joinToString(" ")
 } catch (_: Exception) {
     ""
 }
+
 
 private fun String.toSearchSnippet(
     query: String,
@@ -369,7 +482,10 @@ internal fun getHighlightPatterns(query: String, strategy: SearchMatchingStrateg
 
     return when (strategy) {
         SearchMatchingStrategy.EXACT_PHRASE -> {
-            val words = Regex("[\\p{L}\\p{N}\\p{M}_]+").findAll(query).map { it.value }.toList()
+            val words = Regex("[\\p{L}\\p{N}\\p{M}_]+")
+                .findAll(query)
+                .map { it.value }
+                .toList()
             if (words.isEmpty()) return emptyList()
             val pattern = "(?i)\\b" + words.joinToString(separator = "\\W+") { Regex.escape(it) } + "\\b"
             listOf(Regex(pattern))
@@ -385,8 +501,9 @@ internal fun getHighlightPatterns(query: String, strategy: SearchMatchingStrateg
                 .toList()
 
             val unquoted = query.replace(Regex("\"([^\"]+)\""), " ")
+            val cleanedUnquoted = unquoted.replace(Regex("(?i)\\bNEAR(?:[/:]\\d+)?\\b"), " ")
             val terms = Regex("[\\p{L}\\p{N}\\p{M}_]+")
-                .findAll(unquoted)
+                .findAll(cleanedUnquoted)
                 .map { it.value }
                 .filter { it.isNotBlank() }
                 .distinct()
@@ -395,7 +512,10 @@ internal fun getHighlightPatterns(query: String, strategy: SearchMatchingStrateg
             val patterns = mutableListOf<Regex>()
 
             quotedPhrases.forEach { phrase ->
-                val words = Regex("[\\p{L}\\p{N}\\p{M}_]+").findAll(phrase).map { it.value }.toList()
+                val words = Regex("[\\p{L}\\p{N}\\p{M}_]+")
+                    .findAll(phrase)
+                    .map { it.value }
+                    .toList()
                 if (words.isNotEmpty()) {
                     val pattern = "(?i)\\b" + words.joinToString(separator = "\\W+") { Regex.escape(it) } + "\\b"
                     patterns.add(Regex(pattern))

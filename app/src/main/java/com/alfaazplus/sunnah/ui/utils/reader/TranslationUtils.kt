@@ -8,9 +8,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.withStyle
 import com.alfaazplus.sunnah.R
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences.observeHadithTranslation
-import kotlinx.coroutines.runBlocking
 
 
 enum class HadithTranslation(val langCode: String, val label: String, val isComingSoon: Boolean = false) {
@@ -39,14 +37,8 @@ object TranslationUtils {
         return id == ENGLISH_LANG
     }
 
-    private fun getHadithTranslation(langCode: String): HadithTranslation {
+    fun getHadithTranslation(langCode: String): HadithTranslation {
         return HadithTranslation.fromLangCode(langCode)
-    }
-
-    fun getHadithTranslationLabel(): String {
-        return runBlocking {
-            getHadithTranslation(ReaderPreferences.getHadithTranslation()).label
-        }
     }
 
     @Composable

@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,10 +38,6 @@ fun TranslationUpdateBanner() {
     val navController = LocalNavHostController.current
     val selectedTranslationId = ReaderPreferences.observeHadithTranslation()
     val updateState by ResourceUpdateManager.updateState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        ResourceUpdateManager.checkAndPerformUpdates()
-    }
 
     val showBanner = remember(selectedTranslationId, updateState) {
         isSelectedTranslationUpdateAvailable(context, selectedTranslationId)

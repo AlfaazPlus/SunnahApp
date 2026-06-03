@@ -25,11 +25,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.text.parseAsHtml
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.db.relations.BookWithTranslation
 import com.alfaazplus.sunnah.ui.utils.StringUtils.formatNumbering
-import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils.metadataLangCodes
 import com.alfaazplus.sunnah.ui.utils.text.textStyle
 import com.alfaazplus.sunnah.ui.utils.text.toAnnotatedString
@@ -91,9 +89,7 @@ fun BookItemCard(
                         .getTitle(langCode)
                         ?.let {
                             Text(
-                                text = it
-                                    .parseAsHtml()
-                                    .toAnnotatedString(),
+                                text = it.toAnnotatedString(),
                                 style = textStyle(
                                     langCode = langCode,
                                     fontSize = typography.titleSmall.fontSize,

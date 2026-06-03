@@ -9,7 +9,7 @@ import com.alfaazplus.sunnah.db.entities.search.SearchContentEntity
 import com.alfaazplus.sunnah.db.entities.search.SearchFtsEntity
 import com.alfaazplus.sunnah.db.entities.search.SearchIndexMetaEntity
 
-const val SEARCH_INDEX_DB_VERSION = 3
+const val SEARCH_INDEX_DB_VERSION = 1
 
 @Database(
     entities = [

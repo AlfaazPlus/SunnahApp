@@ -20,12 +20,12 @@ import com.alfaazplus.sunnah.deliverable.v1.CorpusBundle
 import com.alfaazplus.sunnah.helpers.insertCorpusImportPayload
 import com.alfaazplus.sunnah.helpers.toImportPayloadOrNull
 import com.alfaazplus.sunnah.ui.activities.MainActivity
+import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.isGzip
 import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.createForegroundInfoFallback
-import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationManager
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import dagger.assisted.Assisted
@@ -93,9 +93,7 @@ class TranslationDownloadWorker @AssistedInject constructor(
             }
 
             TranslationManager.saveResourceVersion(
-                context = ctx,
-                id = translationId,
-                version = bundle.contentVersion
+                context = ctx, id = translationId, version = bundle.contentVersion
             )
 
             SearchIndexScheduler.enqueueLang(applicationContext, translationId)
@@ -141,9 +139,11 @@ class TranslationDownloadWorker @AssistedInject constructor(
                 setAutoCancel(false)
                 setOngoing(true)
                 setShowWhen(false)
+                setSilent(true)
+                setOnlyAlertOnce(true)
                 setSmallIcon(R.drawable.logo_icon)
                 setContentTitle(ctx.getString(R.string.downloading))
-                setContentText(TranslationUtils.getHadithTranslationLabel())
+                setContentText(TranslationUtils.getHadithTranslation(translationId).label)
                 setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 setProgress(100, progress ?: 0, progress == null)
             }
@@ -212,6 +212,11 @@ suspend fun downloadGithubRawContentToFile(
 
                         output.write(buffer, 0, bytes)
                         downloaded += bytes
+
+                        /*if (BuildConfig.DEBUG) {
+                            val delayMs = (bytes * 1000L) / (100 * 1024L) // (~100 KB/s)
+                            if (delayMs > 0L) delay(delayMs)
+                        }*/
 
                         val now = System.currentTimeMillis()
                         val isFinished = totalBytes > 0L && downloaded == totalBytes

@@ -19,8 +19,8 @@ android {
         applicationId = "com.alfaazplus.sunnah"
         minSdk = 24
         targetSdk = 36
-        versionCode = 19
-        versionName = "0.1.4"
+        versionCode = 20
+        versionName = "0.1.5"
 
         resValue("string", "app_name_generated", "SunnahApp")
         resValue("string", "cleartextTrafficPermitted", "false")

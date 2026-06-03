@@ -45,7 +45,7 @@ fun AppUpdateBanner() {
     val bannerDecision by UpdateManager.bannerDecision.collectAsState()
 
     LaunchedEffect(Unit) {
-        UpdateManager.refreshAppUpdatesJson()
+        UpdateManager.ensureAppUpdatesRefreshed()
     }
 
     if (!bannerDecision.showInlineBanner) return

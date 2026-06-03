@@ -14,10 +14,13 @@ import com.alfaazplus.sunnah.ui.utils.createFile
 import com.alfaazplus.sunnah.ui.utils.getOtherDirectory
 import com.alfaazplus.sunnah.ui.utils.readFileText
 import com.alfaazplus.sunnah.ui.utils.writeFileText
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -29,6 +32,8 @@ data class UpdateBannerDecision(
 )
 
 object UpdateManager {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     const val CRITICAL = 5
     const val MAJOR = 4
     const val MODERATE = 3
@@ -42,7 +47,13 @@ object UpdateManager {
     @Volatile
     private var isRefreshing = false
 
-    suspend fun refreshAppUpdatesJson() = withContext(Dispatchers.IO) {
+    fun ensureAppUpdatesRefreshed() {
+        scope.launch {
+            refreshAppUpdatesJson()
+        }
+    }
+
+    private suspend fun refreshAppUpdatesJson() = withContext(Dispatchers.IO) {
         if (isRefreshing) return@withContext
 
         isRefreshing = true
@@ -71,7 +82,7 @@ object UpdateManager {
 
         _bannerDecision.value = getBannerDecision()
 
-        ResourceUpdateManager.checkAndPerformUpdates()
+        ResourceUpdateManager.ensureUpdatesChecked()
     }
 
     fun getBannerDecision(): UpdateBannerDecision {

@@ -1,6 +1,9 @@
 package com.alfaazplus.sunnah.ui.utils.workers
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -8,8 +11,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.repository.hadith.SearchRepository
+import com.alfaazplus.sunnah.ui.activities.MainActivity
 import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
+import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.createForegroundInfoFallback
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +35,11 @@ enum class SearchIndexSyncMode(val value: String) {
 @HiltWorker
 class SearchIndexWorker @AssistedInject constructor(
     @Assisted
-    appContext: Context,
+    private val ctx: Context,
     @Assisted
     params: WorkerParameters,
     private val searchRepo: SearchRepository,
-) : CoroutineWorker(appContext, params) {
+) : CoroutineWorker(ctx, params) {
     companion object {
         const val KEY_MODE = "mode"
         const val KEY_LANG = "lang"
@@ -42,49 +47,44 @@ class SearchIndexWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat
-            .Builder(
-                applicationContext, NotificationUtils.CHANNEL_ID_DEFAULT
-            )
-            .setContentTitle("Indexing hadith data")
-            .setContentText("Preparing...")
-            .setSmallIcon(R.drawable.logo_icon)
-            .setOngoing(true)
-            .build()
-
-        return ForegroundInfo(1001, notification)
+        return createForegroundInfo()
     }
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        when (SearchIndexSyncMode.fromValue(inputData.getString(KEY_MODE))) {
-            SearchIndexSyncMode.MODE_REMOVE_LANG -> {
-                val langCode = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
+    override suspend fun doWork(): Result {
+        setForeground(createForegroundInfo())
 
-                removeLang(langCode)
+        return withContext(Dispatchers.IO) {
+            when (SearchIndexSyncMode.fromValue(inputData.getString(KEY_MODE))) {
+                SearchIndexSyncMode.MODE_REMOVE_LANG -> {
+                    val langCode = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
 
-                Result.success()
-            }
+                    removeLang(langCode)
 
-            SearchIndexSyncMode.MODE_SINGLE_LANG -> {
-                val slug = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
-
-                buildIndexForLangIfNeeded(slug)
-
-                Result.success()
-            }
-
-            SearchIndexSyncMode.MODE_ALL -> {
-                searchRepo.buildAllIndexes()
-                val hadithVersion = inputData.getInt(KEY_HADITH_VERSION, -1)
-
-                if (hadithVersion >= 0) {
-                    SearchIndexScheduler.markIndexUpToDate(applicationContext, hadithVersion)
+                    Result.success()
                 }
 
-                Result.success()
-            }
+                SearchIndexSyncMode.MODE_SINGLE_LANG -> {
+                    val slug = inputData.getString(KEY_LANG) ?: return@withContext Result.failure()
 
-            else -> Result.failure()
+                    buildIndexForLangIfNeeded(slug)
+
+                    Result.success()
+                }
+
+                SearchIndexSyncMode.MODE_ALL -> {
+                    searchRepo.buildAllIndexes()
+
+                    val hadithVersion = inputData.getInt(KEY_HADITH_VERSION, -1)
+
+                    if (hadithVersion >= 0) {
+                        SearchIndexScheduler.markIndexUpToDate(applicationContext, hadithVersion)
+                    }
+
+                    Result.success()
+                }
+
+                else -> Result.failure()
+            }
         }
     }
 
@@ -96,4 +96,47 @@ class SearchIndexWorker @AssistedInject constructor(
         searchRepo.removeLang(langCode)
     }
 
+    private fun createForegroundInfo(): ForegroundInfo {
+        val mode = SearchIndexSyncMode.fromValue(inputData.getString(KEY_MODE)) ?: return createForegroundInfoFallback(ctx)
+
+        val langCode = inputData.getString(KEY_LANG)
+
+        val notificationId = notificationIdFor(mode, langCode)
+
+        val builder = NotificationCompat
+            .Builder(ctx, NotificationUtils.CHANNEL_ID_DEFAULT)
+            .apply {
+                setAutoCancel(false)
+                setOngoing(true)
+                setShowWhen(false)
+                setSilent(true)
+                setOnlyAlertOnce(true)
+                setSmallIcon(R.drawable.logo_icon)
+                setContentTitle("Indexing hadith data")
+                setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                setProgress(100, 0, true)
+                setContentIntent(
+                    PendingIntent.getActivity(
+                        ctx,
+                        notificationId,
+                        Intent(ctx, MainActivity::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                    )
+                )
+            }
+
+        return ForegroundInfo(
+            notificationId,
+            builder.build(),
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+        )
+    }
+
+    private fun notificationIdFor(mode: SearchIndexSyncMode, langCode: String?): Int {
+        return when (mode) {
+            SearchIndexSyncMode.MODE_SINGLE_LANG -> "search_index:$langCode".hashCode()
+            SearchIndexSyncMode.MODE_ALL -> "search_index:all".hashCode()
+            SearchIndexSyncMode.MODE_REMOVE_LANG -> "search_index:remove:$langCode".hashCode()
+        }
+    }
 }

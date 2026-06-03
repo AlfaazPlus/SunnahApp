@@ -59,9 +59,17 @@ object NotificationUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun createDownloadsChannel(): NotificationChannel {
-        return createChannel(
-            CHANNEL_ID_DOWNLOADS, CHANNEL_NAME_DOWNLOADS, CHANNEL_DESC_DOWNLOADS
-        )
+        return NotificationChannel(
+            CHANNEL_ID_DOWNLOADS,
+            CHANNEL_NAME_DOWNLOADS,
+            NotificationManager.IMPORTANCE_LOW,
+        ).apply {
+            description = CHANNEL_DESC_DOWNLOADS
+            setShowBadge(false)
+            enableLights(false)
+            enableVibration(false)
+            setSound(null, null)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
