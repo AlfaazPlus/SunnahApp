@@ -61,7 +61,10 @@
     <string name="clear_search">مسح البحث</string>
     <string name="noResults">لم يُعثر على نتائج</string>
     <string name="searchTips">ابحث عن الأحاديث أو الكتب أو العلماء</string>
+    <string name="searchIndexingInProgress">جارٍ تجهيز بحث الأحاديث. قد تكون النتائج غير مكتملة حتى ينتهي الفهرسة.</string>
 
+    <string name="app_version">إصدار التطبيق</string>
+    <string name="menu">القائمة</string>
     <string name="settings">الإعدادات</string>
     <string name="app_settings">إعدادات التطبيق</string>
     <string name="reader_settings">إعدادات القارئ</string>
@@ -103,8 +106,7 @@
 
     <string name="install_from_google_play">التثبيت من Google Play</string>
     <string name="install_from_github">التثبيت من GitHub</string>
-
-    <string name="donate">تبرّع</string>
+    <string name="donate">تبرّع لنا</string>
 
     <string name="hadith_layout">طريقة عرض الأحاديث</string>
     <string name="hadith_layout_description">أفقي — التمرير يميناً ويساراً.\nعمودي — التمرير لأعلى وأسفل.</string>

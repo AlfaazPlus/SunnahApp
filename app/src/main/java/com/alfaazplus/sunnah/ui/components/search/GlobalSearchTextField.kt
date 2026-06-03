@@ -48,7 +48,7 @@ fun GlobalSearchTextField(vm: SearchViewModel) {
             .background(
                 color = colorScheme.surfaceContainer,
             )
-            .padding(start = 16.dp, end = 16.dp, bottom = if (searchQuery.isNotBlank()) 0.dp else 16.dp)
+            .padding(horizontal = 16.dp)
             .focusRequester(focusRequester)
             .focusable()
             .onFocusChanged {

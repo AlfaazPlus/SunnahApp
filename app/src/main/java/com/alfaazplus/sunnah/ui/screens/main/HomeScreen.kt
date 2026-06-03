@@ -3,15 +3,17 @@ package com.alfaazplus.sunnah.ui.screens.main
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.ui.LocalNavHostController
 import com.alfaazplus.sunnah.ui.components.HadithOfTheDay
+import com.alfaazplus.sunnah.ui.components.IndexMenuButton
 import com.alfaazplus.sunnah.ui.components.common.AppBar
-import com.alfaazplus.sunnah.ui.components.dialogs.SimpleTooltip
 import com.alfaazplus.sunnah.ui.components.hadith.HadithCollectionList
 import com.alfaazplus.sunnah.ui.components.homepage.AppUpdateBanner
 import com.alfaazplus.sunnah.ui.components.homepage.TranslationUpdateBanner
@@ -37,6 +39,9 @@ fun HomeScreen() {
     val navController = LocalNavHostController.current
 
     Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+        ),
         topBar = {
             AppBar(
                 showNavigationIcon = false,
@@ -60,17 +65,7 @@ fun HomeScreen() {
                     }
                 },
                 actions = {
-                    SimpleTooltip(text = stringResource(R.string.settings)) {
-                        IconButton(
-                            onClick = { navController.navigate(route = Routes.SETTINGS.arg(false)) },
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_settings),
-                                contentDescription = stringResource(R.string.settings),
-                                tint = colorScheme.onSurface,
-                            )
-                        }
-                    }
+                    IndexMenuButton()
                 },
             )
         },

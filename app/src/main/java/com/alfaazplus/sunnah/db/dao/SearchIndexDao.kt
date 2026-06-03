@@ -30,6 +30,9 @@ interface SearchIndexDao {
     @Query("DELETE FROM search_index_meta WHERE `key` = :key")
     suspend fun deleteMeta(key: String)
 
+    @Query("INSERT INTO search_fts(search_fts) VALUES('rebuild')")
+    suspend fun rebuildFtsIndex()
+
     @Transaction
     suspend fun replaceLang(
         langCode: String,
@@ -71,25 +74,37 @@ interface SearchIndexDao {
 
     @Query(
         """
-        SELECT
-            c.hadith_id AS hadith_id,
-            c.langCode AS matched_lang,
-            c.text AS matched_text
-        FROM search_fts
-        INNER JOIN search_content AS c ON c.id = search_fts.rowid
-        WHERE search_fts MATCH :matchQuery
-            AND (:collectionCount = 0 OR c.collection_id IN (:collectionIds))
-        GROUP BY c.hadith_id
-        ORDER BY
-            MIN(
-                CASE c.langCode
-                    WHEN :displayLangCode THEN 0
-                    WHEN 'en' THEN 1
-                    WHEN 'ar' THEN 2
-                    ELSE 3
-                END
-            ),
-            c.hadith_id
+        SELECT hadith_id, matched_lang, matched_text
+        FROM (
+            SELECT
+                c.hadith_id AS hadith_id,
+                c.langCode AS matched_lang,
+                c.text AS matched_text,
+                search_fts.rank AS relevance,
+                ROW_NUMBER() OVER (
+                    PARTITION BY c.hadith_id
+                    ORDER BY search_fts.rank,
+                        CASE c.langCode
+                            WHEN :displayLangCode THEN 0
+                            WHEN 'en' THEN 1
+                            WHEN 'ar' THEN 2
+                            ELSE 3
+                        END
+                ) AS row_num
+            FROM search_fts
+            INNER JOIN search_content AS c ON c.id = search_fts.rowid
+            WHERE search_fts MATCH :matchQuery
+                AND (:collectionCount = 0 OR c.collection_id IN (:collectionIds))
+        ) AS ranked
+        WHERE row_num = 1
+        ORDER BY relevance,
+            CASE matched_lang
+                WHEN :displayLangCode THEN 0
+                WHEN 'en' THEN 1
+                WHEN 'ar' THEN 2
+                ELSE 3
+            END,
+            hadith_id
         LIMIT :limit OFFSET :offset
         """
     )

@@ -91,6 +91,11 @@ class HadithSetupViewModel @Inject constructor(
                 pendingTranslationApplied = true
             }
 
+            SearchIndexScheduler.scheduleSearchIndexIfNeeded(
+                context,
+                AppPreferences.getAssetHadithsImportedVersion(),
+            )
+
             _isSetUp.value = true
         }
     }
@@ -134,7 +139,6 @@ class HadithSetupViewModel @Inject constructor(
             )
             if (status is ResourceDownloadStatus.Completed) {
                 ReaderPreferences.setHadithTranslation(pendingId)
-                SearchIndexScheduler.enqueueLang(context, pendingId)
             } else {
                 Logger.d("Onboarding translation download failed for $pendingId: $status")
                 ReaderPreferences.setHadithTranslation(TranslationUtils.DEFAULT_TRANSLATION.langCode)

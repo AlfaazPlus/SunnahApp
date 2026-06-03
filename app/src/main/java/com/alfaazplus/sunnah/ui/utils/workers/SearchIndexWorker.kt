@@ -8,6 +8,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.alfaazplus.sunnah.R
 import com.alfaazplus.sunnah.repository.hadith.SearchRepository
+import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -37,6 +38,7 @@ class SearchIndexWorker @AssistedInject constructor(
     companion object {
         const val KEY_MODE = "mode"
         const val KEY_LANG = "lang"
+        const val KEY_HADITH_VERSION = "hadith_version"
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -73,6 +75,12 @@ class SearchIndexWorker @AssistedInject constructor(
 
             SearchIndexSyncMode.MODE_ALL -> {
                 searchRepo.buildAllIndexes()
+                val hadithVersion = inputData.getInt(KEY_HADITH_VERSION, -1)
+
+                if (hadithVersion >= 0) {
+                    SearchIndexScheduler.markIndexUpToDate(applicationContext, hadithVersion)
+                }
+
                 Result.success()
             }
 

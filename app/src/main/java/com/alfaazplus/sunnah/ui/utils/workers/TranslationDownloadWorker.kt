@@ -25,6 +25,7 @@ import com.alfaazplus.sunnah.ui.utils.keys.Keys
 import com.alfaazplus.sunnah.ui.utils.keys.Routes
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils
 import com.alfaazplus.sunnah.ui.utils.notification.NotificationUtils.createForegroundInfoFallback
+import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationManager
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
 import dagger.assisted.Assisted
@@ -96,6 +97,8 @@ class TranslationDownloadWorker @AssistedInject constructor(
                 id = translationId,
                 version = bundle.contentVersion
             )
+
+            SearchIndexScheduler.enqueueLang(applicationContext, translationId)
         } finally {
             if (tmpFile.exists()) {
                 tmpFile.delete()

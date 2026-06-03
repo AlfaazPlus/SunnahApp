@@ -95,7 +95,6 @@ class TranslationDownloadViewModel @Inject constructor(
                     }
 
                     if (status is ResourceDownloadStatus.Completed) {
-                        SearchIndexScheduler.enqueueLang(context, id)
                         refreshRows()
                     }
                 }

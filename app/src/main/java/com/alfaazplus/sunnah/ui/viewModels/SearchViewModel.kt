@@ -1,5 +1,6 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,10 @@ import com.alfaazplus.sunnah.ui.search.HadithSearchQuickResult
 import com.alfaazplus.sunnah.ui.search.HadithSearchResult
 import com.alfaazplus.sunnah.ui.search.SearchFilters
 import com.alfaazplus.sunnah.ui.search.SearchFiltersStore
+import com.alfaazplus.sunnah.ui.search.SearchIndexMonitor
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -29,16 +32,44 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 open class SearchViewModel @Inject constructor(
+    @ApplicationContext
+    private val appContext: Context,
     private val repo: HadithRepository,
     private val searchRepo: SearchRepository,
 ) : ViewModel() {
     var primaryColor = Color.Unspecified
+
+    private val indexingFlow = SearchIndexMonitor.isIndexingFlow(appContext)
+
+    val isSearchIndexing = indexingFlow.stateIn(
+        viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
+
+    private val ftsIndexGeneration = MutableStateFlow(0)
+
+    init {
+        viewModelScope.launch {
+            var wasIndexing = false
+
+            indexingFlow.collect { indexing ->
+                if (wasIndexing && !indexing) {
+                    ftsIndexGeneration.update { it + 1 }
+                }
+
+                wasIndexing = indexing
+            }
+        }
+    }
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
@@ -51,7 +82,8 @@ open class SearchViewModel @Inject constructor(
             .debounce(300)
             .distinctUntilChanged(),
         ReaderPreferences.hadithTranslationFlow(),
-    ) { filters, query, langCode ->
+        ftsIndexGeneration,
+    ) { filters, query, langCode, _ ->
         Triple(filters, query, langCode)
     }
         .flatMapLatest { (filters, query, langCode) ->

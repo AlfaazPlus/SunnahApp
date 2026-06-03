@@ -5,10 +5,6 @@
  */
 package com.alfaazplus.sunnah.ui.utils.app
 
-import android.animation.ObjectAnimator
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import com.alfaazplus.sunnah.BuildConfig
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.api.JsonHelper
@@ -18,12 +14,10 @@ import com.alfaazplus.sunnah.ui.utils.createFile
 import com.alfaazplus.sunnah.ui.utils.getOtherDirectory
 import com.alfaazplus.sunnah.ui.utils.readFileText
 import com.alfaazplus.sunnah.ui.utils.writeFileText
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -34,55 +28,50 @@ data class UpdateBannerDecision(
     val showInlineBanner: Boolean,
 )
 
-class UpdateManager private constructor(private val ctx: Context) {
-    companion object {
-        const val CRITICAL = 5
-        const val MAJOR = 4
-        const val MODERATE = 3
-        const val MINOR = 2
-        const val COSMETIC = 1
-        const val NONE = 0
-
-        fun getInstance(context: Context): UpdateManager {
-            return UpdateManager(context)
-        }
-    }
-
-    private val mIconAnimationHandler = Handler(Looper.getMainLooper())
-    private var mIconAnimators = ArrayList<ObjectAnimator>()
+object UpdateManager {
+    const val CRITICAL = 5
+    const val MAJOR = 4
+    const val MODERATE = 3
+    const val MINOR = 2
+    const val COSMETIC = 1
+    const val NONE = 0
 
     private val _bannerDecision = MutableStateFlow(getBannerDecision())
     val bannerDecision: StateFlow<UpdateBannerDecision> = _bannerDecision.asStateFlow()
 
-    init {
-        refreshAppUpdatesJson()
-    }
+    @Volatile
+    private var isRefreshing = false
 
-    fun refreshAppUpdatesJson() {
-        CoroutineScope(Dispatchers.IO).launch { fetchAndSaveUpdates() }
+    suspend fun refreshAppUpdatesJson() = withContext(Dispatchers.IO) {
+        if (isRefreshing) return@withContext
+
+        isRefreshing = true
+
+        try {
+            fetchAndSaveUpdates()
+        } finally {
+            isRefreshing = false
+        }
     }
 
     private suspend fun fetchAndSaveUpdates() {
-        withContext(Dispatchers.IO) {
-            try {
-                val updates = RetrofitInstance.github.getAppUpdates()
-                val updatesString = JsonHelper.json.encodeToString(updates)
-                Logger.d("updatesString: $updatesString")
+        try {
+            val updates = RetrofitInstance.github.getAppUpdates()
+            val updatesString = JsonHelper.json.encodeToString(updates)
+            Logger.d("updatesString: $updatesString")
 
-                val updatesFile = getAppUpdatesFile()
+            val updatesFile = getAppUpdatesFile()
 
-                if (updatesFile.createFile()) {
-                    updatesFile.writeFileText(updatesString)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            if (updatesFile.createFile()) {
+                updatesFile.writeFileText(updatesString)
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         _bannerDecision.value = getBannerDecision()
 
-        ResourceUpdateManager
-            .checkAndPerformUpdates()
+        ResourceUpdateManager.checkAndPerformUpdates()
     }
 
     fun getBannerDecision(): UpdateBannerDecision {
@@ -120,14 +109,5 @@ class UpdateManager private constructor(private val ctx: Context) {
 
     fun getAppUpdatesFile(): File {
         return File(getOtherDirectory(), "app_updates.json")
-    }
-
-    fun onPause() {
-        mIconAnimators.forEach { it.cancel() }
-        mIconAnimationHandler.removeCallbacksAndMessages(null)
-    }
-
-    fun onResume() {
-        mIconAnimators.forEach { it.start() }
     }
 }

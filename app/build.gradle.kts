@@ -158,6 +158,7 @@ dependencies {
     implementation(libs.paging)
     implementation(libs.pagingCompose)
     implementation(libs.androidx.room3.paging)
+    implementation(libs.androidx.sqlite.bundled)
 
     implementation(libs.accompanist.permissions)
     implementation(libs.protobuf.java)

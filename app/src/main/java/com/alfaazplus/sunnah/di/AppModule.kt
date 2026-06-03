@@ -2,6 +2,7 @@ package com.alfaazplus.sunnah.di
 
 import android.app.Application
 import androidx.room3.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.alfaazplus.sunnah.db.databases.HadithDatabase
 import com.alfaazplus.sunnah.db.databases.HadithDatabaseLegacy
 import com.alfaazplus.sunnah.db.databases.ScholarsDatabase
@@ -12,6 +13,7 @@ import com.alfaazplus.sunnah.repository.hadith.HadithRepository
 import com.alfaazplus.sunnah.repository.hadith.SearchRepository
 import com.alfaazplus.sunnah.repository.userdata.UserRepository
 import dagger.Module
+import kotlinx.coroutines.Dispatchers
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -69,6 +71,8 @@ object AppModule {
     fun provideSearchDatabase(app: Application): SearchIndexDatabase {
         return Room
             .databaseBuilder(app, SearchIndexDatabase::class.java, "search_index")
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
             .fallbackToDestructiveMigration(true)
             .build()
     }

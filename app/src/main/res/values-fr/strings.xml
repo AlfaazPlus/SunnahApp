@@ -61,7 +61,10 @@
     <string name="clear_search">Effacer la recherche</string>
     <string name="noResults">Aucun résultat</string>
     <string name="searchTips">Recherchez des hadiths, livres ou savants</string>
+    <string name="searchIndexingInProgress">Préparation de la recherche de hadiths. Les résultats peuvent être incomplets jusqu\'à la fin de l\'indexation.</string>
 
+    <string name="app_version">Version de l\'app</string>
+    <string name="menu">Menu</string>
     <string name="settings">Paramètres</string>
     <string name="app_settings">Paramètres de l\'app</string>
     <string name="reader_settings">Paramètres du lecteur</string>
@@ -103,7 +106,6 @@
 
     <string name="install_from_google_play">Installer depuis Google Play</string>
     <string name="install_from_github">Installer depuis GitHub</string>
-
     <string name="donate">Faire un don</string>
 
     <string name="hadith_layout">Affichage des hadiths</string>

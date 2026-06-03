@@ -61,7 +61,10 @@
     <string name="clear_search">تلاش صاف کریں</string>
     <string name="noResults">کوئی نتیجہ نہیں ملا</string>
     <string name="searchTips">احادیث، کتابیں یا علماء تلاش کریں</string>
+    <string name="searchIndexingInProgress">احادیث کی تلاش تیار کی جا رہی ہے۔ انڈیکسنگ مکمل ہونے تک نتائج نامکمل ہو سکتے ہیں۔</string>
 
+    <string name="app_version">ایپ ورژن</string>
+    <string name="menu">مینو</string>
     <string name="settings">ترتیبات</string>
     <string name="app_settings">ایپ ترتیبات</string>
     <string name="reader_settings">ریڈر ترتیبات</string>
@@ -107,8 +110,7 @@
 
     <string name="install_from_google_play">Google Play سے انسٹال کریں</string>
     <string name="install_from_github">GitHub سے انسٹال کریں</string>
-
-    <string name="donate">تعاون کریں</string>
+    <string name="donate">ہمیں عطیہ دیں</string>
 
     <string name="hadith_layout">حدیث لے آؤٹ</string>
     <string name="hadith_layout_description">افقی — احادیث دائیں اور بائیں اسکرول ہوں گی۔\nعمودی —

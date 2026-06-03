@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.alfaazplus.sunnah.ui.screens.AboutScreen
 import com.alfaazplus.sunnah.ui.screens.BookmarksScreen
 import com.alfaazplus.sunnah.ui.screens.BooksIndexScreen
 import com.alfaazplus.sunnah.ui.screens.ReaderScreen
@@ -155,6 +156,7 @@ fun MainApp(intentFlow: StateFlow<Intent?>) {
                         userCollectionId = bsEntry.arguments?.getLong(Keys.USER_COLLECTION_ID) ?: 0L,
                     )
                 }
+                route(Routes.ABOUT_US) { AboutScreen() }
             }
         }
     }

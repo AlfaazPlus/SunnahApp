@@ -29,6 +29,7 @@ asynclayoutinflater = "1.1.0"
 lifecycle-livedata-ktx = "2.10.0"
 lifecycle-viewmodel-ktx = "2.10.0"
 room3 = "3.0.0-alpha05"
+sqlite = "2.6.2"
 workManager = "2.11.2"
 dataStore = "1.2.1"
 retrofit = "3.0.0"
@@ -96,6 +97,7 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 androidx-room3-paging = { module = "androidx.room3:room3-paging", version.ref = "room3" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protobuf" }

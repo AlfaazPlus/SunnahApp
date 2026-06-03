@@ -40,12 +40,13 @@ object Routes {
     val BOOKS_INDEX = SingleArgRoute("books_index", Keys.COLLECTION_ID)
     val READER = MultiArgRoute("reader", listOf(Keys.BOOK_ID, Keys.HADITH_ID))
     val SCHOLAR_INFO = SingleArgRoute("scholar_info", Keys.SCHOLAR_ID)
-    val READING_HISTORY = "reading_history"
-    val BOOKMARKS = "bookmarks"
+    const val READING_HISTORY = "reading_history"
+    const val BOOKMARKS = "bookmarks"
     val SINGLE_COLLECTION = MultiArgRoute(
         "single_collection", listOf(
             Keys.USER_COLLECTION_ID,
             Keys.USER_COLLECTION_NAME,
         )
     )
+    const val ABOUT_US = "about_us"
 }

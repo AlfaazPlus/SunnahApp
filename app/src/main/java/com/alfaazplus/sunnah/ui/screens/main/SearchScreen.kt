@@ -4,7 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -14,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +43,7 @@ import com.alfaazplus.sunnah.ui.components.search.GlobalSearchTextField
 import com.alfaazplus.sunnah.ui.components.search.HadithSearchResults
 import com.alfaazplus.sunnah.ui.components.search.ScholarsSearchResults
 import com.alfaazplus.sunnah.ui.components.search.SearchFilterSheet
+import com.alfaazplus.sunnah.ui.components.search.SearchIndexingBanner
 import com.alfaazplus.sunnah.ui.components.search.SearchResultTab
 import com.alfaazplus.sunnah.ui.components.search.SearchResultTabs
 import com.alfaazplus.sunnah.ui.theme.alpha
@@ -57,6 +64,7 @@ fun SearchScreen(
 
     val currentFilters by vm.currentFilters.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
+    val isSearchIndexing by vm.isSearchIndexing.collectAsState()
     var previousSearchQuery by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(searchQuery) {
@@ -70,6 +78,13 @@ fun SearchScreen(
     }
 
     Scaffold(
+        contentWindowInsets = if (withBackButton) {
+            ScaffoldDefaults.contentWindowInsets
+        } else {
+            ScaffoldDefaults.contentWindowInsets.only(
+                WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+            )
+        },
         topBar = {
             AppBar(
                 title = stringResource(R.string.global_search), showNavigationIcon = withBackButton,
@@ -102,6 +117,19 @@ fun SearchScreen(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             GlobalSearchTextField(vm)
+
+            if (isSearchIndexing) {
+                SearchIndexingBanner()
+            }
+
+            if (searchQuery.isBlank() && !isSearchIndexing) {
+                Spacer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                        .background(colorScheme.surfaceContainer)
+                )
+            }
 
             if (searchQuery.isBlank()) {
                 Column(

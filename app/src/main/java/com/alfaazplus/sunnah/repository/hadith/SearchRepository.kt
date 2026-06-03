@@ -51,6 +51,7 @@ class SearchRepository(
             .forEach { langCode ->
                 buildIndexForLangIfNeeded(langCode)
             }
+        dao.rebuildFtsIndex()
     }
 
     suspend fun removeLang(langCode: String) {
@@ -229,6 +230,7 @@ private class HadithFtsPagingSource(
                     .coerceAtLeast(0),
             )
         } catch (e: Exception) {
+            Logger.e(e, "Hadith FTS search failed", "matchQuery=$matchQuery")
             LoadResult.Error(e)
         }
     }

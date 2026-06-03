@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.alfaazplus.sunnah.api.DownloadSourceUtils
-import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.ThemeUtils
 import com.alfaazplus.sunnah.ui.utils.app.refreshAppLocale
 import com.alfaazplus.sunnah.ui.utils.extended.ExceptionHandler
@@ -63,7 +62,6 @@ class SunnahApp : Application(), Configuration.Provider {
         runBlocking {
             readerPreferencesRepairer.repairIfNeeded()
         }
-        SearchIndexScheduler.scheduleSearchIndexIfNeeded(applicationContext)
     }
 
     override val workManagerConfiguration: Configuration

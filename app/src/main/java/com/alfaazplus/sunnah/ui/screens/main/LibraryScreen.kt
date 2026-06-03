@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,6 +92,9 @@ fun LibraryScreen(
     )
 
     Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+        ),
         topBar = {
             AppBar(
                 title = stringResource(R.string.library),
@@ -116,92 +122,92 @@ fun LibraryScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SectionTitle(
-                    iconRes = R.drawable.ic_history,
-                    title = stringResource(R.string.reading_history),
-                    headerRightContent = {
-                        SectionHeaderViewAll {
-                            navController.navigate(Routes.READING_HISTORY)
-                        }
-                    },
-                )
-            }
-
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SectionReadHistory()
-            }
-
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SectionTitle(
-                    modifier = Modifier.padding(top = 16.dp),
-                    iconRes = R.drawable.ic_bookmark,
-                    title = stringResource(R.string.bookmarks),
-                    headerRightContent = {
-                        SectionHeaderViewAll {
-                            navController.navigate(Routes.BOOKMARKS)
-                        }
-                    },
-                )
-            }
-
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SectionBookmarks()
-            }
-
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SectionTitle(
-                    modifier = Modifier.padding(top = 16.dp),
-                    iconRes = R.drawable.ic_library,
-                    title = stringResource(R.string.collections),
-                    headerRightContent = {
-                        if (!userCollections.isNullOrEmpty()) {
-                            SectionHeaderActionButton(
-                                icon = R.drawable.ic_add,
-                                text = stringResource(R.string.label_new),
-                            ) { showCreateCollectionSheet = true }
-                        }
-                    },
-                )
-            }
-
-            if (userCollections == null) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier.padding(36.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Loader()
-                    }
-                }
-            } else if (userCollections.isEmpty()) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    CollectionsEmptyState(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onCreateCollection = { showCreateCollectionSheet = true },
+                    SectionTitle(
+                        iconRes = R.drawable.ic_history,
+                        title = stringResource(R.string.reading_history),
+                        headerRightContent = {
+                            SectionHeaderViewAll {
+                                navController.navigate(Routes.READING_HISTORY)
+                            }
+                        },
                     )
                 }
-            } else {
-                itemsIndexed(
-                    items = userCollections,
-                    key = { _, collection -> collection.id },
-                ) { index, collection ->
-                    val column = index % collectionColumnCount
 
-                    Box(
-                        modifier = Modifier.padding(
-                            start = if (column == 0) 16.dp else 0.dp,
-                            end = if (column == collectionColumnCount - 1) 16.dp else 0.dp,
-                        ),
-                    ) {
-                        UserCollectionCard(collection) {
-                            navController.navigate(
-                                Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
-                            )
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SectionReadHistory()
+                }
+
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SectionTitle(
+                        modifier = Modifier.padding(top = 16.dp),
+                        iconRes = R.drawable.ic_bookmark,
+                        title = stringResource(R.string.bookmarks),
+                        headerRightContent = {
+                            SectionHeaderViewAll {
+                                navController.navigate(Routes.BOOKMARKS)
+                            }
+                        },
+                    )
+                }
+
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SectionBookmarks()
+                }
+
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SectionTitle(
+                        modifier = Modifier.padding(top = 16.dp),
+                        iconRes = R.drawable.ic_library,
+                        title = stringResource(R.string.collections),
+                        headerRightContent = {
+                            if (!userCollections.isNullOrEmpty()) {
+                                SectionHeaderActionButton(
+                                    icon = R.drawable.ic_add,
+                                    text = stringResource(R.string.label_new),
+                                ) { showCreateCollectionSheet = true }
+                            }
+                        },
+                    )
+                }
+
+                if (userCollections == null) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Box(
+                            modifier = Modifier.padding(36.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Loader()
+                        }
+                    }
+                } else if (userCollections.isEmpty()) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        CollectionsEmptyState(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onCreateCollection = { showCreateCollectionSheet = true },
+                        )
+                    }
+                } else {
+                    itemsIndexed(
+                        items = userCollections,
+                        key = { _, collection -> collection.id },
+                    ) { index, collection ->
+                        val column = index % collectionColumnCount
+
+                        Box(
+                            modifier = Modifier.padding(
+                                start = if (column == 0) 16.dp else 0.dp,
+                                end = if (column == collectionColumnCount - 1) 16.dp else 0.dp,
+                            ),
+                        ) {
+                            UserCollectionCard(collection) {
+                                navController.navigate(
+                                    Routes.SINGLE_COLLECTION.args(collection.id, collection.name),
+                                )
+                            }
                         }
                     }
                 }
-            }
             }
         }
     }
@@ -270,7 +276,7 @@ private fun ReadHistoryItemCard(
         Column(
             modifier = Modifier
                 .width(250.dp)
-                .height(70.dp)
+                .height(80.dp)
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
