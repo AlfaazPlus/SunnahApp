@@ -249,6 +249,7 @@
     <string name="onboardDescTheme">Choose how the app looks. You can change this later in Settings.</string>
     <string name="onboardDescTranslation">Choose your hadith translation language. It will be downloaded after setup.</string>
     <string name="onboardTranslationWillDownload">Will download after setup</string>
+    <string name="noInternetConnection">No internet connection</string>
     <string name="selectABook">Select a book first.</string>
     <string name="chapter">Chapter</string>
     <string name="workInProgress">Work in progress</string>

@@ -287,6 +287,7 @@
     <string name="onboardDescTheme">اختر مظهر التطبيق. يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
     <string name="onboardDescTranslation">اختر لغة ترجمة الأحاديث. سيتم تنزيلها بعد الإعداد.</string>
     <string name="onboardTranslationWillDownload">سيتم التنزيل بعد الإعداد</string>
+    <string name="noInternetConnection">لا يوجد اتصال بالإنترنت</string>
 
     <string name="selectABook">اختر كتاباً أولاً.</string>
 

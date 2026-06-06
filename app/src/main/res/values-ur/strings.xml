@@ -299,6 +299,7 @@
     <string name="onboardDescTheme">ایپ کی ظاہری شکل منتخب کریں۔ بعد میں سیٹنگز سے تبدیل کر سکتے ہیں۔</string>
     <string name="onboardDescTranslation">حدیث ترجمے کی زبان منتخب کریں۔ سیٹ اپ کے بعد یہ ڈاؤن لوڈ ہوگا۔</string>
     <string name="onboardTranslationWillDownload">سیٹ اپ کے بعد ڈاؤن لوڈ ہوگا</string>
+    <string name="noInternetConnection">انٹرنیٹ کنکشن نہیں ہے</string>
 
     <string name="selectABook">پہلے ایک کتاب منتخب کریں۔</string>
 

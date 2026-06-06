@@ -287,6 +287,7 @@
     <string name="onboardDescTheme">অ্যাপ কেমন দেখাবে তা বেছে নিন। পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।</string>
     <string name="onboardDescTranslation">হাদীস অনুবাদের ভাষা বেছে নিন। সেটআপের পর এটি ডাউনলোড হবে।</string>
     <string name="onboardTranslationWillDownload">সেটআপের পর ডাউনলোড হবে</string>
+    <string name="noInternetConnection">ইন্টারনেট সংযোগ নেই</string>
 
     <string name="selectABook">আগে একটি কিতাব বেছে নিন।</string>
 

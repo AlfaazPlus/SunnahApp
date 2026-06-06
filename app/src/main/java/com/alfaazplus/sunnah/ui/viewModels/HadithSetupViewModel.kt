@@ -1,6 +1,7 @@
 package com.alfaazplus.sunnah.ui.viewModels
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.alfaazplus.sunnah.Logger
 import com.alfaazplus.sunnah.R
@@ -14,6 +15,8 @@ import com.alfaazplus.sunnah.helpers.UserDataMigrator
 import com.alfaazplus.sunnah.ui.search.SearchIndexScheduler
 import com.alfaazplus.sunnah.ui.utils.managers.ResourceDownloadStatus
 import com.alfaazplus.sunnah.ui.utils.managers.TranslationDownloadManager
+import com.alfaazplus.sunnah.ui.utils.message.MessageUtils
+import com.alfaazplus.sunnah.ui.utils.network.NetworkStateMonitor
 import com.alfaazplus.sunnah.ui.utils.preferences.AppPreferences
 import com.alfaazplus.sunnah.ui.utils.preferences.ReaderPreferences
 import com.alfaazplus.sunnah.ui.utils.reader.TranslationUtils
@@ -88,7 +91,7 @@ class HadithSetupViewModel @Inject constructor(
 
             if (!pendingTranslationApplied) {
                 applyPendingOnboardingTranslation(context)
-                pendingTranslationApplied = true
+                pendingTranslationApplied = SPAppActions.getPendingHadithTranslation(context).isNullOrBlank()
             }
 
             SearchIndexScheduler.scheduleSearchIndexIfNeeded(
@@ -102,7 +105,6 @@ class HadithSetupViewModel @Inject constructor(
 
     private suspend fun applyPendingOnboardingTranslation(context: Context) {
         val pendingId = SPAppActions.getPendingHadithTranslation(context)
-        SPAppActions.clearPendingHadithTranslation(context)
 
         if (pendingId.isNullOrBlank()) {
             return
@@ -111,12 +113,21 @@ class HadithSetupViewModel @Inject constructor(
         val isValid = TranslationUtils.AVAILABLE_TRANSLATIONS.any {
             it.langCode == pendingId && !it.isComingSoon
         }
+
         if (!isValid) {
+            SPAppActions.clearPendingHadithTranslation(context)
             return
         }
 
         if (TranslationUtils.isBuiltInTranslation(pendingId)) {
             ReaderPreferences.setHadithTranslation(pendingId)
+            SPAppActions.clearPendingHadithTranslation(context)
+            return
+        }
+
+        if (!NetworkStateMonitor.isNetworkConnected(context)) {
+            ReaderPreferences.setHadithTranslation(TranslationUtils.DEFAULT_TRANSLATION.langCode)
+            MessageUtils.showToast(context, R.string.noInternetConnection, Toast.LENGTH_LONG)
             return
         }
 
@@ -139,9 +150,11 @@ class HadithSetupViewModel @Inject constructor(
             )
             if (status is ResourceDownloadStatus.Completed) {
                 ReaderPreferences.setHadithTranslation(pendingId)
+                SPAppActions.clearPendingHadithTranslation(context)
             } else {
                 Logger.d("Onboarding translation download failed for $pendingId: $status")
                 ReaderPreferences.setHadithTranslation(TranslationUtils.DEFAULT_TRANSLATION.langCode)
+                SPAppActions.clearPendingHadithTranslation(context)
             }
         } finally {
             _isSettingUp.value = false
